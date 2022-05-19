@@ -1,0 +1,34 @@
+{
+    "name": "strix/ergonode",
+    "description": "Shopware Ergonode Integration App",
+    "version": "0.0.1",
+    "type": "shopware-platform-plugin",
+    "license": "MIT",
+    "extra": {
+        "shopware-plugin-class": "Strix\\Ergonode\\StrixErgonode",
+        "author": "Strix",
+        "label": {
+            "de-DE": "Shopware Ergonode Integration App",
+            "en-GB": "Shopware Ergonode Integration App"
+        }
+    },
+    "require": {
+        "php": ">= 7.4",
+        "shopware/administration": "*",
+        "shopware/core": "*",
+        "shopware/storefront": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~8.3.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Strix\\Ergonode\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Strix\\Ergonode\\Tests\\": "tests/"
+        }
+    }
+}

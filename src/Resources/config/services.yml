@@ -1,0 +1,8 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  # SUBSCRIBER
+  Strix\Ergonode\Subscriber\Subscriber:
+    tags: [ 'kernel.event_subscriber' ]
