@@ -1,1 +1,1 @@
-# Shopware Ergonode Integration App 
+# Shopware Ergonode Integration 
