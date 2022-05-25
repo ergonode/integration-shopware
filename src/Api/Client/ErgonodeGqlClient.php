@@ -7,7 +7,7 @@ namespace Strix\Ergonode\Api\Client;
 use GraphQL\Query;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Psr\Http\Message\ResponseInterface;
+use Strix\Ergonode\Struct\GqlResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class ErgonodeGqlClient
@@ -22,14 +22,16 @@ class ErgonodeGqlClient
         $this->httpClient = $httpClient;
     }
 
-    public function query(Query $query): ?ResponseInterface
+    public function query(Query $query): ?GqlResponse
     {
         try {
-            return $this->httpClient->request(
+            $response = $this->httpClient->request(
                 Request::METHOD_GET,
                 self::GRAPHQL_ENDPOINT,
                 $this->buildRequestBody($query)
             );
+
+            return new GqlResponse($response);
         } catch (GuzzleException $e) {
             // TODO log
             dump($e);
