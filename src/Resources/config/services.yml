@@ -3,6 +3,16 @@ services:
     autowire: true
     autoconfigure: true
 
+  # WIRE WHOLE NAMESPACE
+  Strix\Ergonode\:
+    resource: '../../'
+
+  # API
+  Strix\Ergonode\Api\Client\ErgonodeGqlClient:
+    factory: [ '@Strix\Ergonode\Api\Client\ErgonodeGqlClientFactory', 'createFromPluginConfig' ]
+
+  Strix\Ergonode\Api\Client\ErgonodeGqlClientFactory:
+
   # SUBSCRIBER
   Strix\Ergonode\Subscriber\Subscriber:
     tags: [ 'kernel.event_subscriber' ]
