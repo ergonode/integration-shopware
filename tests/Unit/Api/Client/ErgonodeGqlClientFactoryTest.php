@@ -7,7 +7,7 @@ namespace Strix\Ergonode\Tests\Unit\Api\Client;
 use GuzzleHttp\Client;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Strix\Ergonode\Api\Client\ErgonodeAccessData;
+use Strix\Ergonode\Api\ErgonodeAccessData;
 use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
 use Strix\Ergonode\Api\Client\ErgonodeGqlClientFactory;
 use Strix\Ergonode\Api\Client\HttpGqlClientFactory;

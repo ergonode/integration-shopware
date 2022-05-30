@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Strix\Ergonode\Provider;
 
 use Shopware\Core\System\SystemConfig\SystemConfigService;
-use Strix\Ergonode\Api\Client\ErgonodeAccessData;
+use Strix\Ergonode\Api\ErgonodeAccessData;
 
 class ConfigProvider
 {

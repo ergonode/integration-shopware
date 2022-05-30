@@ -8,7 +8,8 @@ use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
 use Strix\Ergonode\Modules\Product\QueryBuilder\ProductQueryBuilder;
 use Strix\Ergonode\Modules\Product\Struct\ErgonodeDeletedProduct;
 use Strix\Ergonode\Modules\Product\Struct\ErgonodeProduct;
-use Strix\Ergonode\Struct\StreamResult;
+use Strix\Ergonode\Struct\ErgonodeEntityStreamCollection;
+use Strix\Ergonode\Transformer\StreamResponseTransformer;
 
 class ErgonodeProductProvider
 {
@@ -16,15 +17,19 @@ class ErgonodeProductProvider
 
     private ErgonodeGqlClient $ergonodeGqlClient;
 
+    private StreamResponseTransformer $streamResponseTransformer;
+
     public function __construct(
         ProductQueryBuilder $productQueryBuilder,
-        ErgonodeGqlClient $ergonodeGqlClient
+        ErgonodeGqlClient $ergonodeGqlClient,
+        StreamResponseTransformer $streamResponseTransformer
     ) {
         $this->productQueryBuilder = $productQueryBuilder;
         $this->ergonodeGqlClient = $ergonodeGqlClient;
+        $this->streamResponseTransformer = $streamResponseTransformer;
     }
 
-    public function provide(int $count, ?string $cursor = null): ?StreamResult
+    public function provide(int $count, ?string $cursor = null): ?ErgonodeEntityStreamCollection
     {
         $query = $this->productQueryBuilder->build($count, $cursor);
         $response = $this->ergonodeGqlClient->query($query);
@@ -33,13 +38,13 @@ class ErgonodeProductProvider
             return null;
         }
 
-        return new StreamResult(
+        return $this->streamResponseTransformer->transformResponse(
             ErgonodeProduct::class,
             $response->getData()['productStream'] ?? []
         );
     }
 
-    public function provideSingleProduct(string $sku): ?StreamResult
+    public function provideSingleProduct(string $sku): ?ErgonodeEntityStreamCollection
     {
         $query = $this->productQueryBuilder->buildSingleProduct($sku);
         $response = $this->ergonodeGqlClient->query($query);
@@ -48,13 +53,13 @@ class ErgonodeProductProvider
             return null;
         }
 
-        return new StreamResult(
+        return $this->streamResponseTransformer->transformResponse(
             ErgonodeProduct::class,
             $response->getData() ?? []
         );
     }
 
-    public function provideDeleted(?int $count = null, ?string $cursor = null): ?StreamResult
+    public function provideDeleted(?int $count = null, ?string $cursor = null): ?ErgonodeEntityStreamCollection
     {
         $query = $this->productQueryBuilder->buildDeleted($count, $cursor);
         $response = $this->ergonodeGqlClient->query($query);
@@ -63,7 +68,7 @@ class ErgonodeProductProvider
             return null;
         }
 
-        return new StreamResult(
+        return $this->streamResponseTransformer->transformResponse(
             ErgonodeDeletedProduct::class,
             $response->getData()['productDeletedStream'] ?? []
         );

@@ -8,8 +8,6 @@ use Strix\Ergonode\Struct\AbstractErgonodeEntity;
 
 class ErgonodeProduct extends AbstractErgonodeEntity
 {
-    protected string $sku;
-
     protected string $createdAt;
 
     protected ?string $editedAt = null;
@@ -18,32 +16,24 @@ class ErgonodeProduct extends AbstractErgonodeEntity
 
     protected string $templateName;
 
+    /**
+     * @var string[]
+     */
     protected array $categoryCodes = [];
 
+    /**
+     * @var string[]
+     */
     protected array $attributeCodes = [];
-
-    public function setFromResponse(array $response): void
-    {
-        $this->sku = $response['sku'];
-        $this->createdAt = $response['createdAt'];
-        $this->editedAt = $response['editedAt'];
-        $this->typename = $response['__typename'];
-        $this->templateName = $response['template']['name'];
-
-        foreach ($response['categoryList']['edges'] as $category) {
-            $this->categoryCodes[] = $category['node']['code'];
-        }
-
-        foreach ($response['attributeList']['edges'] as $attribute) {
-            $this->attributeCodes[] = $attribute['node']['attribute']['code'];
-        }
-
-        $this->setPrimaryValue($this->sku);
-    }
 
     public function getSku(): string
     {
-        return $this->sku;
+        return $this->getCode();
+    }
+
+    public function setSku(string $sku): void
+    {
+        $this->code = $sku;
     }
 
     public function getCreatedAt(): string
@@ -51,9 +41,19 @@ class ErgonodeProduct extends AbstractErgonodeEntity
         return $this->createdAt;
     }
 
+    public function setCreatedAt(string $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
     public function getEditedAt(): ?string
     {
         return $this->editedAt;
+    }
+
+    public function setEditedAt(?string $editedAt): void
+    {
+        $this->editedAt = $editedAt;
     }
 
     public function getTypename(): string
@@ -61,9 +61,19 @@ class ErgonodeProduct extends AbstractErgonodeEntity
         return $this->typename;
     }
 
+    public function setTypename(string $typename): void
+    {
+        $this->typename = $typename;
+    }
+
     public function getTemplateName(): string
     {
         return $this->templateName;
+    }
+
+    public function setTemplateName(string $templateName): void
+    {
+        $this->templateName = $templateName;
     }
 
     public function getCategoryCodes(): array
@@ -71,8 +81,28 @@ class ErgonodeProduct extends AbstractErgonodeEntity
         return $this->categoryCodes;
     }
 
+    public function setCategoryCodes(array $categoryCodes): void
+    {
+        $this->categoryCodes = $categoryCodes;
+    }
+
+    public function addCategoryCode(string $categoryCode): void
+    {
+        $this->categoryCodes[] = $categoryCode;
+    }
+
     public function getAttributeCodes(): array
     {
         return $this->attributeCodes;
+    }
+
+    public function setAttributeCodes(array $attributeCodes): void
+    {
+        $this->attributeCodes = $attributeCodes;
+    }
+
+    public function addAttributeCode(string $attributeCode): void
+    {
+        $this->attributeCodes[] = $attributeCode;
     }
 }

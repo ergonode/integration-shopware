@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Api\Client;
 
+use Strix\Ergonode\Api\ErgonodeAccessData;
 use Strix\Ergonode\Provider\ConfigProvider;
 
 class ErgonodeGqlClientFactory

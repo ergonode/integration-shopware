@@ -8,7 +8,12 @@ abstract class AbstractErgonodeEntity implements ErgonodeEntityInterface
 {
     protected ?string $cursor = null;
 
-    protected string $primaryValue;
+    protected ?string $code = null;
+
+    public function __construct(?string $code = null)
+    {
+        $this->code = $code;
+    }
 
     public function setCursor(?string $cursor): void
     {
@@ -20,13 +25,13 @@ abstract class AbstractErgonodeEntity implements ErgonodeEntityInterface
         return $this->cursor;
     }
 
-    public function setPrimaryValue(string $primaryValue): void
+    public function setCode(?string $code): void
     {
-        $this->primaryValue = $primaryValue;
+        $this->code = $code;
     }
 
-    public function getPrimaryValue(): string
+    public function getCode(): ?string
     {
-        return $this->primaryValue;
+        return $this->code;
     }
 }

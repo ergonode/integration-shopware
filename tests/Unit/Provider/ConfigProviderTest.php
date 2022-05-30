@@ -7,7 +7,7 @@ namespace Strix\Ergonode\Tests\Unit\Provider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
-use Strix\Ergonode\Api\Client\ErgonodeAccessData;
+use Strix\Ergonode\Api\ErgonodeAccessData;
 use Strix\Ergonode\Provider\ConfigProvider;
 
 class ConfigProviderTest extends TestCase

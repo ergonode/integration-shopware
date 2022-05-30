@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Strix\Ergonode\Api\Client;
 
 use GuzzleHttp\Client;
+use Strix\Ergonode\Api\ErgonodeAccessData;
 
 class HttpGqlClientFactory
 {
