@@ -14,9 +14,13 @@ class ProductNodeTransformer implements NodeTransformerInterface
         return $className === ErgonodeProduct::class;
     }
 
-    public function transformNode(array $node): ErgonodeProduct
+    public function transformNode(array $node): ?ErgonodeProduct
     {
-        $entity = new ErgonodeProduct($node['sku']);
+        if (empty($node['sku'])) {
+            return null;
+        }
+
+        $entity = new ErgonodeProduct($node['sku']); // todo transform to sw repository array
 
         $entity->setCreatedAt($node['createdAt']);
         $entity->setEditedAt($node['editedAt']);

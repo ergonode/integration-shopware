@@ -9,44 +9,46 @@ class GqlCategoryResponse
     public static function emptyCategoryTreeResponse(): array
     {
         return [
-            'categoryTree' => [
-                'code' => 'empty_tree',
-                'name' => [
-                    0 => [
-                        'value' => NULL,
-                        'language' => 'pl_PL',
+            'data' => [
+                'categoryTree' => [
+                    'code' => 'empty_tree',
+                    'name' => [
+                        0 => [
+                            'value' => NULL,
+                            'language' => 'pl_PL',
+                        ],
+                        1 => [
+                            'value' => NULL,
+                            'language' => 'cs_CZ',
+                        ],
+                        2 => [
+                            'value' => NULL,
+                            'language' => 'da_DK',
+                        ],
+                        3 => [
+                            'value' => NULL,
+                            'language' => 'en_US',
+                        ],
+                        4 => [
+                            'value' => NULL,
+                            'language' => 'fi_FI',
+                        ],
+                        5 => [
+                            'value' => NULL,
+                            'language' => 'hr_HR',
+                        ],
+                        6 => [
+                            'value' => NULL,
+                            'language' => 'nl_NL',
+                        ],
                     ],
-                    1 => [
-                        'value' => NULL,
-                        'language' => 'cs_CZ',
+                    'categoryTreeLeafList' => [
+                        'pageInfo' => [
+                            'endCursor' => NULL,
+                            'hasNextPage' => false,
+                        ],
+                        'edges' => [],
                     ],
-                    2 => [
-                        'value' => NULL,
-                        'language' => 'da_DK',
-                    ],
-                    3 => [
-                        'value' => NULL,
-                        'language' => 'en_US',
-                    ],
-                    4 => [
-                        'value' => NULL,
-                        'language' => 'fi_FI',
-                    ],
-                    5 => [
-                        'value' => NULL,
-                        'language' => 'hr_HR',
-                    ],
-                    6 => [
-                        'value' => NULL,
-                        'language' => 'nl_NL',
-                    ],
-                ],
-                'categoryTreeLeafList' => [
-                    'pageInfo' => [
-                        'endCursor' => NULL,
-                        'hasNextPage' => false,
-                    ],
-                    'edges' => [],
                 ],
             ],
         ];

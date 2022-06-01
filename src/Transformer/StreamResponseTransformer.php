@@ -40,6 +40,9 @@ class StreamResponseTransformer
                     ['__value__' => $edge['node']])
                 : $edge;
             $entity = $nodeTransformer->transformNode($node);
+            if (null === $entity) {
+                continue;
+            }
 
             $entity->setCursor($edge['cursor'] ?? null);
 

@@ -29,7 +29,7 @@ class QueryProductsCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $result = $this->productProvider->provide(4);
-//        $result = $this->productProvider->provideDeleted();
+//        $result = $this->productProvider->provideDeleted(5);
 
         $entities = $result->getElements();
 

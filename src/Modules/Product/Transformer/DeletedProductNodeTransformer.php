@@ -14,8 +14,12 @@ class DeletedProductNodeTransformer implements NodeTransformerInterface
         return $className === ErgonodeDeletedProduct::class;
     }
 
-    public function transformNode(array $node): ErgonodeDeletedProduct
+    public function transformNode(array $node): ?ErgonodeDeletedProduct
     {
-        return new ErgonodeDeletedProduct($node['__value__']);
+        if (empty($node['__value__'])) {
+            return null;
+        }
+
+        return new ErgonodeDeletedProduct($node['__value__']); // todo transform to sw repository array
     }
 }

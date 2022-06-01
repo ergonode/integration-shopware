@@ -10,5 +10,5 @@ interface NodeTransformerInterface
 {
     public function supports(string $className): bool;
 
-    public function transformNode(array $node): AbstractErgonodeEntity;
+    public function transformNode(array $node): ?AbstractErgonodeEntity;
 }
