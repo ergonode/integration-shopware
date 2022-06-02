@@ -6,8 +6,9 @@ namespace Strix\Ergonode\Api\Client;
 
 use GraphQL\Query;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
-use Strix\Ergonode\Struct\GqlResponse;
+use Strix\Ergonode\Api\GqlResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class ErgonodeGqlClient

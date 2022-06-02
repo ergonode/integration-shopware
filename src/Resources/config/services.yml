@@ -3,6 +3,12 @@ services:
     autowire: true
     autoconfigure: true
 
+  _instanceof:
+    # TRANSFORMER
+    Strix\Ergonode\Transformer\NodeTransformerInterface:
+      tags: [ 'strix_ergonode.node_transformer' ]
+      lazy: true
+
   # WIRE WHOLE NAMESPACE
   Strix\Ergonode\:
     resource: '../../'
@@ -12,6 +18,11 @@ services:
     factory: [ '@Strix\Ergonode\Api\Client\ErgonodeGqlClientFactory', 'createFromPluginConfig' ]
 
   Strix\Ergonode\Api\Client\ErgonodeGqlClientFactory:
+
+  # RESOLVER
+  Strix\Ergonode\Resolver\NodeTransformerResolver:
+    arguments:
+      - !tagged_iterator { tag: 'strix_ergonode.node_transformer' }
 
   # SUBSCRIBER
   Strix\Ergonode\Subscriber\Subscriber:

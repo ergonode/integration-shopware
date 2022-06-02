@@ -2,38 +2,36 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Modules\Product\Command;
+namespace Strix\Ergonode\Modules\Category\Command;
 
-use Strix\Ergonode\Modules\Product\Provider\ErgonodeProductProvider;
+use Strix\Ergonode\Modules\Category\Provider\ErgonodeCategoryProvider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class QueryProductsCommand extends Command
+class QueryCategoriesCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:query:products';
+    protected static $defaultName = 'strix:ergonode:query:categories';
 
-    private ErgonodeProductProvider $productProvider;
+    private ErgonodeCategoryProvider $categoryProvider;
 
     public function __construct(
-        ErgonodeProductProvider $productProvider
+        ErgonodeCategoryProvider $categoryProvider
     ) {
         parent::__construct();
 
-        $this->productProvider = $productProvider;
+        $this->categoryProvider = $categoryProvider;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
-        $result = $this->productProvider->provide(4);
-//        $result = $this->productProvider->provideDeleted(5);
+//        $result = $this->categoryProvider->provideCategoryTree('default_tree');
+        $result = $this->categoryProvider->provideCategoryTree('empty_tree');
 
-        $entities = $result->getElements();
-
-        if (empty($entities)) {
+        if (empty($result)) {
             $io->error('Empty response');
 
             return self::FAILURE;
@@ -41,7 +39,7 @@ class QueryProductsCommand extends Command
 
         $io->success('Got following response:');
 
-        dump($entities);
+        dump($result);
 
         return self::SUCCESS;
     }

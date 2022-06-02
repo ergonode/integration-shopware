@@ -7,11 +7,13 @@ namespace Strix\Ergonode\Tests\Unit\Api\Client;
 use GraphQL\Query;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
+use Strix\Ergonode\Api\GqlResponse;
 use Strix\Ergonode\Tests\Fixtures\GqlQueryFixture;
 
 class ErgonodeGqlClientTest extends TestCase
@@ -40,7 +42,8 @@ class ErgonodeGqlClientTest extends TestCase
 
         $result = $this->gqlClient->query($query);
 
-        $this->assertInstanceOf(ResponseInterface::class, $result);
+        $this->assertInstanceOf(GqlResponse::class, $result);
+        $this->assertEquals(['productStream' => ['some' => 'data']], $result->getData());
     }
 
     public function testFailQueryMethod()
@@ -68,6 +71,11 @@ class ErgonodeGqlClientTest extends TestCase
                         'query' => strval($query),
                     ],
                 ]
+            )
+            ->willReturn(
+                $this->createConfiguredMock(ResponseInterface::class, [
+                    'getBody' => Utils::streamFor('{"data": {"productStream": {"some": "data"}}}'),
+                ])
             );
     }
 }

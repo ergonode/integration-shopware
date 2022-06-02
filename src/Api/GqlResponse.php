@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Struct;
+namespace Strix\Ergonode\Api;
 
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
