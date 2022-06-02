@@ -19,6 +19,24 @@ services:
 
   Strix\Ergonode\Api\Client\ErgonodeGqlClientFactory:
 
+  # CONTROLLER
+  Strix\Ergonode\Modules\Attribute\Controller\AttributeMappingController:
+    tags: [ 'controller.service_arguments' ]
+
+  # COMMAND
+  Strix\Ergonode\Modules\Attribute\Command\CreateAttributeMappingCommand:
+    arguments:
+      $repository: '@strix_ergonode_attribute_mapping.repository'
+
+  # ENTITY
+  Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition:
+    tags: [ 'shopware.entity.definition' ]
+
+  # PROVIDER
+  Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider:
+    arguments:
+      $repository: '@strix_ergonode_attribute_mapping.repository'
+
   # RESOLVER
   Strix\Ergonode\Resolver\NodeTransformerResolver:
     arguments:

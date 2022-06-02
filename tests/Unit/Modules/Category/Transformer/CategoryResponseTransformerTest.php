@@ -6,7 +6,7 @@ namespace Strix\Ergonode\Tests\Unit\Modules\Category\Transformer;
 
 use PHPUnit\Framework\TestCase;
 use Strix\Ergonode\Modules\Category\Transformer\CategoryResponseTransformer;
-use Strix\Ergonode\Tests\Fixtures\GqlCategoryResponse;
+use Strix\Ergonode\Tests\Fixture\GqlCategoryResponse;
 
 class CategoryResponseTransformerTest extends TestCase
 {

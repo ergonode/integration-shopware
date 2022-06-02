@@ -20,14 +20,6 @@ class GqlResponse
         $this->parseResponseBody();
     }
 
-    /**
-     * @return ResponseInterface
-     */
-    public function getHttpResponse(): ResponseInterface
-    {
-        return $this->httpResponse;
-    }
-
     public function isOk(): bool
     {
         return Response::HTTP_OK === $this->httpResponse->getStatusCode();
