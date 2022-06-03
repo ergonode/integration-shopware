@@ -211,6 +211,38 @@ class ProductQueryBuilder
                 'createdAt',
                 'editedAt',
                 '__typename',
+                (new InlineFragment('VariableProduct'))
+                    ->setSelectionSet([
+                        (new Query('bindings'))
+                            ->setSelectionSet([
+                                'code',
+                            ]),
+                        (new Query('attributeList'))
+                            ->setArguments(['first' => self::ATTRIBUTE_LIST_COUNT])
+                            ->setSelectionSet([
+                                (new Query('edges'))
+                                    ->setSelectionSet([
+                                        (new Query('node'))
+                                            ->setSelectionSet([
+                                                (new Query('attribute'))
+                                                    ->setSelectionSet([
+                                                        'code',
+                                                    ]),
+                                            ]),
+                                    ]),
+                            ]),
+                        (new Query('variantList'))
+                            ->setSelectionSet([
+                                (new Query('edges'))
+                                    ->setSelectionSet([
+                                        (new Query('node'))
+                                            ->setSelectionSet([
+                                                'sku',
+                                            ]),
+                                    ]),
+                                'totalCount',
+                            ]),
+                    ]),
                 (new Query('template'))
                     ->setSelectionSet([
                         'name',
