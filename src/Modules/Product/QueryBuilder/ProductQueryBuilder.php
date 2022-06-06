@@ -202,6 +202,178 @@ class ProductQueryBuilder
             ]);
     }
 
+    public function buildProductWithVariants(string $sku): Query
+    {
+        return (new Query('product'))
+            ->setArguments(['sku' => $sku])
+            ->setSelectionSet([
+                'sku',
+                'createdAt',
+                'editedAt',
+                '__typename',
+                (new InlineFragment('VariableProduct'))
+                    ->setSelectionSet([
+                        (new Query('bindings'))
+                            ->setSelectionSet([
+                                'code',
+                            ]),
+                        (new Query('variantList'))
+                            ->setSelectionSet([
+                                (new Query('edges'))
+                                    ->setSelectionSet([
+                                        (new Query('node'))
+                                            ->setSelectionSet([
+                                                'sku',
+                                                (new Query('attributeList'))
+                                                    ->setArguments(['first' => self::ATTRIBUTE_LIST_COUNT])
+                                                    ->setSelectionSet([
+                                                        (new Query('edges'))
+                                                            ->setSelectionSet([
+                                                                (new Query('node'))
+                                                                    ->setSelectionSet([
+                                                                        (new Query('attribute'))
+                                                                            ->setSelectionSet([
+                                                                                'code',
+                                                                            ]),
+                                                                        (new Query('valueTranslations'))
+                                                                            ->setSelectionSet([
+                                                                                'inherited',
+                                                                                'language',
+                                                                                '__typename',
+                                                                                (new InlineFragment('StringAttributeValue'))
+                                                                                    ->setSelectionSet([
+                                                                                        (new Query('value'))->setAlias('value_string'),
+                                                                                    ]),
+                                                                                (new InlineFragment('NumericAttributeValue'))
+                                                                                    ->setSelectionSet([
+                                                                                        (new Query('value'))->setAlias('value_numeric'),
+                                                                                    ]),
+                                                                                (new InlineFragment('StringArrayAttributeValue'))
+                                                                                    ->setSelectionSet([
+                                                                                        (new Query('value'))->setAlias('value_array'),
+                                                                                    ]),
+                                                                                (new InlineFragment('MultimediaAttributeValue'))
+                                                                                    ->setSelectionSet([
+                                                                                        (new Query('value'))
+                                                                                            ->setAlias('value_multimedia')
+                                                                                            ->setSelectionSet([
+                                                                                                'name',
+                                                                                                'extension',
+                                                                                                'mime',
+                                                                                                'size',
+                                                                                                'url',
+                                                                                            ]),
+                                                                                    ]),
+                                                                                (new InlineFragment('MultimediaArrayAttributeValue'))
+                                                                                    ->setSelectionSet([
+                                                                                        (new Query('value'))
+                                                                                            ->setAlias('value_multimedia_array')
+                                                                                            ->setSelectionSet([
+                                                                                                'name',
+                                                                                                'extension',
+                                                                                                'mime',
+                                                                                                'size',
+                                                                                                'url',
+                                                                                            ]),
+                                                                                    ]),
+                                                                                (new InlineFragment('ProductArrayAttributeValue'))
+                                                                                    ->setSelectionSet([
+                                                                                        (new Query('value'))
+                                                                                            ->setAlias('value_product_array')
+                                                                                            ->setSelectionSet([
+                                                                                                'sku',
+                                                                                            ]),
+                                                                                    ]),
+                                                                            ]),
+                                                                    ]),
+                                                            ]),
+                                                    ]),
+                                            ]),
+                                    ]),
+                                'totalCount',
+                            ]),
+                    ]),
+                (new Query('template'))
+                    ->setSelectionSet([
+                        'name',
+                    ]),
+                (new Query('categoryList'))
+                    ->setSelectionSet([
+                        (new Query('edges'))
+                            ->setSelectionSet([
+                                (new Query('node'))
+                                    ->setSelectionSet([
+                                        'code',
+                                    ]),
+                            ]),
+                    ]),
+                (new Query('attributeList'))
+                    ->setArguments(['first' => self::ATTRIBUTE_LIST_COUNT])
+                    ->setSelectionSet([
+                        (new Query('edges'))
+                            ->setSelectionSet([
+                                (new Query('node'))
+                                    ->setSelectionSet([
+                                        (new Query('attribute'))
+                                            ->setSelectionSet([
+                                                'code',
+                                            ]),
+                                        (new Query('valueTranslations'))
+                                            ->setSelectionSet([
+                                                'inherited',
+                                                'language',
+                                                '__typename',
+                                                (new InlineFragment('StringAttributeValue'))
+                                                    ->setSelectionSet([
+                                                        (new Query('value'))->setAlias('value_string'),
+                                                    ]),
+                                                (new InlineFragment('NumericAttributeValue'))
+                                                    ->setSelectionSet([
+                                                        (new Query('value'))->setAlias('value_numeric'),
+                                                    ]),
+                                                (new InlineFragment('StringArrayAttributeValue'))
+                                                    ->setSelectionSet([
+                                                        (new Query('value'))->setAlias('value_array'),
+                                                    ]),
+                                                (new InlineFragment('MultimediaAttributeValue'))
+                                                    ->setSelectionSet([
+                                                        (new Query('value'))
+                                                            ->setAlias('value_multimedia')
+                                                            ->setSelectionSet([
+                                                                'name',
+                                                                'extension',
+                                                                'mime',
+                                                                'size',
+                                                                'url',
+                                                            ]),
+                                                    ]),
+                                                (new InlineFragment('MultimediaArrayAttributeValue'))
+                                                    ->setSelectionSet([
+                                                        (new Query('value'))
+                                                            ->setAlias('value_multimedia_array')
+                                                            ->setSelectionSet([
+                                                                'name',
+                                                                'extension',
+                                                                'mime',
+                                                                'size',
+                                                                'url',
+                                                            ]),
+                                                    ]),
+                                                (new InlineFragment('ProductArrayAttributeValue'))
+                                                    ->setSelectionSet([
+                                                        (new Query('value'))
+                                                            ->setAlias('value_product_array')
+                                                            ->setSelectionSet([
+                                                                'sku',
+                                                            ]),
+                                                    ]),
+                                            ]),
+                                    ]),
+                            ]),
+                    ]),
+            ]);
+    }
+
     public function buildSingleProduct(string $sku): Query
     {
         return (new Query('product'))

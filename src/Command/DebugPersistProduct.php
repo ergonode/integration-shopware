@@ -54,7 +54,7 @@ class DebugPersistProduct extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $query = $this->productQueryBuilder->buildSingleProduct($input->getArgument('sku'));
+        $query = $this->productQueryBuilder->buildProductWithVariants($input->getArgument('sku'));
         $result = $this->gqlClient->query($query);
 
         if (null === $result) {
