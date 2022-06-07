@@ -8,7 +8,7 @@ use GraphQL\Query;
 use Strix\Ergonode\Api\GqlResponse;
 use Symfony\Contracts\Cache\CacheInterface;
 
-class CachedErgonodeGqlClient
+class CachedErgonodeGqlClient implements ErgonodeGqlClientInterface
 {
     private ErgonodeGqlClient $ergonodeGqlClient;
 
