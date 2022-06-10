@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Modules\Attribute\Provider;
 
-use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
+use Strix\Ergonode\Api\Client\CachedErgonodeGqlClient;
+use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
+use Strix\Ergonode\Modules\Attribute\Enum\AttributeTypes;
 use Strix\Ergonode\Modules\Attribute\QueryBuilder\AttributeQueryBuilder;
 
 class ErgonodeAttributeProvider
@@ -13,11 +15,11 @@ class ErgonodeAttributeProvider
 
     private AttributeQueryBuilder $attributeQueryBuilder;
 
-    private ErgonodeGqlClient $ergonodeGqlClient;
+    private CachedErgonodeGqlClient $ergonodeGqlClient;
 
     public function __construct(
         AttributeQueryBuilder $attributeQueryBuilder,
-        ErgonodeGqlClient $ergonodeGqlClient
+        CachedErgonodeGqlClient $ergonodeGqlClient
     ) {
         $this->attributeQueryBuilder = $attributeQueryBuilder;
         $this->ergonodeGqlClient = $ergonodeGqlClient;
@@ -30,16 +32,46 @@ class ErgonodeAttributeProvider
 
         do {
             $query = $this->attributeQueryBuilder->build(self::MAX_ATTRIBUTES_PER_PAGE, $endCursor);
-            $response = $this->ergonodeGqlClient->query($query);
+            $results = $this->ergonodeGqlClient->query($query, AttributeStreamResultsProxy::class);
 
-            if (false === $response->isOk()) {
+            if (!$results instanceof AttributeStreamResultsProxy) {
                 continue;
             }
 
-            $data = $response->getData();
-            $attributes = array_merge($attributes, $data['attributeStream']['edges']);
-            $endCursor = $data['attributeStream']['pageInfo']['endCursor'];
-        } while ($data['attributeStream']['pageInfo']['hasNextPage'] ?? false);
+            $attributes = array_merge($attributes, $results->getEdges());
+            $endCursor = $results->getEndCursor();
+        } while ($results->hasNextPage());
+
+        return $attributes;
+    }
+
+    public function provideBindingAttributes(): ?AttributeStreamResultsProxy
+    {
+        $endCursor = null;
+        $attributes = null;
+
+        do {
+            $query = $this->attributeQueryBuilder->build(self::MAX_ATTRIBUTES_PER_PAGE, $endCursor);
+            $results = $this->ergonodeGqlClient->query($query, AttributeStreamResultsProxy::class);
+
+            if (!$results instanceof AttributeStreamResultsProxy) {
+                continue;
+            }
+
+            $endCursor = $results->getEndCursor();
+            $filteredResults = $results->filterByAttributeTypes([
+                AttributeTypes::SELECT,
+                AttributeTypes::MULTISELECT,
+            ]);
+
+            if (isset($attributes) && $attributes instanceof AttributeStreamResultsProxy) {
+                $attributes->merge($filteredResults);
+
+                continue;
+            }
+
+            $attributes = $filteredResults;
+        } while ($results->hasNextPage());
 
         return $attributes;
     }

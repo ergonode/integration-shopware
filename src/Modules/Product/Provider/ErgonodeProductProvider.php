@@ -4,73 +4,58 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Modules\Product\Provider;
 
-use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
+use Strix\Ergonode\Api\Client\CachedErgonodeGqlClient;
+use Strix\Ergonode\Modules\Product\Api\ProductResultsProxy;
+use Strix\Ergonode\Modules\Product\Api\ProductStreamResultsProxy;
 use Strix\Ergonode\Modules\Product\QueryBuilder\ProductQueryBuilder;
-use Strix\Ergonode\Modules\Product\Struct\ErgonodeDeletedProduct;
-use Strix\Ergonode\Modules\Product\Struct\ErgonodeProduct;
-use Strix\Ergonode\Struct\ErgonodeEntityStreamCollection;
-use Strix\Ergonode\Transformer\StreamResponseTransformer;
 
 class ErgonodeProductProvider
 {
     private ProductQueryBuilder $productQueryBuilder;
 
-    private ErgonodeGqlClient $ergonodeGqlClient;
-
-    private StreamResponseTransformer $streamResponseTransformer;
+    private CachedErgonodeGqlClient $ergonodeGqlClient;
 
     public function __construct(
         ProductQueryBuilder $productQueryBuilder,
-        ErgonodeGqlClient $ergonodeGqlClient,
-        StreamResponseTransformer $streamResponseTransformer
+        CachedErgonodeGqlClient $ergonodeGqlClient
     ) {
         $this->productQueryBuilder = $productQueryBuilder;
         $this->ergonodeGqlClient = $ergonodeGqlClient;
-        $this->streamResponseTransformer = $streamResponseTransformer;
     }
 
-    public function provide(int $count, ?string $cursor = null): ?ErgonodeEntityStreamCollection
+    public function provide(int $count, ?string $cursor = null): ?ProductStreamResultsProxy
     {
         $query = $this->productQueryBuilder->build($count, $cursor);
-        $response = $this->ergonodeGqlClient->query($query);
+        $response = $this->ergonodeGqlClient->query($query, ProductStreamResultsProxy::class);
 
-        if (false === $response->isOk()) {
+        if (!$response instanceof ProductStreamResultsProxy) {
             return null;
         }
 
-        return $this->streamResponseTransformer->transformResponse(
-            ErgonodeProduct::class,
-            $response->getData()['productStream'] ?? []
-        );
+        return $response;
     }
 
-    public function provideSingleProduct(string $sku): ?ErgonodeEntityStreamCollection
+    public function provideProductWithVariants(string $sku): ?ProductResultsProxy
     {
-        $query = $this->productQueryBuilder->buildSingleProduct($sku);
-        $response = $this->ergonodeGqlClient->query($query);
+        $query = $this->productQueryBuilder->buildProductWithVariants($sku);
+        $response = $this->ergonodeGqlClient->query($query, ProductResultsProxy::class);
 
-        if (false === $response->isOk()) {
+        if (!$response instanceof ProductResultsProxy) {
             return null;
         }
 
-        return $this->streamResponseTransformer->transformResponse(
-            ErgonodeProduct::class,
-            $response->getData() ?? []
-        );
+        return $response;
     }
 
-    public function provideDeleted(?int $count = null, ?string $cursor = null): ?ErgonodeEntityStreamCollection
+    public function provideDeleted(?int $count = null, ?string $cursor = null): ?ProductStreamResultsProxy
     {
         $query = $this->productQueryBuilder->buildDeleted($count, $cursor);
-        $response = $this->ergonodeGqlClient->query($query);
+        $response = $this->ergonodeGqlClient->query($query, ProductStreamResultsProxy::class);
 
-        if (false === $response->isOk()) {
+        if (!$response instanceof ProductStreamResultsProxy) {
             return null;
         }
 
-        return $this->streamResponseTransformer->transformResponse(
-            ErgonodeDeletedProduct::class,
-            $response->getData()['productDeletedStream'] ?? []
-        );
+        return $response;
     }
 }
