@@ -6,7 +6,7 @@ namespace Strix\Ergonode\Tests\Unit\Modules\Product\Transformer;
 
 use PHPUnit\Framework\TestCase;
 use Strix\Ergonode\Modules\Product\Transformer\ProductNodeTransformer;
-use Strix\Ergonode\Tests\Fixtures\GqlProductResponse;
+use Strix\Ergonode\Tests\Fixture\GqlProductResponse;
 
 class ProductNodeTransformerTest extends TestCase
 {

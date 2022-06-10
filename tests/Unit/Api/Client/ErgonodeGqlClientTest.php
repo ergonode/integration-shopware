@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
 use Strix\Ergonode\Api\GqlResponse;
-use Strix\Ergonode\Tests\Fixtures\GqlQueryFixture;
+use Strix\Ergonode\Tests\Fixture\GqlQueryFixture;
 
 class ErgonodeGqlClientTest extends TestCase
 {
