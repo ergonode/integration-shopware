@@ -6,10 +6,9 @@ services:
     autoconfigure: true
 
   _instanceof:
-    # TRANSFORMER
-    Strix\Ergonode\Transformer\NodeTransformerInterface:
-      tags: [ 'strix_ergonode.node_transformer' ]
-      lazy: true
+    # EXTENSION
+    Strix\Ergonode\Extension\AbstractErgonodeMappingExtension:
+      tags: [ 'shopware.entity.extension' ]
 
   # WIRE WHOLE NAMESPACE
   Strix\Ergonode\:
@@ -30,8 +29,11 @@ services:
     arguments:
       $repository: '@strix_ergonode_attribute_mapping.repository'
 
-  # ENTITY
+  # ENTITY DEFINITION
   Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition:
+    tags: [ 'shopware.entity.definition' ]
+
+  Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntityDefinition:
     tags: [ 'shopware.entity.definition' ]
 
   # PROVIDER

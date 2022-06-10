@@ -10,18 +10,13 @@ class AttributeStreamResultsProxy extends AbstractStreamResultsProxy
 {
     public const MAIN_FIELD = 'attributeStream';
 
-    public function filterByAttributeTypes(array $array = []): self
+    /**
+     * @param string[] $array
+     */
+    public function filterByAttributeTypes(array $array = []): AbstractStreamResultsProxy
     {
-        $filteredResults = clone $this;
-
-        $filteredEdges = array_filter(
-            $filteredResults->getEdges(),
+        return $this->filter(
             fn(array $attribute) => array_intersect($array, array_keys($attribute['node'] ?? []))
         );
-
-        $filteredResults->results['data'][static::MAIN_FIELD]['edges'] = $filteredEdges;
-        $filteredResults->results['data'][static::MAIN_FIELD]['totalCount'] = count($filteredEdges);
-
-        return $filteredResults;
     }
 }

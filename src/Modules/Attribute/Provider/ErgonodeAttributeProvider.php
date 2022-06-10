@@ -55,7 +55,7 @@ class ErgonodeAttributeProvider
             $results = $this->ergonodeGqlClient->query($query, AttributeStreamResultsProxy::class);
 
             if (!$results instanceof AttributeStreamResultsProxy) {
-                continue;
+                return null;
             }
 
             $endCursor = $results->getEndCursor();

@@ -1,7 +1,7 @@
 {
     "name": "strix/ergonode",
     "description": "Shopware Ergonode Integration",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "type": "shopware-platform-plugin",
     "license": "MIT",
     "extra": {
