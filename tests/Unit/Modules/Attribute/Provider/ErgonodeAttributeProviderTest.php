@@ -6,12 +6,12 @@ namespace Strix\Ergonode\Tests\Unit\Modules\Attribute\Provider;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
-use Strix\Ergonode\Api\GqlResponse;
+use Strix\Ergonode\Api\Client\CachedErgonodeGqlClient;
+use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
 use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
 use Strix\Ergonode\Modules\Attribute\QueryBuilder\AttributeQueryBuilder;
+use Strix\Ergonode\Modules\Product\Api\ProductStreamResultsProxy;
 use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class ErgonodeAttributeProviderTest extends TestCase
 {
@@ -23,14 +23,14 @@ class ErgonodeAttributeProviderTest extends TestCase
     private $attributeQueryBuilderMock;
 
     /**
-     * @var MockObject|ErgonodeGqlClient
+     * @var MockObject|CachedErgonodeGqlClient
      */
     private $ergonodeGqlClientMock;
 
     protected function setUp(): void
     {
         $this->attributeQueryBuilderMock = $this->createMock(AttributeQueryBuilder::class);
-        $this->ergonodeGqlClientMock = $this->createMock(ErgonodeGqlClient::class);
+        $this->ergonodeGqlClientMock = $this->createMock(CachedErgonodeGqlClient::class);
 
         $this->provider = new ErgonodeAttributeProvider(
             $this->attributeQueryBuilderMock,
@@ -41,9 +41,9 @@ class ErgonodeAttributeProviderTest extends TestCase
     /**
      * @dataProvider attributesOutputDataProvider
      */
-    public function testProvideProductAttributesMethod(int $statusCode, int $responsePages, array $response, array $expectedOutput)
+    public function testProvideProductAttributesMethod(int $responsePages, array $response, string $proxyClass, array $expectedOutput)
     {
-        $this->mockGqlResponse($statusCode, $responsePages, GqlAttributeResponse::attributeStreamResponse());
+        $this->mockGqlResponse($responsePages, $response, $proxyClass);
 
         $result = $this->provider->provideProductAttributes();
 
@@ -54,16 +54,15 @@ class ErgonodeAttributeProviderTest extends TestCase
     {
         return [
             [
-                Response::HTTP_OK,
                 1,
                 GqlAttributeResponse::attributeStreamResponse(),
+                AttributeStreamResultsProxy::class,
                 GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'],
-
             ],
             [
-                Response::HTTP_OK,
                 3,
                 GqlAttributeResponse::attributeStreamResponse(),
+                AttributeStreamResultsProxy::class,
                 array_merge(
                     GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'],
                     GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'],
@@ -71,28 +70,25 @@ class ErgonodeAttributeProviderTest extends TestCase
                 ),
             ],
             [
-                Response::HTTP_BAD_REQUEST,
                 1,
                 GqlAttributeResponse::attributeStreamResponse(),
+                ProductStreamResultsProxy::class,
                 [],
             ],
         ];
     }
 
-    private function mockGqlResponse(int $statusCode, int $responsePages, array $response): void
+    private function mockGqlResponse(int $responsePages, array $response, string $proxyClass = AttributeStreamResultsProxy::class): void
     {
         $returns = [];
-        $response['data']['attributeStream']['pageInfo']['hasNextPage'] = true;
 
         for ($i = 0; $i < $responsePages; $i++) {
-            if ($i === $responsePages - 1) {
-                $response['data']['attributeStream']['pageInfo']['hasNextPage'] = false;
-            }
+            $methods = [
+                'getEdges' => $response['data']['attributeStream']['edges'],
+                'hasNextPage' => $i !== $responsePages - 1,
+            ];
 
-            $returns[] = $this->createConfiguredMock(GqlResponse::class, [
-                'isOk' => $statusCode === Response::HTTP_OK,
-                'getData' => $response['data'],
-            ]);
+            $returns[] = $this->createConfiguredMock($proxyClass, $methods);
         }
 
         $this->ergonodeGqlClientMock->expects($this->exactly($responsePages))

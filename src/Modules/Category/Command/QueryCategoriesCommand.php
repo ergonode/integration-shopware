@@ -28,8 +28,8 @@ class QueryCategoriesCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-//        $result = $this->categoryProvider->provideCategoryTree('default_tree');
-        $result = $this->categoryProvider->provideCategoryTree('empty_tree');
+        $result = $this->categoryProvider->provideCategoryTree('default_tree');
+//        $result = $this->categoryProvider->provideCategoryTree('empty_tree');
 
         if (empty($result)) {
             $io->error('Empty response');

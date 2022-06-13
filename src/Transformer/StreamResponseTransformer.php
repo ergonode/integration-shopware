@@ -7,6 +7,9 @@ namespace Strix\Ergonode\Transformer;
 use Strix\Ergonode\Resolver\NodeTransformerResolver;
 use Strix\Ergonode\Struct\ErgonodeEntityStreamCollection;
 
+/**
+ * @deprecated ?
+ */
 class StreamResponseTransformer
 {
     private NodeTransformerResolver $nodeTransformerResolver;

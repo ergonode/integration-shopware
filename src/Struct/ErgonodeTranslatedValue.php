@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Struct;
 
+/**
+ * @deprecated ?
+ */
 class ErgonodeTranslatedValue
 {
     private string $locale;

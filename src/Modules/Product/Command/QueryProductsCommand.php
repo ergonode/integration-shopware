@@ -31,9 +31,9 @@ class QueryProductsCommand extends Command
         $result = $this->productProvider->provide(4);
 //        $result = $this->productProvider->provideDeleted(5);
 
-        $entities = $result->getElements();
+        $products = $result->getEdges();
 
-        if (empty($entities)) {
+        if (empty($products)) {
             $io->error('Empty response');
 
             return self::FAILURE;
@@ -41,7 +41,7 @@ class QueryProductsCommand extends Command
 
         $io->success('Got following response:');
 
-        dump($entities);
+        dump($products);
 
         return self::SUCCESS;
     }
