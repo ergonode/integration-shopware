@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Strix\Ergonode\Api\Client;
 
 use GraphQL\Query;
-use Strix\Ergonode\Api\GqlResponse;
+use GraphQL\Results;
 
 interface ErgonodeGqlClientInterface
 {
-    public function query(Query $query): ?GqlResponse;
+    public function query(Query $query, ?string $proxyClass = null): ?Results;
 }

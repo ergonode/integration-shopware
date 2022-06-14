@@ -6,7 +6,9 @@ namespace Strix\Ergonode\Persistor;
 
 use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Strix\Ergonode\Entity\ErgonodeCategoryMappingExtensionEntity;
 use Strix\Ergonode\Extension\ErgonodeCategoryMappingExtension;
 use Strix\Ergonode\Modules\Category\Struct\ErgonodeCategoryCollection;
 use Strix\Ergonode\Provider\CategoryProvider;
@@ -72,7 +74,15 @@ class CategoryPersistor
         ?string $parentId = null,
         ?string $afterCategoryId = null
     ): string {
-        $existingCategory = $this->categoryProvider->getCategoryByMapping($code, $locale, $context);
+        $existingCategory = $this->categoryProvider->getCategoryByMapping(
+            $code,
+            $locale,
+            $context,
+            [
+                ErgonodeCategoryMappingExtension::EXTENSION_NAME
+            ]
+        );
+
         $writeResult = $this->categoryRepository->upsert(
             [[
                 'id' => null === $existingCategory ? null : $existingCategory->getId(),
@@ -80,6 +90,7 @@ class CategoryPersistor
                 'parentId' => $parentId,
                 'afterCategoryId' => $afterCategoryId,
                 ErgonodeCategoryMappingExtension::EXTENSION_NAME => [
+                    'id' => null === $existingCategory ? null : $this->getEntityExtensionId($existingCategory),
                     'code' => $code,
                     'locale' => $locale
                 ]
@@ -88,5 +99,15 @@ class CategoryPersistor
         );
 
         return $writeResult->getPrimaryKeys(CategoryDefinition::ENTITY_NAME)[0];
+    }
+
+    private function getEntityExtensionId(Entity $entity): ?string
+    {
+        $extension = $entity->getExtension(ErgonodeCategoryMappingExtension::EXTENSION_NAME);
+        if ($extension instanceof ErgonodeCategoryMappingExtensionEntity) {
+            return $extension->getId();
+        }
+
+        return null;
     }
 }
