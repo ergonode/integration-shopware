@@ -42,6 +42,10 @@ services:
     arguments:
       $repository: '@strix_ergonode_attribute_mapping.repository'
 
+  Strix\Ergonode\Provider\ErgonodeMappingProvider:
+    arguments:
+      $repository: '@strix_ergonode_mapping_extension.repository'
+
   # RESOLVER
   Strix\Ergonode\Resolver\NodeTransformerResolver:
     arguments:
