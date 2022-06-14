@@ -7,7 +7,7 @@ namespace Strix\Ergonode\Api\Client;
 use GraphQL\Client;
 use GraphQL\Query;
 use GraphQL\Results;
-use GuzzleHttp\Exception\ClientException;
+use Psr\Http\Client\ClientExceptionInterface;
 
 class ErgonodeGqlClient implements ErgonodeGqlClientInterface
 {
@@ -29,7 +29,7 @@ class ErgonodeGqlClient implements ErgonodeGqlClientInterface
             }
 
             return $results;
-        } catch (ClientException $e) {
+        } catch (ClientExceptionInterface $e) {
             // TODO log
             dump($e);
         }

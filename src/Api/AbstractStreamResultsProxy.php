@@ -11,9 +11,14 @@ abstract class AbstractStreamResultsProxy extends AbstractResultsProxy
         return $this->getMainData()['edges'] ?? [];
     }
 
+    public function hasEndCursor(): bool
+    {
+        return null !== $this->getEndCursor();
+    }
+
     public function getEndCursor(): ?string
     {
-        return (string)$this->getMainData()['pageInfo']['endCursor'] ?? null;
+        return $this->getMainData()['pageInfo']['endCursor'] ?? null;
     }
 
     public function hasNextPage(): bool

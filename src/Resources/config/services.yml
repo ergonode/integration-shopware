@@ -1,6 +1,7 @@
 imports:
   - { resource: parameters.yml }
   - { resource: packages/cache.yml }
+
 services:
   _defaults:
     autowire: true
@@ -37,14 +38,29 @@ services:
   Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntityDefinition:
     tags: [ 'shopware.entity.definition' ]
 
+  Strix\Ergonode\Entity\ErgonodeCategoryMappingExtensionEntityDefinition:
+    tags: [ 'shopware.entity.definition' ]
+
+  Strix\Ergonode\Entity\ErgonodeCursor\ErgonodeCursorDefinition:
+    tags: [ 'shopware.entity.definition' ]
+
+  # EXTENSION
+  Strix\Ergonode\Extension\ErgonodeCategoryMappingExtension:
+    tags: [ 'shopware.entity.extension' ]
+
   # PROVIDER
   Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider:
     arguments:
       $repository: '@strix_ergonode_attribute_mapping.repository'
 
-  Strix\Ergonode\Provider\ErgonodeMappingProvider:
+  Strix\Ergonode\Provider\ErgonodeCursorProvider:
     arguments:
-      $repository: '@strix_ergonode_mapping_extension.repository'
+      $repository: '@strix_ergonode_cursor.repository'
+
+  # PERSISTOR
+  Strix\Ergonode\Persistor\ErgonodeCursorPersistor:
+    arguments:
+      $repository: '@strix_ergonode_cursor.repository'
 
   # RESOLVER
   Strix\Ergonode\Resolver\NodeTransformerResolver:
@@ -54,11 +70,3 @@ services:
   # SUBSCRIBER
   Strix\Ergonode\Subscriber\Subscriber:
     tags: [ 'kernel.event_subscriber' ]
-
-  # EXTENSION
-  Strix\Ergonode\Extension\ErgonodeCategoryMappingExtension:
-    tags: [ 'shopware.entity.extension' ]
-
-  # ENTITY DEFINITION
-  Strix\Ergonode\Entity\ErgonodeCategoryMappingExtensionEntityDefinition:
-    tags: [ 'shopware.entity.definition' ]

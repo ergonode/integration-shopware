@@ -6,6 +6,7 @@ namespace Strix\Ergonode\Modules\Attribute\Provider;
 
 use Generator;
 use Strix\Ergonode\Api\Client\CachedErgonodeGqlClient;
+use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
 use Strix\Ergonode\Modules\Attribute\Api\AttributeDeletedStreamResultsProxy;
 use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
 use Strix\Ergonode\Modules\Attribute\Enum\AttributeTypes;
@@ -17,11 +18,11 @@ class ErgonodeAttributeProvider
 
     private AttributeQueryBuilder $attributeQueryBuilder;
 
-    private CachedErgonodeGqlClient $ergonodeGqlClient;
+    private ErgonodeGqlClientInterface $ergonodeGqlClient;
 
     public function __construct(
         AttributeQueryBuilder $attributeQueryBuilder,
-        CachedErgonodeGqlClient $ergonodeGqlClient
+        ErgonodeGqlClientInterface $ergonodeGqlClient
     ) {
         $this->attributeQueryBuilder = $attributeQueryBuilder;
         $this->ergonodeGqlClient = $ergonodeGqlClient;
@@ -78,10 +79,8 @@ class ErgonodeAttributeProvider
         return $attributes;
     }
 
-    public function provideDeletedBindingAttributes(): ?Generator
+    public function provideDeletedBindingAttributes(?string $endCursor = null): Generator
     {
-        $endCursor = null;
-
         do {
             $query = $this->attributeQueryBuilder->buildDeleted(self::MAX_ATTRIBUTES_PER_PAGE, $endCursor);
             $results = $this->ergonodeGqlClient->query($query, AttributeDeletedStreamResultsProxy::class);
@@ -94,7 +93,5 @@ class ErgonodeAttributeProvider
 
             $endCursor = $results->getEndCursor();
         } while ($results->hasNextPage());
-
-        return null;
     }
 }

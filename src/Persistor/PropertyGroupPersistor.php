@@ -8,10 +8,10 @@ use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOp
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Strix\Ergonode\Extension\PropertyGroup\PropertyGroupExtension;
+use Strix\Ergonode\Exception\OrphansNotDeletedException;
 use Strix\Ergonode\Modules\Attribute\Api\AttributeDeletedStreamResultsProxy;
 use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\Provider\ErgonodeMappingProvider;
+use Strix\Ergonode\Provider\PropertyGroupProvider;
 use Strix\Ergonode\Transformer\AttributeNodeTransformer;
 
 class PropertyGroupPersistor
@@ -20,16 +20,16 @@ class PropertyGroupPersistor
 
     private AttributeNodeTransformer $attributeNodeTransformer;
 
-    private ErgonodeMappingProvider $ergonodeMappingProvider;
+    private PropertyGroupProvider $propertyGroupProvider;
 
     public function __construct(
         EntityRepositoryInterface $propertyGroupRepository,
         AttributeNodeTransformer $attributeNodeTransformer,
-        ErgonodeMappingProvider $ergonodeMappingProvider
+        PropertyGroupProvider $propertyGroupProvider
     ) {
         $this->propertyGroupRepository = $propertyGroupRepository;
         $this->attributeNodeTransformer = $attributeNodeTransformer;
-        $this->ergonodeMappingProvider = $ergonodeMappingProvider;
+        $this->propertyGroupProvider = $propertyGroupProvider;
     }
 
     public function persistStream(AttributeStreamResultsProxy $attributes, Context $context): array
@@ -57,13 +57,13 @@ class PropertyGroupPersistor
         $codes = $attributes->map(fn(array $node) => $node['node'] ?? null);
         $codes = array_filter($codes);
 
-        $ids = $this->ergonodeMappingProvider->getIdsByType($codes, PropertyGroupExtension::ERGONODE_TYPE, $context);
+        $ids = $this->propertyGroupProvider->getIdsByCodes($codes, $context);
 
         if (empty($ids)) {
             return [];
         }
 
-        $deleted = $this->propertyGroupRepository->delete($ids, $context);
+        $deleted = $this->propertyGroupRepository->delete(array_map(fn($id) => ['id' => $id], $ids), $context);
 
         return [
             PropertyGroupDefinition::ENTITY_NAME => $deleted->getPrimaryKeys(PropertyGroupDefinition::ENTITY_NAME),

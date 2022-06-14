@@ -6,8 +6,7 @@ namespace Strix\Ergonode\Modules\Attribute\Command;
 
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
-use Strix\Ergonode\Persistor\PropertyGroupPersistor;
+use Strix\Ergonode\Manager\OrphanEntitiesManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,37 +18,29 @@ class RemoveOrphanBindingAttributesCommand extends Command
 
     private Context $context;
 
-    private ErgonodeAttributeProvider $ergonodeAttributeProvider;
-
-    private PropertyGroupPersistor $propertyGroupPersistor;
+    private OrphanEntitiesManager $orphanEntitiesManager;
 
     public function __construct(
-        ErgonodeAttributeProvider $ergonodeAttributeProvider,
-        PropertyGroupPersistor $propertyGroupPersistor
+        OrphanEntitiesManager $orphanEntitiesManager
     ) {
         parent::__construct();
 
         $this->context = new Context(new SystemSource());
-        $this->ergonodeAttributeProvider = $ergonodeAttributeProvider;
-        $this->propertyGroupPersistor = $propertyGroupPersistor;
+        $this->orphanEntitiesManager = $orphanEntitiesManager;
     }
 
     protected function configure()
     {
         $this->setDescription(
-            'Fetches select and multiselect attributes from Ergonode and saves them as PropertyGroup and PropertyGroupOption entities in Shopware.'
+            'Iterates through latest Ergonode deleted attributes and deletes matching Shopware Property Groups.'
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $entities = [];
 
-        $iterator = $this->ergonodeAttributeProvider->provideDeletedBindingAttributes();
-        foreach ($iterator as $deletedAttributes) {
-            $entities = array_merge($entities, $this->propertyGroupPersistor->remove($deletedAttributes, $this->context));
-        }
+        $entities = $this->orphanEntitiesManager->cleanPropertyGroups($this->context);
 
         if (empty($entities)) {
             $io->info('Could not find any orphan property groups');
@@ -57,7 +48,7 @@ class RemoveOrphanBindingAttributesCommand extends Command
             return self::SUCCESS;
         }
 
-        $io->success('Deleted property groups removed (Ergonode->Shopware).');
+        $io->success('Orphan property groups deleted (Ergonode->Shopware).');
         foreach ($entities as $entity => $ids) {
             $io->success(["Deleted $entity:", ...$ids]);
         }

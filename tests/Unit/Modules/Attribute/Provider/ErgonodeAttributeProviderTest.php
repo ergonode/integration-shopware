@@ -10,6 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Strix\Ergonode\Api\Client\CachedErgonodeGqlClient;
+use Strix\Ergonode\Modules\Attribute\Api\AttributeDeletedStreamResultsProxy;
 use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
 use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
 use Strix\Ergonode\Modules\Attribute\QueryBuilder\AttributeQueryBuilder;
@@ -51,7 +52,21 @@ class ErgonodeAttributeProviderTest extends TestCase
 
         $result = $this->provider->provideProductAttributes();
 
-        $this->assertEquals($expectedOutput, $result);
+        $this->assertSame($expectedOutput, $result);
+    }
+
+    public function testIfProvideProductAttributesMethodWillFailWhenApiRespondsWithWrongResults()
+    {
+        $this->mockGqlResults(
+            1,
+            GqlAttributeResponse::attributeStreamResponse(),
+            ProductStreamResultsProxy::class,
+            'attributeStream'
+        );
+
+        $result = $this->provider->provideProductAttributes();
+
+        $this->assertSame([], $result);
     }
 
     /**
@@ -63,7 +78,7 @@ class ErgonodeAttributeProviderTest extends TestCase
 
         $result = $this->provider->provideBindingAttributes();
 
-        $this->assertEquals($expectedOutput, array_values($result->getEdges()));
+        $this->assertSame($expectedOutput, array_values($result->getEdges()));
     }
 
     public function testIfProvideBindingAttributesMethodWillFailWhenApiRespondsWithWrongResults()
@@ -72,7 +87,37 @@ class ErgonodeAttributeProviderTest extends TestCase
 
         $result = $this->provider->provideBindingAttributes();
 
-        $this->assertEquals(null, $result);
+        $this->assertSame(null, $result);
+    }
+
+    /**
+     * @dataProvider deletedAttributesOutputDataProvider
+     */
+    public function testProvideDeletedAttributesMethod(int $responsePages, array $response, string $proxyClass, array $expectedOutput)
+    {
+        $this->mockGqlResults($responsePages, $response, $proxyClass);
+
+        $generator = $this->provider->provideDeletedBindingAttributes();
+
+        foreach ($generator as $result) {
+            $this->assertSame($expectedOutput, array_values($result->getEdges()));
+        }
+    }
+
+    public function testIfProvideDeletedAttributesMethodWillFailWhenApiRespondsWithWrongResults()
+    {
+        $this->mockGqlResults(
+            1,
+            GqlAttributeResponse::attributeDeletedStreamResponse(),
+            ProductStreamResultsProxy::class,
+            'attributeDeletedStream'
+        );
+
+        $generator = $this->provider->provideDeletedBindingAttributes();
+
+        foreach ($generator as $result) {
+            $this->assertEquals(null, $result);
+        }
     }
 
     public function attributesOutputDataProvider(): array
@@ -93,12 +138,6 @@ class ErgonodeAttributeProviderTest extends TestCase
                     GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'],
                     GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges']
                 ),
-            ],
-            [
-                1,
-                GqlAttributeResponse::attributeStreamResponse(),
-                ProductStreamResultsProxy::class,
-                [],
             ],
         ];
     }
@@ -127,13 +166,35 @@ class ErgonodeAttributeProviderTest extends TestCase
         ];
     }
 
-    private function mockGqlResults(int $responsePages, array $response, string $proxyClass = AttributeStreamResultsProxy::class): void
+    public function deletedAttributesOutputDataProvider(): array
+    {
+        return [
+            [
+                1,
+                GqlAttributeResponse::attributeDeletedStreamResponse(),
+                AttributeDeletedStreamResultsProxy::class,
+                GqlAttributeResponse::attributeDeletedStreamResponse()['data']['attributeDeletedStream']['edges'],
+            ],
+            [
+                3,
+                GqlAttributeResponse::attributeDeletedStreamResponse(),
+                AttributeDeletedStreamResultsProxy::class,
+                GqlAttributeResponse::attributeDeletedStreamResponse()['data']['attributeDeletedStream']['edges'],
+            ],
+        ];
+    }
+
+    private function mockGqlResults(int $responsePages, array $response, string $proxyClass = AttributeStreamResultsProxy::class, string $mainFieldKey = ''): void
     {
         $returns = [];
 
+        $mainFieldKey = empty($mainFieldKey) ? $proxyClass::MAIN_FIELD : $mainFieldKey;
+
+        $response['data'][$mainFieldKey]['totalCount'] = $responsePages * count($response['data'][$mainFieldKey]['edges']);
+
         for ($i = 0; $i < $responsePages; $i++) {
             $methods = [
-                'getEdges' => $response['data']['attributeStream']['edges'],
+                'getEdges' => $response['data'][$mainFieldKey]['edges'],
                 'hasNextPage' => $i !== $responsePages - 1,
             ];
 
@@ -149,10 +210,12 @@ class ErgonodeAttributeProviderTest extends TestCase
     {
         $returns = [];
 
+        $response['data'][$proxyClass::MAIN_FIELD]['totalCount'] = $responsePages * count($response['data'][$proxyClass::MAIN_FIELD]['edges']);
+
         for ($i = 0; $i < $responsePages; $i++) {
-            $response['data']['attributeStream']['pageInfo']['hasNextPage'] = $i !== $responsePages - 1;
+            $response['data'][$proxyClass::MAIN_FIELD]['pageInfo']['hasNextPage'] = $i !== $responsePages - 1;
             $resultsMock = $this->createConfiguredMock(Results::class, [
-                'getResults' => [], // just to pass is_array check
+                'getResults' => [], // just to pass is_array check in proxy class
                 'getResponseObject' => $this->createConfiguredMock(ResponseInterface::class, [
                     'getBody' => Utils::streamFor(json_encode($response)),
                 ]),
