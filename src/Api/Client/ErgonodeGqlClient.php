@@ -4,48 +4,36 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Api\Client;
 
+use GraphQL\Client;
 use GraphQL\Query;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use Strix\Ergonode\Api\GqlResponse;
-use Symfony\Component\HttpFoundation\Request;
+use GraphQL\Results;
+use GuzzleHttp\Exception\ClientException;
 
 class ErgonodeGqlClient implements ErgonodeGqlClientInterface
 {
-    private const GRAPHQL_ENDPOINT = 'api/graphql/';
-
-    private Client $httpClient;
+    private Client $gqlClient;
 
     public function __construct(
-        Client $httpClient
+        Client $gqlClient
     ) {
-        $this->httpClient = $httpClient;
+        $this->gqlClient = $gqlClient;
     }
 
-    public function query(Query $query): ?GqlResponse
+    public function query(Query $query, ?string $proxyClass = null): ?Results
     {
         try {
-            $response = $this->httpClient->request(
-                Request::METHOD_GET,
-                self::GRAPHQL_ENDPOINT,
-                $this->buildRequestBody($query)
-            );
+            $results = $this->gqlClient->runQuery($query, true);
 
-            return new GqlResponse($response);
-        } catch (GuzzleException $e) {
+            if (null !== $proxyClass && in_array(Results::class, class_parents($proxyClass))) {
+                return new $proxyClass($results);
+            }
+
+            return $results;
+        } catch (ClientException $e) {
             // TODO log
             dump($e);
         }
 
         return null;
-    }
-
-    private function buildRequestBody(Query $query): array
-    {
-        return [
-            'json' => [
-                'query' => strval($query),
-            ],
-        ];
     }
 }

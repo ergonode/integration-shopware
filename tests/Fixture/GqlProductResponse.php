@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Fixtures;
+namespace Strix\Ergonode\Tests\Fixture;
 
 class GqlProductResponse
 {

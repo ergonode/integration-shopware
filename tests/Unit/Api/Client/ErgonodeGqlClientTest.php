@@ -4,33 +4,34 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Tests\Unit\Api\Client;
 
+use GraphQL\Client;
 use GraphQL\Query;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
+use GraphQL\Results;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
-use Strix\Ergonode\Api\GqlResponse;
-use Strix\Ergonode\Tests\Fixtures\GqlQueryFixture;
+use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
+use Strix\Ergonode\Tests\Fixture\GqlQueryFixture;
 
 class ErgonodeGqlClientTest extends TestCase
 {
     /**
      * @var Client|MockObject
      */
-    private $guzzleClientMock;
+    private $gqlClientMock;
 
     private ErgonodeGqlClient $gqlClient;
 
     protected function setUp(): void
     {
-        $this->guzzleClientMock = $this->createMock(Client::class);
+        $this->gqlClientMock = $this->createMock(Client::class);
 
         $this->gqlClient = new ErgonodeGqlClient(
-            $this->guzzleClientMock
+            $this->gqlClientMock
         );
     }
 
@@ -38,43 +39,61 @@ class ErgonodeGqlClientTest extends TestCase
     {
         $query = GqlQueryFixture::basicProductStreamQuery();
 
-        $this->mockGuzzleRequest($query);
+        $this->mockGqlRequest($query);
 
         $result = $this->gqlClient->query($query);
 
-        $this->assertInstanceOf(GqlResponse::class, $result);
-        $this->assertEquals(['productStream' => ['some' => 'data']], $result->getData());
+        $this->assertInstanceOf(Results::class, $result);
+        $this->assertEquals(['attributeStream' => ['some' => 'data']], $result->getData());
+    }
+
+    public function testSuccessQueryMethodWhenProvidedResultsProxy()
+    {
+        $query = GqlQueryFixture::basicProductStreamQuery();
+
+        $this->mockGqlRequest($query);
+
+        $result = $this->gqlClient->query($query, AttributeStreamResultsProxy::class);
+
+        $this->assertInstanceOf(AttributeStreamResultsProxy::class, $result);
+        $this->assertEquals(['attributeStream' => ['some' => 'data']], $result->getData());
     }
 
     public function testFailQueryMethod()
     {
         $query = GqlQueryFixture::basicProductStreamQuery();
 
-        $this->mockGuzzleRequest($query)
-            ->willThrowException($this->createMock(GuzzleException::class));
+        $this->mockGqlRequest($query)
+            ->willThrowException($this->createMock(ClientException::class));
 
         $result = $this->gqlClient->query($query);
 
         $this->assertNull($result);
     }
 
-    private function mockGuzzleRequest(Query $query): InvocationMocker
+    private function mockGqlRequest(Query $query): InvocationMocker
     {
-        return $this->guzzleClientMock
+        return $this->gqlClientMock
             ->expects($this->once())
-            ->method('request')
-            ->with(
-                'GET',
-                'api/graphql/',
-                [
-                    'json' => [
-                        'query' => strval($query),
-                    ],
-                ]
-            )
+            ->method('runQuery')
+            ->with($query)
             ->willReturn(
-                $this->createConfiguredMock(ResponseInterface::class, [
-                    'getBody' => Utils::streamFor('{"data": {"productStream": {"some": "data"}}}'),
+                $this->createConfiguredMock(Results::class, [
+                    'getResults' => [
+                        'data' => [
+                            'attributeStream' => [
+                                'some' => 'data',
+                            ],
+                        ],
+                    ],
+                    'getData' => [
+                        'attributeStream' => [
+                            'some' => 'data',
+                        ],
+                    ],
+                    'getResponseObject' => $this->createConfiguredMock(ResponseInterface::class, [
+                        'getBody' => Utils::streamFor('{"data": {"attributeStream": {"some":"data"}}}'),
+                    ]),
                 ])
             );
     }

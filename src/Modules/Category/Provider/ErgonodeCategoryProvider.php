@@ -6,6 +6,7 @@ namespace Strix\Ergonode\Modules\Category\Provider;
 
 use RuntimeException;
 use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
+use Strix\Ergonode\Modules\Category\Api\CategoryTreeResultsProxy;
 use Strix\Ergonode\Modules\Category\QueryBuilder\CategoryQueryBuilder;
 use Strix\Ergonode\Modules\Category\Struct\ErgonodeCategoryCollection;
 use Strix\Ergonode\Modules\Category\Transformer\CategoryResponseTransformer;
@@ -40,20 +41,19 @@ class ErgonodeCategoryProvider
 
         do {
             $query = $this->categoryQueryBuilder->build($treeCode, self::CATEGORIES_PER_PAGE, $cursor);
-            $response = $this->ergonodeGqlClient->query($query);
+            $results = $this->ergonodeGqlClient->query($query, CategoryTreeResultsProxy::class);
 
-            if (false === $response->isOk()) {
+            if (!$results instanceof CategoryTreeResultsProxy) {
                 continue;
             }
 
-            $data = $response->getData();
-            if (empty($data['categoryTree'])) {
+            if ($results->isMainDataEmpty()) {
                 throw new RuntimeException(sprintf('Tree with code %1 does not exist in Ergonode.', $treeCode));
             }
 
-            $categories = $categories->merge($this->categoryResponseTransformer->transformResponse($data['categoryTree']));
-            $cursor = $data['categoryTree']['categoryTreeLeafList']['pageInfo']['endCursor'] ?? null;
-        } while (null !== $cursor && ($data['categoryTree']['categoryTreeLeafList']['pageInfo']['hasNextPage'] ?? false));
+            $categories = $categories->merge($this->categoryResponseTransformer->transformResponse($results->getMainData()));
+            $cursor = $results->getEndCursor();
+        } while (null !== $cursor && $results->hasNextPage());
 
         return $categories;
     }

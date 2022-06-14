@@ -26,4 +26,14 @@ class ConfigProvider
             $this->configService->getString(self::STRIX_ERGONODE_CONFIG_NAMESPACE . 'ergonodeApiKey'),
         );
     }
+
+    public function getErgonodeCustomFields(): array
+    {
+        $keys = $this->configService->get(self::STRIX_ERGONODE_CONFIG_NAMESPACE . 'customFieldKeys');
+        if (is_array($keys)) {
+            return $keys;
+        }
+
+        return [];
+    }
 }

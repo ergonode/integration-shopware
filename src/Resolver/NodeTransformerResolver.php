@@ -6,6 +6,9 @@ namespace Strix\Ergonode\Resolver;
 
 use Strix\Ergonode\Transformer\NodeTransformerInterface;
 
+/**
+ * @deprecated ?
+ */
 class NodeTransformerResolver
 {
     /**
