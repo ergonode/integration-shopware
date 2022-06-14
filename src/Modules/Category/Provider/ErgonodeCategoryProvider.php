@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Strix\Ergonode\Modules\Category\Provider;
 
 use RuntimeException;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
+use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
 use Strix\Ergonode\Modules\Category\Api\CategoryTreeResultsProxy;
 use Strix\Ergonode\Modules\Category\QueryBuilder\CategoryQueryBuilder;
 use Strix\Ergonode\Modules\Category\Struct\ErgonodeCategoryCollection;
@@ -17,13 +17,13 @@ class ErgonodeCategoryProvider
 
     private CategoryQueryBuilder $categoryQueryBuilder;
 
-    private ErgonodeGqlClient $ergonodeGqlClient;
+    private ErgonodeGqlClientInterface $ergonodeGqlClient;
 
     private CategoryResponseTransformer $categoryResponseTransformer;
 
     public function __construct(
         CategoryQueryBuilder $categoryQueryBuilder,
-        ErgonodeGqlClient $ergonodeGqlClient,
+        ErgonodeGqlClientInterface $ergonodeGqlClient,
         CategoryResponseTransformer $categoryResponseTransformer
     ) {
         $this->categoryQueryBuilder = $categoryQueryBuilder;

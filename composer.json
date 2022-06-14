@@ -26,7 +26,8 @@
     "autoload": {
         "psr-4": {
             "Strix\\Ergonode\\": "src/"
-        }
+        },
+        "exclude-from-classmap": ["src/DependencyInjection/*"]
     },
     "autoload-dev": {
         "psr-4": {

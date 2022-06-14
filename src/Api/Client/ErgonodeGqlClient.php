@@ -9,7 +9,7 @@ use GraphQL\Query;
 use GraphQL\Results;
 use GuzzleHttp\Exception\ClientException;
 
-class ErgonodeGqlClient
+class ErgonodeGqlClient implements ErgonodeGqlClientInterface
 {
     private Client $gqlClient;
 
