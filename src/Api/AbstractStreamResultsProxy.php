@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Strix\Ergonode\Api;
+
+abstract class AbstractStreamResultsProxy extends AbstractResultsProxy
+{
+    public function getEdges(): array
+    {
+        return $this->getMainData()['edges'] ?? [];
+    }
+
+    public function getEndCursor(): ?string
+    {
+        return (string)$this->getMainData()['pageInfo']['endCursor'] ?? null;
+    }
+
+    public function hasNextPage(): bool
+    {
+        return (bool)$this->getMainData()['pageInfo']['hasNextPage'] ?? false;
+    }
+
+    public function merge(AbstractStreamResultsProxy $results): self
+    {
+        array_merge($this->results['data'][static::MAIN_FIELD]['edges'], $results->getEdges());
+        $this->results['data'][static::MAIN_FIELD]['pageInfo']['endCursor'] = $results->getEndCursor();
+        $this->results['data'][static::MAIN_FIELD]['pageInfo']['hasNextPage'] = $results->hasNextPage();
+
+        return $this;
+    }
+}

@@ -14,6 +14,7 @@ use RuntimeException;
  * @method AbstractErgonodeEntity|null get(string $key)
  * @method AbstractErgonodeEntity|null first()
  * @method AbstractErgonodeEntity|null last()
+ * @deprecated ?
  */
 class ErgonodeEntityStreamCollection extends AbstractErgonodeEntityCollection
 {

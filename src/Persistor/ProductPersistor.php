@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Strix\Ergonode\Persistor;
 
 use Shopware\Core\Content\Product\ProductDefinition;
@@ -7,7 +9,7 @@ use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Strix\Ergonode\Api\GqlResponse;
+use Strix\Ergonode\Modules\Product\Api\ProductResultsProxy;
 use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
 use Strix\Ergonode\Provider\ProductProvider;
 use Strix\Ergonode\Transformer\ProductTransformer;
@@ -32,12 +34,11 @@ class ProductPersistor
     /**
      * @throws MissingRequiredProductMappingException
      */
-    public function persist(GqlResponse $response, Context $context): void
+    public function persist(ProductResultsProxy $results, Context $context): void
     {
-        $productData = $response->getData()['product'];
-        $parentId = $this->persistProduct($productData, null, $context);
+        $parentId = $this->persistProduct($results->getProductData(), null, $context);
 
-        foreach ($productData['variantList']['edges'] as $variantData) {
+        foreach ($results->getVariants() as $variantData) {
             $this->persistProduct($variantData['node'], $parentId, $context);
         }
     }
@@ -58,7 +59,7 @@ class ProductPersistor
         $sku = $productData['sku'];
 
         //TODO Process taxID
-        $taxId = 'f9646f89e4534e64bdce99cedb38afba';
+        $taxId = 'f2994dd722dd4e828614187aa26a9f11';
 
         $existingProduct = $this->productProvider->getProductBySku($sku, $context);
 

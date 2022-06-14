@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Strix\Ergonode\Api\Client;
 
 use GraphQL\Query;
-use Strix\Ergonode\Api\GqlResponse;
+use GraphQL\Results;
 use Symfony\Contracts\Cache\CacheInterface;
 
-class CachedErgonodeGqlClient
+class CachedErgonodeGqlClient implements ErgonodeGqlClientInterface
 {
     private ErgonodeGqlClient $ergonodeGqlClient;
 
@@ -22,10 +22,10 @@ class CachedErgonodeGqlClient
         $this->cache = $gqlRequestCache;
     }
 
-    public function query(Query $query): ?GqlResponse
+    public function query(Query $query, ?string $proxyClass = null): ?Results
     {
         $queryHash = \md5(\strval($query));
 
-        return $this->cache->get($queryHash, fn() => $this->ergonodeGqlClient->query($query));
+        return $this->cache->get($queryHash, fn() => $this->ergonodeGqlClient->query($query, $proxyClass));
     }
 }

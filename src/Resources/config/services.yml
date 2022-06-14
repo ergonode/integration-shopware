@@ -1,4 +1,5 @@
 imports:
+  - { resource: parameters.yml }
   - { resource: packages/cache.yml }
 services:
   _defaults:
@@ -47,3 +48,11 @@ services:
   # SUBSCRIBER
   Strix\Ergonode\Subscriber\Subscriber:
     tags: [ 'kernel.event_subscriber' ]
+
+  # EXTENSION
+  Strix\Ergonode\Extension\ErgonodeCategoryMappingExtension:
+    tags: [ 'shopware.entity.extension' ]
+
+  # ENTITY DEFINITION
+  Strix\Ergonode\Entity\ErgonodeCategoryMappingExtensionEntityDefinition:
+    tags: [ 'shopware.entity.definition' ]
