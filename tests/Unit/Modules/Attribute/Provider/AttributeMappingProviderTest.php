@@ -10,7 +10,6 @@ use Shopware\Core\Content\Product\ProductCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
-use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
 use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
 use Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider;
 use Strix\Ergonode\Tests\Fixture\ErgonodeAttributeMappingFixture;

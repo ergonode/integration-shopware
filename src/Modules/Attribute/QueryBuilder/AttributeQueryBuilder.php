@@ -6,6 +6,7 @@ namespace Strix\Ergonode\Modules\Attribute\QueryBuilder;
 
 use GraphQL\InlineFragment;
 use GraphQL\Query;
+use Strix\Ergonode\Modules\Attribute\Enum\AttributeTypes;
 
 class AttributeQueryBuilder
 {
@@ -52,55 +53,73 @@ class AttributeQueryBuilder
                                     ]),
                                 (new InlineFragment('DateAttribute'))
                                     ->setSelectionSet([
-                                        (new Query('code'))->setAlias('type_date'),
-                                        (new Query('format'))->setAlias('additional_date_format'),
+                                        new Query('code', AttributeTypes::DATE),
+                                        new Query('format', 'additional_date_format'),
                                     ]),
                                 (new InlineFragment('FileAttribute'))
                                     ->setSelectionSet([
-                                        (new Query('code'))->setAlias('type_file'),
+                                        new Query('code', AttributeTypes::FILE),
                                     ]),
                                 (new InlineFragment('GalleryAttribute'))
                                     ->setSelectionSet([
-                                        (new Query('code'))->setAlias('type_gallery'),
+                                        new Query('code', AttributeTypes::GALLERY),
                                     ]),
                                 (new InlineFragment('ImageAttribute'))
                                     ->setSelectionSet([
-                                        (new Query('code'))->setAlias('type_image'),
+                                        new Query('code', AttributeTypes::IMAGE),
                                     ]),
                                 (new InlineFragment('SelectAttribute'))
                                     ->setSelectionSet([
-                                        (new Query('code'))->setAlias('type_select'),
+                                        new Query('code', AttributeTypes::SELECT),
+                                        (new Query('options'))
+                                            ->setSelectionSet([
+                                                new Query('code'),
+                                                (new Query('label'))
+                                                    ->setSelectionSet([
+                                                        'language',
+                                                        'value',
+                                                    ]),
+                                            ]),
                                     ]),
                                 (new InlineFragment('MultiSelectAttribute'))
                                     ->setSelectionSet([
-                                        (new Query('code'))->setAlias('type_multiselect'),
+                                        new Query('code', AttributeTypes::MULTISELECT),
+                                        (new Query('options'))
+                                            ->setSelectionSet([
+                                                new Query('code'),
+                                                (new Query('label'))
+                                                    ->setSelectionSet([
+                                                        'language',
+                                                        'value',
+                                                    ]),
+                                            ]),
                                     ]),
                                 (new InlineFragment('NumericAttribute'))
                                     ->setSelectionSet([
-                                        (new Query('code'))->setAlias('type_numeric'),
+                                        new Query('code', AttributeTypes::NUMERIC),
                                     ]),
                                 (new InlineFragment('PriceAttribute'))
                                     ->setSelectionSet([
-                                        (new Query('code'))->setAlias('type_price'),
-                                        (new Query('currency'))->setAlias('additional_currency'),
+                                        new Query('code', AttributeTypes::PRICE),
+                                        new Query('currency', 'additional_currency'),
                                     ]),
                                 (new InlineFragment('ProductRelationAttribute'))
                                     ->setSelectionSet([
-                                        (new Query('code'))->setAlias('type_relation'),
+                                        new Query('code', AttributeTypes::RELATION),
                                     ]),
                                 (new InlineFragment('TextareaAttribute'))
                                     ->setSelectionSet([
-                                        (new Query('code'))->setAlias('type_textarea'),
-                                        (new Query('richEdit'))->setAlias('additional_richEdit'),
+                                        new Query('code', AttributeTypes::TEXTAREA),
+                                        new Query('richEdit', 'additional_richEdit'),
                                     ]),
                                 (new InlineFragment('TextAttribute'))
                                     ->setSelectionSet([
-                                        (new Query('code'))->setAlias('type_text'),
+                                        new Query('code', AttributeTypes::TEXT),
                                     ]),
                                 (new InlineFragment('UnitAttribute'))
                                     ->setSelectionSet([
-                                        (new Query('code'))->setAlias('type_unit'),
-                                        (new Query('unit'))->setAlias('additional_unit')
+                                        new Query('code', AttributeTypes::UNIT),
+                                        (new Query('unit', 'additional_unit'))
                                             ->setSelectionSet([
                                                 'name',
                                                 'symbol',

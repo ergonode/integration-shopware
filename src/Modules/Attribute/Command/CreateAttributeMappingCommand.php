@@ -17,7 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CreateAttributeMappingCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:mapping:create';
+    protected static $defaultName = 'strix:ergonode:attributes:create-mapping';
 
     private Context $context;
 

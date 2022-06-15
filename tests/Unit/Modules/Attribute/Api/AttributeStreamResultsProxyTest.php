@@ -23,16 +23,16 @@ class AttributeStreamResultsProxyTest extends TestCase
     }
 
     /**
-     * @dataProvider getAttributesOfTypesDataProvider
+     * @dataProvider filterAttributesOfTypesDataProvider
      */
-    public function testGetAttributesOfTypesMethod(array $requestedTypes, array $expectedOutput)
+    public function testFilterAttributesOfTypesMethod(array $requestedTypes, array $expectedOutput)
     {
         $output = $this->results->filterByAttributeTypes($requestedTypes);
 
         $this->assertSame($expectedOutput, array_values($output->getEdges()));
     }
 
-    public function getAttributesOfTypesDataProvider(): array
+    public function filterAttributesOfTypesDataProvider(): array
     {
         return [
             [
@@ -40,16 +40,24 @@ class AttributeStreamResultsProxyTest extends TestCase
                 [],
             ],
             [
+                [AttributeTypes::NUMERIC],
+                [
+                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][0],
+                ],
+            ],
+            [
                 [AttributeTypes::SELECT],
                 [
-                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][5]
+                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][4],
+                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][5],
                 ],
             ],
             [
                 [AttributeTypes::SELECT, AttributeTypes::PRICE],
                 [
                     GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][3],
-                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][5]
+                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][4],
+                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][5],
                 ],
             ],
         ];

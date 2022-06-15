@@ -29,4 +29,19 @@ abstract class AbstractStreamResultsProxy extends AbstractResultsProxy
 
         return $this;
     }
+
+    public function filter(callable $callback): self
+    {
+        $filteredResults = clone $this;
+
+        $filteredEdges = array_filter(
+            $filteredResults->getEdges(),
+            $callback
+        );
+
+        $filteredResults->results['data'][static::MAIN_FIELD]['edges'] = $filteredEdges;
+        $filteredResults->results['data'][static::MAIN_FIELD]['totalCount'] = count($filteredEdges);
+
+        return $filteredResults;
+    }
 }
