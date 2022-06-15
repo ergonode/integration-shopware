@@ -6,35 +6,41 @@ namespace Strix\Ergonode\Transformer;
 
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
+use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
 use Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider;
 use Strix\Ergonode\Util\ArrayUnfoldUtil;
+use Strix\Ergonode\Util\ErgonodeApiValueKeyResolverUtil;
+use Strix\Ergonode\Util\IsoCodeConverter;
 
-/**
- * Transforms Ergonode product data array into Shopware's product repository compatible array using attribute mapping
- */
-class ProductTransformer
+class ProductTransformer implements ProductDataTransformerInterface
 {
     private const DEFAULT_LOCALE = 'en_US';
 
     private const REQUIRED_KEYS = [
         'name',
-        'price.net',
-        'price.gross',
         'stock',
-        //TODO
-        //'tax.rate'
+        'tax.rate',
+        'price.net',
+        'price.gross'
+    ];
+
+    private const TRANSLATABLE_KEYS = [
+        'name',
+        'description',
+        'metaDescription',
+        'keywords',
+        'metaTitle',
+        'packUnit',
+        'packUnitPlural',
+        'customSearchKeywords',
     ];
 
     private AttributeMappingProvider $attributeMappingProvider;
 
-    private ArrayUnfoldUtil $arrayUnfoldUtil;
-
     public function __construct(
-        AttributeMappingProvider $attributeMappingProvider,
-        ArrayUnfoldUtil $arrayUnfoldUtil)
-    {
+        AttributeMappingProvider $attributeMappingProvider
+    ) {
         $this->attributeMappingProvider = $attributeMappingProvider;
-        $this->arrayUnfoldUtil = $arrayUnfoldUtil;
     }
 
     /**
@@ -42,28 +48,38 @@ class ProductTransformer
      */
     public function transform(array $productData, Context $context): array
     {
+        if (false === \is_array($productData['attributeList']['edges'] ?? null)) {
+            throw new \RuntimeException('Invalid data format');
+        }
+
         $result = [];
+
         foreach ($productData['attributeList']['edges'] as $edge) {
             $code = $edge['node']['attribute']['code'];
             $mappingKeys = $this->attributeMappingProvider->provideByErgonodeKey($code, $context);
 
-            $translatedValues = [];
-            foreach ($edge['node']['valueTranslations'] as $valueTranslation) {
-                $translatedValues[$valueTranslation['language']] = $valueTranslation[$this->resolveValueKey($valueTranslation['__typename'])];
-                //$valueTranslation['inherited'];
-                //$valueTranslation['language'];
-                //$valueTranslation['__typename']; // StringAttributeValue
-                //$valueTranslation['value_string'];
+            if (null === $mappingKeys) {
+                continue;
             }
 
-            foreach ($mappingKeys as $ergonodeAttributeMappingEntity) {
-                $result[$ergonodeAttributeMappingEntity->getShopwareKey()] = $translatedValues[self::DEFAULT_LOCALE];
+            $translatedValues = $this->getTranslatedValues($edge['node']['valueTranslations']);
+
+            if (false === \array_key_exists(self::DEFAULT_LOCALE, $translatedValues)) {
+                throw new \RuntimeException(
+                    \sprintf('Default locale %s not found in product data', self::DEFAULT_LOCALE)
+                );
             }
+
+            $result = \array_merge_recursive(
+                $result,
+                $this->getTransformedResult($mappingKeys, $translatedValues)
+            );
         }
+
 
         $this->validateResult($result);
 
-        return $this->arrayUnfoldUtil->unfoldArray($result);
+        return ArrayUnfoldUtil::unfoldArray($result);
     }
 
     /**
@@ -78,23 +94,46 @@ class ProductTransformer
         }
     }
 
-    private function resolveValueKey(string $typename): string
+    private function getTranslatedValues(array $valueTranslations): array
     {
-        switch ($typename) {
-            case 'StringAttributeValue':
-                return 'value_string';
-            case 'NumericAttributeValue':
-                return 'value_numeric';
-            case 'StringArrayAttributeValue':
-                return 'value_array';
-            case 'MultimediaAttributeValue':
-                return 'value_multimedia';
-            case 'MultimediaArrayAttributeValue':
-                return 'value_multimedia_array';
-            case 'ProductArrayAttributeValue':
-                return 'value_product_array';
-            default:
-                throw new \RuntimeException(\sprintf('Unknown value typename: %s', $typename));
+        $translatedValues = [];
+        foreach ($valueTranslations as $valueTranslation) {
+            $valueKey = ErgonodeApiValueKeyResolverUtil::resolve($valueTranslation['__typename']);
+            $translatedValues[$valueTranslation['language']] = $valueTranslation[$valueKey];
         }
+        
+        return $translatedValues;
+    }
+
+    private function getTransformedResult(
+        ErgonodeAttributeMappingCollection $mappingKeys,
+        array $translatedValues
+    ): array {
+        $result = [];
+        foreach ($mappingKeys as $ergonodeAttributeMappingEntity) {
+            $swKey = $ergonodeAttributeMappingEntity->getShopwareKey();
+            $result[$swKey] = $translatedValues[self::DEFAULT_LOCALE];
+            $result = $this->getTranslations($translatedValues, $swKey, $result);
+        }
+
+        return $result;
+    }
+
+    private function getTranslations(array $translatedValues, string $swKey, array $result): array
+    {
+        foreach ($translatedValues as $locale => $value) {
+            if (
+                false === \in_array($swKey, self::TRANSLATABLE_KEYS)
+                || null === $value
+                || self::DEFAULT_LOCALE === $locale
+            ) {
+                continue;
+            }
+
+            $swLocale = IsoCodeConverter::ergonodeToShopwareIso($locale);
+            $result['translations'][$swLocale][$swKey] = $value;
+        }
+
+        return $result;
     }
 }
