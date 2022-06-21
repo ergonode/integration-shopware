@@ -101,7 +101,7 @@ class ProductTransformer implements ProductDataTransformerInterface
             $valueKey = ErgonodeApiValueKeyResolverUtil::resolve($valueTranslation['__typename']);
             $translatedValues[$valueTranslation['language']] = $valueTranslation[$valueKey];
         }
-        
+
         return $translatedValues;
     }
 
@@ -122,11 +122,7 @@ class ProductTransformer implements ProductDataTransformerInterface
     private function getTranslations(array $translatedValues, string $swKey, array $result): array
     {
         foreach ($translatedValues as $locale => $value) {
-            if (
-                false === \in_array($swKey, self::TRANSLATABLE_KEYS)
-                || null === $value
-                || self::DEFAULT_LOCALE === $locale
-            ) {
+            if (null === $value || false === \in_array($swKey, self::TRANSLATABLE_KEYS)) {
                 continue;
             }
 
