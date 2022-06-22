@@ -48,14 +48,15 @@ services:
   Strix\Ergonode\Extension\ErgonodeCategoryMappingExtension:
     tags: [ 'shopware.entity.extension' ]
 
+  # MANAGER
+  Strix\Ergonode\Manager\ErgonodeCursorManager:
+    arguments:
+      $repository: '@strix_ergonode_cursor.repository'
+
   # PROVIDER
   Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider:
     arguments:
       $repository: '@strix_ergonode_attribute_mapping.repository'
-
-  Strix\Ergonode\Provider\ErgonodeCursorProvider:
-    arguments:
-      $repository: '@strix_ergonode_cursor.repository'
 
   # PERSISTOR
   Strix\Ergonode\Persistor\ErgonodeCursorPersistor:

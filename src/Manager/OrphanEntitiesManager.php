@@ -7,28 +7,22 @@ namespace Strix\Ergonode\Manager;
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\Modules\Attribute\Api\AttributeDeletedStreamResultsProxy;
 use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
-use Strix\Ergonode\Persistor\ErgonodeCursorPersistor;
 use Strix\Ergonode\Persistor\PropertyGroupPersistor;
-use Strix\Ergonode\Provider\ErgonodeCursorProvider;
 
 class OrphanEntitiesManager
 {
-    private ErgonodeCursorProvider $ergonodeCursorProvider;
-
-    private ErgonodeCursorPersistor $ergonodeCursorPersistor;
+    private ErgonodeCursorManager $ergonodeCursorManager;
 
     private ErgonodeAttributeProvider $ergonodeAttributeProvider;
 
     private PropertyGroupPersistor $propertyGroupPersistor;
 
     public function __construct(
-        ErgonodeCursorProvider $ergonodeCursorProvider,
-        ErgonodeCursorPersistor $ergonodeCursorPersistor,
+        ErgonodeCursorManager $ergonodeCursorManager,
         ErgonodeAttributeProvider $ergonodeAttributeProvider,
         PropertyGroupPersistor $propertyGroupPersistor
     ) {
-        $this->ergonodeCursorProvider = $ergonodeCursorProvider;
-        $this->ergonodeCursorPersistor = $ergonodeCursorPersistor;
+        $this->ergonodeCursorManager = $ergonodeCursorManager;
         $this->ergonodeAttributeProvider = $ergonodeAttributeProvider;
         $this->propertyGroupPersistor = $propertyGroupPersistor;
     }
@@ -37,7 +31,8 @@ class OrphanEntitiesManager
     {
         $entities = [];
 
-        $lastCursor = $this->ergonodeCursorProvider->get(AttributeDeletedStreamResultsProxy::MAIN_FIELD, $context);
+        $lastCursor = $this->ergonodeCursorManager->getCursorEntity(AttributeDeletedStreamResultsProxy::MAIN_FIELD, $context);
+        $lastCursor = null !== $lastCursor ? $lastCursor->getCursor() : null;
         $generator = $this->ergonodeAttributeProvider->provideDeletedBindingAttributes($lastCursor);
 
         foreach ($generator as $deletedAttributes) {
@@ -48,7 +43,7 @@ class OrphanEntitiesManager
         }
 
         if (isset($deletedAttributes) && $deletedAttributes->hasEndCursor()) {
-            $this->ergonodeCursorPersistor->save(
+            $this->ergonodeCursorManager->persist(
                 $deletedAttributes->getEndCursor(),
                 AttributeDeletedStreamResultsProxy::MAIN_FIELD,
                 $context
