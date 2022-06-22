@@ -11,9 +11,14 @@ abstract class AbstractStreamResultsProxy extends AbstractResultsProxy
         return $this->getMainData()['edges'] ?? [];
     }
 
+    public function hasEndCursor(): bool
+    {
+        return null !== $this->getEndCursor();
+    }
+
     public function getEndCursor(): ?string
     {
-        return (string)$this->getMainData()['pageInfo']['endCursor'] ?? null;
+        return $this->getMainData()['pageInfo']['endCursor'] ?? null;
     }
 
     public function hasNextPage(): bool
@@ -40,8 +45,12 @@ abstract class AbstractStreamResultsProxy extends AbstractResultsProxy
         );
 
         $filteredResults->results['data'][static::MAIN_FIELD]['edges'] = $filteredEdges;
-        $filteredResults->results['data'][static::MAIN_FIELD]['totalCount'] = count($filteredEdges);
 
         return $filteredResults;
+    }
+
+    public function map(callable $callback): array
+    {
+        return array_map($callback, $this->getEdges());
     }
 }

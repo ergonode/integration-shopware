@@ -11,6 +11,8 @@ class HttpGqlClientFactory
 {
     private const GRAPHQL_ENDPOINT = 'api/graphql/';
 
+    private const TIMEOUT_SEC = 10;
+
     public function create(ErgonodeAccessData $accessData): Client
     {
         return new Client(
@@ -20,6 +22,7 @@ class HttpGqlClientFactory
             ],
             [
                 'base_uri' => $accessData->getBaseUrl(),
+                'timeout' => self::TIMEOUT_SEC,
             ]
         );
     }
