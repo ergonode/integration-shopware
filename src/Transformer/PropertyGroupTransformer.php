@@ -15,7 +15,7 @@ use Strix\Ergonode\Extension\PropertyGroup\PropertyGroupExtension;
 use Strix\Ergonode\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
 use Strix\Ergonode\Provider\PropertyGroupProvider;
 
-class AttributeNodeTransformer implements NodeTransformerInterface
+class PropertyGroupTransformer
 {
     private PropertyGroupProvider $propertyGroupProvider;
 
@@ -29,7 +29,7 @@ class AttributeNodeTransformer implements NodeTransformerInterface
         $this->translationTransformer = $translationTransformer;
     }
 
-    public function transformNode(array $node, Context $context): array
+    public function transformAttributeNode(array $node, Context $context): array
     {
         $code = $node['code'];
 

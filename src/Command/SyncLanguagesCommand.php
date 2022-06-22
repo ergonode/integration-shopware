@@ -6,7 +6,7 @@ namespace Strix\Ergonode\Command;
 
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Manager\LanguageManager;
+use Strix\Ergonode\Processor\LanguageSyncProcessor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,15 +18,15 @@ class SyncLanguagesCommand extends Command
 
     private Context $context;
 
-    private LanguageManager $languageManager;
+    private LanguageSyncProcessor $processor;
 
     public function __construct(
-        LanguageManager $languageManager
+        LanguageSyncProcessor $processor
     ) {
         parent::__construct();
 
         $this->context = new Context(new SystemSource());
-        $this->languageManager = $languageManager;
+        $this->processor = $processor;
     }
 
     protected function configure()
@@ -40,7 +40,7 @@ class SyncLanguagesCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $entities = $this->languageManager->syncLanguages($this->context);
+        $entities = $this->processor->process($this->context);
 
         if (empty($entities)) {
             $io->info('No new languages created.');

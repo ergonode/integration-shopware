@@ -6,42 +6,42 @@ namespace Strix\Ergonode\Command;
 
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Manager\ProductCustomFieldManager;
+use Strix\Ergonode\Processor\AttributeSyncProcessor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class CreateCustomFieldsCommand extends Command
+class SyncAttributesCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:custom-fields:create';
+    protected static $defaultName = 'strix:ergonode:attributes:sync';
 
     private Context $context;
 
-    private ProductCustomFieldManager $manager;
+    private AttributeSyncProcessor $processor;
 
     public function __construct(
-        ProductCustomFieldManager $manager
+        AttributeSyncProcessor $processor
     ) {
         parent::__construct();
 
         $this->context = new Context(new SystemSource());
-        $this->manager = $manager;
+        $this->processor = $processor;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
-        $entities = $this->manager->prepareCustomFields($this->context);
+        $entities = $this->processor->process($this->context);
 
         if (empty($entities)) {
-            $io->info('No custom fields created.');
+            $io->info('No entities created.');
 
             return self::SUCCESS;
         }
 
-        $io->success('Custom fields created (Ergonode->Shopware).');
+        $io->success('Attributes synced (Ergonode->Shopware).');
         foreach ($entities as $entity => $ids) {
             $io->success(["Created/updated $entity:", ...$ids]);
         }

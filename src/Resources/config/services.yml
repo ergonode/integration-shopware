@@ -12,6 +12,10 @@ services:
     Strix\Ergonode\Extension\AbstractErgonodeMappingExtension:
       tags: [ 'shopware.entity.extension' ]
 
+    # TRANSFORMER
+    Strix\Ergonode\Transformer\CustomField\CustomFieldTransformerInterface:
+      tags: ['strix_ergonode.custom_field_transformer']
+
   # WIRE WHOLE NAMESPACE
   Strix\Ergonode\:
     resource: '../../'
@@ -58,15 +62,10 @@ services:
     arguments:
       $repository: '@strix_ergonode_attribute_mapping.repository'
 
-  # PERSISTOR
-  Strix\Ergonode\Persistor\ErgonodeCursorPersistor:
-    arguments:
-      $repository: '@strix_ergonode_cursor.repository'
-
   # RESOLVER
-  Strix\Ergonode\Resolver\NodeTransformerResolver:
+  Strix\Ergonode\Resolver\CustomFieldTransformerResolver:
     arguments:
-      - !tagged_iterator { tag: 'strix_ergonode.node_transformer' }
+      - !tagged_iterator { tag: 'strix_ergonode.custom_field_transformer' }
 
   # SUBSCRIBER
   Strix\Ergonode\Subscriber\Subscriber:

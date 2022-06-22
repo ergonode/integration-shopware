@@ -61,18 +61,21 @@ class AttributeMappingService
     {
         $definition = $this->definitionInstanceRegistry->getByEntityName(ProductDefinition::ENTITY_NAME);
 
-        $fields = $definition->getTranslatedFields(); // todo more fields ?
+        $fields = $definition->getTranslatedFields(); // todo define list of mappable sw fields ?
 
         return array_keys($fields);
     }
 
     public function getAllErgonodeAttributes(): array
     {
-        $attributes = $this->ergonodeAttributeProvider->provideProductAttributes();
-
         $attributeCodes = [];
-        foreach ($attributes as $attribute) {
-            $attributeCodes[] = $attribute['node']['code'] ?? ''; // todo use parsed response
+
+        $generator = $this->ergonodeAttributeProvider->provideProductAttributes();
+
+        foreach ($generator as $attributes) {
+            foreach ($attributes->getEdges() as $attribute) {
+                $attributeCodes[] = $attribute['node']['code'] ?? '';
+            }
         }
 
         return $attributeCodes;

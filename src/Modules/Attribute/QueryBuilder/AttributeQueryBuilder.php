@@ -6,7 +6,7 @@ namespace Strix\Ergonode\Modules\Attribute\QueryBuilder;
 
 use GraphQL\InlineFragment;
 use GraphQL\Query;
-use Strix\Ergonode\Modules\Attribute\Enum\AttributeTypes;
+use Strix\Ergonode\Enum\AttributeTypesEnum;
 
 class AttributeQueryBuilder
 {
@@ -53,24 +53,24 @@ class AttributeQueryBuilder
                                     ]),
                                 (new InlineFragment('DateAttribute'))
                                     ->setSelectionSet([
-                                        new Query('code', AttributeTypes::DATE),
+                                        new Query('code', AttributeTypesEnum::DATE),
                                         new Query('format', 'additional_date_format'),
                                     ]),
                                 (new InlineFragment('FileAttribute'))
                                     ->setSelectionSet([
-                                        new Query('code', AttributeTypes::FILE),
+                                        new Query('code', AttributeTypesEnum::FILE),
                                     ]),
                                 (new InlineFragment('GalleryAttribute'))
                                     ->setSelectionSet([
-                                        new Query('code', AttributeTypes::GALLERY),
+                                        new Query('code', AttributeTypesEnum::GALLERY),
                                     ]),
                                 (new InlineFragment('ImageAttribute'))
                                     ->setSelectionSet([
-                                        new Query('code', AttributeTypes::IMAGE),
+                                        new Query('code', AttributeTypesEnum::IMAGE),
                                     ]),
                                 (new InlineFragment('SelectAttribute'))
                                     ->setSelectionSet([
-                                        new Query('code', AttributeTypes::SELECT),
+                                        new Query('code', AttributeTypesEnum::SELECT),
                                         (new Query('options'))
                                             ->setSelectionSet([
                                                 new Query('code'),
@@ -83,7 +83,7 @@ class AttributeQueryBuilder
                                     ]),
                                 (new InlineFragment('MultiSelectAttribute'))
                                     ->setSelectionSet([
-                                        new Query('code', AttributeTypes::MULTISELECT),
+                                        new Query('code', AttributeTypesEnum::MULTISELECT),
                                         (new Query('options'))
                                             ->setSelectionSet([
                                                 new Query('code'),
@@ -96,29 +96,29 @@ class AttributeQueryBuilder
                                     ]),
                                 (new InlineFragment('NumericAttribute'))
                                     ->setSelectionSet([
-                                        new Query('code', AttributeTypes::NUMERIC),
+                                        new Query('code', AttributeTypesEnum::NUMERIC),
                                     ]),
                                 (new InlineFragment('PriceAttribute'))
                                     ->setSelectionSet([
-                                        new Query('code', AttributeTypes::PRICE),
+                                        new Query('code', AttributeTypesEnum::PRICE),
                                         new Query('currency', 'additional_currency'),
                                     ]),
                                 (new InlineFragment('ProductRelationAttribute'))
                                     ->setSelectionSet([
-                                        new Query('code', AttributeTypes::RELATION),
+                                        new Query('code', AttributeTypesEnum::RELATION),
                                     ]),
                                 (new InlineFragment('TextareaAttribute'))
                                     ->setSelectionSet([
-                                        new Query('code', AttributeTypes::TEXTAREA),
+                                        new Query('code', AttributeTypesEnum::TEXTAREA),
                                         new Query('richEdit', 'additional_richEdit'),
                                     ]),
                                 (new InlineFragment('TextAttribute'))
                                     ->setSelectionSet([
-                                        new Query('code', AttributeTypes::TEXT),
+                                        new Query('code', AttributeTypesEnum::TEXT),
                                     ]),
                                 (new InlineFragment('UnitAttribute'))
                                     ->setSelectionSet([
-                                        new Query('code', AttributeTypes::UNIT),
+                                        new Query('code', AttributeTypesEnum::UNIT),
                                         (new Query('unit', 'additional_unit'))
                                             ->setSelectionSet([
                                                 'name',

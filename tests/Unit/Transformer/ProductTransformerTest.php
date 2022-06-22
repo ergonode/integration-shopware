@@ -81,6 +81,9 @@ class ProductTransformerTest extends TestCase
             'translations' => [
                 'pl-PL' => [
                     'name' => 'Test product PL'
+                ],
+                'en-US' => [
+                    'name' => 'Test product EN'
                 ]
             ],
             'stock' => 999,
