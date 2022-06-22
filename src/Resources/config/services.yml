@@ -58,3 +58,11 @@ services:
   # ENTITY DEFINITION
   Strix\Ergonode\Entity\ErgonodeCategoryMappingExtensionEntityDefinition:
     tags: [ 'shopware.entity.definition' ]
+
+  # TRANSFORMER
+  Strix\Ergonode\Transformer\ProductTransformerChain:
+    arguments:
+      $transformers:
+        - '@Strix\Ergonode\Transformer\ProductTransformer'
+        - '@Strix\Ergonode\Transformer\ProductTaxTransformer'
+        - '@Strix\Ergonode\Transformer\ProductPriceTransformer'

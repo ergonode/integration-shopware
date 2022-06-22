@@ -6,7 +6,8 @@ namespace Strix\Ergonode\Command;
 
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Api\Client\CachedErgonodeGqlClient;
+use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
+use Strix\Ergonode\Modules\Product\Api\ProductResultsProxy;
 use Strix\Ergonode\Modules\Product\QueryBuilder\ProductQueryBuilder;
 use Strix\Ergonode\Persistor\ProductPersistor;
 use Symfony\Component\Console\Command\Command;
@@ -22,12 +23,12 @@ class DebugPersistProduct extends Command
 {
     protected static $defaultName = 'strix:debug:product-persist';
 
-    private CachedErgonodeGqlClient $gqlClient;
+    private ErgonodeGqlClientInterface $gqlClient;
     private ProductQueryBuilder $productQueryBuilder;
     private ProductPersistor $productPersistor;
 
     public function __construct(
-        CachedErgonodeGqlClient $gqlClient,
+        ErgonodeGqlClientInterface $gqlClient,
         ProductQueryBuilder $productQueryBuilder,
         ProductPersistor $productPersistor
     ) {
@@ -63,7 +64,10 @@ class DebugPersistProduct extends Command
             return self::FAILURE;
         }
 
-        $this->productPersistor->persist($result, new Context(new SystemSource()));
+        $this->productPersistor->persist(
+            new ProductResultsProxy($result),
+            new Context(new SystemSource())
+        );
 
         return self::SUCCESS;
     }
