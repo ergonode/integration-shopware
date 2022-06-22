@@ -8,6 +8,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
+use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Transformer\ProductPriceTransformer;
 
 class ProductPriceTransformerTest extends TestCase
@@ -31,7 +32,7 @@ class ProductPriceTransformerTest extends TestCase
      */
     public function testTransformingData(array $data): void
     {
-        $result = $this->productPriceTransformer->transform($data, $this->contextMock);
+        $result = $this->productPriceTransformer->transform(new ProductTransformationDTO([], $data), $this->contextMock);
 
         $this->assertEquals([
             'price' => [
@@ -42,7 +43,7 @@ class ProductPriceTransformerTest extends TestCase
                     'currencyId' => Defaults::CURRENCY
                 ]
             ]
-        ], $result);
+        ], $result->getShopwareData());
     }
 
     public function getProductData(): array

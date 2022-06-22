@@ -10,6 +10,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\System\Tax\TaxEntity;
+use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Provider\TaxProvider;
 use Strix\Ergonode\Transformer\ProductTaxTransformer;
 
@@ -62,13 +63,13 @@ class ProductTaxTransformerTest extends TestCase
             ->with(self::TEST_TAX_RATE, $this->contextMock)
             ->willReturn($taxEntity);
 
-        $result = $this->productTaxTransformer->transform($data, $this->contextMock);
+        $result = $this->productTaxTransformer->transform(new ProductTransformationDTO([], $data), $this->contextMock);
 
         $this->assertEquals([
             'taxId' => self::TEST_TAX_ID
-        ], $result);
+        ], $result->getShopwareData());
 
-        $this->assertArrayNotHasKey('tax', $result);
+        $this->assertArrayNotHasKey('tax', $result->getShopwareData());
     }
 
     public function testCreatingTax(): void
@@ -102,12 +103,12 @@ class ProductTaxTransformerTest extends TestCase
             ->willReturn($entityWrittenEvent);
 
 
-        $result = $this->productTaxTransformer->transform($data, $this->contextMock);
+        $result = $this->productTaxTransformer->transform(new ProductTransformationDTO([], $data), $this->contextMock);
 
         $this->assertEquals([
             'taxId' => self::TEST_TAX_ID
-        ], $result);
+        ], $result->getShopwareData());
 
-        $this->assertArrayNotHasKey('tax', $result);
+        $this->assertArrayNotHasKey('tax', $result->getShopwareData());
     }
 }

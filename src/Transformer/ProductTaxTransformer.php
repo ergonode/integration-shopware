@@ -7,6 +7,7 @@ namespace Strix\Ergonode\Transformer;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\Tax\TaxDefinition;
+use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Provider\TaxProvider;
 
 class ProductTaxTransformer implements ProductDataTransformerInterface
@@ -23,9 +24,10 @@ class ProductTaxTransformer implements ProductDataTransformerInterface
         $this->taxRepository = $taxRepository;
     }
 
-    public function transform(array $productData, Context $context): array
+    public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
-        $productTaxRate = $productData['tax']['rate'] ?? null;
+        $swData = $productData->getShopwareData();
+        $productTaxRate = $swData['tax']['rate'] ?? null;
 
         if (null === $productTaxRate) {
             throw new \RuntimeException('Missing tax.rate from product data');
@@ -47,8 +49,10 @@ class ProductTaxTransformer implements ProductDataTransformerInterface
             )->getPrimaryKeys(TaxDefinition::ENTITY_NAME)[0];
         }
 
-        $productData['taxId'] = $taxId;
-        unset($productData['tax']);
+        $swData['taxId'] = $taxId;
+        unset($swData['tax']);
+
+        $productData->setShopwareData($swData);
 
         return $productData;
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Provider;
 
+use Shopware\Core\Content\Category\CategoryCollection;
 use Shopware\Core\Content\Category\CategoryEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -33,5 +34,14 @@ class CategoryProvider
         $criteria->addAssociations($associations);
 
         return $this->categoryRepository->search($criteria, $context)->first();
+    }
+
+    public function getCategoriesByCode(string $code, Context $context, array $associations = []): CategoryCollection
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter(ErgonodeCategoryMappingExtension::EXTENSION_NAME . '.code', $code));
+        $criteria->addAssociations($associations);
+
+        return $this->categoryRepository->search($criteria, $context)->getEntities();
     }
 }
