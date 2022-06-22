@@ -5,24 +5,33 @@ declare(strict_types=1);
 namespace Strix\Ergonode\Persistor;
 
 use Shopware\Core\Content\Product\ProductDefinition;
-use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
 use Strix\Ergonode\Modules\Product\Api\ProductResultsProxy;
 use Strix\Ergonode\Provider\ProductProvider;
+use Strix\Ergonode\Transformer\ProductTransformerChain;
 
 class ProductPersistor
 {
     private EntityRepositoryInterface $productRepository;
 
     private ProductProvider $productProvider;
+    private ProductTransformerChain $productTransformerChain;
 
-    public function __construct(EntityRepositoryInterface $productRepository, ProductProvider $productProvider)
-    {
+    public function __construct(
+        EntityRepositoryInterface $productRepository,
+        ProductProvider $productProvider,
+        ProductTransformerChain $productTransformerChain
+    ) {
         $this->productRepository = $productRepository;
         $this->productProvider = $productProvider;
+        $this->productTransformerChain = $productTransformerChain;
     }
 
+    /**
+     * @throws MissingRequiredProductMappingException
+     */
     public function persist(ProductResultsProxy $results, Context $context): void
     {
         $parentId = $this->persistProduct($results->getProductData(), null, $context);
@@ -32,35 +41,27 @@ class ProductPersistor
         }
     }
 
-    public function persistProduct(array $productData, ?string $parentId, Context $context): string
+    /**
+     * @throws MissingRequiredProductMappingException
+     */
+    protected function persistProduct(array $productData, ?string $parentId, Context $context): string
     {
-        // TODO dynamic attribute mapping
+        $transformedData = $this->productTransformerChain->transform($productData, $context);
+
         $sku = $productData['sku'];
-        $productName = 'Ergonode Test Product';
-        $price = 100;
-        $priceGross = 111;
-        $stock = 999;
-
-        //TODO Process taxID
-        $taxId = 'f2994dd722dd4e828614187aa26a9f11';
-
         $existingProduct = $this->productProvider->getProductBySku($sku, $context);
 
-        $productIds = $this->productRepository->upsert(
-            [[
+        $swProductData = \array_merge_recursive(
+            [
                 'id' => null !== $existingProduct ? $existingProduct->getId() : null,
                 'parentId' => $parentId,
                 'productNumber' => $sku,
-                'name' => $productName,
-                'price' => [[
-                    'net' => $price,
-                    'gross' => $priceGross,
-                    'linked' => true,
-                    'currencyId' => Defaults::CURRENCY,
-                ]],
-                'stock' => $stock,
-                'taxId' => $taxId,
-            ]],
+            ],
+            $transformedData
+        );
+
+        $productIds = $this->productRepository->upsert(
+            [$swProductData],
             $context
         )->getPrimaryKeys(ProductDefinition::ENTITY_NAME);
 

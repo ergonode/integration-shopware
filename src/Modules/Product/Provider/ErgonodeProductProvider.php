@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Modules\Product\Provider;
 
-use Strix\Ergonode\Api\Client\CachedErgonodeGqlClient;
+use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
 use Strix\Ergonode\Modules\Product\Api\ProductResultsProxy;
 use Strix\Ergonode\Modules\Product\Api\ProductStreamResultsProxy;
 use Strix\Ergonode\Modules\Product\QueryBuilder\ProductQueryBuilder;
@@ -13,11 +13,11 @@ class ErgonodeProductProvider
 {
     private ProductQueryBuilder $productQueryBuilder;
 
-    private CachedErgonodeGqlClient $ergonodeGqlClient;
+    private ErgonodeGqlClientInterface $ergonodeGqlClient;
 
     public function __construct(
         ProductQueryBuilder $productQueryBuilder,
-        CachedErgonodeGqlClient $ergonodeGqlClient
+        ErgonodeGqlClientInterface $ergonodeGqlClient
     ) {
         $this->productQueryBuilder = $productQueryBuilder;
         $this->ergonodeGqlClient = $ergonodeGqlClient;

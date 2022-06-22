@@ -879,4 +879,61 @@ class GqlAttributeResponse
             ],
         ];
     }
+
+    public static function attributeDeletedStreamResponse(): array
+    {
+        return [
+            'data' => [
+                'attributeDeletedStream' => [
+                    'totalCount' => 10,
+                    'pageInfo' => [
+                        'endCursor' => 'YXJyYXljb25uZWN0aW9uOjEzODgyOA==',
+                        'hasNextPage' => false,
+                    ],
+                    'edges' => [
+                        0 => [
+                            'cursor' => 'YXJyYXljb25uZWN0aW9uOjI1Ng==',
+                            'node' => 'color_name',
+                        ],
+                        1 => [
+                            'cursor' => 'YXJyYXljb25uZWN0aW9uOjI2OQ==',
+                            'node' => 'waiste',
+                        ],
+                        2 => [
+                            'cursor' => 'YXJyYXljb25uZWN0aW9uOjM3MjE=',
+                            'node' => 'year',
+                        ],
+                        3 => [
+                            'cursor' => 'YXJyYXljb25uZWN0aW9uOjM3MjI=',
+                            'node' => 'country_origin',
+                        ],
+                        4 => [
+                            'cursor' => 'YXJyYXljb25uZWN0aW9uOjM3MjM=',
+                            'node' => 'cn_hs_code',
+                        ],
+                        5 => [
+                            'cursor' => 'YXJyYXljb25uZWN0aW9uOjM3MjQ=',
+                            'node' => 'filling',
+                        ],
+                        6 => [
+                            'cursor' => 'YXJyYXljb25uZWN0aW9uOjM3MjU=',
+                            'node' => 'lining',
+                        ],
+                        7 => [
+                            'cursor' => 'YXJyYXljb25uZWN0aW9uOjM3MjY=',
+                            'node' => 'assortment_group',
+                        ],
+                        8 => [
+                            'cursor' => 'YXJyYXljb25uZWN0aW9uOjM3Mjc=',
+                            'node' => 'season',
+                        ],
+                        9 => [
+                            'cursor' => 'YXJyYXljb25uZWN0aW9uOjM3Mjg=',
+                            'node' => 'gender',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
 }

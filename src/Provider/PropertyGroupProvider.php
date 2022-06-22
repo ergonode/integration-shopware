@@ -8,6 +8,7 @@ use Shopware\Core\Content\Property\PropertyGroupEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
 
@@ -31,5 +32,16 @@ class PropertyGroupProvider
         ]);
 
         return $this->propertyGroupRepository->search($criteria, $context)->first();
+    }
+
+    /**
+     * @param string[] $codes
+     */
+    public function getIdsByCodes(array $codes, Context $context): array
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsAnyFilter(AbstractErgonodeMappingExtension::EXTENSION_NAME . '.code', $codes));
+
+        return $this->propertyGroupRepository->searchIds($criteria, $context)->getIds();
     }
 }
