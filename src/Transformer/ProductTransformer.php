@@ -21,7 +21,7 @@ class ProductTransformer implements ProductDataTransformerInterface
         'stock',
         'tax.rate',
         'price.net',
-        'price.gross'
+        'price.gross',
     ];
 
     private const TRANSLATABLE_KEYS = [
@@ -75,7 +75,6 @@ class ProductTransformer implements ProductDataTransformerInterface
                 $this->getTransformedResult($mappingKeys, $translatedValues)
             );
         }
-
 
         $this->validateResult($result);
 

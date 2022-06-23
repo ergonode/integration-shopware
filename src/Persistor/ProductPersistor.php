@@ -17,6 +17,7 @@ class ProductPersistor
     private EntityRepositoryInterface $productRepository;
 
     private ProductProvider $productProvider;
+
     private ProductTransformerChain $productTransformerChain;
 
     public function __construct(
@@ -32,19 +33,26 @@ class ProductPersistor
     /**
      * @throws MissingRequiredProductMappingException
      */
-    public function persist(ProductResultsProxy $results, Context $context): void
+    public function persist(ProductResultsProxy $results, Context $context): array
     {
-        $parentId = $this->persistProduct($results->getProductData(), null, $context);
+        $entities = $this->persistProduct($results->getProductData(), null, $context);
+
+        $parentId = $entities[ProductDefinition::ENTITY_NAME][0];
 
         foreach ($results->getVariants() as $variantData) {
-            $this->persistProduct($variantData['node'], $parentId, $context);
+            $entities = array_merge_recursive(
+                $entities,
+                $this->persistProduct($variantData['node'], $parentId, $context)
+            );
         }
+
+        return $entities;
     }
 
     /**
      * @throws MissingRequiredProductMappingException
      */
-    protected function persistProduct(array $productData, ?string $parentId, Context $context): string
+    protected function persistProduct(array $productData, ?string $parentId, Context $context): array
     {
         $transformedData = $this->productTransformerChain->transform($productData, $context);
 
@@ -60,11 +68,13 @@ class ProductPersistor
             $transformedData
         );
 
-        $productIds = $this->productRepository->upsert(
+        $written = $this->productRepository->upsert(
             [$swProductData],
             $context
-        )->getPrimaryKeys(ProductDefinition::ENTITY_NAME);
+        );
 
-        return $productIds[0];
+        return [
+            ProductDefinition::ENTITY_NAME => $written->getPrimaryKeys(ProductDefinition::ENTITY_NAME),
+        ];
     }
 }
