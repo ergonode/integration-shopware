@@ -20,9 +20,6 @@ class ProductTransformer implements ProductDataTransformerInterface
     private const REQUIRED_KEYS = [
         'name',
         'stock',
-        'tax.rate',
-        'price.net',
-        'price.gross'
     ];
 
     private const TRANSLATABLE_KEYS = [

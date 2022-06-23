@@ -6,12 +6,18 @@ namespace Strix\Ergonode\DTO;
 
 class ProductTransformationDTO
 {
+    public const OPERATION_CREATE = 'create';
+    public const OPERATION_UPDATE = 'update';
+
     private array $ergonodeData;
 
     private array $shopwareData;
 
-    public function __construct(array $ergonodeData, array $shopwareData = [])
+    private string $operation;
+
+    public function __construct(string $operation, array $ergonodeData, array $shopwareData = [])
     {
+        $this->operation = $operation;
         $this->ergonodeData = $ergonodeData;
         $this->shopwareData = $shopwareData;
     }
@@ -34,5 +40,10 @@ class ProductTransformationDTO
     public function setShopwareData(array $shopwareData): void
     {
         $this->shopwareData = $shopwareData;
+    }
+
+    public function getOperation(): string
+    {
+        return $this->operation;
     }
 }
