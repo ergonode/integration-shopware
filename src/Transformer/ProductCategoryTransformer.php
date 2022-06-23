@@ -28,7 +28,11 @@ class ProductCategoryTransformer implements ProductDataTransformerInterface
 
         $categoryIds = [];
         foreach ($categoryData as $category) {
-            $categoryCode = $category['node']['code'];
+            $categoryCode = $category['node']['code'] ?? null;
+            if (null === $categoryCode) {
+                continue;
+            }
+
             $categoryCollection = $this->categoryProvider->getCategoriesByCode($categoryCode, $context);
 
             $categoryIds = \array_merge(
