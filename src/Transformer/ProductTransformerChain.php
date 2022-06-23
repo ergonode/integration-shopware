@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Strix\Ergonode\Transformer;
 
 use Shopware\Core\Framework\Context;
+use Strix\Ergonode\DTO\ProductTransformationDTO;
 
 class ProductTransformerChain implements ProductDataTransformerInterface
 {
@@ -15,7 +16,7 @@ class ProductTransformerChain implements ProductDataTransformerInterface
         $this->transformers = $transformers;
     }
 
-    public function transform(array $productData, Context $context): array
+    public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         /** @var ProductDataTransformerInterface $transformer */
         foreach ($this->transformers as $transformer) {

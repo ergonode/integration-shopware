@@ -77,5 +77,6 @@ services:
     arguments:
       $transformers:
         - '@Strix\Ergonode\Transformer\ProductTransformer'
+        - '@Strix\Ergonode\Transformer\ProductCategoryTransformer'
         - '@Strix\Ergonode\Transformer\ProductTaxTransformer'
         - '@Strix\Ergonode\Transformer\ProductPriceTransformer'

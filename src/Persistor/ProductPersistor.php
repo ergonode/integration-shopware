@@ -7,6 +7,7 @@ namespace Strix\Ergonode\Persistor;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
 use Strix\Ergonode\Modules\Product\Api\ProductResultsProxy;
 use Strix\Ergonode\Provider\ProductProvider;
@@ -46,7 +47,10 @@ class ProductPersistor
      */
     protected function persistProduct(array $productData, ?string $parentId, Context $context): string
     {
-        $transformedData = $this->productTransformerChain->transform($productData, $context);
+        $transformedData = $this->productTransformerChain->transform(
+            new ProductTransformationDTO($productData),
+            $context
+        );
 
         $sku = $productData['sku'];
         $existingProduct = $this->productProvider->getProductBySku($sku, $context);
@@ -57,7 +61,7 @@ class ProductPersistor
                 'parentId' => $parentId,
                 'productNumber' => $sku,
             ],
-            $transformedData
+            $transformedData->getShopwareData()
         );
 
         $productIds = $this->productRepository->upsert(
