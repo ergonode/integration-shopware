@@ -9,13 +9,14 @@ use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
 use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
 use Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider;
+use Strix\Ergonode\Provider\LanguageProvider;
 use Strix\Ergonode\Util\ArrayUnfoldUtil;
 use Strix\Ergonode\Util\ErgonodeApiValueKeyResolverUtil;
 use Strix\Ergonode\Util\IsoCodeConverter;
 
 class ProductTransformer implements ProductDataTransformerInterface
 {
-    private const DEFAULT_LOCALE = 'en_US';
+    private string $defaultLocale;
 
     private const REQUIRED_KEYS = [
         'name',
@@ -37,11 +38,14 @@ class ProductTransformer implements ProductDataTransformerInterface
     ];
 
     private AttributeMappingProvider $attributeMappingProvider;
+    private LanguageProvider $languageProvider;
 
     public function __construct(
-        AttributeMappingProvider $attributeMappingProvider
+        AttributeMappingProvider $attributeMappingProvider,
+        LanguageProvider $languageProvider
     ) {
         $this->attributeMappingProvider = $attributeMappingProvider;
+        $this->languageProvider = $languageProvider;
     }
 
     /**
@@ -53,6 +57,10 @@ class ProductTransformer implements ProductDataTransformerInterface
         if (false === \is_array($ergonodeData['attributeList']['edges'] ?? null)) {
             throw new \RuntimeException('Invalid data format');
         }
+
+        $this->defaultLocale = IsoCodeConverter::shopwareToErgonodeIso(
+            $this->languageProvider->getDefaultLanguageLocale($context)
+        );
 
         $result = [];
 
@@ -66,9 +74,9 @@ class ProductTransformer implements ProductDataTransformerInterface
 
             $translatedValues = $this->getTranslatedValues($edge['node']['valueTranslations']);
 
-            if (false === \array_key_exists(self::DEFAULT_LOCALE, $translatedValues)) {
+            if (false === \array_key_exists($this->defaultLocale, $translatedValues)) {
                 throw new \RuntimeException(
-                    \sprintf('Default locale %s not found in product data', self::DEFAULT_LOCALE)
+                    \sprintf('Default locale %s not found in product data', $this->defaultLocale)
                 );
             }
 
@@ -118,7 +126,7 @@ class ProductTransformer implements ProductDataTransformerInterface
         $result = [];
         foreach ($mappingKeys as $ergonodeAttributeMappingEntity) {
             $swKey = $ergonodeAttributeMappingEntity->getShopwareKey();
-            $result[$swKey] = $translatedValues[self::DEFAULT_LOCALE];
+            $result[$swKey] = $translatedValues[$this->defaultLocale];
             $result = $this->getTranslations($translatedValues, $swKey, $result);
         }
 
