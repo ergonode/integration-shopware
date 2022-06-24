@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Strix\Ergonode\Transformer;
 
 use Shopware\Core\Framework\Context;
+use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
 use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
 use Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider;
@@ -46,15 +47,16 @@ class ProductTransformer implements ProductDataTransformerInterface
     /**
      * @throws MissingRequiredProductMappingException
      */
-    public function transform(array $productData, Context $context): array
+    public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
-        if (false === \is_array($productData['attributeList']['edges'] ?? null)) {
+        $ergonodeData = $productData->getErgonodeData();
+        if (false === \is_array($ergonodeData['attributeList']['edges'] ?? null)) {
             throw new \RuntimeException('Invalid data format');
         }
 
         $result = [];
 
-        foreach ($productData['attributeList']['edges'] as $edge) {
+        foreach ($ergonodeData['attributeList']['edges'] as $edge) {
             $code = $edge['node']['attribute']['code'];
             $mappingKeys = $this->attributeMappingProvider->provideByErgonodeKey($code, $context);
 
@@ -78,7 +80,11 @@ class ProductTransformer implements ProductDataTransformerInterface
 
         $this->validateResult($result);
 
-        return ArrayUnfoldUtil::unfoldArray($result);
+        $productData->setShopwareData(
+            ArrayUnfoldUtil::unfoldArray($result)
+        );
+
+        return $productData;
     }
 
     /**

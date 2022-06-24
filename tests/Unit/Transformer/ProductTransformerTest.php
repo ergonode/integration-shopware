@@ -7,6 +7,7 @@ namespace Strix\Ergonode\Tests\Unit\Provider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
+use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
 use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
 use Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider;
@@ -74,7 +75,7 @@ class ProductTransformerTest extends TestCase
      */
     public function testTransformingData(array $data): void
     {
-        $result = $this->productTransformer->transform($data, $this->contextMock);
+        $result = $this->productTransformer->transform(new ProductTransformationDTO($data), $this->contextMock);
 
         $this->assertEquals([
             'name' => 'Test product EN',
@@ -94,7 +95,7 @@ class ProductTransformerTest extends TestCase
                 'net' => 100,
                 'gross' => 123,
             ]
-        ], $result);
+        ], $result->getShopwareData());
     }
 
     public function getProductData(): array
