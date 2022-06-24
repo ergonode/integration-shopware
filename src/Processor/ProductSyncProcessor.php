@@ -7,7 +7,6 @@ namespace Strix\Ergonode\Processor;
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
 use Strix\Ergonode\Modules\Product\Provider\ErgonodeProductProvider;
-use Strix\Ergonode\Persistor\ProductMediaPersistor;
 use Strix\Ergonode\Persistor\ProductPersistor;
 
 class ProductSyncProcessor
@@ -16,29 +15,25 @@ class ProductSyncProcessor
 
     private ProductPersistor $productPersistor;
 
-    private ProductMediaPersistor $productMediaPersistor;
-
     public function __construct(
         ErgonodeProductProvider $ergonodeProductProvider,
-        ProductPersistor $productPersistor,
-        ProductMediaPersistor $productMediaPersistor
+        ProductPersistor $productPersistor
     ) {
         $this->ergonodeProductProvider = $ergonodeProductProvider;
         $this->productPersistor = $productPersistor;
-        $this->productMediaPersistor = $productMediaPersistor;
     }
 
     /**
      * @throws MissingRequiredProductMappingException
      */
-    public function process(Context $context): array
+    public function process(Context $context): void
     {
         $result = $this->ergonodeProductProvider->provideProductWithVariants('fko002'); // todo fetch stream
 
         if (null === $result) {
-            return [];
+            return;
         }
 
-        return $this->productPersistor->persist($result, $context);
+        $this->productPersistor->persist($result, $context);
     }
 }

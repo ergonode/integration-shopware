@@ -42,23 +42,14 @@ class SyncProductsCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         try {
-            $entities = $this->processor->process($this->context);
+            $this->processor->process($this->context);
         } catch (MissingRequiredProductMappingException $e) {
             $io->error($e->getMessage());
 
             return self::FAILURE;
         }
-
-        if (empty($entities)) {
-            $io->info('No new products created.');
-
-            return self::SUCCESS;
-        }
-
+        
         $io->success('Products synchronized (Ergonode->Shopware).');
-        foreach ($entities as $entity => $ids) {
-            $io->success(["Created $entity:", ...$ids]);
-        }
 
         return self::SUCCESS;
     }
