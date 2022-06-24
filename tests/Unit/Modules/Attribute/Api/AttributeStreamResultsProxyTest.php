@@ -8,7 +8,7 @@ use GraphQL\Results;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\Modules\Attribute\Enum\AttributeTypes;
+use Strix\Ergonode\Enum\AttributeTypesEnum;
 use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
 
 class AttributeStreamResultsProxyTest extends TestCase
@@ -23,16 +23,26 @@ class AttributeStreamResultsProxyTest extends TestCase
     }
 
     /**
-     * @dataProvider filterAttributesOfTypesDataProvider
+     * @dataProvider filterByAttributeTypesDataProvider
      */
-    public function testFilterAttributesOfTypesMethod(array $requestedTypes, array $expectedOutput)
+    public function testFilterByAttributeTypesMethod(array $requestedTypes, array $expectedOutput)
     {
         $output = $this->results->filterByAttributeTypes($requestedTypes);
 
         $this->assertSame($expectedOutput, array_values($output->getEdges()));
     }
 
-    public function filterAttributesOfTypesDataProvider(): array
+    /**
+     * @dataProvider filterByCodesDataProvider
+     */
+    public function testFilterByCodesMethod(array $requestedCodes, array $expectedOutput)
+    {
+        $output = $this->results->filterByCodes($requestedCodes);
+
+        $this->assertSame($expectedOutput, array_values($output->getEdges()));
+    }
+
+    public function filterByAttributeTypesDataProvider(): array
     {
         return [
             [
@@ -40,24 +50,47 @@ class AttributeStreamResultsProxyTest extends TestCase
                 [],
             ],
             [
-                [AttributeTypes::NUMERIC],
+                [AttributeTypesEnum::NUMERIC],
                 [
                     GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][0],
                 ],
             ],
             [
-                [AttributeTypes::SELECT],
+                [AttributeTypesEnum::SELECT],
                 [
                     GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][4],
                     GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][5],
                 ],
             ],
             [
-                [AttributeTypes::SELECT, AttributeTypes::PRICE],
+                [AttributeTypesEnum::SELECT, AttributeTypesEnum::PRICE],
                 [
                     GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][3],
                     GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][4],
                     GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][5],
+                ],
+            ],
+        ];
+    }
+
+    public function filterByCodesDataProvider(): array
+    {
+        return [
+            [
+                [],
+                [],
+            ],
+            [
+                ['stock'],
+                [
+                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][0],
+                ],
+            ],
+            [
+                ['stock', 'name'],
+                [
+                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][0],
+                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][1],
                 ],
             ],
         ];

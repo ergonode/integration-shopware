@@ -19,5 +19,4 @@ class StrixErgonode extends Plugin
         parent::build($container);
         $container->addCompilerPass(new GqlClientCacheCompilerPass());
     }
-
 }

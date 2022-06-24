@@ -6,34 +6,27 @@ namespace Strix\Ergonode\Command;
 
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Processor\LanguageSyncProcessor;
+use Strix\Ergonode\Processor\AttributeSyncProcessor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class SyncLanguagesCommand extends Command
+class SyncAttributesCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:languages:sync';
+    protected static $defaultName = 'strix:ergonode:attributes:sync';
 
     private Context $context;
 
-    private LanguageSyncProcessor $processor;
+    private AttributeSyncProcessor $processor;
 
     public function __construct(
-        LanguageSyncProcessor $processor
+        AttributeSyncProcessor $processor
     ) {
         parent::__construct();
 
         $this->context = new Context(new SystemSource());
         $this->processor = $processor;
-    }
-
-    protected function configure()
-    {
-        $this->setDescription(
-            'Fetches all languages from Ergonode and saves them as Language entities in Shopware.'
-        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -43,14 +36,14 @@ class SyncLanguagesCommand extends Command
         $entities = $this->processor->process($this->context);
 
         if (empty($entities)) {
-            $io->info('No new languages created.');
+            $io->info('No entities created.');
 
             return self::SUCCESS;
         }
 
-        $io->success('Languages synchronized (Ergonode->Shopware).');
+        $io->success('Attributes synced (Ergonode->Shopware).');
         foreach ($entities as $entity => $ids) {
-            $io->success(["Created $entity:", ...$ids]);
+            $io->success(["Created/updated $entity:", ...$ids]);
         }
 
         return self::SUCCESS;

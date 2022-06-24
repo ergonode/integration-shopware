@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Manager;
+namespace Strix\Ergonode\Processor;
 
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\Persistor\LanguagePersistor;
 use Strix\Ergonode\Provider\ErgonodeLanguageProvider;
 
-class LanguageManager
+class LanguageSyncProcessor
 {
     private ErgonodeLanguageProvider $ergonodeLanguageProvider;
 
@@ -22,11 +22,10 @@ class LanguageManager
         $this->languagePersistor = $languagePersistor;
     }
 
-    public function syncLanguages(Context $context): array
+    public function process(Context $context): array
     {
-        $entities = [];
-
         $generator = $this->ergonodeLanguageProvider->provideActiveLanguages();
+        $entities = [];
 
         foreach ($generator as $languages) {
             $entities = array_merge_recursive(
