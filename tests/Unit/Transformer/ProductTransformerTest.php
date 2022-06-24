@@ -19,9 +19,6 @@ class ProductTransformerTest extends TestCase
     private const MOCK_MAPPING = [
         'name' => 'name',
         'stock' => 'stock',
-        'tax.rate' => 'tax',
-        'price.net' => 'priceNet',
-        'price.gross' => 'priceGross'
     ];
 
     private ProductTransformer $productTransformer;
@@ -80,7 +77,10 @@ class ProductTransformerTest extends TestCase
      */
     public function testTransformingData(array $data): void
     {
-        $result = $this->productTransformer->transform(new ProductTransformationDTO($data), $this->contextMock);
+        $result = $this->productTransformer->transform(
+            new ProductTransformationDTO(ProductTransformationDTO::OPERATION_CREATE, $data),
+            $this->contextMock
+        );
 
         $this->assertEquals([
             'name' => 'Test product EN',
@@ -93,13 +93,6 @@ class ProductTransformerTest extends TestCase
                 ]
             ],
             'stock' => 999,
-            'tax' => [
-                'rate' => 23
-            ],
-            'price' => [
-                'net' => 100,
-                'gross' => 123,
-            ]
         ], $result->getShopwareData());
     }
 
@@ -161,78 +154,6 @@ class ProductTransformerTest extends TestCase
                                                     'language' => 'en_GB',
                                                     '__typename' => 'NumericAttributeValue',
                                                     'value_numeric' => 999,
-                                                ],
-                                            ],
-                                    ],
-                            ],
-                            [
-                                'node' =>
-                                    [
-                                        'attribute' =>
-                                            [
-                                                'code' => 'tax',
-                                            ],
-                                        'valueTranslations' =>
-                                            [
-                                                [
-                                                    'inherited' => false,
-                                                    'language' => 'pl_PL',
-                                                    '__typename' => 'NumericAttributeValue',
-                                                    'value_numeric' => 23,
-                                                ],
-                                                [
-                                                    'inherited' => false,
-                                                    'language' => 'en_GB',
-                                                    '__typename' => 'NumericAttributeValue',
-                                                    'value_numeric' => 23,
-                                                ],
-                                            ],
-                                    ],
-                            ],
-                            [
-                                'node' =>
-                                    [
-                                        'attribute' =>
-                                            [
-                                                'code' => 'priceNet',
-                                            ],
-                                        'valueTranslations' =>
-                                            [
-                                                [
-                                                    'inherited' => false,
-                                                    'language' => 'pl_PL',
-                                                    '__typename' => 'NumericAttributeValue',
-                                                    'value_numeric' => 100,
-                                                ],
-                                                [
-                                                    'inherited' => false,
-                                                    'language' => 'en_GB',
-                                                    '__typename' => 'NumericAttributeValue',
-                                                    'value_numeric' => 100,
-                                                ],
-                                            ],
-                                    ],
-                            ],
-                            [
-                                'node' =>
-                                    [
-                                        'attribute' =>
-                                            [
-                                                'code' => 'priceGross',
-                                            ],
-                                        'valueTranslations' =>
-                                            [
-                                                [
-                                                    'inherited' => false,
-                                                    'language' => 'pl_PL',
-                                                    '__typename' => 'NumericAttributeValue',
-                                                    'value_numeric' => 123,
-                                                ],
-                                                [
-                                                    'inherited' => false,
-                                                    'language' => 'en_GB',
-                                                    '__typename' => 'NumericAttributeValue',
-                                                    'value_numeric' => 123,
                                                 ],
                                             ],
                                     ],

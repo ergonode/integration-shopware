@@ -12,15 +12,18 @@ class ProductPriceTransformer implements ProductDataTransformerInterface
 {
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
+        if (ProductTransformationDTO::OPERATION_UPDATE === $productData->getOperation()) {
+            return $productData;
+        }
+
         $swData = $productData->getShopwareData();
         $swData['price'] = [
-            \array_merge(
-                $swData['price'],
-                [
-                    'linked' => false,
-                    'currencyId' => Defaults::CURRENCY
-                ]
-            )
+            [
+                'net' => 0,
+                'gross' => 0,
+                'linked' => false,
+                'currencyId' => Defaults::CURRENCY
+            ]
         ];
 
         $productData->setShopwareData($swData);

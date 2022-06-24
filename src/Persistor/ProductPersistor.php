@@ -47,17 +47,20 @@ class ProductPersistor
      */
     protected function persistProduct(array $productData, ?string $parentId, Context $context): string
     {
-        $transformedData = $this->productTransformerChain->transform(
-            new ProductTransformationDTO($productData),
-            $context
-        );
-
         $sku = $productData['sku'];
         $existingProduct = $this->productProvider->getProductBySku($sku, $context);
 
+        $operation = null === $existingProduct ?
+            ProductTransformationDTO::OPERATION_CREATE : ProductTransformationDTO::OPERATION_UPDATE;
+
+        $transformedData = $this->productTransformerChain->transform(
+            new ProductTransformationDTO($operation, $productData),
+            $context
+        );
+
         $swProductData = \array_merge_recursive(
             [
-                'id' => null !== $existingProduct ? $existingProduct->getId() : null,
+                'id' => ProductTransformationDTO::OPERATION_UPDATE === $operation ? $existingProduct->getId() : null,
                 'parentId' => $parentId,
                 'productNumber' => $sku,
             ],
