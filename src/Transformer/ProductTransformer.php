@@ -68,7 +68,7 @@ class ProductTransformer implements ProductDataTransformerInterface
             $code = $edge['node']['attribute']['code'];
             $mappingKeys = $this->attributeMappingProvider->provideByErgonodeKey($code, $context);
 
-            if (null === $mappingKeys) {
+            if (0 === $mappingKeys->count()) {
                 continue;
             }
 
