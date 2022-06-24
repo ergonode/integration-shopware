@@ -43,7 +43,7 @@ class CustomFieldProvider
         if (null === $this->customFieldSetId) {
             $set = $this->getCustomFieldSet($context);
 
-            if ($set instanceof CustomFieldSetEntity) {
+            if (null !== $set) {
                 $this->customFieldSetId = $set->getId();
             }
         }
