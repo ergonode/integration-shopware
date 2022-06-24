@@ -10,12 +10,12 @@ use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOp
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
+use Strix\Ergonode\Entity\ErgonodeCursor\ErgonodeCursorEntity;
+use Strix\Ergonode\Manager\ErgonodeCursorManager;
 use Strix\Ergonode\Manager\OrphanEntitiesManager;
 use Strix\Ergonode\Modules\Attribute\Api\AttributeDeletedStreamResultsProxy;
 use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
-use Strix\Ergonode\Persistor\ErgonodeCursorPersistor;
 use Strix\Ergonode\Persistor\PropertyGroupPersistor;
-use Strix\Ergonode\Provider\ErgonodeCursorProvider;
 use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
 use Strix\Ergonode\Tests\Util\DataConverter;
 
@@ -24,14 +24,9 @@ class OrphanEntitiesManagerTest extends TestCase
     private OrphanEntitiesManager $manager;
 
     /**
-     * @var MockObject|ErgonodeCursorProvider
+     * @var MockObject|ErgonodeCursorManager
      */
-    private ErgonodeCursorProvider $ergonodeCursorProviderMock;
-
-    /**
-     * @var MockObject|ErgonodeCursorPersistor
-     */
-    private ErgonodeCursorPersistor $ergonodeCursorPersistorMock;
+    private ErgonodeCursorManager $ergonodeCursorManagerMock;
 
     /**
      * @var MockObject|ErgonodeAttributeProvider
@@ -50,16 +45,14 @@ class OrphanEntitiesManagerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->ergonodeCursorProviderMock = $this->createMock(ErgonodeCursorProvider::class);
-        $this->ergonodeCursorPersistorMock = $this->createMock(ErgonodeCursorPersistor::class);
+        $this->ergonodeCursorManagerMock = $this->createMock(ErgonodeCursorManager::class);
         $this->ergonodeAttributeProviderMock = $this->createMock(ErgonodeAttributeProvider::class);
         $this->propertyGroupPersistorMock = $this->createMock(PropertyGroupPersistor::class);
 
         $this->contextMock = $this->createMock(Context::class);
 
         $this->manager = new OrphanEntitiesManager(
-            $this->ergonodeCursorProviderMock,
-            $this->ergonodeCursorPersistorMock,
+            $this->ergonodeCursorManagerMock,
             $this->ergonodeAttributeProviderMock,
             $this->propertyGroupPersistorMock
         );
@@ -146,11 +139,15 @@ class OrphanEntitiesManagerTest extends TestCase
 
     private function mockErgonodeCursorProvider(string $argument = 'cursor', string $returnValue = 'some_ergonode_cursor')
     {
-        $this->ergonodeCursorProviderMock
+        $this->ergonodeCursorManagerMock
             ->expects($this->once())
-            ->method('get')
+            ->method('getCursorEntity')
             ->with($argument, $this->contextMock)
-            ->willReturn($returnValue);
+            ->willReturn(
+                $this->createConfiguredMock(ErgonodeCursorEntity::class, [
+                    'getCursor' => $returnValue
+                ])
+            );
     }
 
     private function mockErgonodeAttributeProvider(?string $endCursor = null, array $returnValues = [])
@@ -182,9 +179,9 @@ class OrphanEntitiesManagerTest extends TestCase
 
     private function mockErgonodeCursorPersistor(string $cursor, string $query)
     {
-        $this->ergonodeCursorPersistorMock
+        $this->ergonodeCursorManagerMock
             ->expects($this->once())
-            ->method('save')
+            ->method('persist')
             ->with($cursor, $query, $this->contextMock)
             ->willReturn($this->createMock(EntityWrittenContainerEvent::class));
     }

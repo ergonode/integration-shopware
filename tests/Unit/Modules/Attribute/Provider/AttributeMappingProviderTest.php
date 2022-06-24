@@ -52,7 +52,7 @@ class AttributeMappingProviderTest extends TestCase
     {
         $this->mockRepositoryResult(ErgonodeAttributeMappingFixture::collection([['swKey1', 'some_ergo_key'], ['swKey2', 'some_ergo_key']]));
 
-        $output = $this->provider->provideByErgonodeKey('some_key', $this->contextMock);
+        $output = $this->provider->provideByErgonodeKey('some_ergo_key', $this->contextMock);
 
         $rawOutput = $output->map(fn(ErgonodeAttributeMappingEntity $entity) => $entity->getShopwareKey());
 
@@ -65,7 +65,7 @@ class AttributeMappingProviderTest extends TestCase
 
         $output = $this->provider->provideByErgonodeKey('some_key', $this->contextMock);
 
-        $this->assertEquals(null, $output);
+        $this->assertEquals(0, $output->count());
     }
 
     private function mockRepositoryResult($result): void

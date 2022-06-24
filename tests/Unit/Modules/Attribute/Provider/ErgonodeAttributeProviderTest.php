@@ -16,7 +16,6 @@ use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
 use Strix\Ergonode\Modules\Attribute\QueryBuilder\AttributeQueryBuilder;
 use Strix\Ergonode\Modules\Product\Api\ProductStreamResultsProxy;
 use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
-use Strix\Ergonode\Tests\Fixture\GqlProductResponse;
 
 class ErgonodeAttributeProviderTest extends TestCase
 {
@@ -50,9 +49,11 @@ class ErgonodeAttributeProviderTest extends TestCase
     {
         $this->mockGqlResults($responsePages, $response, $proxyClass);
 
-        $result = $this->provider->provideProductAttributes();
+        $generator = $this->provider->provideProductAttributes();
 
-        $this->assertSame($expectedOutput, $result);
+        foreach ($generator as $result) {
+            $this->assertEquals($expectedOutput, array_values($result->getEdges()));
+        }
     }
 
     public function testIfProvideProductAttributesMethodWillFailWhenApiRespondsWithWrongResults()
@@ -64,30 +65,11 @@ class ErgonodeAttributeProviderTest extends TestCase
             'attributeStream'
         );
 
-        $result = $this->provider->provideProductAttributes();
+        $generator = $this->provider->provideProductAttributes();
 
-        $this->assertSame([], $result);
-    }
-
-    /**
-     * @dataProvider bindingAttributesOutputDataProvider
-     */
-    public function testProvideBindingAttributesMethod(int $responsePages, array $response, string $proxyClass, array $expectedOutput)
-    {
-        $this->mockRealGqlResults($responsePages, $response, $proxyClass);
-
-        $result = $this->provider->provideBindingAttributes();
-
-        $this->assertSame($expectedOutput, array_values($result->getEdges()));
-    }
-
-    public function testIfProvideBindingAttributesMethodWillFailWhenApiRespondsWithWrongResults()
-    {
-        $this->mockRealGqlResults(1, GqlProductResponse::productStreamResponse(), ProductStreamResultsProxy::class);
-
-        $result = $this->provider->provideBindingAttributes();
-
-        $this->assertSame(null, $result);
+        foreach ($generator as $result) {
+            $this->assertEquals(null, $result);
+        }
     }
 
     /**
@@ -133,35 +115,7 @@ class ErgonodeAttributeProviderTest extends TestCase
                 3,
                 GqlAttributeResponse::attributeStreamResponse(),
                 AttributeStreamResultsProxy::class,
-                array_merge(
-                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'],
-                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'],
-                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges']
-                ),
-            ],
-        ];
-    }
-
-    public function bindingAttributesOutputDataProvider(): array
-    {
-        return [
-            [
-                1,
-                GqlAttributeResponse::attributeStreamResponse(),
-                AttributeStreamResultsProxy::class,
-                [
-                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][4],
-                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][5],
-                ],
-            ],
-            [
-                2,
-                GqlAttributeResponse::attributeStreamResponse(),
-                AttributeStreamResultsProxy::class,
-                [
-                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][4],
-                    GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][5],
-                ],
+                GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'],
             ],
         ];
     }
@@ -199,29 +153,6 @@ class ErgonodeAttributeProviderTest extends TestCase
             ];
 
             $returns[] = $this->createConfiguredMock($proxyClass, $methods);
-        }
-
-        $this->ergonodeGqlClientMock->expects($this->exactly($responsePages))
-            ->method('query')
-            ->willReturnOnConsecutiveCalls(...$returns);
-    }
-
-    private function mockRealGqlResults(int $responsePages, array $response, string $proxyClass = AttributeStreamResultsProxy::class): void
-    {
-        $returns = [];
-
-        $response['data'][$proxyClass::MAIN_FIELD]['totalCount'] = $responsePages * count($response['data'][$proxyClass::MAIN_FIELD]['edges']);
-
-        for ($i = 0; $i < $responsePages; $i++) {
-            $response['data'][$proxyClass::MAIN_FIELD]['pageInfo']['hasNextPage'] = $i !== $responsePages - 1;
-            $resultsMock = $this->createConfiguredMock(Results::class, [
-                'getResults' => [], // just to pass is_array check in proxy class
-                'getResponseObject' => $this->createConfiguredMock(ResponseInterface::class, [
-                    'getBody' => Utils::streamFor(json_encode($response)),
-                ]),
-            ]);
-
-            $returns[] = new $proxyClass($resultsMock);
         }
 
         $this->ergonodeGqlClientMock->expects($this->exactly($responsePages))

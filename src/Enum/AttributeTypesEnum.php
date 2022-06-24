@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Modules\Attribute\Enum;
+namespace Strix\Ergonode\Enum;
 
-class AttributeTypes
+use ReflectionClass;
+
+class AttributeTypesEnum
 {
     public const DATE = 'type_date';
     public const FILE = 'type_file';
@@ -18,4 +20,22 @@ class AttributeTypes
     public const TEXTAREA = 'type_textarea';
     public const TEXT = 'type_text';
     public const UNIT = 'type_unit';
+
+    public static function getAttributeNodeType(array $node): string
+    {
+        if (empty($node['code'])) {
+            return self::TEXT;
+        }
+
+        $type = array_intersect(self::cases(), array_keys($node ?? []));
+
+        return reset($type);
+    }
+
+    public static function cases(): array
+    {
+        $refl = new ReflectionClass(self::class);
+
+        return array_values($refl->getConstants());
+    }
 }

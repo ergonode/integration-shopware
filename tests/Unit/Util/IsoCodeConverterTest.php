@@ -24,6 +24,18 @@ class IsoCodeConverterTest extends TestCase
     }
 
     /**
+     * @param array|string $input
+     * @param array|string $expectedOutput
+     * @dataProvider isoDataProvider
+     */
+    public function testShopwareToErgonodeIsoMethod($expectedOutput, $input)
+    {
+        $output = IsoCodeConverter::shopwareToErgonodeIso($input);
+
+        $this->assertSame($output, $expectedOutput);
+    }
+
+    /**
      * @param mixed $input
      * @dataProvider wrongTypeIsoDataProvider
      */

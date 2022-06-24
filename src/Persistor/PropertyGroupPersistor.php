@@ -8,27 +8,26 @@ use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOp
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Strix\Ergonode\Exception\OrphansNotDeletedException;
 use Strix\Ergonode\Modules\Attribute\Api\AttributeDeletedStreamResultsProxy;
 use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
 use Strix\Ergonode\Provider\PropertyGroupProvider;
-use Strix\Ergonode\Transformer\AttributeNodeTransformer;
+use Strix\Ergonode\Transformer\PropertyGroupTransformer;
 
 class PropertyGroupPersistor
 {
     private EntityRepositoryInterface $propertyGroupRepository;
 
-    private AttributeNodeTransformer $attributeNodeTransformer;
+    private PropertyGroupTransformer $propertyGroupTransformer;
 
     private PropertyGroupProvider $propertyGroupProvider;
 
     public function __construct(
         EntityRepositoryInterface $propertyGroupRepository,
-        AttributeNodeTransformer $attributeNodeTransformer,
+        PropertyGroupTransformer $propertyGroupTransformer,
         PropertyGroupProvider $propertyGroupProvider
     ) {
         $this->propertyGroupRepository = $propertyGroupRepository;
-        $this->attributeNodeTransformer = $attributeNodeTransformer;
+        $this->propertyGroupTransformer = $propertyGroupTransformer;
         $this->propertyGroupProvider = $propertyGroupProvider;
     }
 
@@ -41,7 +40,11 @@ class PropertyGroupPersistor
                 continue;
             }
 
-            $payloads[] = $this->attributeNodeTransformer->transformNode($node, $context);
+            $payloads[] = $this->propertyGroupTransformer->transformAttributeNode($node, $context);
+        }
+
+        if (empty($payloads)) {
+            return [];
         }
 
         $written = $this->propertyGroupRepository->upsert($payloads, $context);

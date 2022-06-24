@@ -11,6 +11,7 @@ use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
 use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
 use Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider;
+use Strix\Ergonode\Provider\LanguageProvider;
 use Strix\Ergonode\Transformer\ProductTransformer;
 
 class ProductTransformerTest extends TestCase
@@ -38,8 +39,12 @@ class ProductTransformerTest extends TestCase
         $this->contextMock = $this->createMock(Context::class);
         $this->mockAttributeMappingProvider();
 
+        $languageProvider = $this->createMock(LanguageProvider::class);
+        $languageProvider->method('getDefaultLanguageLocale')->willReturn('en-GB');
+
         $this->productTransformer = new ProductTransformer(
-            $this->attributeMappingProvider
+            $this->attributeMappingProvider,
+            $languageProvider
         );
     }
 
@@ -83,7 +88,7 @@ class ProductTransformerTest extends TestCase
                 'pl-PL' => [
                     'name' => 'Test product PL'
                 ],
-                'en-US' => [
+                'en-GB' => [
                     'name' => 'Test product EN'
                 ]
             ],
@@ -122,7 +127,7 @@ class ProductTransformerTest extends TestCase
                                                 ],
                                                 [
                                                     'inherited' => false,
-                                                    'language' => 'en_US',
+                                                    'language' => 'en_GB',
                                                     '__typename' => 'StringAttributeValue',
                                                     'value_string' => 'Test product EN',
                                                 ],
@@ -146,7 +151,7 @@ class ProductTransformerTest extends TestCase
                                                 ],
                                                 [
                                                     'inherited' => false,
-                                                    'language' => 'en_US',
+                                                    'language' => 'en_GB',
                                                     '__typename' => 'NumericAttributeValue',
                                                     'value_numeric' => 999,
                                                 ],

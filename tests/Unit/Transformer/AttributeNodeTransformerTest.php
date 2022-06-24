@@ -18,12 +18,12 @@ use Strix\Ergonode\Extension\PropertyGroup\PropertyGroupExtension;
 use Strix\Ergonode\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
 use Strix\Ergonode\Provider\PropertyGroupProvider;
 use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
-use Strix\Ergonode\Transformer\AttributeNodeTransformer;
+use Strix\Ergonode\Transformer\PropertyGroupTransformer;
 use Strix\Ergonode\Transformer\TranslationTransformer;
 
 class AttributeNodeTransformerTest extends TestCase
 {
-    private AttributeNodeTransformer $transformer;
+    private PropertyGroupTransformer $transformer;
 
     /**
      * @var MockObject|PropertyGroupProvider
@@ -41,7 +41,7 @@ class AttributeNodeTransformerTest extends TestCase
         $this->translationTransformerMock = $this->createMock(TranslationTransformer::class);
         $this->contextMock = $this->createMock(Context::class);
 
-        $this->transformer = new AttributeNodeTransformer(
+        $this->transformer = new PropertyGroupTransformer(
             $this->propertyGroupProviderMock,
             $this->translationTransformerMock
         );
@@ -55,7 +55,7 @@ class AttributeNodeTransformerTest extends TestCase
         $this->mockTranslationTransformation(2 + count($nodeInput['options']));
         $this->mockPropertyGroupProvider($providerReturnValue);
 
-        $output = $this->transformer->transformNode($nodeInput, $this->contextMock);
+        $output = $this->transformer->transformAttributeNode($nodeInput, $this->contextMock);
 
         $this->assertSame($expectedOutput, $output);
     }

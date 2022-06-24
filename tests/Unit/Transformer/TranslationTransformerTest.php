@@ -20,7 +20,7 @@ class TranslationTransformerTest extends TestCase
     /**
      * @dataProvider ergonodeTranslationDataProvider
      */
-    public function testTransformMethod(array $ergonodeTranslationInput, string $shopwareKeyInput, array $expectedOutput)
+    public function testTransformMethod(array $ergonodeTranslationInput, ?string $shopwareKeyInput, array $expectedOutput)
     {
         $output = $this->transformer->transform($ergonodeTranslationInput, $shopwareKeyInput);
 
@@ -57,6 +57,14 @@ class TranslationTransformerTest extends TestCase
                     'en-US' => [
                         'name' => 'size',
                     ],
+                ],
+            ],
+            [
+                GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][5]['node']['label'],
+                null,
+                [
+                    'pl-PL' => 'rozmiar',
+                    'en-US' => 'size',
                 ],
             ],
         ];

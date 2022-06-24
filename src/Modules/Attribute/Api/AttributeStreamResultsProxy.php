@@ -19,4 +19,14 @@ class AttributeStreamResultsProxy extends AbstractStreamResultsProxy
             fn(array $attribute) => array_intersect($array, array_keys($attribute['node'] ?? []))
         );
     }
+
+    /**
+     * @param string[] $array
+     */
+    public function filterByCodes(array $array = []): AbstractStreamResultsProxy
+    {
+        return $this->filter(
+            fn(array $attribute) => in_array($attribute['node']['code'] ?? null, $array)
+        );
+    }
 }
