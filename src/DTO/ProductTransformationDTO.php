@@ -5,18 +5,12 @@ declare(strict_types=1);
 namespace Strix\Ergonode\DTO;
 
 use Shopware\Core\Content\Product\ProductEntity;
-use Strix\Ergonode\Util\Constants;
 
 class ProductTransformationDTO
 {
-    public const OPERATION_CREATE = 'create';
-    public const OPERATION_UPDATE = 'update';
-
     private array $ergonodeData;
 
     private array $shopwareData;
-
-    private string $operation;
 
     private ?ProductEntity $swProduct;
 
@@ -24,7 +18,6 @@ class ProductTransformationDTO
 
     public function __construct(array $ergonodeData, array $shopwareData = [])
     {
-        $this->operation = $operation;
         $this->ergonodeData = $ergonodeData;
         $this->shopwareData = $shopwareData;
     }
@@ -49,11 +42,6 @@ class ProductTransformationDTO
         $this->shopwareData = $shopwareData;
     }
 
-    public function getOperation(): string
-    {
-        return $this->operation;
-    }
-
     public function getSwProduct(): ?ProductEntity
     {
         return $this->swProduct;
@@ -62,6 +50,16 @@ class ProductTransformationDTO
     public function setSwProduct(?ProductEntity $swProduct): void
     {
         $this->swProduct = $swProduct;
+    }
+
+    public function isUpdate(): bool
+    {
+        return null !== $this->swProduct;
+    }
+
+    public function isCreate(): bool
+    {
+        return null === $this->swProduct;
     }
 
     public function getEntitiesToDelete(): array

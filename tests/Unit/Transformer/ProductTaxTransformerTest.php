@@ -6,6 +6,7 @@ namespace Strix\Ergonode\Tests\Unit\Transformer;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\Tax\TaxEntity;
 use Strix\Ergonode\DTO\ProductTransformationDTO;
@@ -47,8 +48,11 @@ class ProductTaxTransformerTest extends TestCase
             ->with($this->contextMock)
             ->willReturn($taxEntity);
 
+        $dto = new ProductTransformationDTO([]);
+        $dto->setSwProduct(null);
+
         $result = $this->productTaxTransformer->transform(
-            new ProductTransformationDTO(ProductTransformationDTO::OPERATION_CREATE, []),
+            $dto,
             $this->contextMock
         );
 
@@ -59,8 +63,11 @@ class ProductTaxTransformerTest extends TestCase
 
     public function testTransformingUpdatedProduct(): void
     {
+        $dto = new ProductTransformationDTO([]);
+        $dto->setSwProduct($this->createMock(ProductEntity::class));
+
         $result = $this->productTaxTransformer->transform(
-            new ProductTransformationDTO(ProductTransformationDTO::OPERATION_UPDATE, []),
+            $dto,
             $this->contextMock
         );
 

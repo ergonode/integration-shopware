@@ -72,7 +72,7 @@ class ProductPersistor
         $swProductData = array_merge_recursive(
             $transformedData->getShopwareData(),
             [
-                'id' => ProductTransformationDTO::OPERATION_UPDATE === $operation ? $existingProduct->getId() : null,
+                'id' => $dto->isUpdate() ? $existingProduct->getId() : null,
                 'parentId' => $parentId,
                 'productNumber' => $sku,
             ]

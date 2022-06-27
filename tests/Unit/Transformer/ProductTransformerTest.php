@@ -78,7 +78,7 @@ class ProductTransformerTest extends TestCase
     public function testTransformingData(array $data): void
     {
         $result = $this->productTransformer->transform(
-            new ProductTransformationDTO(ProductTransformationDTO::OPERATION_CREATE, $data),
+            new ProductTransformationDTO($data),
             $this->contextMock
         );
 

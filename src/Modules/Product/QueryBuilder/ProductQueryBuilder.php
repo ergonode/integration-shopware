@@ -142,7 +142,6 @@ class ProductQueryBuilder
                                                             ->setAlias('value_multimedia')
                                                             ->setSelectionSet([
                                                                 'name',
-                                                                'path',
                                                                 'extension',
                                                                 'mime',
                                                                 'size',

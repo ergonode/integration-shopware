@@ -91,7 +91,7 @@ class ProductMediaTransformerTest extends TestCase
 
         $output = $this->transformer->transform($dto, $this->contextMock);
 
-        $this->assertSame(['media' => []], $output->getShopwareData());
+        $this->assertArrayNotHasKey('media', $output->getShopwareData());
     }
 
     /**
@@ -106,7 +106,7 @@ class ProductMediaTransformerTest extends TestCase
 
         $output = $this->transformer->transform($dto, $this->contextMock);
 
-        $this->assertSame(['media' => []], $output->getShopwareData());
+        $this->assertArrayNotHasKey('media', $output->getShopwareData());
     }
 
     /**

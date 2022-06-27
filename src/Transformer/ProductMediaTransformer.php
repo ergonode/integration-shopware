@@ -58,6 +58,10 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
             }
         }
 
+        if (empty($swData[Constants::SW_PRODUCT_FIELD_MEDIA])) {
+            unset($swData[Constants::SW_PRODUCT_FIELD_MEDIA]);
+        }
+
         $productData->setShopwareData($swData);
 
         $idsToDelete = $this->getProductMediaToDelete($productData);
@@ -101,15 +105,14 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
         }
 
         $swData = $productData->getShopwareData();
-        $newProductMedia = $swData[Constants::SW_PRODUCT_FIELD_MEDIA];
         $productMediaIds = $productMedia->getIds();
 
-        if (empty($newProductMedia)) {
+        if (!isset($swData[Constants::SW_PRODUCT_FIELD_MEDIA])) {
             return $productMediaIds;
         }
 
         $newProductMediaIds = array_filter(
-            array_map(fn(array $media) => $media['id'] ?? null, $newProductMedia)
+            array_map(fn(array $media) => $media['id'] ?? null, $swData[Constants::SW_PRODUCT_FIELD_MEDIA])
         );
 
         return array_diff($productMediaIds, $newProductMediaIds);
