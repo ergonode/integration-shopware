@@ -16,6 +16,9 @@ services:
     Strix\Ergonode\Transformer\CustomField\CustomFieldTransformerInterface:
       tags: ['strix_ergonode.custom_field_transformer']
 
+    Strix\Ergonode\Transformer\ProductCustomField\ProductCustomFieldTransformerInterface:
+      tags: [ 'strix_ergonode.product_custom_field_transformer' ]
+
   # WIRE WHOLE NAMESPACE
   Strix\Ergonode\:
     resource: '../../'
@@ -67,6 +70,10 @@ services:
     arguments:
       - !tagged_iterator { tag: 'strix_ergonode.custom_field_transformer' }
 
+  Strix\Ergonode\Resolver\ProductCustomFieldTransformerResolver:
+    arguments:
+      - !tagged_iterator { tag: 'strix_ergonode.product_custom_field_transformer' }
+
   # SUBSCRIBER
   Strix\Ergonode\Subscriber\Subscriber:
     tags: [ 'kernel.event_subscriber' ]
@@ -80,3 +87,4 @@ services:
         - '@Strix\Ergonode\Transformer\ProductTaxTransformer'
         - '@Strix\Ergonode\Transformer\ProductPriceTransformer'
         - '@Strix\Ergonode\Transformer\ProductMediaTransformer'
+        - '@Strix\Ergonode\Transformer\ProductCustomFieldTransformer'

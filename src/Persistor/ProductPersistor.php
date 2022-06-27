@@ -46,22 +46,25 @@ class ProductPersistor
      */
     public function persist(ProductResultsProxy $results, Context $context): void
     {
-        $parentId = $this->persistProduct($results->getProductData(), null, $context);
+        $parentId = $this->persistProduct($results, null, $context);
 
-        foreach ($results->getVariants() as $variantData) {
-            $this->persistProduct($variantData['node'], $parentId, $context);
-        }
+        // todo variants
+//        foreach ($results->getVariants() as $variantData) {
+//            $this->persistProduct($variantData['node'], $parentId, $context);
+//        }
     }
 
     /**
      * @throws MissingRequiredProductMappingException
      */
-    protected function persistProduct(array $productData, ?string $parentId, Context $context): string
+    protected function persistProduct(ProductResultsProxy $results, ?string $parentId, Context $context): string
     {
+        $productData = $results->getMainData();
+
         $sku = $productData['sku'];
         $existingProduct = $this->productProvider->getProductBySku($sku, $context, ['media']);
 
-        $dto = new ProductTransformationDTO($productData);
+        $dto = new ProductTransformationDTO($results);
         $dto->setSwProduct($existingProduct);
 
         $transformedData = $this->productTransformerChain->transform(

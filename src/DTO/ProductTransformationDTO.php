@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Strix\Ergonode\DTO;
 
 use Shopware\Core\Content\Product\ProductEntity;
+use Strix\Ergonode\Modules\Product\Api\ProductResultsProxy;
 
 class ProductTransformationDTO
 {
-    private array $ergonodeData;
+    private ProductResultsProxy $ergonodeObject;
 
     private array $shopwareData;
 
@@ -16,20 +17,25 @@ class ProductTransformationDTO
 
     private array $entitiesToDelete = [];
 
-    public function __construct(array $ergonodeData, array $shopwareData = [])
+    public function __construct(ProductResultsProxy $ergonodeObject, array $shopwareData = [])
     {
-        $this->ergonodeData = $ergonodeData;
+        $this->ergonodeObject = $ergonodeObject;
         $this->shopwareData = $shopwareData;
     }
 
     public function getErgonodeData(): array
     {
-        return $this->ergonodeData;
+        return $this->ergonodeObject->getMainData();
     }
 
-    public function setErgonodeData(array $ergonodeData): void
+    public function getErgonodeObject(): ProductResultsProxy
     {
-        $this->ergonodeData = $ergonodeData;
+        return $this->ergonodeObject;
+    }
+
+    public function setErgonodeObject(ProductResultsProxy $ergonodeObject): void
+    {
+        $this->ergonodeObject = $ergonodeObject;
     }
 
     public function getShopwareData(): array

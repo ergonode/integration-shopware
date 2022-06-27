@@ -9,6 +9,7 @@ use Shopware\Core\Framework\Context;
 use Strix\Ergonode\Provider\CustomFieldProvider;
 use Strix\Ergonode\Resolver\CustomFieldTransformerResolver;
 use Strix\Ergonode\Util\Constants;
+use Strix\Ergonode\Util\CustomFieldUtil;
 
 class CustomFieldTransformer
 {
@@ -32,7 +33,10 @@ class CustomFieldTransformer
     {
         $code = $node['code'];
 
-        $customField = $this->customFieldProvider->getCustomFieldByName($this->buildCustomFieldName($code), $context);
+        $customField = $this->customFieldProvider->getCustomFieldByName(
+            CustomFieldUtil::buildCustomFieldName($code),
+            $context
+        );
 
         $typedTransformer = $this->customFieldTransformerResolver->resolve($node);
 
@@ -43,17 +47,12 @@ class CustomFieldTransformer
         return array_merge_recursive(
             [
                 'id' => $customField ? $customField->getId() : null,
-                'name' => $this->buildCustomFieldName($code),
+                'name' => CustomFieldUtil::buildCustomFieldName($code),
                 'config' => [
                     'label' => empty($label) ? [Defaults::LANGUAGE_SYSTEM => $code] : $label,
                 ],
             ],
             $typedTransformer->transformNode($node)
         );
-    }
-
-    private function buildCustomFieldName(string $code): string
-    {
-        return sprintf('%s_%s', Constants::PRODUCT_CUSTOM_FIELD_SET_NAME, $code);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Transformer;
 
+use RuntimeException;
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
@@ -13,6 +14,15 @@ use Strix\Ergonode\Provider\LanguageProvider;
 use Strix\Ergonode\Util\ArrayUnfoldUtil;
 use Strix\Ergonode\Util\ErgonodeApiValueKeyResolverUtil;
 use Strix\Ergonode\Util\IsoCodeConverter;
+
+use function array_diff;
+use function array_key_exists;
+use function array_keys;
+use function array_merge_recursive;
+use function count;
+use function in_array;
+use function is_array;
+use function sprintf;
 
 class ProductTransformer implements ProductDataTransformerInterface
 {
@@ -51,8 +61,8 @@ class ProductTransformer implements ProductDataTransformerInterface
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $ergonodeData = $productData->getErgonodeData();
-        if (false === \is_array($ergonodeData['attributeList']['edges'] ?? null)) {
-            throw new \RuntimeException('Invalid data format');
+        if (false === is_array($ergonodeData['attributeList']['edges'] ?? null)) {
+            throw new RuntimeException('Invalid data format');
         }
 
         $this->defaultLocale = IsoCodeConverter::shopwareToErgonodeIso(
@@ -71,13 +81,13 @@ class ProductTransformer implements ProductDataTransformerInterface
 
             $translatedValues = $this->getTranslatedValues($edge['node']['valueTranslations']);
 
-            if (false === \array_key_exists($this->defaultLocale, $translatedValues)) {
-                throw new \RuntimeException(
-                    \sprintf('Default locale %s not found in product data', $this->defaultLocale)
+            if (false === array_key_exists($this->defaultLocale, $translatedValues)) {
+                throw new RuntimeException(
+                    sprintf('Default locale %s not found in product data', $this->defaultLocale)
                 );
             }
 
-            $result = \array_merge_recursive(
+            $result = array_merge_recursive(
                 $result,
                 $this->getTransformedResult($mappingKeys, $translatedValues)
             );
@@ -97,9 +107,9 @@ class ProductTransformer implements ProductDataTransformerInterface
      */
     private function validateResult(array $result): void
     {
-        $missingAttributes = \array_diff(self::REQUIRED_KEYS, \array_keys($result));
+        $missingAttributes = array_diff(self::REQUIRED_KEYS, array_keys($result));
 
-        if (\count($missingAttributes) > 0) {
+        if (count($missingAttributes) > 0) {
             throw new MissingRequiredProductMappingException($missingAttributes);
         }
     }
@@ -132,7 +142,7 @@ class ProductTransformer implements ProductDataTransformerInterface
     private function getTranslations(array $translatedValues, string $swKey, array $result): array
     {
         foreach ($translatedValues as $locale => $value) {
-            if (null === $value || false === \in_array($swKey, self::TRANSLATABLE_KEYS)) {
+            if (null === $value || false === in_array($swKey, self::TRANSLATABLE_KEYS)) {
                 continue;
             }
 
