@@ -9,7 +9,6 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
-use Strix\Ergonode\Modules\Product\Api\ProductResultsProxy;
 use Strix\Ergonode\Provider\ProductProvider;
 use Strix\Ergonode\Transformer\ProductTransformerChain;
 
@@ -31,15 +30,18 @@ class ProductPersistor
     }
 
     /**
+     * @return string Shopware product ID
      * @throws MissingRequiredProductMappingException
      */
-    public function persist(ProductResultsProxy $results, Context $context): void
+    public function persist(array $productData, Context $context): string
     {
-        $parentId = $this->persistProduct($results->getProductData(), null, $context);
+        $productId = $this->persistProduct($productData, null, $context);
 
-        foreach ($results->getVariants() as $variantData) {
-            $this->persistProduct($variantData['node'], $parentId, $context);
+        foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
+            $this->persistProduct($variantData['node'], $productId, $context);
         }
+
+        return $productId;
     }
 
     /**
@@ -66,6 +68,8 @@ class ProductPersistor
             ],
             $transformedData->getShopwareData()
         );
+
+        $swProductData = \array_filter($swProductData);
 
         $productIds = $this->productRepository->upsert(
             [$swProductData],
