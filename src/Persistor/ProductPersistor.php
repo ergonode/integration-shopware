@@ -16,6 +16,8 @@ use Strix\Ergonode\Provider\ProductProvider;
 use Strix\Ergonode\Transformer\ProductTransformerChain;
 
 use function array_merge_recursive;
+use function array_values;
+use function is_array;
 
 class ProductPersistor
 {
@@ -70,7 +72,7 @@ class ProductPersistor
         $swProductData = array_merge_recursive(
             $transformedData->getShopwareData(),
             [
-                'id' => null !== $existingProduct ? $existingProduct->getId() : null,
+                'id' => ProductTransformationDTO::OPERATION_UPDATE === $operation ? $existingProduct->getId() : null,
                 'parentId' => $parentId,
                 'productNumber' => $sku,
             ]

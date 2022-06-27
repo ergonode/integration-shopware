@@ -27,18 +27,18 @@ class ProductPriceTransformerTest extends TestCase
         $this->productPriceTransformer = new ProductPriceTransformer();
     }
 
-    /**
-     * @dataProvider getProductData
-     */
-    public function testTransformingData(array $data): void
+    public function testTransformingNewProduct(): void
     {
-        $result = $this->productPriceTransformer->transform(new ProductTransformationDTO([], $data), $this->contextMock);
+        $result = $this->productPriceTransformer->transform(
+            new ProductTransformationDTO(ProductTransformationDTO::OPERATION_CREATE, []),
+            $this->contextMock
+        );
 
         $this->assertEquals([
             'price' => [
                 [
-                    'net' => 100,
-                    'gross' => 123,
+                    'net' => 0,
+                    'gross' => 0,
                     'linked' => false,
                     'currencyId' => Defaults::CURRENCY
                 ]
@@ -46,17 +46,13 @@ class ProductPriceTransformerTest extends TestCase
         ], $result->getShopwareData());
     }
 
-    public function getProductData(): array
+    public function testTransformingUpdatedProduct(): void
     {
-        return [
-            [
-                [
-                    'price' => [
-                        'net' => 100,
-                        'gross' => 123,
-                    ]
-                ]
-            ]
-        ];
+        $result = $this->productPriceTransformer->transform(
+            new ProductTransformationDTO(ProductTransformationDTO::OPERATION_UPDATE, []),
+            $this->contextMock
+        );
+
+        $this->assertArrayNotHasKey('price', $result->getShopwareData());
     }
 }

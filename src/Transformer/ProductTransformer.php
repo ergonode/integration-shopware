@@ -9,20 +9,18 @@ use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
 use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
 use Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider;
+use Strix\Ergonode\Provider\LanguageProvider;
 use Strix\Ergonode\Util\ArrayUnfoldUtil;
 use Strix\Ergonode\Util\ErgonodeApiValueKeyResolverUtil;
 use Strix\Ergonode\Util\IsoCodeConverter;
 
 class ProductTransformer implements ProductDataTransformerInterface
 {
-    private const DEFAULT_LOCALE = 'en_US';
+    private string $defaultLocale;
 
     private const REQUIRED_KEYS = [
         'name',
         'stock',
-        'tax.rate',
-        'price.net',
-        'price.gross',
     ];
 
     private const TRANSLATABLE_KEYS = [
@@ -37,11 +35,14 @@ class ProductTransformer implements ProductDataTransformerInterface
     ];
 
     private AttributeMappingProvider $attributeMappingProvider;
+    private LanguageProvider $languageProvider;
 
     public function __construct(
-        AttributeMappingProvider $attributeMappingProvider
+        AttributeMappingProvider $attributeMappingProvider,
+        LanguageProvider $languageProvider
     ) {
         $this->attributeMappingProvider = $attributeMappingProvider;
+        $this->languageProvider = $languageProvider;
     }
 
     /**
@@ -54,21 +55,25 @@ class ProductTransformer implements ProductDataTransformerInterface
             throw new \RuntimeException('Invalid data format');
         }
 
+        $this->defaultLocale = IsoCodeConverter::shopwareToErgonodeIso(
+            $this->languageProvider->getDefaultLanguageLocale($context)
+        );
+
         $result = [];
 
         foreach ($ergonodeData['attributeList']['edges'] as $edge) {
             $code = $edge['node']['attribute']['code'];
             $mappingKeys = $this->attributeMappingProvider->provideByErgonodeKey($code, $context);
 
-            if (null === $mappingKeys) {
+            if (0 === $mappingKeys->count()) {
                 continue;
             }
 
             $translatedValues = $this->getTranslatedValues($edge['node']['valueTranslations']);
 
-            if (false === \array_key_exists(self::DEFAULT_LOCALE, $translatedValues)) {
+            if (false === \array_key_exists($this->defaultLocale, $translatedValues)) {
                 throw new \RuntimeException(
-                    \sprintf('Default locale %s not found in product data', self::DEFAULT_LOCALE)
+                    \sprintf('Default locale %s not found in product data', $this->defaultLocale)
                 );
             }
 
@@ -117,7 +122,7 @@ class ProductTransformer implements ProductDataTransformerInterface
         $result = [];
         foreach ($mappingKeys as $ergonodeAttributeMappingEntity) {
             $swKey = $ergonodeAttributeMappingEntity->getShopwareKey();
-            $result[$swKey] = $translatedValues[self::DEFAULT_LOCALE];
+            $result[$swKey] = $translatedValues[$this->defaultLocale];
             $result = $this->getTranslations($translatedValues, $swKey, $result);
         }
 

@@ -55,7 +55,10 @@ class ProductCategoryTransformerTest extends TestCase
      */
     public function testTransformingData(array $data): void
     {
-        $result = $this->productCategoryTransformer->transform(new ProductTransformationDTO($data), $this->contextMock);
+        $result = $this->productCategoryTransformer->transform(
+            new ProductTransformationDTO(ProductTransformationDTO::OPERATION_CREATE, $data),
+            $this->contextMock
+        );
 
         $this->assertEquals([
             'categories' => [
