@@ -39,14 +39,10 @@ class CreateAttributeMappingCommand extends Command
     protected function configure()
     {
         $this->addArgument(
-            'shopwareKey',
-            InputArgument::REQUIRED,
-            'Available keys: ' . implode(', ', $this->service->getMappableShopwareAttributes())
+            'shopwareKey'
         );
         $this->addArgument(
-            'ergonodeKey',
-            InputArgument::REQUIRED,
-            'Available keys: ' . implode(', ', $this->service->getAllErgonodeAttributes())
+            'ergonodeKey'
         );
     }
 
@@ -54,10 +50,24 @@ class CreateAttributeMappingCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
+        $shopwareKey = $input->getArgument('shopwareKey');
+        $ergonodeKey = $input->getArgument('ergonodeKey');
+
+        if (empty($shopwareKey)) {
+            $io->error(['No Shopware key provided.', 'Available keys: ' . implode(', ', $this->service->getMappableShopwareAttributes())]);
+
+            return self::FAILURE;
+        }
+        if (empty($ergonodeKey)) {
+            $io->error(['No Ergonode key provided.', 'Available keys: ' . implode(', ', $this->service->getAllErgonodeAttributes())]);
+
+            return self::FAILURE;
+        }
+
         $written = $this->repository->create([
             [
-                'shopwareKey' => $input->getArgument('shopwareKey'),
-                'ergonodeKey' => $input->getArgument('ergonodeKey'),
+                'shopwareKey' => $shopwareKey,
+                'ergonodeKey' => $ergonodeKey,
             ],
         ], $this->context);
 
@@ -67,7 +77,7 @@ class CreateAttributeMappingCommand extends Command
             return self::FAILURE;
         }
 
-        $io->success('Product attribute mapping created');
+        $io->success('Product attribute mapping created.');
         $io->success($written->getPrimaryKeys(ErgonodeAttributeMappingDefinition::ENTITY_NAME));
 
         return self::SUCCESS;

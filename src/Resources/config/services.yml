@@ -81,6 +81,7 @@ services:
         - '@Strix\Ergonode\Transformer\ProductTaxTransformer'
         - '@Strix\Ergonode\Transformer\ProductPriceTransformer'
         - '@Strix\Ergonode\Transformer\ProductDefaultValuesTransformer'
+        - '@Strix\Ergonode\Transformer\ProductMediaTransformer'
 
   # SCHEDULED TASK
   Strix\Ergonode\Service\ScheduledTask\ProductSyncTask:

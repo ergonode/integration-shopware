@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Provider;
+namespace Strix\Ergonode\Tests\Unit\Transformer;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -78,7 +78,7 @@ class ProductTransformerTest extends TestCase
     public function testTransformingData(array $data): void
     {
         $result = $this->productTransformer->transform(
-            new ProductTransformationDTO(ProductTransformationDTO::OPERATION_CREATE, $data),
+            new ProductTransformationDTO($data),
             $this->contextMock
         );
 
