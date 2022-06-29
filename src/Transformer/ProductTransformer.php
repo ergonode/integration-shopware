@@ -83,7 +83,6 @@ class ProductTransformer implements ProductDataTransformerInterface
             );
         }
 
-
         $this->validateResult($result);
 
         $productData->setShopwareData(

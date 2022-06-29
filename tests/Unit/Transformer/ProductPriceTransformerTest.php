@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Provider;
+namespace Strix\Ergonode\Tests\Unit\Transformer;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\DTO\ProductTransformationDTO;
@@ -29,8 +30,11 @@ class ProductPriceTransformerTest extends TestCase
 
     public function testTransformingNewProduct(): void
     {
+        $dto = new ProductTransformationDTO([]);
+        $dto->setSwProduct(null);
+
         $result = $this->productPriceTransformer->transform(
-            new ProductTransformationDTO(ProductTransformationDTO::OPERATION_CREATE, []),
+            $dto,
             $this->contextMock
         );
 
@@ -48,8 +52,11 @@ class ProductPriceTransformerTest extends TestCase
 
     public function testTransformingUpdatedProduct(): void
     {
+        $dto = new ProductTransformationDTO([]);
+        $dto->setSwProduct($this->createMock(ProductEntity::class));
+
         $result = $this->productPriceTransformer->transform(
-            new ProductTransformationDTO(ProductTransformationDTO::OPERATION_UPDATE, []),
+            $dto,
             $this->contextMock
         );
 
