@@ -11,7 +11,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityRepositoryNotFoundException;
 use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
-use Strix\Ergonode\Modules\Product\Api\ProductResultsProxy;
 use Strix\Ergonode\Provider\ProductProvider;
 use Strix\Ergonode\Transformer\ProductTransformerChain;
 
@@ -42,29 +41,29 @@ class ProductPersistor
     }
 
     /**
+     * @return string Shopware product ID
      * @throws MissingRequiredProductMappingException
      */
-    public function persist(ProductResultsProxy $results, Context $context): void
+    public function persist(array $productData, Context $context): string
     {
-        $parentId = $this->persistProduct($results, null, $context);
+        $productId = $this->persistProduct($productData, null, $context);
 
-        // todo variants
-//        foreach ($results->getVariants() as $variantData) {
-//            $this->persistProduct($variantData['node'], $parentId, $context);
-//        }
+        foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
+            $this->persistProduct($variantData['node'], $productId, $context);
+        }
+
+        return $productId;
     }
 
     /**
      * @throws MissingRequiredProductMappingException
      */
-    protected function persistProduct(ProductResultsProxy $results, ?string $parentId, Context $context): string
+    protected function persistProduct(array $productData, ?string $parentId, Context $context): string
     {
-        $productData = $results->getMainData();
-
         $sku = $productData['sku'];
         $existingProduct = $this->productProvider->getProductBySku($sku, $context, ['media']);
 
-        $dto = new ProductTransformationDTO($results);
+        $dto = new ProductTransformationDTO($productData);
         $dto->setSwProduct($existingProduct);
 
         $transformedData = $this->productTransformerChain->transform(
@@ -80,6 +79,8 @@ class ProductPersistor
                 'productNumber' => $sku,
             ]
         );
+
+        $swProductData = \array_filter($swProductData);
 
         $writtenProducts = $this->productRepository->upsert(
             [$swProductData],
