@@ -62,7 +62,7 @@ class DebugPersistCategories extends Command
             return self::FAILURE;
         }
 
-        $this->categoryPersistor->persist($categoryCollection, new Context(new SystemSource()));
+        $this->categoryPersistor->persistCollection($categoryCollection, new Context(new SystemSource()));
 
         return self::SUCCESS;
     }

@@ -44,4 +44,13 @@
             <helpText lang="de-DE">Every selected attribute will be fetched as product custom field</helpText>
         </input-field>
     </card>
+    <card>
+        <title>Category Sync</title>
+        <title lang="de-DE">Category Sync</title>
+        <input-field type="text">
+            <name>categoryTreeCode</name>
+            <label>Code of the category tree to synchronize</label>
+            <label lang="de-DE">Code of the category tree to synchronize</label>
+        </input-field>
+    </card>
 </config>

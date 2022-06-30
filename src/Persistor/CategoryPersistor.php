@@ -29,7 +29,33 @@ class CategoryPersistor
         $this->categoryProvider = $categoryProvider;
     }
 
-    public function persist(ErgonodeCategoryCollection $categoryCollection, Context $context): void
+    public function persist(array $categoryData, Context $context): void
+    {
+        foreach ($categoryData['name'] as $nameTranslation) {
+            $payload = $this->createCategoryPayload(
+                $categoryData['code'],
+                $nameTranslation['value'],
+                $nameTranslation['language'],
+                $context
+            );
+
+            $categoryId = $payload['id'] ?? null;
+            if (empty($categoryId)) {
+                continue;
+            }
+
+            unset($payload['parentId'], $payload['afterCategoryId']);
+
+            $this->categoryRepository->update(
+                [
+                    $payload
+                ],
+                $context
+            );
+        }
+    }
+
+    public function persistCollection(ErgonodeCategoryCollection $categoryCollection, Context $context): void
     {
         foreach ($categoryCollection as $category) {
             foreach ($category->getNameTranslations() as $categoryTranslation) {
@@ -41,14 +67,21 @@ class CategoryPersistor
                     );
                 }
 
-                $categoryId = $this->createCategory(
-                    $category->getCode(),
-                    $categoryTranslation->getValue(),
-                    $categoryTranslation->getLocale(),
-                    $context,
-                    $parentId,
-                    $this->lastChildMapping[$parentId] ?? null
+                $writeResult = $this->categoryRepository->upsert(
+                    [
+                        $this->createCategoryPayload(
+                            $category->getCode(),
+                            $categoryTranslation->getValue(),
+                            $categoryTranslation->getLocale(),
+                            $context,
+                            $parentId,
+                            $this->lastChildMapping[$parentId] ?? null
+                        )
+                    ],
+                    $context
                 );
+
+                $categoryId = $writeResult->getPrimaryKeys(CategoryDefinition::ENTITY_NAME)[0];
 
                 $this->setParentMapping($category->getCode(), $categoryTranslation->getLocale(), $categoryId);
                 $this->lastChildMapping[$parentId] = $categoryId;
@@ -66,14 +99,14 @@ class CategoryPersistor
         return $this->parentMapping[$locale][$code] ?? null;
     }
 
-    private function createCategory(
+    private function createCategoryPayload(
         string $code,
         ?string $translated,
         string $locale,
         Context $context,
         ?string $parentId = null,
         ?string $afterCategoryId = null
-    ): string {
+    ): array {
         $existingCategory = $this->categoryProvider->getCategoryByMapping(
             $code,
             $locale,
@@ -83,22 +116,17 @@ class CategoryPersistor
             ]
         );
 
-        $writeResult = $this->categoryRepository->upsert(
-            [[
-                'id' => null === $existingCategory ? null : $existingCategory->getId(),
-                'name' => empty($translated) ? $code . '_' . $locale : $translated,
-                'parentId' => $parentId,
-                'afterCategoryId' => $afterCategoryId,
-                ErgonodeCategoryMappingExtension::EXTENSION_NAME => [
-                    'id' => null === $existingCategory ? null : $this->getEntityExtensionId($existingCategory),
-                    'code' => $code,
-                    'locale' => $locale
-                ]
-            ]],
-            $context
-        );
-
-        return $writeResult->getPrimaryKeys(CategoryDefinition::ENTITY_NAME)[0];
+        return [
+            'id' => null === $existingCategory ? null : $existingCategory->getId(),
+            'name' => empty($translated) ? $code . '_' . $locale : $translated,
+            'parentId' => $parentId,
+            'afterCategoryId' => $afterCategoryId,
+            ErgonodeCategoryMappingExtension::EXTENSION_NAME => [
+                'id' => null === $existingCategory ? null : $this->getEntityExtensionId($existingCategory),
+                'code' => $code,
+                'locale' => $locale
+            ]
+        ];
     }
 
     private function getEntityExtensionId(Entity $entity): ?string

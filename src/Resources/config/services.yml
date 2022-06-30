@@ -87,5 +87,11 @@ services:
   Strix\Ergonode\Service\ScheduledTask\ProductSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
+  Strix\Ergonode\Service\ScheduledTask\CategorySyncTask:
+    tags: [ 'shopware.scheduled.task' ]
+
   Strix\Ergonode\Service\ScheduledTask\ProductSyncTaskHandler:
+    tags: [ 'messenger.message_handler' ]
+
+  Strix\Ergonode\Service\ScheduledTask\CategorySyncTaskHandler:
     tags: [ 'messenger.message_handler' ]

@@ -40,7 +40,7 @@ class ErgonodeCategoryProvider
         $categories = new ErgonodeCategoryCollection();
 
         do {
-            $query = $this->categoryQueryBuilder->build($treeCode, self::CATEGORIES_PER_PAGE, $cursor);
+            $query = $this->categoryQueryBuilder->buildTree($treeCode, self::CATEGORIES_PER_PAGE, $cursor);
             $results = $this->ergonodeGqlClient->query($query, CategoryTreeResultsProxy::class);
 
             if (!$results instanceof CategoryTreeResultsProxy) {

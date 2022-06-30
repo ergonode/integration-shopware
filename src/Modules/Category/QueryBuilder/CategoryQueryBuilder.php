@@ -8,7 +8,7 @@ use GraphQL\Query;
 
 class CategoryQueryBuilder
 {
-    public function build(string $treeCode, int $count, ?string $cursor): Query
+    public function buildTree(string $treeCode, int $count, ?string $cursor): Query
     {
         $listArguments = ['first' => $count];
         if ($cursor !== null) {
@@ -54,6 +54,37 @@ class CategoryQueryBuilder
             ])
             ->setArguments([
                 'code' => $treeCode,
+            ]);
+    }
+
+    public function build(string $treeCode, int $count, ?string $cursor): Query
+    {
+        $listArguments = ['first' => $count];
+        if ($cursor !== null) {
+            $listArguments['after'] = $cursor;
+        }
+        return (new Query('categoryStream'))
+            ->setArguments($listArguments)
+            ->setSelectionSet([
+                'totalCount',
+                (new Query('pageInfo'))
+                    ->setSelectionSet([
+                        'endCursor',
+                        'hasNextPage',
+                    ]),
+                (new Query('edges'))
+                    ->setSelectionSet([
+                        'cursor',
+                        (new Query('node'))
+                            ->setSelectionSet([
+                                'code',
+                                (new Query('name'))
+                                    ->setSelectionSet([
+                                        'value',
+                                        'language',
+                                    ]),
+                            ])
+                    ])
             ]);
     }
 }

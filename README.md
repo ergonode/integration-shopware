@@ -2,7 +2,16 @@
 
 ## Development
 
+### Dev notes
+
+`ProductSyncProcessor` and `CategorySyncProcessor` both have a setting of products/categories fetched per page when
+syncing using Ergonode streams (10). Scheduled task runners have a limit on how many pages per run are processed (25) to
+prevent infinite loop when something goes wrong.
+
+ProductSyncProcessor might not properly handle variants that were "detached" since last sync.
+
 ### Testing
+
 In Shopware root run:
 
 `php /var/www/html/vendor/phpunit/phpunit/phpunit --configuration /var/www/html/custom/plugins/StrixErgonode/phpunit.xml`
