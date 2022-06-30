@@ -14,6 +14,7 @@ use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
 use Strix\Ergonode\Provider\ProductProvider;
 use Strix\Ergonode\Transformer\ProductTransformerChain;
 
+use function array_filter;
 use function array_merge_recursive;
 use function array_values;
 use function is_array;
@@ -80,7 +81,7 @@ class ProductPersistor
             ]
         );
 
-        $swProductData = \array_filter($swProductData);
+        $swProductData = array_filter($swProductData);
 
         $writtenProducts = $this->productRepository->upsert(
             [$swProductData],

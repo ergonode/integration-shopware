@@ -9,7 +9,9 @@ use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Provider\ConfigProvider;
 use Strix\Ergonode\Resolver\ProductCustomFieldTransformerResolver;
 
+use function array_filter;
 use function array_merge_recursive;
+use function in_array;
 
 class ProductCustomFieldTransformer implements ProductDataTransformerInterface
 {
@@ -28,15 +30,13 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $swData = $productData->getShopwareData();
-        $ergoResult = $productData->getErgonodeObject();
 
-        $keys = $this->configProvider->getErgonodeCustomFields();
+        $codes = $this->configProvider->getErgonodeCustomFields();
 
-        $ergoResult = $ergoResult->filterAttributesByCodes($keys);
-        $ergoCustomFields = $ergoResult->getAttributeList();
+        $attributes = $this->getAttributesByCodes($productData->getErgonodeData(), $codes);
 
         $customFields = [];
-        foreach ($ergoCustomFields as $ergoCustomField) {
+        foreach ($attributes as $ergoCustomField) {
             $node = $ergoCustomField['node'];
 
             $typedTransformer = $this->transformerResolver->resolve($node);
@@ -60,5 +60,13 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
         $productData->setShopwareData($swData);
 
         return $productData;
+    }
+
+    private function getAttributesByCodes(array $ergonodeData, array $codes): array
+    {
+        return array_filter(
+            $ergonodeData['attributeList']['edges'] ?? [],
+            fn(array $attribute) => in_array($attribute['node']['attribute']['code'] ?? '', $codes)
+        );
     }
 }
