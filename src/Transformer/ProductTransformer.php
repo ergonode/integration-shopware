@@ -18,11 +18,6 @@ class ProductTransformer implements ProductDataTransformerInterface
 {
     private string $defaultLocale;
 
-    private const REQUIRED_KEYS = [
-        'name',
-        'stock',
-    ];
-
     private const TRANSLATABLE_KEYS = [
         'name',
         'description',
@@ -83,25 +78,11 @@ class ProductTransformer implements ProductDataTransformerInterface
             );
         }
 
-        $this->validateResult($result);
-
         $productData->setShopwareData(
             ArrayUnfoldUtil::unfoldArray($result)
         );
 
         return $productData;
-    }
-
-    /**
-     * @throws MissingRequiredProductMappingException
-     */
-    private function validateResult(array $result): void
-    {
-        $missingAttributes = \array_diff(self::REQUIRED_KEYS, \array_keys($result));
-
-        if (\count($missingAttributes) > 0) {
-            throw new MissingRequiredProductMappingException($missingAttributes);
-        }
     }
 
     private function getTranslatedValues(array $valueTranslations): array

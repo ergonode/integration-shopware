@@ -1,6 +1,7 @@
 imports:
   - { resource: parameters.yml }
   - { resource: packages/cache.yml }
+  - { resource: packages/monolog.yml }
 
 services:
   _defaults:
@@ -79,4 +80,12 @@ services:
         - '@Strix\Ergonode\Transformer\ProductCategoryTransformer'
         - '@Strix\Ergonode\Transformer\ProductTaxTransformer'
         - '@Strix\Ergonode\Transformer\ProductPriceTransformer'
+        - '@Strix\Ergonode\Transformer\ProductDefaultValuesTransformer'
         - '@Strix\Ergonode\Transformer\ProductMediaTransformer'
+
+  # SCHEDULED TASK
+  Strix\Ergonode\Service\ScheduledTask\ProductSyncTask:
+    tags: [ 'shopware.scheduled.task' ]
+
+  Strix\Ergonode\Service\ScheduledTask\ProductSyncTaskHandler:
+    tags: [ 'messenger.message_handler' ]
