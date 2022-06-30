@@ -11,7 +11,7 @@ class MediaCustomFieldTransformer implements CustomFieldTransformerInterface
 {
     public function supports(array $node): bool
     {
-        return AttributeTypesEnum::IMAGE === AttributeTypesEnum::getAttributeNodeType($node);
+        return AttributeTypesEnum::IMAGE === AttributeTypesEnum::getNodeType($node);
     }
 
     public function transformNode(array $node): array

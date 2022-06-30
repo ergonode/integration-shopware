@@ -11,7 +11,7 @@ class NumericCustomFieldTransformer implements CustomFieldTransformerInterface
 {
     public function supports(array $node): bool
     {
-        return AttributeTypesEnum::NUMERIC === AttributeTypesEnum::getAttributeNodeType($node);
+        return AttributeTypesEnum::NUMERIC === AttributeTypesEnum::getNodeType($node);
     }
 
     public function transformNode(array $node): array

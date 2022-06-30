@@ -21,7 +21,7 @@ class AttributeTypesEnum
     public const TEXT = 'type_text';
     public const UNIT = 'type_unit';
 
-    public static function getAttributeNodeType(array $node): string
+    public static function getNodeType(array $node): string
     {
         if (empty($node['code'])) {
             return self::TEXT;
