@@ -53,7 +53,7 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
         }
 
         $swData['translations'] = array_merge_recursive(
-            $swData['translations'],
+            $swData['translations'] ?? [],
             $customFields
         );
 
