@@ -46,7 +46,8 @@ class MediaProductCustomFieldTransformer implements ProductCustomFieldTransforme
         );
 
         foreach ($translated as &$value) {
-            if (is_array($firstImage = reset($value))) {
+            $firstImage = reset($value);
+            if (is_array($firstImage)) {
                 $value = $firstImage; // in case $value is MultimediaArrayAttribute, use first element
             }
 

@@ -74,9 +74,10 @@ class PriceProductCustomFieldTransformer implements ProductCustomFieldTransforme
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('isoCode', $code));
 
+        /** @var CurrencyEntity|null $currency **/
         $currency = $this->currencyRepository->search($criteria, $context)->first();
 
-        if ($currency instanceof CurrencyEntity) {
+        if (null !== $currency) {
             return $currency->getId();
         }
 
