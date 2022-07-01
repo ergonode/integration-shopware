@@ -21,12 +21,12 @@ class RemoveOrphanBindingAttributesCommand extends Command
     private OrphanEntitiesManager $orphanEntitiesManager;
 
     public function __construct(
-        OrphanEntitiesManager $orphanEntitiesManager
+        OrphanEntitiesManager $orphanEntitiesProcessor
     ) {
         parent::__construct();
 
         $this->context = new Context(new SystemSource());
-        $this->orphanEntitiesManager = $orphanEntitiesManager;
+        $this->orphanEntitiesManager = $orphanEntitiesProcessor;
     }
 
     protected function configure()

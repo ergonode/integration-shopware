@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Modules\Product\Provider;
 
+use Generator;
+use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
 use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
-use Strix\Ergonode\Modules\Product\Api\ProductResultsProxy;
 use Strix\Ergonode\Modules\Product\Api\ProductStreamResultsProxy;
 use Strix\Ergonode\Modules\Product\QueryBuilder\ProductQueryBuilder;
 
@@ -35,18 +36,6 @@ class ErgonodeProductProvider
         return $response;
     }
 
-    public function provideProductWithVariants(string $sku): ?ProductResultsProxy
-    {
-        $query = $this->productQueryBuilder->buildProductWithVariants($sku);
-        $response = $this->ergonodeGqlClient->query($query, ProductResultsProxy::class);
-
-        if (!$response instanceof ProductResultsProxy) {
-            return null;
-        }
-
-        return $response;
-    }
-
     public function provideDeleted(?int $count = null, ?string $cursor = null): ?ProductStreamResultsProxy
     {
         $query = $this->productQueryBuilder->buildDeleted($count, $cursor);
@@ -57,5 +46,25 @@ class ErgonodeProductProvider
         }
 
         return $response;
+    }
+
+    public function provideOnlySkus(int $count, ?string $endCursor = null, ?ErgonodeGqlClient $client = null): Generator
+    {
+        if (null === $client) {
+            $client = $this->ergonodeGqlClient;
+        }
+
+        do {
+            $query = $this->productQueryBuilder->buildOnlySkus($count, $endCursor);
+            $results = $client->query($query, ProductStreamResultsProxy::class);
+
+            if (!$results instanceof ProductStreamResultsProxy) {
+                return null;
+            }
+
+            yield $results;
+
+            $endCursor = $results->getEndCursor();
+        } while ($results->hasNextPage());
     }
 }
