@@ -1,0 +1,21 @@
+{
+  "StrixErgonode": {
+    "mainMenuItemGeneral": "Integracja z Ergonode",
+    "tabs": {
+      "attributeMappings": "Mapowania atrybutów"
+      },
+    "mappings": {
+      "attributeMappingGeneral": "Mapowanie atrybutów",
+      "attributeMappings": "Mapowania atrybutów",
+      "shopwareAttribute": "Atrybut Shopware",
+      "ergonodeAttribute": "Atrybut Ergonode",
+      "addAttributeMapping": "Dodaj mapowanie atrybutu",
+      "messages": {
+        "mappingCreationSuccessful": "Pomyślnie utworzono mapowanie atrybutów.",
+        "mappingCreationFailure": "Nie udało się utworzyć mapowania.",
+        "mappingAlreadyExists": "Mapowanie podanych dwóch atrybutów już istnieje.",
+        "shopwareAttributesMustBeUnique": "Dla każdego atrybutu Shopware może istnieć tylko jedno mapowanie go zawierające."
+      }
+    }
+  }
+}

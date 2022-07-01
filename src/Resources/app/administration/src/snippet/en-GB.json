@@ -1,0 +1,21 @@
+{
+  "StrixErgonode": {
+    "mainMenuItemGeneral": "Ergonode integration",
+    "tabs": {
+      "attributeMappings": "Attribute mappings"
+    },
+    "mappings": {
+      "attributeMappingGeneral": "Attribute mapping",
+      "attributeMappings": "Attribute mappings",
+      "shopwareAttribute": "Shopware attribute",
+      "ergonodeAttribute": "Ergonode attribute",
+      "addAttributeMapping": "Add mapping",
+      "messages": {
+        "mappingCreationSuccessful": "An attribute mapping has been successfully created.",
+        "mappingCreationFailure": "Could not create an attribute mapping.",
+        "mappingAlreadyExists": "A mapping of these attributes already exists.",
+        "shopwareAttributesMustBeUnique": "For every Shopware attribute there may only be one mapping that includes it."
+      }
+    }
+  }
+}
