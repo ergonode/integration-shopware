@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Strix\Ergonode\Modules\Attribute\Api;
 
 use Strix\Ergonode\Api\AbstractStreamResultsProxy;
+use Strix\Ergonode\Enum\AttributeTypesEnum;
 
 class AttributeStreamResultsProxy extends AbstractStreamResultsProxy
 {
@@ -16,7 +17,7 @@ class AttributeStreamResultsProxy extends AbstractStreamResultsProxy
     public function filterByAttributeTypes(array $array = []): AbstractStreamResultsProxy
     {
         return $this->filter(
-            fn(array $attribute) => array_intersect($array, array_keys($attribute['node'] ?? []))
+            fn(array $attribute) => in_array(AttributeTypesEnum::getNodeType($attribute['node']), $array)
         );
     }
 

@@ -62,7 +62,7 @@ class ProductPersistor
     protected function persistProduct(array $productData, ?string $parentId, Context $context): string
     {
         $sku = $productData['sku'];
-        $existingProduct = $this->productProvider->getProductBySku($sku, $context, ['media']);
+        $existingProduct = $this->productProvider->getProductBySku($sku, $context, ['media', 'properties']);
 
         $dto = new ProductTransformationDTO($productData);
         $dto->setSwProduct($existingProduct);
@@ -97,16 +97,15 @@ class ProductPersistor
 
     private function deleteEntities(ProductTransformationDTO $dto, Context $context): void
     {
-        foreach ($dto->getEntitiesToDelete() as $entityName => $ids) {
-            if (!is_array($ids)) {
+        foreach ($dto->getEntitiesToDelete() as $entityName => $payload) {
+            if (!is_array($payload)) {
                 continue;
             }
 
             try {
                 $repository = $this->definitionInstanceRegistry->getRepository($entityName);
 
-                $payload = array_values(array_map(fn($id) => ['id' => $id], $ids));
-                $repository->delete($payload, $context);
+                $repository->delete(array_values($payload), $context);
             } catch (EntityRepositoryNotFoundException $e) {
                 continue;
             }
