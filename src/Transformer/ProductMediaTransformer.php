@@ -12,6 +12,11 @@ use Strix\Ergonode\Manager\FileManager;
 use Strix\Ergonode\Provider\ProductMediaProvider;
 use Strix\Ergonode\Util\Constants;
 
+use function array_diff;
+use function array_filter;
+use function array_map;
+use function is_array;
+
 class ProductMediaTransformer implements ProductDataTransformerInterface
 {
     private FileManager $fileManager;

@@ -77,14 +77,18 @@ class CustomFieldPersistor
         }
 
         $written = $this->customFieldSetRepository->create([
-            'name' => Constants::PRODUCT_CUSTOM_FIELD_SET_NAME,
-            'config' => [
-                'label' => [
-                    'en-GB' => 'Ergonode Custom Fields',
+            [
+                'name' => Constants::PRODUCT_CUSTOM_FIELD_SET_NAME,
+                'config' => [
+                    'label' => [
+                        'en-GB' => 'Ergonode Custom Fields',
+                    ],
                 ],
-            ],
-            'relations' => [
-                'entity_name' => ProductDefinition::ENTITY_NAME,
+                'relations' => [
+                    [
+                        'entityName' => ProductDefinition::ENTITY_NAME,
+                    ],
+                ],
             ],
         ], $context);
 

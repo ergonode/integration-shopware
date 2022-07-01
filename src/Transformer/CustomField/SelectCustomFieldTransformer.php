@@ -9,6 +9,8 @@ use Shopware\Core\System\CustomField\CustomFieldTypes;
 use Strix\Ergonode\Transformer\TranslationTransformer;
 use Strix\Ergonode\Enum\AttributeTypesEnum;
 
+use function in_array;
+
 class SelectCustomFieldTransformer implements CustomFieldTransformerInterface
 {
     private TranslationTransformer $translationTransformer;
