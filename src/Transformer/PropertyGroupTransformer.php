@@ -15,6 +15,9 @@ use Strix\Ergonode\Extension\PropertyGroup\PropertyGroupExtension;
 use Strix\Ergonode\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
 use Strix\Ergonode\Provider\PropertyGroupProvider;
 
+use function array_merge_recursive;
+use function sprintf;
+
 class PropertyGroupTransformer
 {
     private PropertyGroupProvider $propertyGroupProvider;
