@@ -3,6 +3,7 @@
 namespace Strix\Ergonode\Subscriber;
 
 use Shopware\Storefront\Event\StorefrontRenderEvent;
+use Shopware\Storefront\Page\Product\ProductPage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class Subscriber implements EventSubscriberInterface
@@ -22,6 +23,15 @@ class Subscriber implements EventSubscriberInterface
      */
     public function onStorefrontRender(StorefrontRenderEvent $event)
     {
+        // todo remove
+
         dump('StrixErgonode app loaded');
+
+        $params = $event->getParameters();
+        $page = $params['page'] ?? null;
+
+        if ($page instanceof ProductPage) {
+            dump($page->getProduct());
+        }
     }
 }

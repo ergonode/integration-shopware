@@ -11,6 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
+use Strix\Ergonode\Extension\PropertyGroup\PropertyGroupExtension;
 
 class PropertyGroupProvider
 {
@@ -26,6 +27,11 @@ class PropertyGroupProvider
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter(AbstractErgonodeMappingExtension::EXTENSION_NAME . '.code', $code));
+        $criteria->addFilter(new EqualsFilter(
+            AbstractErgonodeMappingExtension::EXTENSION_NAME . '.type',
+            PropertyGroupExtension::ERGONODE_TYPE
+        ));
+
         $criteria->addAssociations([
             AbstractErgonodeMappingExtension::EXTENSION_NAME,
             'options.' . AbstractErgonodeMappingExtension::EXTENSION_NAME,

@@ -40,7 +40,12 @@ class PropertyGroupPersistor
                 continue;
             }
 
-            $payloads[] = $this->propertyGroupTransformer->transformAttributeNode($node, $context);
+            $payload = $this->propertyGroupTransformer->transformAttributeNode($node, $context);
+            if (empty($payload)) {
+                continue;
+            }
+
+            $payloads[] = $payload;
         }
 
         if (empty($payloads)) {

@@ -6,6 +6,9 @@ namespace Strix\Ergonode\Util;
 
 class Constants
 {
+    public const ATTRIBUTE_SCOPE_GLOBAL = 'GLOBAL';
+    public const ATTRIBUTE_SCOPE_LOCAL = 'LOCAL';
+
     public const PRODUCT_CUSTOM_FIELD_SET_NAME = 'strix_ergonode_custom_fields';
 
     public const SW_PRODUCT_FIELD_NAME = 'name';

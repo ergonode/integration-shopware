@@ -14,6 +14,11 @@ use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
 use Strix\Ergonode\Extension\PropertyGroup\PropertyGroupExtension;
 use Strix\Ergonode\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
 use Strix\Ergonode\Provider\PropertyGroupProvider;
+use Strix\Ergonode\Util\Constants;
+use Strix\Ergonode\Util\PropertyGroupOptionUtil;
+
+use function array_merge_recursive;
+use function sprintf;
 
 class PropertyGroupTransformer
 {
@@ -31,6 +36,10 @@ class PropertyGroupTransformer
 
     public function transformAttributeNode(array $node, Context $context): array
     {
+        if (Constants::ATTRIBUTE_SCOPE_GLOBAL !== $node['scope'] ?? null) { // properties in Shopware are not translatable
+            return [];
+        }
+
         $code = $node['code'];
 
         $translations = [];
@@ -56,7 +65,7 @@ class PropertyGroupTransformer
                         'extensions' => [
                             AbstractErgonodeMappingExtension::EXTENSION_NAME => [
                                 'id' => $existingOption ? $this->getEntityExtensionId($existingOption) : null,
-                                'code' => $this->buildOptionCode($code, $option['code']),
+                                'code' => PropertyGroupOptionUtil::buildOptionCode($code, $option['code']),
                                 'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                             ],
                         ],
@@ -103,17 +112,12 @@ class PropertyGroupTransformer
             if (
                 $extension instanceof ErgonodeMappingExtensionEntity &&
                 $groupExtension instanceof ErgonodeMappingExtensionEntity &&
-                $this->buildOptionCode($groupExtension->getCode(), $code) === $extension->getCode()
+                PropertyGroupOptionUtil::buildOptionCode($groupExtension->getCode(), $code) === $extension->getCode()
             ) {
                 return $option;
             }
         }
 
         return null;
-    }
-
-    private function buildOptionCode(string $prefix, string $suffix): string
-    {
-        return sprintf('%s_%s', $prefix, $suffix);
     }
 }
