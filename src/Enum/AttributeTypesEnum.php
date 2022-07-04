@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Enum;
 
-use ReflectionClass;
-
-class AttributeTypesEnum
+class AttributeTypesEnum extends AbstractEnum
 {
     public const DATE = 'type_date';
     public const FILE = 'type_file';
@@ -21,21 +19,14 @@ class AttributeTypesEnum
     public const TEXT = 'type_text';
     public const UNIT = 'type_unit';
 
-    public static function getAttributeNodeType(array $node): string
+    public static function getNodeType(array $attribute): string
     {
-        if (empty($node['code'])) {
+        if (empty($attribute['code'])) {
             return self::TEXT;
         }
 
-        $type = array_intersect(self::cases(), array_keys($node ?? []));
+        $type = array_intersect(self::cases(), array_keys($attribute ?? []));
 
-        return reset($type);
-    }
-
-    public static function cases(): array
-    {
-        $refl = new ReflectionClass(self::class);
-
-        return array_values($refl->getConstants());
+        return reset($type) ?: self::TEXT;
     }
 }

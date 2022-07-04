@@ -11,7 +11,7 @@ class DateCustomFieldTransformer implements CustomFieldTransformerInterface
 {
     public function supports(array $node): bool
     {
-        return AttributeTypesEnum::DATE === AttributeTypesEnum::getAttributeNodeType($node);
+        return AttributeTypesEnum::DATE === AttributeTypesEnum::getNodeType($node);
     }
 
     public function transformNode(array $node): array

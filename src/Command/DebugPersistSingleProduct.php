@@ -20,7 +20,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 /**
  * Temporary debug command
  */
-class DebugPersistProduct extends Command
+class DebugPersistSingleProduct extends Command
 {
     protected static $defaultName = 'strix:debug:product-persist';
 
@@ -60,6 +60,7 @@ class DebugPersistProduct extends Command
         $io = new SymfonyStyle($input, $output);
         $sku = $input->getArgument('sku');
 
+        /** @var ProductResultsProxy|null $result */
         $result = $this->gqlRequestCache->get(
             $sku,
             function () use ($sku) {
@@ -75,7 +76,7 @@ class DebugPersistProduct extends Command
         }
 
         $this->productPersistor->persist(
-            $result,
+            $result->getProductData(),
             new Context(new SystemSource())
         );
 

@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\DTO;
 
+use Shopware\Core\Content\Product\ProductEntity;
+
 class ProductTransformationDTO
 {
-    public const OPERATION_CREATE = 'create';
-    public const OPERATION_UPDATE = 'update';
-
     private array $ergonodeData;
 
     private array $shopwareData;
 
-    private string $operation;
+    private ?ProductEntity $swProduct;
 
-    public function __construct(string $operation, array $ergonodeData, array $shopwareData = [])
+    private array $entitiesToDelete = [];
+
+    public function __construct(array $ergonodeData, array $shopwareData = [])
     {
-        $this->operation = $operation;
         $this->ergonodeData = $ergonodeData;
         $this->shopwareData = $shopwareData;
     }
@@ -42,8 +42,45 @@ class ProductTransformationDTO
         $this->shopwareData = $shopwareData;
     }
 
-    public function getOperation(): string
+    public function getSwProduct(): ?ProductEntity
     {
-        return $this->operation;
+        return $this->swProduct;
+    }
+
+    public function setSwProduct(?ProductEntity $swProduct): void
+    {
+        $this->swProduct = $swProduct;
+    }
+
+    public function isUpdate(): bool
+    {
+        return null !== $this->swProduct;
+    }
+
+    public function isCreate(): bool
+    {
+        return null === $this->swProduct;
+    }
+
+    public function getEntitiesToDelete(): array
+    {
+        return $this->entitiesToDelete;
+    }
+
+    public function addEntitiesToDelete(string $entityName, array $payload): void
+    {
+        if (!isset($this->entitiesToDelete[$entityName])) {
+            $this->entitiesToDelete[$entityName] = [];
+        }
+
+        $this->entitiesToDelete[$entityName] = array_merge(
+            $this->entitiesToDelete[$entityName],
+            $payload
+        );
+    }
+
+    public function unsetSwData(string $fieldKey): void
+    {
+        unset($this->shopwareData[$fieldKey]);
     }
 }

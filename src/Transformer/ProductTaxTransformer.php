@@ -19,7 +19,7 @@ class ProductTaxTransformer implements ProductDataTransformerInterface
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
-        if (ProductTransformationDTO::OPERATION_UPDATE === $productData->getOperation()) {
+        if ($productData->isUpdate()) {
             return $productData;
         }
 

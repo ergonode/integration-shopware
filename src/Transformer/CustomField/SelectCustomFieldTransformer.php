@@ -9,6 +9,8 @@ use Shopware\Core\System\CustomField\CustomFieldTypes;
 use Strix\Ergonode\Transformer\TranslationTransformer;
 use Strix\Ergonode\Enum\AttributeTypesEnum;
 
+use function in_array;
+
 class SelectCustomFieldTransformer implements CustomFieldTransformerInterface
 {
     private TranslationTransformer $translationTransformer;
@@ -22,7 +24,7 @@ class SelectCustomFieldTransformer implements CustomFieldTransformerInterface
     public function supports(array $node): bool
     {
         return in_array(
-            AttributeTypesEnum::getAttributeNodeType($node),
+            AttributeTypesEnum::getNodeType($node),
             [
                 AttributeTypesEnum::SELECT,
                 AttributeTypesEnum::MULTISELECT,
@@ -42,7 +44,7 @@ class SelectCustomFieldTransformer implements CustomFieldTransformerInterface
             ];
         }
 
-        $isMultiSelect = AttributeTypesEnum::MULTISELECT === AttributeTypesEnum::getAttributeNodeType($node);
+        $isMultiSelect = AttributeTypesEnum::MULTISELECT === AttributeTypesEnum::getNodeType($node);
 
         return [
             'type' => CustomFieldTypes::SELECT,
