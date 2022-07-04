@@ -11,7 +11,7 @@ class HtmlCustomFieldTransformer implements CustomFieldTransformerInterface
 {
     public function supports(array $node): bool
     {
-        return AttributeTypesEnum::TEXTAREA === AttributeTypesEnum::getAttributeNodeType($node) &&
+        return AttributeTypesEnum::TEXTAREA === AttributeTypesEnum::getNodeType($node) &&
             isset($node['additional_richEdit']) &&
             true === $node['additional_richEdit'];
     }

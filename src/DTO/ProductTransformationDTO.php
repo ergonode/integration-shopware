@@ -67,7 +67,7 @@ class ProductTransformationDTO
         return $this->entitiesToDelete;
     }
 
-    public function addEntitiesToDelete(string $entityName, array $ids): void
+    public function addEntitiesToDelete(string $entityName, array $payload): void
     {
         if (!isset($this->entitiesToDelete[$entityName])) {
             $this->entitiesToDelete[$entityName] = [];
@@ -75,7 +75,7 @@ class ProductTransformationDTO
 
         $this->entitiesToDelete[$entityName] = array_merge(
             $this->entitiesToDelete[$entityName],
-            $ids
+            $payload
         );
     }
 

@@ -6,6 +6,7 @@ namespace Strix\Ergonode\Modules\Product\QueryBuilder;
 
 use GraphQL\InlineFragment;
 use GraphQL\Query;
+use Strix\Ergonode\Enum\AttributeTypesEnum;
 
 class ProductQueryBuilder
 {
@@ -143,10 +144,7 @@ class ProductQueryBuilder
                                             ->setSelectionSet([
                                                 (new Query('node'))
                                                     ->setSelectionSet([
-                                                        (new Query('attribute'))
-                                                            ->setSelectionSet([
-                                                                'code',
-                                                            ]),
+                                                        $this->getAttributeFragment(),
                                                         (new Query('valueTranslations'))
                                                             ->setSelectionSet([
                                                                 'inherited',
@@ -200,7 +198,7 @@ class ProductQueryBuilder
                                                     ]),
                                             ]),
                                     ]),
-                            ])
+                            ]),
                     ]),
             ]);
     }
@@ -263,13 +261,9 @@ class ProductQueryBuilder
                                                             ->setSelectionSet([
                                                                 (new Query('node'))
                                                                     ->setSelectionSet([
-                                                                        (new Query('attribute'))
-                                                                            ->setSelectionSet([
-                                                                                'code',
-                                                                            ]),
+                                                                        $this->getAttributeFragment(),
                                                                         (new Query('valueTranslations'))
                                                                             ->setSelectionSet([
-                                                                                'inherited',
                                                                                 'language',
                                                                                 '__typename',
                                                                                 (new InlineFragment('StringAttributeValue'))
@@ -319,15 +313,15 @@ class ProductQueryBuilder
                                                                             ]),
                                                                     ]),
                                                             ]),
+                                                        'totalCount',
                                                     ]),
                                             ]),
                                     ]),
-                                'totalCount',
                             ]),
                     ]),
                 (new Query('template'))
                     ->setSelectionSet([
-                        'name',
+                        'code',
                     ]),
                 (new Query('categoryList'))
                     ->setSelectionSet([
@@ -346,13 +340,9 @@ class ProductQueryBuilder
                             ->setSelectionSet([
                                 (new Query('node'))
                                     ->setSelectionSet([
-                                        (new Query('attribute'))
-                                            ->setSelectionSet([
-                                                'code',
-                                            ]),
+                                        $this->getAttributeFragment(),
                                         (new Query('valueTranslations'))
                                             ->setSelectionSet([
-                                                'inherited',
                                                 'language',
                                                 '__typename',
                                                 (new InlineFragment('StringAttributeValue'))
@@ -402,6 +392,64 @@ class ProductQueryBuilder
                                             ]),
                                     ]),
                             ]),
+                    ]),
+            ]);
+    }
+
+    private function getAttributeFragment(): Query
+    {
+        return (new Query('attribute'))
+            ->setSelectionSet([
+                'code',
+                'scope',
+                (new InlineFragment('DateAttribute'))
+                    ->setSelectionSet([
+                        new Query('code', AttributeTypesEnum::DATE),
+                    ]),
+                (new InlineFragment('FileAttribute'))
+                    ->setSelectionSet([
+                        new Query('code', AttributeTypesEnum::FILE),
+                    ]),
+                (new InlineFragment('GalleryAttribute'))
+                    ->setSelectionSet([
+                        new Query('code', AttributeTypesEnum::GALLERY),
+                    ]),
+                (new InlineFragment('ImageAttribute'))
+                    ->setSelectionSet([
+                        new Query('code', AttributeTypesEnum::IMAGE),
+                    ]),
+                (new InlineFragment('SelectAttribute'))
+                    ->setSelectionSet([
+                        new Query('code', AttributeTypesEnum::SELECT),
+                    ]),
+                (new InlineFragment('MultiSelectAttribute'))
+                    ->setSelectionSet([
+                        new Query('code', AttributeTypesEnum::MULTISELECT),
+                    ]),
+                (new InlineFragment('NumericAttribute'))
+                    ->setSelectionSet([
+                        new Query('code', AttributeTypesEnum::NUMERIC),
+                    ]),
+                (new InlineFragment('PriceAttribute'))
+                    ->setSelectionSet([
+                        new Query('code', AttributeTypesEnum::PRICE),
+                        'currency',
+                    ]),
+                (new InlineFragment('ProductRelationAttribute'))
+                    ->setSelectionSet([
+                        new Query('code', AttributeTypesEnum::RELATION),
+                    ]),
+                (new InlineFragment('TextareaAttribute'))
+                    ->setSelectionSet([
+                        new Query('code', AttributeTypesEnum::TEXTAREA),
+                    ]),
+                (new InlineFragment('TextAttribute'))
+                    ->setSelectionSet([
+                        new Query('code', AttributeTypesEnum::TEXT),
+                    ]),
+                (new InlineFragment('UnitAttribute'))
+                    ->setSelectionSet([
+                        new Query('code', AttributeTypesEnum::UNIT),
                     ]),
             ]);
     }

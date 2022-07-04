@@ -330,9 +330,9 @@ class ProductMediaTransformerTest extends TestCase
                 ],
                 [
                     ProductMediaDefinition::ENTITY_NAME => [
-                        'not_linked_id_1',
-                        'not_linked_id_2',
-                        'not_linked_id_3',
+                        ['id' => 'not_linked_id_1'],
+                        ['id' => 'not_linked_id_2'],
+                        ['id' => 'not_linked_id_3'],
                     ],
                 ],
             ],
@@ -362,8 +362,8 @@ class ProductMediaTransformerTest extends TestCase
                 ],
                 [
                     ProductMediaDefinition::ENTITY_NAME => [
-                        'not_linked_id_2',
-                        'not_linked_id_3',
+                        ['id' => 'not_linked_id_2'],
+                        ['id' => 'not_linked_id_3'],
                     ],
                 ],
             ],
@@ -421,9 +421,9 @@ class ProductMediaTransformerTest extends TestCase
                 ],
                 [
                     ProductMediaDefinition::ENTITY_NAME => [
-                        'not_linked_id_1',
-                        'not_linked_id_2',
-                        'not_linked_id_3',
+                        ['id' => 'not_linked_id_1'],
+                        ['id' => 'not_linked_id_2'],
+                        ['id' => 'not_linked_id_3'],
                     ],
                 ],
             ],
@@ -453,9 +453,9 @@ class ProductMediaTransformerTest extends TestCase
                 ],
                 [
                     ProductMediaDefinition::ENTITY_NAME => [
-                        'product_media/media/image_1.jpg',
-                        'product_media/media/image_2.jpg',
-                        'not_linked_id_3',
+                        ['id' => 'product_media/media/image_1.jpg'],
+                        ['id' => 'product_media/media/image_2.jpg'],
+                        ['id' => 'not_linked_id_3'],
                     ],
                 ],
             ],

@@ -67,6 +67,31 @@ class TranslationTransformerTest extends TestCase
                     'en-US' => 'size',
                 ],
             ],
+            [
+                [
+                    [
+                        'inherited' => false,
+                        'language' => 'pl_PL',
+                        '__typename' => 'NumericAttributeValue',
+                        'value_numeric' => 666,
+                    ],
+                    [
+                        'inherited' => false,
+                        'language' => 'de_DE',
+                        '__typename' => 'NumericAttributeValue',
+                        'value_numeric' => 1234,
+                    ],
+                ],
+                'number_number',
+                [
+                    'pl-PL' => [
+                        'number_number' => 666,
+                    ],
+                    'de-DE' => [
+                        'number_number' => 1234,
+                    ],
+                ],
+            ],
         ];
     }
 }
