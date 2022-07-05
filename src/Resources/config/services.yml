@@ -31,7 +31,7 @@ services:
   Strix\Ergonode\Api\Client\ErgonodeGqlClientFactory:
 
   # CONTROLLER
-  Strix\Ergonode\Modules\Attribute\Controller\AttributeMappingController:
+  Strix\Ergonode\Controller\AttributeMappingController:
     tags: [ 'controller.service_arguments' ]
 
   # COMMAND

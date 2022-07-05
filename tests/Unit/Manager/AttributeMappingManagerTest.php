@@ -2,21 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Modules\Attribute\Service;
+namespace Strix\Ergonode\Tests\Unit\Manager;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
-use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
+use Strix\Ergonode\Manager\AttributeMappingManager;
 use Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider;
 use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
-use Strix\Ergonode\Modules\Attribute\Service\AttributeMappingService;
 use Strix\Ergonode\Tests\Fixture\ErgonodeAttributeMappingFixture;
 
-class AttributeMappingServiceTest extends TestCase
+class AttributeMappingManagerTest extends TestCase
 {
-    private AttributeMappingService $service;
+    private AttributeMappingManager $manager;
 
     /**
      * @var MockObject|AttributeMappingProvider
@@ -30,14 +28,12 @@ class AttributeMappingServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $definitionInstanceRegistryMock = $this->createMock(DefinitionInstanceRegistry::class);
         $ergonodeAttributeProviderMock = $this->createMock(ErgonodeAttributeProvider::class);
         $this->attributeMappingProviderMock = $this->createMock(AttributeMappingProvider::class);
 
         $this->contextMock = $this->createMock(Context::class);
 
-        $this->service = new AttributeMappingService(
-            $definitionInstanceRegistryMock,
+        $this->manager = new AttributeMappingManager(
             $ergonodeAttributeProviderMock,
             $this->attributeMappingProviderMock
         );
@@ -50,7 +46,7 @@ class AttributeMappingServiceTest extends TestCase
     {
         $this->mockProviderMethod('provideByShopwareKey', ErgonodeAttributeMappingFixture::entity($shopwareKey, $ergonodeKey));
 
-        $output = $this->service->mapShopwareKey($shopwareKey, $this->contextMock);
+        $output = $this->manager->mapShopwareKey($shopwareKey, $this->contextMock);
 
         $this->assertEquals($ergonodeKey, $output);
     }
@@ -67,7 +63,7 @@ class AttributeMappingServiceTest extends TestCase
 
         $this->mockProviderMethod('provideByErgonodeKey', ErgonodeAttributeMappingFixture::collection($collection));
 
-        $output = $this->service->mapErgonodeKey($ergonodeKey, $this->contextMock);
+        $output = $this->manager->mapErgonodeKey($ergonodeKey, $this->contextMock);
 
         $this->assertEquals($shopwareKeys, $output);
     }
@@ -76,7 +72,7 @@ class AttributeMappingServiceTest extends TestCase
     {
         $this->mockProviderMethod('provideByShopwareKey', null);
 
-        $output = $this->service->mapShopwareKey('example_string', $this->contextMock);
+        $output = $this->manager->mapShopwareKey('example_string', $this->contextMock);
 
         $this->assertEquals(null, $output);
     }
@@ -85,7 +81,7 @@ class AttributeMappingServiceTest extends TestCase
     {
         $this->mockProviderMethod('provideByErgonodeKey', ErgonodeAttributeMappingFixture::collection([]));
 
-        $output = $this->service->mapErgonodeKey('example_string', $this->contextMock);
+        $output = $this->manager->mapErgonodeKey('example_string', $this->contextMock);
 
         $this->assertEquals([], $output);
     }

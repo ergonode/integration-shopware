@@ -8,7 +8,7 @@ use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition;
-use Strix\Ergonode\Modules\Attribute\Service\AttributeMappingService;
+use Strix\Ergonode\Manager\AttributeMappingManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,11 +23,11 @@ class CreateAttributeMappingCommand extends Command
 
     private EntityRepositoryInterface $repository;
 
-    private AttributeMappingService $service;
+    private AttributeMappingManager $service;
 
     public function __construct(
         EntityRepositoryInterface $repository,
-        AttributeMappingService $service
+        AttributeMappingManager $service
     ) {
         $this->context = new Context(new SystemSource());
         $this->repository = $repository;
