@@ -36,4 +36,9 @@ class ConfigProvider
 
         return [];
     }
+
+    public function getCategoryTreeCode(): string
+    {
+        return $this->configService->getString(self::STRIX_ERGONODE_CONFIG_NAMESPACE . 'categoryTreeCode');
+    }
 }

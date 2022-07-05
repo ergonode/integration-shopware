@@ -24,7 +24,7 @@ class CachedErgonodeGqlClient implements ErgonodeGqlClientInterface
 
     public function query(Query $query, ?string $proxyClass = null): ?Results
     {
-        $queryHash = \md5(\strval($query));
+        $queryHash = \sprintf('%s_%s', \md5(\strval($query)), $proxyClass);
 
         return $this->cache->get($queryHash, fn() => $this->ergonodeGqlClient->query($query, $proxyClass));
     }
