@@ -32,7 +32,7 @@ class ConfigProvider
     /**
      * @return ErgonodeAccessData[]
      */
-    public function getAllErgonodeAccessData(Context $context): array
+    public function getSalesChannelErgonodeAccessData(Context $context): array
     {
         $defaultConfig = $this->getErgonodeAccessData();
         $baseUrl = $defaultConfig->getBaseUrl();

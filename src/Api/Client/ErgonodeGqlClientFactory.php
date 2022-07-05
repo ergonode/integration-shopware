@@ -32,7 +32,7 @@ class ErgonodeGqlClientFactory
 
     public function createForEverySalesChannel(Context $context): Generator
     {
-        $accessDataArray = $this->configProvider->getAllErgonodeAccessData($context);
+        $accessDataArray = $this->configProvider->getSalesChannelErgonodeAccessData($context);
 
         foreach ($accessDataArray as $accessData) {
             yield $this->create($accessData);

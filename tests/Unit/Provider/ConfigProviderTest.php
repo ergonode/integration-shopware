@@ -49,9 +49,9 @@ class ConfigProviderTest extends TestCase
     }
 
     /**
-     * @dataProvider allAccessDataProvider
+     * @dataProvider salesChannelAccessDataProvider
      */
-    public function testGetAllErgonodeAccessDataGetter(array $mockReturn, array $expectedOutput)
+    public function testGetSalesChannelErgonodeAccessDataGetter(array $mockReturn, array $expectedOutput)
     {
         $this->mockSystemConfigServiceReturnsAccessData();
 
@@ -62,7 +62,7 @@ class ConfigProviderTest extends TestCase
                 'getEntities' => new SystemConfigCollection($mockReturn),
             ]));
 
-        $output = $this->configProvider->getAllErgonodeAccessData($this->contextMock);
+        $output = $this->configProvider->getSalesChannelErgonodeAccessData($this->contextMock);
 
         /** @var ErgonodeAccessData $accessData */
         foreach (array_values($output) as $index => $accessData) {
@@ -111,7 +111,7 @@ class ConfigProviderTest extends TestCase
         ];
     }
 
-    public function allAccessDataProvider(): array
+    public function salesChannelAccessDataProvider(): array
     {
         return [
             [
