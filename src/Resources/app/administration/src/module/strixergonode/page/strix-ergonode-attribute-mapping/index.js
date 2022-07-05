@@ -35,12 +35,12 @@ Component.register('strix-ergonode-attribute-mapping', {
                 {
                     property: 'shopwareKey',
                     label: this.$t('StrixErgonode.mappings.shopwareAttribute'),
-                    inlineEdit: 'string',
+                    inlineEdit: false,
                 },
                 {
                     property: 'ergonodeKey',
                     label: this.$t('StrixErgonode.mappings.ergonodeAttribute'),
-                    inlineEdit: 'string',
+                    inlineEdit: false,
                 },
             ];
         },
@@ -108,10 +108,10 @@ Component.register('strix-ergonode-attribute-mapping', {
                     message: this.$t('StrixErgonode.mappings.messages.mappingCreationSuccessful'),
                 });
             } catch (e) {
+                console.error(e);
                 this.createNotificationError({
                     message: e?.message || this.$t('StrixErgonode.mappings.messages.mappingCreationFailure')
                 });
-                console.error(e);
             } finally {
                 this.isCreateLoading = false;
             }

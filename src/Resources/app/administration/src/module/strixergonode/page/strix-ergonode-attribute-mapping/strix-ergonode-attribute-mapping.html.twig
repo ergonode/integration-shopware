@@ -50,8 +50,8 @@
                                 :repository="repository"
                                 :fullPage="false"
                                 :allow-delete="acl.can('strix_ergonode_attribute_mapping.deleter')"
-                                :allow-edit="acl.can('strix_ergonode_attribute_mapping.editor')"
-                                :allow-inline-edit="acl.can('strix_ergonode_attribute_mapping.editor')"
+                                :allow-edit="false"
+                                :allow-inline-edit="false"
                                 :is-loading="isMappingLoading"
                                 @delete-item-finish="fetchMappings()"
                             >
