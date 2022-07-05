@@ -4,10 +4,10 @@ import './strix-ergonode-attribute-mapping.scss';
 const { Component, Context, Data: { Criteria }, Mixin } = Shopware;
 
 Component.register('strix-ergonode-attribute-mapping', {
-    inject: ['repositoryFactory', 'ergonodeAttributeService'],
+    inject: ['acl', 'repositoryFactory', 'ergonodeAttributeService'],
 
     mixins: [
-        Mixin.getByName('notification')
+        Mixin.getByName('notification'),
     ],
 
     template,
@@ -105,12 +105,10 @@ Component.register('strix-ergonode-attribute-mapping', {
                 await this.fetchMappings();
 
                 this.createNotificationSuccess({
-                    title: this.$t('global.default.success'),
                     message: this.$t('StrixErgonode.mappings.messages.mappingCreationSuccessful'),
                 });
             } catch (e) {
                 this.createNotificationError({
-                    title: this.$t('global.default.error'),
                     message: e?.message || this.$t('StrixErgonode.mappings.messages.mappingCreationFailure')
                 });
                 console.error(e);
@@ -137,7 +135,6 @@ Component.register('strix-ergonode-attribute-mapping', {
         } catch (e) {
             console.error(e);
             this.createNotificationError({
-                title: this.$t('global.default.error'),
                 message: e.message,
             });
         } finally {

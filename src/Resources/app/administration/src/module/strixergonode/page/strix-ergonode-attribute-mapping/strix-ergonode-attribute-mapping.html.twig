@@ -9,7 +9,7 @@
                 </sw-tabs>
                 <sw-skeleton v-if="isLoading"></sw-skeleton>
                 <template v-else>
-                    <sw-card
+                    <sw-card v-if="acl.can('strix_ergonode_attribute_mapping.creator')"
                         :title="$t('StrixErgonode.mappings.addAttributeMapping')"
                     >
                         <sw-single-select
@@ -38,7 +38,7 @@
                             {{ $t('StrixErgonode.mappings.messages.mappingAlreadyExists') }}
                         </sw-label>
                     </sw-card>
-                    <sw-card
+                    <sw-card v-if="acl.can('strix_ergonode_attribute_mapping.viewer')"
                         class="strix-ergonode__attribute-mapping-grid-card"
                         :title="$t('StrixErgonode.mappings.attributeMappings')"
                     >
@@ -49,10 +49,11 @@
                                 :items="mappings"
                                 :repository="repository"
                                 :fullPage="false"
-                                :allow-delete="true"
-                                :allow-edit="true"
-                                :allow-inline-edit="true"
+                                :allow-delete="acl.can('strix_ergonode_attribute_mapping.deleter')"
+                                :allow-edit="acl.can('strix_ergonode_attribute_mapping.editor')"
+                                :allow-inline-edit="acl.can('strix_ergonode_attribute_mapping.editor')"
                                 :is-loading="isMappingLoading"
+                                @delete-item-finish="fetchMappings()"
                             >
                             </sw-entity-listing>
                         </template>

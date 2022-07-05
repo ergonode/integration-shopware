@@ -13,7 +13,10 @@ Shopware.Module.register('strix-ergonode', {
         attributeMapping: {
             name: 'strix-ergonode-mapping',
             component: 'strix-ergonode-attribute-mapping',
-            path: 'mapping'
+            path: 'mapping',
+            meta: {
+                privilege: 'strix_ergonode_attribute_mapping.viewer',
+            }
         }
     },
 
@@ -21,6 +24,7 @@ Shopware.Module.register('strix-ergonode', {
         id: 'strix.ergonode.mapping',
         path: 'strix.ergonode.attributeMapping',
         label: 'StrixErgonode.mainMenuItemGeneral',
-        parent: 'sw-catalogue',
+        parent: 'sw-settings',
+        privilege: 'strix_ergonode_attribute_mapping.viewer',
     }],
 })
