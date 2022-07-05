@@ -9,6 +9,7 @@
             <name>ergonodeBaseUrl</name>
             <label>Ergonode base URL</label>
             <label lang="de-DE">Ergonode base URL</label>
+            <helpText>Base URL will always be inherited (from "All Sales Channels")!</helpText>
         </input-field>
 
         <input-field type="text">
