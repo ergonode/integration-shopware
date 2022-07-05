@@ -15,11 +15,8 @@ use Strix\Ergonode\Util\ArrayUnfoldUtil;
 use Strix\Ergonode\Util\ErgonodeApiValueKeyResolverUtil;
 use Strix\Ergonode\Util\IsoCodeConverter;
 
-use function array_diff;
 use function array_key_exists;
-use function array_keys;
 use function array_merge_recursive;
-use function count;
 use function in_array;
 use function is_array;
 use function sprintf;
@@ -40,6 +37,7 @@ class ProductTransformer implements ProductDataTransformerInterface
     ];
 
     private AttributeMappingProvider $attributeMappingProvider;
+
     private LanguageProvider $languageProvider;
 
     public function __construct(

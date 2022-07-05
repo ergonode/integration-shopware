@@ -10,7 +10,6 @@ use Shopware\Core\Framework\Uuid\Uuid;
 use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Manager\FileManager;
 use Strix\Ergonode\Provider\ProductMediaProvider;
-use Strix\Ergonode\Util\Constants;
 
 use function array_diff;
 use function array_filter;
@@ -19,6 +18,8 @@ use function is_array;
 
 class ProductMediaTransformer implements ProductDataTransformerInterface
 {
+    private const SW_PRODUCT_FIELD_MEDIA = 'media';
+
     private FileManager $fileManager;
 
     private ProductMediaProvider $productMediaProvider;
@@ -36,24 +37,24 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
         $swData = $productData->getShopwareData();
 
         if (
-            empty($swData[Constants::SW_PRODUCT_FIELD_MEDIA]) ||
-            !is_array($swData[Constants::SW_PRODUCT_FIELD_MEDIA])
+            empty($swData[self::SW_PRODUCT_FIELD_MEDIA]) ||
+            !is_array($swData[self::SW_PRODUCT_FIELD_MEDIA])
         ) {
-            $productData->unsetSwData(Constants::SW_PRODUCT_FIELD_MEDIA);
+            $productData->unsetSwData(self::SW_PRODUCT_FIELD_MEDIA);
 
             return $productData;
         }
 
-        foreach ($swData[Constants::SW_PRODUCT_FIELD_MEDIA] as $index => &$image) {
+        foreach ($swData[self::SW_PRODUCT_FIELD_MEDIA] as $index => &$image) {
             $mediaId = $this->fileManager->persist($image, $context);
             if (null === $mediaId) {
-                unset($swData[Constants::SW_PRODUCT_FIELD_MEDIA][$index]);
+                unset($swData[self::SW_PRODUCT_FIELD_MEDIA][$index]);
                 continue;
             }
 
             $payload = $this->buildProductMediaPayload($mediaId, $productData, $context);
             if (empty($payload)) {
-                unset($swData[Constants::SW_PRODUCT_FIELD_MEDIA][$index]);
+                unset($swData[self::SW_PRODUCT_FIELD_MEDIA][$index]);
                 continue;
             }
 
@@ -64,8 +65,8 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
             }
         }
 
-        if (empty($swData[Constants::SW_PRODUCT_FIELD_MEDIA])) {
-            unset($swData[Constants::SW_PRODUCT_FIELD_MEDIA]);
+        if (empty($swData[self::SW_PRODUCT_FIELD_MEDIA])) {
+            unset($swData[self::SW_PRODUCT_FIELD_MEDIA]);
         }
 
         $productData->setShopwareData($swData);
@@ -113,12 +114,12 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
         $swData = $productData->getShopwareData();
         $productMediaIds = $productMedia->getIds();
 
-        if (!isset($swData[Constants::SW_PRODUCT_FIELD_MEDIA])) {
+        if (!isset($swData[self::SW_PRODUCT_FIELD_MEDIA])) {
             return array_map(fn(string $id) => ['id' => $id], $productMediaIds);
         }
 
         $newProductMediaIds = array_filter(
-            array_map(fn(array $media) => $media['id'] ?? null, $swData[Constants::SW_PRODUCT_FIELD_MEDIA])
+            array_map(fn(array $media) => $media['id'] ?? null, $swData[self::SW_PRODUCT_FIELD_MEDIA])
         );
 
         $idsToDelete = array_diff($productMediaIds, $newProductMediaIds);

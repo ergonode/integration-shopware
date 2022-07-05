@@ -2,28 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Modules\Attribute\Service;
+namespace Strix\Ergonode\Service;
 
-use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider;
 use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
+use Strix\Ergonode\Util\Constants;
 
-class AttributeMappingService
+class AttributeMapper
 {
-    private DefinitionInstanceRegistry $definitionInstanceRegistry;
-
     private ErgonodeAttributeProvider $ergonodeAttributeProvider;
 
     private AttributeMappingProvider $mappingProvider;
 
     public function __construct(
-        DefinitionInstanceRegistry $definitionInstanceRegistry,
         ErgonodeAttributeProvider $ergonodeAttributeProvider,
         AttributeMappingProvider $mappingProvider
     ) {
-        $this->definitionInstanceRegistry = $definitionInstanceRegistry;
         $this->ergonodeAttributeProvider = $ergonodeAttributeProvider;
         $this->mappingProvider = $mappingProvider;
     }
@@ -59,11 +54,7 @@ class AttributeMappingService
      */
     public function getMappableShopwareAttributes(): array
     {
-        $definition = $this->definitionInstanceRegistry->getByEntityName(ProductDefinition::ENTITY_NAME);
-
-        $fields = $definition->getTranslatedFields(); // todo define list of mappable sw fields ?
-
-        return array_keys($fields);
+        return Constants::SW_PRODUCT_MAPPABLE_FIELDS;
     }
 
     public function getAllErgonodeAttributes(): array
