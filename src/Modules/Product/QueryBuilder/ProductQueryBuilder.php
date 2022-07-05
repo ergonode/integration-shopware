@@ -396,6 +396,37 @@ class ProductQueryBuilder
             ]);
     }
 
+    public function buildOnlySkus(int $count, ?string $cursor): Query
+    {
+        $arguments = [
+            'first' => $count,
+        ];
+
+        if ($cursor !== null) {
+            $arguments['after'] = $cursor;
+        }
+
+        return (new Query('productStream'))
+            ->setArguments($arguments)
+            ->setSelectionSet([
+                'totalCount',
+                (new Query('pageInfo'))
+                    ->setSelectionSet([
+                        'endCursor',
+                        'hasNextPage',
+                    ]),
+                (new Query('edges'))
+                    ->setSelectionSet([
+                        'cursor',
+                        (new Query('node'))
+                            ->setSelectionSet([
+                                'sku',
+                                '__typename',
+                            ]),
+                    ]),
+            ]);
+    }
+
     private function getAttributeFragment(): Query
     {
         return (new Query('attribute'))

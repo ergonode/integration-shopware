@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Tests\Unit\Provider;
 
+use Generator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
@@ -51,7 +52,7 @@ class ConfigProviderTest extends TestCase
     /**
      * @dataProvider salesChannelAccessDataProvider
      */
-    public function testGetSalesChannelErgonodeAccessDataGetter(array $mockReturn, array $expectedOutput)
+    public function testGetSalesChannelErgonodeAccessDataGetter(array $mockReturn, array $expectedOutput): void
     {
         $this->mockSystemConfigServiceReturnsAccessData();
 
@@ -63,6 +64,8 @@ class ConfigProviderTest extends TestCase
             ]));
 
         $output = $this->configProvider->getSalesChannelErgonodeAccessData($this->contextMock);
+
+        $this->assertNotEmpty($output);
 
         /** @var ErgonodeAccessData $accessData */
         foreach (array_values($output) as $index => $accessData) {
@@ -77,7 +80,26 @@ class ConfigProviderTest extends TestCase
         }
     }
 
-    public function testGetErgonodeAccessDataGetter()
+    /**
+     * @dataProvider salesChannelAccessDataProvider
+     */
+    public function testGetSalesChannelErgonodeAccessDataGetterOnEmptyReturn(): void
+    {
+        $this->mockSystemConfigServiceReturnsAccessData();
+
+        $this->systemConfigRepositoryMock
+            ->expects($this->once())
+            ->method('search')
+            ->willReturn($this->createConfiguredMock(EntitySearchResult::class, [
+                'getEntities' => new SystemConfigCollection([]),
+            ]));
+
+        $output = $this->configProvider->getSalesChannelErgonodeAccessData($this->contextMock);
+
+        $this->assertSame([], $output);
+    }
+
+    public function testGetErgonodeAccessDataGetter(): void
     {
         $this->mockSystemConfigServiceReturnsAccessData();
 
@@ -91,7 +113,7 @@ class ConfigProviderTest extends TestCase
     /**
      * @dataProvider customFieldKeysDataProvider
      */
-    public function testGetErgonodeCustomFieldsGetter($mockReturn, $expectedOutput)
+    public function testGetErgonodeCustomFieldsGetter($mockReturn, $expectedOutput): void
     {
         $this->systemConfigServiceMock->expects($this->once())
             ->method('get')
@@ -103,74 +125,66 @@ class ConfigProviderTest extends TestCase
         $this->assertSame($expectedOutput, $output);
     }
 
-    public function customFieldKeysDataProvider(): array
+    public function customFieldKeysDataProvider(): Generator
     {
-        return [
-            [['a', 'b', 'c'], ['a', 'b', 'c']],
-            ['blabla', []],
-        ];
+        yield [['a', 'b', 'c'], ['a', 'b', 'c']];
+        yield ['blabla', []];
     }
 
-    public function salesChannelAccessDataProvider(): array
+    public function salesChannelAccessDataProvider(): Generator
     {
-        return [
+        yield [
             [
-                [],
-                [],
+                $this->mockSystemConfigEntity('sales_channel_1', 'api_key_1'),
             ],
             [
                 [
-                    $this->mockSystemConfigEntity('sales_channel_1', 'api_key_1'),
+                    'some_base_url',
+                    'sales_channel_1',
+                    'api_key_1',
                 ],
-                [
-                    [
-                        'some_base_url',
-                        'sales_channel_1',
-                        'api_key_1',
-                    ],
-                ],
+            ],
+        ];
+        yield [
+            [
+                $this->mockSystemConfigEntity('sales_channel_1', 'api_key_1'),
+                $this->mockSystemConfigEntity('sales_channel_2', 'api_key_2'),
+                $this->mockSystemConfigEntity('sales_channel_3', 'api_key_3'),
             ],
             [
                 [
-                    $this->mockSystemConfigEntity('sales_channel_1', 'api_key_1'),
-                    $this->mockSystemConfigEntity('sales_channel_2', 'api_key_2'),
-                    $this->mockSystemConfigEntity('sales_channel_3', 'api_key_3'),
+                    'some_base_url',
+                    'sales_channel_1',
+                    'api_key_1',
                 ],
                 [
-                    [
-                        'some_base_url',
-                        'sales_channel_1',
-                        'api_key_1',
-                    ],
-                    [
-                        'some_base_url',
-                        'sales_channel_2',
-                        'api_key_2',
-                    ],
-                    [
-                        'some_base_url',
-                        'sales_channel_3',
-                        'api_key_3',
-                    ],
+                    'some_base_url',
+                    'sales_channel_2',
+                    'api_key_2',
                 ],
+                [
+                    'some_base_url',
+                    'sales_channel_3',
+                    'api_key_3',
+                ],
+            ],
+        ];
+        yield [
+            [
+                $this->mockSystemConfigEntity('sales_channel_1', 'api_key_1'),
+                $this->mockSystemConfigEntity(null, 'api_key_2'),
+                $this->mockSystemConfigEntity('sales_channel_3', 'api_key_3'),
             ],
             [
                 [
-                    $this->mockSystemConfigEntity('sales_channel_1', 'api_key_1'),
-                    $this->mockSystemConfigEntity(null, 'api_key_2'),
-                    $this->mockSystemConfigEntity('sales_channel_3', 'api_key_3'),
+                    'some_base_url',
+                    'sales_channel_1',
+                    'api_key_1',
                 ],
                 [
-                    [
-                        'some_base_url',
-                        'sales_channel_1',
-                        'api_key_1',
-                    ],
-                    [
-                        'some_base_url',
-                        'sales_channel_3',
-                        'api_key_3',
-                    ],
+                    'some_base_url',
+                    'sales_channel_3',
+                    'api_key_3',
                 ],
             ],
         ];
@@ -188,7 +202,7 @@ class ConfigProviderTest extends TestCase
         ]);
     }
 
-    private function mockSystemConfigServiceReturnsAccessData()
+    private function mockSystemConfigServiceReturnsAccessData(): void
     {
         $this->systemConfigServiceMock->expects($this->exactly(2))
             ->method('getString')

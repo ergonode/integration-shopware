@@ -49,14 +49,11 @@ class ProductVisibilityProcessor
             }
         }
 
-        $events = [];
+        $newEvents = [];
         foreach ($skuSalesChannelsMap as $sku => $salesChannelIds) {
-            $events = array_merge(
-                $events,
-                $this->persistor->persist(strval($sku), $salesChannelIds, $context)
-            );
+            $newEvents[] = $this->persistor->persist(strval($sku), $salesChannelIds, $context);
         }
 
-        return $events;
+        return array_merge_recursive([], ...$newEvents);
     }
 }
