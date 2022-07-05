@@ -11,7 +11,7 @@ class PriceCustomFieldTransformer implements CustomFieldTransformerInterface
 {
     public function supports(array $node): bool
     {
-        return AttributeTypesEnum::PRICE === AttributeTypesEnum::getAttributeNodeType($node);
+        return AttributeTypesEnum::PRICE === AttributeTypesEnum::getNodeType($node);
     }
 
     public function transformNode(array $node): array

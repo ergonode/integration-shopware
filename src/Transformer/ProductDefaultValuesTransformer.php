@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Transformer;
 
-use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\DTO\ProductTransformationDTO;
 
-class ProductPriceTransformer implements ProductDataTransformerInterface
+class ProductDefaultValuesTransformer implements ProductDataTransformerInterface
 {
+    private const DEFAULT_STOCK_VALUE = 999;
+
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         if ($productData->isUpdate()) {
@@ -17,14 +18,8 @@ class ProductPriceTransformer implements ProductDataTransformerInterface
         }
 
         $swData = $productData->getShopwareData();
-        $swData['price'] = [
-            [
-                'net' => 0,
-                'gross' => 0,
-                'linked' => false,
-                'currencyId' => Defaults::CURRENCY
-            ]
-        ];
+        $swData['name'] = $swData['name'] ?? $productData->getErgonodeData()['sku'];
+        $swData['stock'] = $swData['stock'] ?? self::DEFAULT_STOCK_VALUE;
 
         $productData->setShopwareData($swData);
 

@@ -7,11 +7,17 @@ namespace Strix\Ergonode\Transformer\CustomField;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
 use Strix\Ergonode\Enum\AttributeTypesEnum;
 
+use function in_array;
+
 class MediaCustomFieldTransformer implements CustomFieldTransformerInterface
 {
     public function supports(array $node): bool
     {
-        return AttributeTypesEnum::IMAGE === AttributeTypesEnum::getAttributeNodeType($node);
+        return in_array(AttributeTypesEnum::getNodeType($node), [
+            AttributeTypesEnum::IMAGE,
+            AttributeTypesEnum::FILE,
+            AttributeTypesEnum::GALLERY,
+        ]);
     }
 
     public function transformNode(array $node): array
