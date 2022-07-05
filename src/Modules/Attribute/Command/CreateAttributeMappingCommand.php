@@ -8,9 +8,8 @@ use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition;
-use Strix\Ergonode\Manager\AttributeMappingManager;
+use Strix\Ergonode\Service\AttributeMapper;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -23,15 +22,15 @@ class CreateAttributeMappingCommand extends Command
 
     private EntityRepositoryInterface $repository;
 
-    private AttributeMappingManager $service;
+    private AttributeMapper $attributeMapper;
 
     public function __construct(
         EntityRepositoryInterface $repository,
-        AttributeMappingManager $service
+        AttributeMapper $attributeMapper
     ) {
         $this->context = new Context(new SystemSource());
         $this->repository = $repository;
-        $this->service = $service;
+        $this->attributeMapper = $attributeMapper;
 
         parent::__construct();
     }
@@ -54,12 +53,12 @@ class CreateAttributeMappingCommand extends Command
         $ergonodeKey = $input->getArgument('ergonodeKey');
 
         if (empty($shopwareKey)) {
-            $io->error(['No Shopware key provided.', 'Available keys: ' . implode(', ', $this->service->getMappableShopwareAttributes())]);
+            $io->error(['No Shopware key provided.', 'Available keys: ' . implode(', ', $this->attributeMapper->getMappableShopwareAttributes())]);
 
             return self::FAILURE;
         }
         if (empty($ergonodeKey)) {
-            $io->error(['No Ergonode key provided.', 'Available keys: ' . implode(', ', $this->service->getAllErgonodeAttributes())]);
+            $io->error(['No Ergonode key provided.', 'Available keys: ' . implode(', ', $this->attributeMapper->getAllErgonodeAttributes())]);
 
             return self::FAILURE;
         }

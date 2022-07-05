@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Controller;
 
-use Strix\Ergonode\Manager\AttributeMappingManager;
+use Strix\Ergonode\Service\AttributeMapper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,12 +15,12 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class AttributeMappingController extends AbstractController
 {
-    private AttributeMappingManager $mappingService;
+    private AttributeMapper $attributeMapper;
 
     public function __construct(
-        AttributeMappingManager $mappingService
+        AttributeMapper $attributeMapper
     ) {
-        $this->mappingService = $mappingService;
+        $this->attributeMapper = $attributeMapper;
     }
 
     /**
@@ -28,7 +28,7 @@ class AttributeMappingController extends AbstractController
      */
     public function ergonodeAttributes(): JsonResponse
     {
-        $attributes = $this->mappingService->getAllErgonodeAttributes();
+        $attributes = $this->attributeMapper->getAllErgonodeAttributes();
 
         return new JsonResponse([
             'data' => $attributes,
@@ -40,7 +40,7 @@ class AttributeMappingController extends AbstractController
      */
     public function shopwareAttributes(): JsonResponse
     {
-        $attributes = $this->mappingService->getMappableShopwareAttributes();
+        $attributes = $this->attributeMapper->getMappableShopwareAttributes();
 
         return new JsonResponse([
             'data' => $attributes,
