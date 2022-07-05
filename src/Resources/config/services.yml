@@ -87,6 +87,8 @@ services:
 
   Strix\Ergonode\Service\ScheduledTask\CategorySyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
+    arguments:
+      $lockFactory: '@strix.ergonode.lock-factory'
 
   # SUBSCRIBER
   Strix\Ergonode\Subscriber\Subscriber:
@@ -104,3 +106,18 @@ services:
         - '@Strix\Ergonode\Transformer\ProductMediaTransformer'
         - '@Strix\Ergonode\Transformer\ProductCustomFieldTransformer'
         - '@Strix\Ergonode\Transformer\ProductPropertiesTransformer'
+
+  # LOCK
+  strix.ergonode.flock-store:
+    class: Symfony\Component\Lock\Store\FlockStore
+
+  strix.ergonode.lock-factory:
+    class: Symfony\Component\Lock\LockFactory
+    arguments:
+      - '@strix.ergonode.flock-store'
+    calls:
+      - setLogger: [ '@monolog.logger.sync_logger' ]
+
+  Strix\Ergonode\Command\DebugLockCommand:
+    arguments:
+      - '@strix.ergonode.lock-factory'
