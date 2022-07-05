@@ -125,19 +125,11 @@ Component.register('strix-ergonode-attribute-mapping', {
         try {
             let result;
 
-            try {
             const {data: {data: shopwareAttributes}} = await this.ergonodeAttributeService.getShopwareAttributes();
             this.shopwareAttributes = shopwareAttributes;
 
             const {data: {data: ergonodeAttributes}} = await this.ergonodeAttributeService.getErgonodeAttributes();
             this.ergonodeAttributes = ergonodeAttributes;
-
-            await this.fetchMappings();
-        }
-            this.shopwareAttributes = result.data.data;
-
-            result = await this.ergonodeAttributeService.getErgonodeAttributes();
-            this.ergonodeAttributes = result.data.data;
 
             await this.fetchMappings();
         } catch (e) {
