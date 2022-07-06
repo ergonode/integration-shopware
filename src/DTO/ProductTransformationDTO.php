@@ -16,6 +16,8 @@ class ProductTransformationDTO
 
     private array $entitiesToDelete = [];
 
+    private bool $isVariant = false;
+
     public function __construct(array $ergonodeData, array $shopwareData = [])
     {
         $this->ergonodeData = $ergonodeData;
@@ -50,6 +52,16 @@ class ProductTransformationDTO
     public function setSwProduct(?ProductEntity $swProduct): void
     {
         $this->swProduct = $swProduct;
+    }
+
+    public function isVariant(): bool
+    {
+        return $this->isVariant;
+    }
+
+    public function setIsVariant(bool $isVariant): void
+    {
+        $this->isVariant = $isVariant;
     }
 
     public function isUpdate(): bool
