@@ -1,0 +1,8 @@
+<sw-button
+    v-bind="$attrs"
+    v-on="$listeners"
+    :is-loading="isLoadingMerged"
+    @click="trigger()"
+>
+    <slot></slot>
+</sw-button>

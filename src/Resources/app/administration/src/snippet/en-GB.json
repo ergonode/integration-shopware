@@ -2,7 +2,8 @@
   "StrixErgonode": {
     "mainMenuItemGeneral": "Ergonode integration",
     "tabs": {
-      "attributeMappings": "Attribute mappings"
+      "attributeMappings": "Attribute mappings",
+      "synchronisation": "Synchronisation"
     },
     "mappings": {
       "attributeMappingGeneral": "Attribute mapping",
@@ -16,6 +17,13 @@
         "mappingAlreadyExists": "A mapping of these attributes already exists.",
         "shopwareAttributesMustBeUnique": "For every Shopware attribute there may only be one mapping that includes it.",
         "ergonodeAttributeFetchFailure": "Failed to fetch Ergonode attributes. Please, check if Ergonode API Settings are correct."
+      }
+    },
+    "synchronisation": {
+      "synchronisation": "Synchronisation",
+      "synchronise": "Synchronise",
+      "messages": {
+        "executed": "Trigger executed successfully"
       }
     }
   }

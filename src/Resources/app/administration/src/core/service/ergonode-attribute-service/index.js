@@ -8,4 +8,8 @@ export default class ErgonodeAttributeService extends ApiService {
     async getErgonodeAttributes () {
         return await this.client.get('strix/ergonode/ergonode-attributes');
     }
+
+    async triggerSynchronisation (endpoint) {
+        return await this.client.post(`_action/strix/ergonode/${endpoint}`);
+    }
 }
