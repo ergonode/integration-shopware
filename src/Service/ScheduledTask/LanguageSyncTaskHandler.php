@@ -11,6 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Strix\Ergonode\Processor\LanguageSyncProcessor;
 use Symfony\Component\Lock\LockFactory;
+use Throwable;
 
 class LanguageSyncTaskHandler extends ScheduledTaskHandler
 {
@@ -51,6 +52,10 @@ class LanguageSyncTaskHandler extends ScheduledTaskHandler
             return;
         }
 
-        $this->languageSyncProcessor->process($this->context);
+        try {
+            $this->languageSyncProcessor->process($this->context);
+        } catch (Throwable $e) {
+            $this->logger->error($e->getMessage());
+        }
     }
 }

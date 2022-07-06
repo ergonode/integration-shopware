@@ -70,10 +70,6 @@ services:
     calls:
       - setLogger: [ '@monolog.logger.sync' ]
 
-  Strix\Ergonode\Command\DebugLockCommand:
-    arguments:
-      - '@strix.ergonode.lock-factory'
-
   # MANAGER
   Strix\Ergonode\Manager\ErgonodeCursorManager:
     arguments:

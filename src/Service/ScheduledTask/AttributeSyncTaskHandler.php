@@ -11,6 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Strix\Ergonode\Processor\AttributeSyncProcessor;
 use Symfony\Component\Lock\LockFactory;
+use Throwable;
 
 class AttributeSyncTaskHandler extends ScheduledTaskHandler
 {
@@ -51,6 +52,10 @@ class AttributeSyncTaskHandler extends ScheduledTaskHandler
             return;
         }
 
-        $this->attributeSyncProcessor->process($this->context);
+        try {
+            $this->attributeSyncProcessor->process($this->context);
+        } catch (Throwable $e) {
+            $this->logger->error($e->getMessage());
+        }
     }
 }
