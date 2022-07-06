@@ -27,13 +27,13 @@ class ProductSyncProcessor
         ProductQueryBuilder $productQueryBuilder,
         ProductPersistor $productPersistor,
         ErgonodeCursorManager $cursorManager,
-        LoggerInterface $syncLoggerLogger
+        LoggerInterface $syncLogger
     ) {
         $this->gqlClient = $gqlClient;
         $this->productQueryBuilder = $productQueryBuilder;
         $this->productPersistor = $productPersistor;
         $this->cursorManager = $cursorManager;
-        $this->logger = $syncLoggerLogger;
+        $this->logger = $syncLogger;
     }
 
     /**
