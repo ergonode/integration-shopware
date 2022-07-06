@@ -34,6 +34,9 @@ services:
   Strix\Ergonode\Controller\AttributeMappingController:
     tags: [ 'controller.service_arguments' ]
 
+  Strix\Ergonode\Controller\SyncTriggerController:
+    tags: [ 'controller.service_arguments' ]
+
   # COMMAND
   Strix\Ergonode\Modules\Attribute\Command\CreateAttributeMappingCommand:
     arguments:
@@ -55,6 +58,21 @@ services:
   # EXTENSION
   Strix\Ergonode\Extension\ErgonodeCategoryMappingExtension:
     tags: [ 'shopware.entity.extension' ]
+
+  # LOCK
+  strix.ergonode.flock-store:
+    class: Symfony\Component\Lock\Store\FlockStore
+
+  strix.ergonode.lock-factory:
+    class: Symfony\Component\Lock\LockFactory
+    arguments:
+      - '@strix.ergonode.flock-store'
+    calls:
+      - setLogger: [ '@monolog.logger.sync' ]
+
+  Strix\Ergonode\Command\DebugLockCommand:
+    arguments:
+      - '@strix.ergonode.lock-factory'
 
   # MANAGER
   Strix\Ergonode\Manager\ErgonodeCursorManager:
@@ -79,14 +97,38 @@ services:
   Strix\Ergonode\Service\ScheduledTask\ProductSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
+  Strix\Ergonode\Service\ScheduledTask\ProductVisibilitySyncTask:
+    tags: [ 'shopware.scheduled.task' ]
+
   Strix\Ergonode\Service\ScheduledTask\CategorySyncTask:
+    tags: [ 'shopware.scheduled.task' ]
+
+  Strix\Ergonode\Service\ScheduledTask\AttributeSyncTask:
+    tags: [ 'shopware.scheduled.task' ]
+
+  Strix\Ergonode\Service\ScheduledTask\LanguageSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
   Strix\Ergonode\Service\ScheduledTask\ProductSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
 
+  Strix\Ergonode\Service\ScheduledTask\ProductVisibilitySyncTaskHandler:
+    tags: [ 'messenger.message_handler' ]
+    arguments:
+      $lockFactory: '@strix.ergonode.lock-factory'
+
   Strix\Ergonode\Service\ScheduledTask\CategorySyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
+
+  Strix\Ergonode\Service\ScheduledTask\AttributeSyncTaskHandler:
+    tags: [ 'messenger.message_handler' ]
+    arguments:
+      $lockFactory: '@strix.ergonode.lock-factory'
+
+  Strix\Ergonode\Service\ScheduledTask\LanguageSyncTaskHandler:
+    tags: [ 'messenger.message_handler' ]
+    arguments:
+      $lockFactory: '@strix.ergonode.lock-factory'
 
   # SUBSCRIBER
   Strix\Ergonode\Subscriber\Subscriber:

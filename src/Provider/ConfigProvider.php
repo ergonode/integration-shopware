@@ -7,9 +7,7 @@ namespace Strix\Ergonode\Provider;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\System\SystemConfig\SystemConfigCollection;
-use Shopware\Core\System\SystemConfig\SystemConfigEntity;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Strix\Ergonode\Api\ErgonodeAccessData;
 
@@ -19,14 +17,14 @@ class ConfigProvider
 
     private SystemConfigService $configService;
 
-    private EntityRepositoryInterface $systemConfigRepository;
+    private EntityRepositoryInterface $salesChannelRepository;
 
     public function __construct(
         SystemConfigService $configService,
-        EntityRepositoryInterface $systemConfigRepository
+        EntityRepositoryInterface $salesChannelRepository
     ) {
         $this->configService = $configService;
-        $this->systemConfigRepository = $systemConfigRepository;
+        $this->salesChannelRepository = $salesChannelRepository;
     }
 
     /**
@@ -34,31 +32,23 @@ class ConfigProvider
      */
     public function getSalesChannelErgonodeAccessData(Context $context): array
     {
-        $defaultConfig = $this->getErgonodeAccessData();
-        $baseUrl = $defaultConfig->getBaseUrl();
+        $salesChannels = $this->salesChannelRepository->search(new Criteria(), $context)->getEntities();
+        $accessData = [];
 
-        $criteria = new Criteria();
-        $criteria->addFilter(
-            new EqualsFilter('configurationKey', self::STRIX_ERGONODE_CONFIG_NAMESPACE . 'ergonodeApiKey')
-        );
+        /** @var SalesChannelEntity $salesChannel */
+        foreach ($salesChannels as $salesChannel) {
+            $accessData[] = $this->getErgonodeAccessData($salesChannel->getId());
+        }
 
-        /** @var SystemConfigCollection $result */
-        $result = $this->systemConfigRepository->search($criteria, $context)->getEntities();
-
-        return $result
-            ->filter(fn(SystemConfigEntity $entity) => $entity->getSalesChannelId())
-            ->map(fn(SystemConfigEntity $entity) => new ErgonodeAccessData(
-                $baseUrl,
-                strval($entity->getConfigurationValue()),
-                $entity->getSalesChannelId()
-            ));
+        return $accessData;
     }
 
     public function getErgonodeAccessData(?string $salesChannelId = null): ErgonodeAccessData
     {
         return new ErgonodeAccessData(
-            $this->configService->getString(self::STRIX_ERGONODE_CONFIG_NAMESPACE . 'ergonodeBaseUrl', $salesChannelId),
+            $this->configService->getString(self::STRIX_ERGONODE_CONFIG_NAMESPACE . 'ergonodeBaseUrl'), // always use global url
             $this->configService->getString(self::STRIX_ERGONODE_CONFIG_NAMESPACE . 'ergonodeApiKey', $salesChannelId),
+            $salesChannelId
         );
     }
 
