@@ -14,7 +14,8 @@
         "mappingCreationSuccessful": "An attribute mapping has been successfully created.",
         "mappingCreationFailure": "Could not create an attribute mapping.",
         "mappingAlreadyExists": "A mapping of these attributes already exists.",
-        "shopwareAttributesMustBeUnique": "For every Shopware attribute there may only be one mapping that includes it."
+        "shopwareAttributesMustBeUnique": "For every Shopware attribute there may only be one mapping that includes it.",
+        "ergonodeAttributeFetchFailure": "Failed to fetch Ergonode attributes. Please, check if Ergonode API Settings are correct."
       }
     }
   }

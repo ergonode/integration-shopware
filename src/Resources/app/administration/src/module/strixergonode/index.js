@@ -1,4 +1,5 @@
 import './page'
+import './component'
 
 Shopware.Module.register('strix-ergonode', {
     type: 'plugin',

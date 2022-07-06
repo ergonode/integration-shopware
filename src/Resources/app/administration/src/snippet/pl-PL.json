@@ -14,7 +14,8 @@
         "mappingCreationSuccessful": "Pomyślnie utworzono mapowanie atrybutów.",
         "mappingCreationFailure": "Nie udało się utworzyć mapowania.",
         "mappingAlreadyExists": "Mapowanie podanych dwóch atrybutów już istnieje.",
-        "shopwareAttributesMustBeUnique": "Dla każdego atrybutu Shopware może istnieć tylko jedno mapowanie go zawierające."
+        "shopwareAttributesMustBeUnique": "Dla każdego atrybutu Shopware może istnieć tylko jedno mapowanie go zawierające.",
+        "ergonodeAttributeFetchFailure": "Wystąpił błąd podczas pobierania atrybutów Ergonode. Proszę sprawdzić czy ustawiania Ergonode API są prawidłowe."
       }
     }
   }
