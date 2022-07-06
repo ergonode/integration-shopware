@@ -13,8 +13,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEve
 use Strix\Ergonode\Entity\ErgonodeCursor\ErgonodeCursorEntity;
 use Strix\Ergonode\Manager\ErgonodeCursorManager;
 use Strix\Ergonode\Manager\OrphanEntitiesManager;
-use Strix\Ergonode\Modules\Attribute\Api\AttributeDeletedStreamResultsProxy;
-use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
+use Strix\Ergonode\Api\AttributeDeletedStreamResultsProxy;
+use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
 use Strix\Ergonode\Persistor\PropertyGroupPersistor;
 use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
 use Strix\Ergonode\Tests\Util\DataConverter;

@@ -6,7 +6,7 @@ namespace Strix\Ergonode\Tests\Fixture;
 
 use Ramsey\Uuid\Uuid;
 use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
-use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntityCollection;
+use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionCollection;
 
 class ErgonodeMappingExtensionFixture
 {
@@ -20,12 +20,12 @@ class ErgonodeMappingExtensionFixture
         return $entity;
     }
 
-    public static function collection(array $data): ErgonodeMappingExtensionEntityCollection
+    public static function collection(array $data): ErgonodeMappingExtensionCollection
     {
         foreach ($data as &$entity) {
             $entity = self::entity(...$entity);
         }
 
-        return new ErgonodeMappingExtensionEntityCollection($data);
+        return new ErgonodeMappingExtensionCollection($data);
     }
 }

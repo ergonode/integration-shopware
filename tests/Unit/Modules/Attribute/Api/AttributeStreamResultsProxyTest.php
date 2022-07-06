@@ -7,7 +7,7 @@ namespace Strix\Ergonode\Tests\Unit\Modules\Attribute\Api;
 use GraphQL\Results;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
+use Strix\Ergonode\Api\AttributeStreamResultsProxy;
 use Strix\Ergonode\Enum\AttributeTypesEnum;
 use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
 

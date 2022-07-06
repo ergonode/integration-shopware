@@ -10,7 +10,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\CascadeDelete;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
-use Strix\Ergonode\Entity\ErgonodeCategoryMappingExtensionEntityDefinition;
+use Strix\Ergonode\Entity\ErgonodeCategoryMappingExtension\ErgonodeCategoryMappingExtensionDefinition;
 
 class ErgonodeCategoryMappingExtension extends EntityExtension
 {
@@ -26,7 +26,7 @@ class ErgonodeCategoryMappingExtension extends EntityExtension
             new FkField(
                 self::STORAGE_NAME,
                 self::PROPERTY_NAME,
-                ErgonodeCategoryMappingExtensionEntityDefinition::class
+                ErgonodeCategoryMappingExtensionDefinition::class
             )
         );
 
@@ -35,7 +35,7 @@ class ErgonodeCategoryMappingExtension extends EntityExtension
                 self::EXTENSION_NAME,
                 self::STORAGE_NAME,
                 'id',
-                ErgonodeCategoryMappingExtensionEntityDefinition::class,
+                ErgonodeCategoryMappingExtensionDefinition::class,
                 false
             ))->addFlags(new CascadeDelete())
         );

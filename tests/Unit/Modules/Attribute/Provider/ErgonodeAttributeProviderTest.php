@@ -10,11 +10,11 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Strix\Ergonode\Api\Client\CachedErgonodeGqlClient;
-use Strix\Ergonode\Modules\Attribute\Api\AttributeDeletedStreamResultsProxy;
-use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
-use Strix\Ergonode\Modules\Attribute\QueryBuilder\AttributeQueryBuilder;
-use Strix\Ergonode\Modules\Product\Api\ProductStreamResultsProxy;
+use Strix\Ergonode\Api\AttributeDeletedStreamResultsProxy;
+use Strix\Ergonode\Api\AttributeStreamResultsProxy;
+use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
+use Strix\Ergonode\QueryBuilder\AttributeQueryBuilder;
+use Strix\Ergonode\Api\ProductStreamResultsProxy;
 use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
 
 class ErgonodeAttributeProviderTest extends TestCase

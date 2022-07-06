@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Strix\Ergonode\Tests\Fixture;
 
 use Ramsey\Uuid\Uuid;
-use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
-use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
+use Strix\Ergonode\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
+use Strix\Ergonode\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
 
 class ErgonodeAttributeMappingFixture
 {

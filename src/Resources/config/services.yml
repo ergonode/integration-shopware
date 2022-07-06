@@ -38,18 +38,18 @@ services:
     tags: [ 'controller.service_arguments' ]
 
   # COMMAND
-  Strix\Ergonode\Modules\Attribute\Command\CreateAttributeMappingCommand:
+  Strix\Ergonode\Command\CreateAttributeMappingCommand:
     arguments:
       $repository: '@strix_ergonode_attribute_mapping.repository'
 
   # ENTITY DEFINITION
-  Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition:
+  Strix\Ergonode\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition:
     tags: [ 'shopware.entity.definition' ]
 
-  Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntityDefinition:
+  Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionDefinition:
     tags: [ 'shopware.entity.definition' ]
 
-  Strix\Ergonode\Entity\ErgonodeCategoryMappingExtensionEntityDefinition:
+  Strix\Ergonode\Entity\ErgonodeCategoryMappingExtension\ErgonodeCategoryMappingExtensionDefinition:
     tags: [ 'shopware.entity.definition' ]
 
   Strix\Ergonode\Entity\ErgonodeCursor\ErgonodeCursorDefinition:
@@ -76,7 +76,7 @@ services:
       $repository: '@strix_ergonode_cursor.repository'
 
   # PROVIDER
-  Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider:
+  Strix\Ergonode\Provider\AttributeMappingProvider:
     arguments:
       $repository: '@strix_ergonode_attribute_mapping.repository'
 

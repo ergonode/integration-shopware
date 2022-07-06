@@ -14,7 +14,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
-use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
+use Strix\Ergonode\Api\AttributeStreamResultsProxy;
 use Strix\Ergonode\Tests\Fixture\GqlQueryFixture;
 
 class ErgonodeGqlClientTest extends TestCase
