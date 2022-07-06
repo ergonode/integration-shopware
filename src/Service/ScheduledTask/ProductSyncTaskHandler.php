@@ -52,10 +52,14 @@ class ProductSyncTaskHandler extends ScheduledTaskHandler
         $context = new Context(new SystemSource());
         $currentPage = 0;
 
-        while ($this->productSyncProcessor->processStream($context)) {
-            if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
-                break;
+        try {
+            while ($this->productSyncProcessor->processStream($context)) {
+                if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
+                    break;
+                }
             }
+        } catch (\Throwable $e) {
+            $this->logger->error($e->getMessage());
         }
     }
 }

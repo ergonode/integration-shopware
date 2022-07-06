@@ -58,13 +58,19 @@ class CategorySyncTaskHandler extends ScheduledTaskHandler
 
         $categoryTreeCode = $this->configProvider->getCategoryTreeCode();
         if (empty($categoryTreeCode)) {
-            throw new \RuntimeException('Could not find category tree code in plugin config.');
+            $this->logger->error('Could not find category tree code in plugin config.');
+
+            return;
         }
 
-        while ($this->categorySyncProcessor->processStream($categoryTreeCode, $context)) {
-            if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
-                break;
+        try {
+            while ($this->categorySyncProcessor->processStream($categoryTreeCode, $context)) {
+                if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
+                    break;
+                }
             }
+        } catch (\Throwable $e) {
+            $this->logger->error($e->getMessage());
         }
     }
 }
