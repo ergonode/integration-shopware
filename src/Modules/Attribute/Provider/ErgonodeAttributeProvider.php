@@ -8,7 +8,6 @@ use Generator;
 use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
 use Strix\Ergonode\Modules\Attribute\Api\AttributeDeletedStreamResultsProxy;
 use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\Enum\AttributeTypesEnum;
 use Strix\Ergonode\Modules\Attribute\QueryBuilder\AttributeQueryBuilder;
 
 class ErgonodeAttributeProvider
@@ -43,7 +42,7 @@ class ErgonodeAttributeProvider
         } while ($results->hasNextPage());
     }
 
-    public function provideDeletedBindingAttributes(?string $endCursor = null): Generator
+    public function provideDeletedAttributes(?string $endCursor = null): Generator
     {
         do {
             $query = $this->attributeQueryBuilder->buildDeleted(self::MAX_ATTRIBUTES_PER_PAGE, $endCursor);

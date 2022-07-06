@@ -154,7 +154,7 @@ class OrphanEntitiesManagerTest extends TestCase
     {
         $this->ergonodeAttributeProviderMock
             ->expects($this->once())
-            ->method('provideDeletedBindingAttributes')
+            ->method('provideDeletedAttributes')
             ->with($endCursor)
             ->willReturn(DataConverter::arrayAsGenerator($returnValues));
     }

@@ -50,7 +50,9 @@ class SyncLanguagesCommand extends Command
 
         $io->success('Languages synchronized (Ergonode->Shopware).');
         foreach ($entities as $entity => $ids) {
-            $io->success(["Created $entity:", ...$ids]);
+            if (!empty($ids)) {
+                $io->success(["Created $entity:", ...$ids]);
+            }
         }
 
         return self::SUCCESS;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Api\Client;
 
+use Generator;
+use Shopware\Core\Framework\Context;
 use Strix\Ergonode\Api\ErgonodeAccessData;
 use Strix\Ergonode\Provider\ConfigProvider;
 
@@ -28,10 +30,20 @@ class ErgonodeGqlClientFactory
         );
     }
 
+    public function createForEverySalesChannel(Context $context): Generator
+    {
+        $accessDataArray = $this->configProvider->getSalesChannelErgonodeAccessData($context);
+
+        foreach ($accessDataArray as $accessData) {
+            yield $this->create($accessData);
+        }
+    }
+
     public function create(ErgonodeAccessData $accessData): ErgonodeGqlClient
     {
         return new ErgonodeGqlClient(
-            $this->httpClientFactory->create($accessData)
+            $this->httpClientFactory->create($accessData),
+            $accessData->getSalesChannelId()
         );
     }
 }

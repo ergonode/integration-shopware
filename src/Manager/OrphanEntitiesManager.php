@@ -33,7 +33,7 @@ class OrphanEntitiesManager
 
         $lastCursor = $this->ergonodeCursorManager->getCursorEntity(AttributeDeletedStreamResultsProxy::MAIN_FIELD, $context);
         $lastCursor = null !== $lastCursor ? $lastCursor->getCursor() : null;
-        $generator = $this->ergonodeAttributeProvider->provideDeletedBindingAttributes($lastCursor);
+        $generator = $this->ergonodeAttributeProvider->provideDeletedAttributes($lastCursor);
 
         foreach ($generator as $deletedAttributes) {
             $entities = array_merge_recursive(

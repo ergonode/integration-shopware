@@ -23,27 +23,13 @@
         <title>Fields mapping</title>
         <title lang="de-DE">Fields mapping</title>
 
-        <input-field type="multi-select">
+        <component name="strix-ergonode-customfieldkeys-multiselect">
             <name>customFieldKeys</name>
-            <options> <!-- todo get fields dynamically from api -->
-                <option>
-                    <id>name</id>
-                    <name>name</name>
-                </option>
-                <option>
-                    <id>description</id>
-                    <name>description</name>
-                </option>
-                <option>
-                    <id>custom_field_1</id>
-                    <name>custom_field_1</name>
-                </option>
-            </options>
             <label>Ergonode attributes as custom fields</label>
             <label lang="de-DE">Ergonode attributes as custom fields</label>
             <helpText>Every selected attribute will be fetched as product custom field</helpText>
             <helpText lang="de-DE">Every selected attribute will be fetched as product custom field</helpText>
-        </input-field>
+        </component>
     </card>
     <card>
         <title>Category Sync</title>

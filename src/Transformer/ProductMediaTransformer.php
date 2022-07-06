@@ -84,15 +84,14 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
 
     private function buildProductMediaPayload(string $mediaId, ProductTransformationDTO $productData, Context $context): array
     {
-        if (null === $productData->getSwProduct()) {
-            return [];
+        $productMedia = null;
+        if (null !== $productData->getSwProduct()) {
+            $productMedia = $this->productMediaProvider->getProductMedia(
+                $mediaId,
+                $productData->getSwProduct()->getId(),
+                $context
+            );
         }
-
-        $productMedia = $this->productMediaProvider->getProductMedia(
-            $mediaId,
-            $productData->getSwProduct()->getId(),
-            $context
-        );
 
         return [
             'id' => $productMedia ? $productMedia->getId() : Uuid::randomHex(), // need to generate uuid here so media won't be duplicated if used as cover
