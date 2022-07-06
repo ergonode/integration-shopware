@@ -13,10 +13,19 @@ class ErgonodeGqlClient implements ErgonodeGqlClientInterface
 {
     private Client $gqlClient;
 
+    private ?string $salesChannelId;
+
     public function __construct(
-        Client $gqlClient
+        Client $gqlClient,
+        ?string $salesChannelId = null
     ) {
         $this->gqlClient = $gqlClient;
+        $this->salesChannelId = $salesChannelId;
+    }
+
+    public function getSalesChannelId(): ?string
+    {
+        return $this->salesChannelId;
     }
 
     public function query(Query $query, ?string $proxyClass = null): ?Results

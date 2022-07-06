@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class RemoveOrphanBindingAttributesCommand extends Command
+class RemoveOrphanAttributesCommand extends Command
 {
     protected static $defaultName = 'strix:ergonode:attributes:remove-orphan';
 

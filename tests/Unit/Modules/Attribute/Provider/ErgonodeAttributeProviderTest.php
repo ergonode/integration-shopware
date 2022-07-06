@@ -79,7 +79,7 @@ class ErgonodeAttributeProviderTest extends TestCase
     {
         $this->mockGqlResults($responsePages, $response, $proxyClass);
 
-        $generator = $this->provider->provideDeletedBindingAttributes();
+        $generator = $this->provider->provideDeletedAttributes();
 
         foreach ($generator as $result) {
             $this->assertSame($expectedOutput, array_values($result->getEdges()));
@@ -95,7 +95,7 @@ class ErgonodeAttributeProviderTest extends TestCase
             'attributeDeletedStream'
         );
 
-        $generator = $this->provider->provideDeletedBindingAttributes();
+        $generator = $this->provider->provideDeletedAttributes();
 
         foreach ($generator as $result) {
             $this->assertEquals(null, $result);
