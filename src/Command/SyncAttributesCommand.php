@@ -44,7 +44,7 @@ class SyncAttributesCommand extends Command
         $io->success('Attributes synced (Ergonode->Shopware).');
         foreach ($entities as $entity => $ids) {
             if (!empty($ids)) {
-                $io->success(["Created/updated $entity:", ...$ids]);
+                $io->success(["$entity:", ...$ids]);
             }
         }
 
