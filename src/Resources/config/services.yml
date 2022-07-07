@@ -107,6 +107,8 @@ services:
 
   Strix\Ergonode\Service\ScheduledTask\ProductSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
+    arguments:
+      $lockFactory: '@strix.ergonode.lock-factory'
 
   Strix\Ergonode\Service\ScheduledTask\ProductVisibilitySyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
@@ -115,6 +117,8 @@ services:
 
   Strix\Ergonode\Service\ScheduledTask\CategorySyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
+    arguments:
+      $lockFactory: '@strix.ergonode.lock-factory'
 
   Strix\Ergonode\Service\ScheduledTask\AttributeSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
@@ -142,3 +146,14 @@ services:
         - '@Strix\Ergonode\Transformer\ProductMediaTransformer'
         - '@Strix\Ergonode\Transformer\ProductCustomFieldTransformer'
         - '@Strix\Ergonode\Transformer\ProductPropertiesTransformer'
+
+  # LOCK
+  strix.ergonode.flock-store:
+    class: Symfony\Component\Lock\Store\FlockStore
+
+  strix.ergonode.lock-factory:
+    class: Symfony\Component\Lock\LockFactory
+    arguments:
+      - '@strix.ergonode.flock-store'
+    calls:
+      - setLogger: [ '@monolog.logger.sync' ]
