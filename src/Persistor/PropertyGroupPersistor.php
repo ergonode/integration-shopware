@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Persistor;
 
-use Shopware\Core\Content\Product\Aggregate\ProductOption\ProductOptionDefinition;
-use Shopware\Core\Content\Product\Aggregate\ProductVisibility\ProductVisibilityDefinition;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionDefinition;
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Strix\Ergonode\Api\AttributeDeletedStreamResultsProxy;
+use Strix\Ergonode\Api\AttributeStreamResultsProxy;
 use Strix\Ergonode\DTO\PropertyGroupTransformationDTO;
-use Strix\Ergonode\Modules\Attribute\Api\AttributeDeletedStreamResultsProxy;
-use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
 use Strix\Ergonode\Provider\PropertyGroupProvider;
-use Strix\Ergonode\Service\EntityRemover;
 use Strix\Ergonode\Transformer\PropertyGroupTransformer;
 
 class PropertyGroupPersistor

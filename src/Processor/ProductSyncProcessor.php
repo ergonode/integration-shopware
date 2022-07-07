@@ -8,8 +8,8 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
 use Strix\Ergonode\Manager\ErgonodeCursorManager;
-use Strix\Ergonode\Modules\Product\Api\ProductStreamResultsProxy;
-use Strix\Ergonode\Modules\Product\QueryBuilder\ProductQueryBuilder;
+use Strix\Ergonode\Api\ProductStreamResultsProxy;
+use Strix\Ergonode\QueryBuilder\ProductQueryBuilder;
 use Strix\Ergonode\Persistor\ProductPersistor;
 
 class ProductSyncProcessor
@@ -27,13 +27,13 @@ class ProductSyncProcessor
         ProductQueryBuilder $productQueryBuilder,
         ProductPersistor $productPersistor,
         ErgonodeCursorManager $cursorManager,
-        LoggerInterface $syncLoggerLogger
+        LoggerInterface $syncLogger
     ) {
         $this->gqlClient = $gqlClient;
         $this->productQueryBuilder = $productQueryBuilder;
         $this->productPersistor = $productPersistor;
         $this->cursorManager = $cursorManager;
-        $this->logger = $syncLoggerLogger;
+        $this->logger = $syncLogger;
     }
 
     /**

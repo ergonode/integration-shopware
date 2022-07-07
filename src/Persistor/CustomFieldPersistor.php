@@ -10,7 +10,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetDefinition;
 use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetEntity;
 use Shopware\Core\System\CustomField\CustomFieldDefinition;
-use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
+use Strix\Ergonode\Api\AttributeStreamResultsProxy;
 use Strix\Ergonode\Provider\CustomFieldProvider;
 use Strix\Ergonode\Transformer\CustomFieldTransformer;
 use Strix\Ergonode\Util\Constants;

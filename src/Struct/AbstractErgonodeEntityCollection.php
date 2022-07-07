@@ -6,9 +6,6 @@ namespace Strix\Ergonode\Struct;
 
 use Shopware\Core\Framework\Struct\Collection;
 
-/**
- * @deprecated ?
- */
 abstract class AbstractErgonodeEntityCollection extends Collection
 {
     public function merge(self $collection): self
