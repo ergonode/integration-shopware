@@ -26,5 +26,13 @@
         "executed": "Trigger executed successfully"
       }
     }
+  },
+  "sw-privileges": {
+    "additional_permissions": {
+      "strix_ergonode_synchronisation": {
+        "label": "Ergonode integration",
+        "triggerer": "Trigger synchronisation"
+      }
+    }
   }
 }

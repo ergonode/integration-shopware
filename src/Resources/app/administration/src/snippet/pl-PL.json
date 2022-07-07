@@ -26,5 +26,13 @@
         "executed": "Pomyślnie wywołano wyzwalacz"
       }
     }
+  },
+  "sw-privileges": {
+    "additional_permissions": {
+      "strix_ergonode_synchronisation": {
+        "label": "Integracja z Ergonode",
+        "triggerer": "Wyzwalanie synchronizacji"
+      }
+    }
   }
 }

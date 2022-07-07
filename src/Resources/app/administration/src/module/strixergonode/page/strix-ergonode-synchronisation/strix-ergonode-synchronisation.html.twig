@@ -6,6 +6,7 @@
                     <sw-tabs-item
                         :route="{ path: 'mapping' }"
                         :active="false"
+                        :disabled="!acl.can('strix_ergonode_attribute_mapping.viewer')"
                     >{{ $t('StrixErgonode.tabs.attributeMappings') }}</sw-tabs-item>
                     <sw-tabs-item
                         :route="{ path: 'synchronisation' }"

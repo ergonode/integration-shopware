@@ -1,19 +1,6 @@
+import './acl'
 import './page'
 import './component'
-
-// TODO: add privilege for triggering synchronisation triggers
-// Shopware.Service('privileges')
-//      .addPrivilegeMappingEntry({
-//          category: 'additional_permissions',
-//          parent: null,
-//          key: 'system', //'strix_ergonode_synchronisation',
-//          roles: {
-//              synchroniser: {
-//                  privileges: ['strix_ergonode:sync'],
-//                  dependencies: [],
-//              },
-//          },
-//      })
 
 Shopware.Module.register('strix-ergonode', {
     type: 'plugin',
@@ -38,16 +25,33 @@ Shopware.Module.register('strix-ergonode', {
             component: 'strix-ergonode-synchronisation',
             path: 'synchronisation',
             meta: {
-                privilege: 'strix_ergonode_attribute_mapping.viewer',
+                privilege: 'strix_ergonode_synchronisation.triggerer',
             }
         },
     },
 
-    navigation: [{
-        id: 'strix.ergonode.mapping',
-        path: 'strix.ergonode.attributeMapping',
-        label: 'StrixErgonode.mainMenuItemGeneral',
-        parent: 'sw-settings',
-        privilege: 'strix_ergonode_attribute_mapping.viewer',
-    }],
+    navigation: [
+        {
+            id: 'strix.ergonode',
+            path: 'strix.ergonode.attributeMapping',
+            label: 'StrixErgonode.mainMenuItemGeneral',
+            parent: 'sw-settings',
+            privilege: 'strix_ergonode_attribute_mapping.viewer',
+        },
+        {
+            id: 'strix.ergonode.mapping',
+            path: 'strix.ergonode.attributeMapping',
+            label: 'StrixErgonode.tabs.attributeMappings',
+            parent: 'strix.ergonode',
+            privilege: 'strix_ergonode_attribute_mapping.viewer',
+        },
+        {
+            id: 'strix.ergonode.synchronisation',
+            path: 'strix.ergonode.synchronisation',
+            label: 'StrixErgonode.tabs.synchronisation',
+            parent: 'strix.ergonode',
+            privilege: 'strix_ergonode_synchronisation.triggerer',
+        },
+
+    ],
 })
