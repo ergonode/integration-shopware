@@ -11,7 +11,7 @@ Component.register('strix-ergonode-synchronisation', {
         return {
             triggers: [
                 {
-                    endpoint: 'trigger-visibility-sync',
+                    endpoint: 'trigger-sync',
                     label: this.$t('StrixErgonode.synchronisation.synchronise'),
                 },
             ],
