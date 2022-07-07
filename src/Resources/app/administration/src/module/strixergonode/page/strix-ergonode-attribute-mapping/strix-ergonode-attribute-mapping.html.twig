@@ -4,8 +4,14 @@
             <sw-card-view>
                 <sw-tabs>
                     <sw-tabs-item
+                        :route="{ path: 'mapping' }"
                         :active="true"
                     >{{ $t('StrixErgonode.tabs.attributeMappings') }}</sw-tabs-item>
+                    <sw-tabs-item
+                        :route="{ path: 'synchronisation' }"
+                        :active="false"
+                        :disabled="!acl.can('strix_ergonode_synchronisation.viewer')"
+                    >{{ $t('StrixErgonode.tabs.synchronisation') }}</sw-tabs-item>
                 </sw-tabs>
                 <sw-skeleton v-if="isLoading"></sw-skeleton>
                 <template v-else>
