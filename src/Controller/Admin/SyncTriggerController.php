@@ -7,6 +7,7 @@ namespace Strix\Ergonode\Controller\Admin;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Strix\Ergonode\Service\ScheduledTask\CategorySyncTask;
 use Strix\Ergonode\Service\ScheduledTask\ProductSyncTask;
+use Strix\Ergonode\Service\ScheduledTask\ProductVisibilitySyncTask;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -37,6 +38,7 @@ class SyncTriggerController extends AbstractController
     {
         $this->messageBus->dispatch(new CategorySyncTask());
         $this->messageBus->dispatch(new ProductSyncTask());
+        $this->messageBus->dispatch(new ProductVisibilitySyncTask());
 
         return new JsonResponse([
             'success' => true,
