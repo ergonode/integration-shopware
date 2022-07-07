@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Struct;
 
-/**
- * @deprecated ?
- */
-abstract class AbstractErgonodeEntity implements ErgonodeEntityInterface
+abstract class AbstractErgonodeEntity
 {
     protected ?string $cursor = null;
 

@@ -8,8 +8,8 @@ use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOp
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Strix\Ergonode\Modules\Attribute\Api\AttributeDeletedStreamResultsProxy;
-use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
+use Strix\Ergonode\Api\AttributeDeletedStreamResultsProxy;
+use Strix\Ergonode\Api\AttributeStreamResultsProxy;
 use Strix\Ergonode\Provider\PropertyGroupProvider;
 use Strix\Ergonode\Transformer\PropertyGroupTransformer;
 

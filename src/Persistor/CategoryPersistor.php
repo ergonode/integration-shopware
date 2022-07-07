@@ -8,9 +8,9 @@ use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Strix\Ergonode\Entity\ErgonodeCategoryMappingExtensionEntity;
+use Strix\Ergonode\Entity\ErgonodeCategoryMappingExtension\ErgonodeCategoryMappingExtensionEntity;
 use Strix\Ergonode\Extension\ErgonodeCategoryMappingExtension;
-use Strix\Ergonode\Modules\Category\Struct\ErgonodeCategoryCollection;
+use Strix\Ergonode\Struct\ErgonodeCategoryCollection;
 use Strix\Ergonode\Provider\CategoryProvider;
 
 class CategoryPersistor

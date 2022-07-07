@@ -6,7 +6,7 @@ namespace Strix\Ergonode\Processor;
 
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\Api\Client\ErgonodeGqlClientFactory;
-use Strix\Ergonode\Modules\Product\Provider\ErgonodeProductProvider;
+use Strix\Ergonode\Provider\ErgonodeProductProvider;
 use Strix\Ergonode\Persistor\ProductVisibilityPersistor;
 
 class ProductVisibilitySyncProcessor

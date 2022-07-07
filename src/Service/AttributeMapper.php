@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Strix\Ergonode\Service;
 
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider;
-use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
+use Strix\Ergonode\Provider\AttributeMappingProvider;
+use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
 use Strix\Ergonode\Util\Constants;
 
 class AttributeMapper
