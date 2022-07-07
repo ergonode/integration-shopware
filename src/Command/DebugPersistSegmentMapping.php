@@ -6,7 +6,7 @@ namespace Strix\Ergonode\Command;
 
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Processor\ProductVisibilityProcessor;
+use Strix\Ergonode\Processor\ProductVisibilitySyncProcessor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,15 +21,15 @@ class DebugPersistSegmentMapping extends Command
 
     private Context $context;
 
-    private ProductVisibilityProcessor $productVisibilityProcessor;
+    private ProductVisibilitySyncProcessor $productVisibilitySyncProcessor;
 
     public function __construct(
-        ProductVisibilityProcessor $productVisibilityProcessor
+        ProductVisibilitySyncProcessor $productVisibilitySyncProcessor
     ) {
         parent::__construct();
 
         $this->context = new Context(new SystemSource());
-        $this->productVisibilityProcessor = $productVisibilityProcessor;
+        $this->productVisibilitySyncProcessor = $productVisibilitySyncProcessor;
     }
 
     protected function configure()
@@ -45,7 +45,7 @@ class DebugPersistSegmentMapping extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $events = $this->productVisibilityProcessor->processStream($this->context);
+        $events = $this->productVisibilitySyncProcessor->processStream($this->context);
 
         if (empty($events)) {
             $io->info('No actions performed.');

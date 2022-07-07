@@ -47,6 +47,10 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
         $swData = $productData->getShopwareData();
         $swData['properties'] = $propertyIds;
 
+        if ($productData->isVariant()) {
+            $swData['options'] = $propertyIds;
+        }
+
         $productData->setShopwareData($swData);
 
         $productData->addEntitiesToDelete(

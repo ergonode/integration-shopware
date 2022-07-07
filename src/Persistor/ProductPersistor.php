@@ -65,6 +65,7 @@ class ProductPersistor
         $existingProduct = $this->productProvider->getProductBySku($sku, $context, ['media', 'properties']);
 
         $dto = new ProductTransformationDTO($productData);
+        $dto->setIsVariant($parentId !== null);
         $dto->setSwProduct($existingProduct);
 
         $transformedData = $this->productTransformerChain->transform(
@@ -77,7 +78,7 @@ class ProductPersistor
             [
                 'id' => $dto->isUpdate() ? $existingProduct->getId() : null,
                 'parentId' => $parentId,
-                'productNumber' => $sku,
+                'productNumber' => $sku
             ]
         );
 

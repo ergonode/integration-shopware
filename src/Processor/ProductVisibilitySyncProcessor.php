@@ -9,7 +9,7 @@ use Strix\Ergonode\Api\Client\ErgonodeGqlClientFactory;
 use Strix\Ergonode\Modules\Product\Provider\ErgonodeProductProvider;
 use Strix\Ergonode\Persistor\ProductVisibilityPersistor;
 
-class ProductVisibilityProcessor
+class ProductVisibilitySyncProcessor
 {
     public const DEFAULT_PRODUCT_COUNT = 200;
 
