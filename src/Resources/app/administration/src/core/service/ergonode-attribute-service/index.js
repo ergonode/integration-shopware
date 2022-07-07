@@ -16,10 +16,4 @@ export default class ErgonodeAttributeService extends ApiService {
             headers: this.getBasicHeaders(),
         });
     }
-
-    async triggerSynchronisation (endpoint) {
-        return await this.client.post(`_action/strix/ergonode/${endpoint}`, null,{
-            headers: this.getBasicHeaders(),
-        });
-    }
 }

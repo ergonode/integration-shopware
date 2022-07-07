@@ -3,7 +3,7 @@ import template from './strix-ergonode-trigger-button.html.twig';
 const { Component, Mixin } = Shopware;
 
 Component.register('strix-ergonode-trigger-button', {
-    inject: ['ergonodeAttributeService'],
+    inject: ['ergonodeSynchronisationService'],
 
     mixins: [
         Mixin.getByName('notification'),
@@ -39,7 +39,7 @@ Component.register('strix-ergonode-trigger-button', {
         async trigger () {
             this.isLoadingInternal = true;
             try {
-                let result = await this.ergonodeAttributeService.triggerSynchronisation(this.endpoint);
+                let result = await this.ergonodeSynchronisationService.triggerSynchronisation(this.endpoint);
                 if (!result?.status === 200) {
                     throw new Error(result.statusText);
                 }
