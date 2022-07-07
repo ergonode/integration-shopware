@@ -34,9 +34,6 @@ services:
   Strix\Ergonode\Controller\AttributeMappingController:
     tags: [ 'controller.service_arguments' ]
 
-  Strix\Ergonode\Controller\SyncTriggerController:
-    tags: [ 'controller.service_arguments' ]
-
   # COMMAND
   Strix\Ergonode\Command\CreateAttributeMappingCommand:
     arguments:
