@@ -10,6 +10,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Strix\Ergonode\Api\AttributeDeletedStreamResultsProxy;
 use Strix\Ergonode\Api\AttributeStreamResultsProxy;
+use Strix\Ergonode\DTO\PropertyGroupTransformationDTO;
 use Strix\Ergonode\Provider\PropertyGroupProvider;
 use Strix\Ergonode\Transformer\PropertyGroupTransformer;
 
@@ -17,46 +18,64 @@ class PropertyGroupPersistor
 {
     private EntityRepositoryInterface $propertyGroupRepository;
 
+    private EntityRepositoryInterface $propertyGroupOptionRepository;
+
     private PropertyGroupTransformer $propertyGroupTransformer;
 
     private PropertyGroupProvider $propertyGroupProvider;
 
     public function __construct(
         EntityRepositoryInterface $propertyGroupRepository,
+        EntityRepositoryInterface $propertyGroupOptionRepository,
         PropertyGroupTransformer $propertyGroupTransformer,
         PropertyGroupProvider $propertyGroupProvider
     ) {
         $this->propertyGroupRepository = $propertyGroupRepository;
+        $this->propertyGroupOptionRepository = $propertyGroupOptionRepository;
         $this->propertyGroupTransformer = $propertyGroupTransformer;
         $this->propertyGroupProvider = $propertyGroupProvider;
     }
 
     public function persistStream(AttributeStreamResultsProxy $attributes, Context $context): array
     {
-        $payloads = [];
+        $propertyGroupPayloads = [];
+        $optionDeletePayloads = [];
 
         foreach ($attributes->getEdges() as $attribute) {
-            if (empty($node = $attribute['node'])) {
+            if (empty($node = $attribute['node']) || empty($code = $node['code'])) {
                 continue;
             }
 
-            $payload = $this->propertyGroupTransformer->transformAttributeNode($node, $context);
-            if (empty($payload)) {
+            $propertyGroup = $this->propertyGroupProvider->getPropertyGroupByMapping($code, $context);
+
+            $dto = new PropertyGroupTransformationDTO($node);
+            $dto->setSwPropertyGroup($propertyGroup);
+
+            $dto = $this->propertyGroupTransformer->transformAttributeNode($dto, $context);
+
+            $propertyGroupPayload = $dto->getPropertyGroupPayload();
+            if (empty($propertyGroupPayload)) {
                 continue;
             }
 
-            $payloads[] = $payload;
+            $propertyGroupPayloads[] = $propertyGroupPayload;
+
+            $deletePayload = $dto->getOptionDeletePayload();
+            if (empty($deletePayload)) {
+                continue;
+            }
+
+            $optionDeletePayloads[] = $deletePayload;
         }
 
-        if (empty($payloads)) {
-            return [];
-        }
-
-        $written = $this->propertyGroupRepository->upsert($payloads, $context);
+        $upserted = $this->propertyGroupRepository->upsert($propertyGroupPayloads, $context);
+        $deleted = $this->propertyGroupOptionRepository->delete(array_merge([], ...$optionDeletePayloads), $context);
 
         return [
-            PropertyGroupDefinition::ENTITY_NAME => $written->getPrimaryKeys(PropertyGroupDefinition::ENTITY_NAME),
-            PropertyGroupOptionDefinition::ENTITY_NAME => $written->getPrimaryKeys(PropertyGroupOptionDefinition::ENTITY_NAME),
+            PropertyGroupDefinition::ENTITY_NAME . '.upserted' =>
+                $upserted->getPrimaryKeys(PropertyGroupDefinition::ENTITY_NAME),
+            PropertyGroupOptionDefinition::ENTITY_NAME . '.deleted' =>
+                $deleted->getPrimaryKeys(PropertyGroupOptionDefinition::ENTITY_NAME),
         ];
     }
 
