@@ -40,12 +40,11 @@ Component.register('strix-ergonode-trigger-button', {
             this.isLoadingInternal = true;
             try {
                 let result = await this.ergonodeAttributeService.triggerSynchronisation(this.endpoint);
-                if (!result.ok) {
-                    throw new Error(result);
+                if (!result?.status === 200) {
+                    throw new Error(result.statusText);
                 }
-                result = await result.json();
-                if (!result?.success) {
-                    throw new Error(result);
+                if (!result?.data?.success) {
+                    throw new Error(result?.data?.errors[0]?.title);
                 }
                 this.createNotificationSuccess({
                     message: this.$t('StrixErgonode.synchronisation.messages.executed'),
