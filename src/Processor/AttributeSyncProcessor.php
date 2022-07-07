@@ -6,8 +6,8 @@ namespace Strix\Ergonode\Processor;
 
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\Enum\AttributeTypesEnum;
-use Strix\Ergonode\Modules\Attribute\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
+use Strix\Ergonode\Api\AttributeStreamResultsProxy;
+use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
 use Strix\Ergonode\Persistor\CustomFieldPersistor;
 use Strix\Ergonode\Persistor\PropertyGroupPersistor;
 use Strix\Ergonode\Provider\ConfigProvider;

@@ -6,7 +6,7 @@ namespace Strix\Ergonode\Command;
 
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Modules\Category\Provider\ErgonodeCategoryProvider;
+use Strix\Ergonode\Provider\ErgonodeCategoryProvider;
 use Strix\Ergonode\Persistor\CategoryPersistor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

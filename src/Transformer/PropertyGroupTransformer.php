@@ -9,6 +9,7 @@ use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Content\Property\PropertyGroupEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
+use Strix\Ergonode\DTO\PropertyGroupTransformationDTO;
 use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
 use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
 use Strix\Ergonode\Extension\PropertyGroup\PropertyGroupExtension;
@@ -18,7 +19,6 @@ use Strix\Ergonode\Util\Constants;
 use Strix\Ergonode\Util\PropertyGroupOptionUtil;
 
 use function array_merge_recursive;
-use function sprintf;
 
 class PropertyGroupTransformer
 {
@@ -34,10 +34,12 @@ class PropertyGroupTransformer
         $this->translationTransformer = $translationTransformer;
     }
 
-    public function transformAttributeNode(array $node, Context $context): array
+    public function transformAttributeNode(PropertyGroupTransformationDTO $dto, Context $context): PropertyGroupTransformationDTO
     {
+        $node = $dto->getErgonodeData();
+
         if (Constants::ATTRIBUTE_SCOPE_GLOBAL !== $node['scope'] ?? null) { // properties in Shopware are not translatable
-            return [];
+            return $dto;
         }
 
         $code = $node['code'];
@@ -50,7 +52,7 @@ class PropertyGroupTransformer
             $translations = array_merge_recursive($translations, $this->translationTransformer->transform($node['hint'], 'description'));
         }
 
-        $propertyGroup = $this->propertyGroupProvider->getPropertyGroupByMapping($code, $context);
+        $propertyGroup = $dto->getSwPropertyGroup();
 
         $options = [];
         if (!empty($node['options'])) {
@@ -74,7 +76,7 @@ class PropertyGroupTransformer
             }
         }
 
-        return [
+        $dto->setPropertyGroupPayload([
             'id' => $propertyGroup ? $propertyGroup->getId() : null,
             'displayType' => PropertyGroupDefinition::DISPLAY_TYPE_TEXT,
             'sortingType' => PropertyGroupDefinition::SORTING_TYPE_ALPHANUMERIC,
@@ -88,7 +90,11 @@ class PropertyGroupTransformer
                     'type' => PropertyGroupExtension::ERGONODE_TYPE,
                 ],
             ],
-        ];
+        ]);
+
+        $dto->setDeletePayloadIds($this->getOptionIdsToRemove($dto, $options));
+
+        return $dto;
     }
 
     private function getEntityExtensionId(Entity $entity): ?string
@@ -119,5 +125,29 @@ class PropertyGroupTransformer
         }
 
         return null;
+    }
+
+    private function getOptionIdsToRemove(PropertyGroupTransformationDTO $dto, array $newOptions): array
+    {
+        $propertyGroup = $dto->getSwPropertyGroup();
+
+        if (null === $propertyGroup) {
+            return [];
+        }
+
+        $idsToDelete = [];
+        $newOptionIds = array_filter(
+            array_map(fn(array $option) => $option['id'] ?? null, $newOptions)
+        );
+
+        foreach ($propertyGroup->getOptions() ?? [] as $option) {
+            if (in_array($option->getId(), $newOptionIds)) {
+                continue;
+            }
+
+            $idsToDelete[] = $option->getId();
+        }
+
+        return $idsToDelete;
     }
 }

@@ -8,9 +8,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\DTO\ProductTransformationDTO;
-use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
-use Strix\Ergonode\Modules\Attribute\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
-use Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider;
+use Strix\Ergonode\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
+use Strix\Ergonode\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
+use Strix\Ergonode\Provider\AttributeMappingProvider;
 use Strix\Ergonode\Provider\LanguageProvider;
 use Strix\Ergonode\Transformer\ProductTransformer;
 

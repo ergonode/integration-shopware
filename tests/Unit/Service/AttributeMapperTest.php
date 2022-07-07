@@ -8,8 +8,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\Service\AttributeMapper;
-use Strix\Ergonode\Modules\Attribute\Provider\AttributeMappingProvider;
-use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
+use Strix\Ergonode\Provider\AttributeMappingProvider;
+use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
 use Strix\Ergonode\Tests\Fixture\ErgonodeAttributeMappingFixture;
 
 class AttributeMapperTest extends TestCase

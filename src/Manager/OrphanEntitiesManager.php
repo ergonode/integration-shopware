@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Strix\Ergonode\Manager;
 
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Modules\Attribute\Api\AttributeDeletedStreamResultsProxy;
-use Strix\Ergonode\Modules\Attribute\Provider\ErgonodeAttributeProvider;
+use Strix\Ergonode\Api\AttributeDeletedStreamResultsProxy;
+use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
 use Strix\Ergonode\Persistor\PropertyGroupPersistor;
 
 class OrphanEntitiesManager

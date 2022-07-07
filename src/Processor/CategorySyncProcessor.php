@@ -8,8 +8,8 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
 use Strix\Ergonode\Manager\ErgonodeCursorManager;
-use Strix\Ergonode\Modules\Category\Api\CategoryStreamResultsProxy;
-use Strix\Ergonode\Modules\Category\QueryBuilder\CategoryQueryBuilder;
+use Strix\Ergonode\Api\CategoryStreamResultsProxy;
+use Strix\Ergonode\QueryBuilder\CategoryQueryBuilder;
 use Strix\Ergonode\Persistor\CategoryPersistor;
 
 class CategorySyncProcessor
