@@ -1,0 +1,6 @@
+framework:
+ cache:
+  pools:
+   gql_request_cache:
+    adapter: cache.adapter.filesystem
+    default_lifetime: -1

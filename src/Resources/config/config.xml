@@ -2,13 +2,42 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
     <card>
-        <title>#StrixErgonode# Settings</title>
-        <title lang="de-DE">#StrixErgonode# Einstellungen</title>
+        <title>API Settings</title>
+        <title lang="de-DE">API Einstellungen</title>
 
-        <input-field type="bool">
-            <name>active</name>
-            <label>Active</label>
-            <label lang="de-DE">Aktiviert</label>
+        <input-field type="text">
+            <name>ergonodeBaseUrl</name>
+            <label>Ergonode base URL</label>
+            <label lang="de-DE">Ergonode base URL</label>
+            <helpText>Base URL will always be inherited (from "All Sales Channels")!</helpText>
+        </input-field>
+
+        <input-field type="text">
+            <name>ergonodeApiKey</name>
+            <label>Ergonode API key</label>
+            <label lang="de-DE">Ergonode API key</label>
+        </input-field>
+    </card>
+
+    <card>
+        <title>Fields mapping</title>
+        <title lang="de-DE">Fields mapping</title>
+
+        <component name="strix-ergonode-customfieldkeys-multiselect">
+            <name>customFieldKeys</name>
+            <label>Ergonode attributes as custom fields</label>
+            <label lang="de-DE">Ergonode attributes as custom fields</label>
+            <helpText>Every selected attribute will be fetched as product custom field</helpText>
+            <helpText lang="de-DE">Every selected attribute will be fetched as product custom field</helpText>
+        </component>
+    </card>
+    <card>
+        <title>Category Sync</title>
+        <title lang="de-DE">Category Sync</title>
+        <input-field type="text">
+            <name>categoryTreeCode</name>
+            <label>Code of the category tree to synchronize</label>
+            <label lang="de-DE">Code of the category tree to synchronize</label>
         </input-field>
     </card>
 </config>

@@ -1,0 +1,9 @@
+monolog:
+ channels: [ sync ]
+ handlers:
+  sync:
+   type: rotating_file
+   path: "%kernel.logs_dir%/sync.%kernel.environment%.log"
+   level: debug
+   max_files: 10
+   channels: [ sync ]

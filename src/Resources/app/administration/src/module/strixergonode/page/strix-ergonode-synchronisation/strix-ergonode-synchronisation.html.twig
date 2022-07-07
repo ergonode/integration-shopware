@@ -1,0 +1,34 @@
+{% block strix_ergonode_synchronisation_page %}
+    <sw-page class="strix-ergonode__synchronisation-page">
+        <template slot="content">
+            <sw-card-view>
+                <sw-tabs>
+                    <sw-tabs-item
+                        :route="{ path: 'mapping' }"
+                        :active="false"
+                        :disabled="!acl.can('strix_ergonode_attribute_mapping.viewer')"
+                    >{{ $t('StrixErgonode.tabs.attributeMappings') }}</sw-tabs-item>
+                    <sw-tabs-item
+                        :route="{ path: 'synchronisation' }"
+                        :active="true"
+                    >{{ $t('StrixErgonode.tabs.synchronisation') }}</sw-tabs-item>
+                </sw-tabs>
+                <sw-card v-if="acl.can('strix_ergonode_attribute_mapping.viewer')"
+                    :title="$t('StrixErgonode.synchronisation.synchronisation')"
+                >
+                    <sw-button-group v-if="triggers">
+                        <strix-ergonode-trigger-button v-for="trigger, triggerIndex in triggers"
+                            :key="triggerIndex"
+                            variant="ghost"
+                            size="large"
+                            :endpoint="trigger.endpoint"
+                            :disabled="!acl.can('strix_ergonode_attribute_mapping.viewer')"
+                        >
+                            {{ trigger.label }}
+                        </strix-ergonode-trigger-button>
+                    </sw-button-group>
+                </sw-card>
+            </sw-card-view>
+        </template>
+    </sw-page>
+{% endblock %}

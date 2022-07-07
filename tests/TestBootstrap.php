@@ -30,7 +30,8 @@ function getProjectDir(): string
 
 define('TEST_PROJECT_DIR', getProjectDir());
 
-$loader = require TEST_PROJECT_DIR . '/vendor/autoload.php';
+$loader = require TEST_PROJECT_DIR . '/vendor/autoload.php'; // load shopware deps
+$loader = require TEST_PROJECT_DIR . '/custom/plugins/StrixErgonode/vendor/autoload.php'; // load plugin deps
 
 $loader->addPsr4('Strix\\Ergonode\\', TEST_PROJECT_DIR . '/custom/plugins/StrixErgonode/src', true);
 $loader->addPsr4('Strix\\Ergonode\\Tests\\', TEST_PROJECT_DIR . '/custom/plugins/StrixErgonode/tests', true);

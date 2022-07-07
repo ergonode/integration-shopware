@@ -1,0 +1,2 @@
+parameters:
+ strix.ergonode.use_gql_cache: false
