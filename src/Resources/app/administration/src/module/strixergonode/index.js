@@ -6,7 +6,7 @@ Shopware.Module.register('strix-ergonode', {
     name: 'StrixErgonode',
     title: 'StrixErgonode.mainMenuItemGeneral',
     description: 'Shopware Ergonode integration plugin',
-    version: '0.0.4',
+    version: '0.0.2',
     color: '#00bc87',
     icon: 'default-symbol-products',
 
