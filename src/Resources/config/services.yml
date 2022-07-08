@@ -102,6 +102,9 @@ services:
   Strix\Ergonode\Service\ScheduledTask\LanguageSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
+  Strix\Ergonode\Service\ScheduledTask\CategoryTreeSyncTask:
+    tags: [ 'shopware.scheduled.task' ]
+
   Strix\Ergonode\Service\ScheduledTask\ProductSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
@@ -123,6 +126,11 @@ services:
       $lockFactory: '@strix.ergonode.lock-factory'
 
   Strix\Ergonode\Service\ScheduledTask\LanguageSyncTaskHandler:
+    tags: [ 'messenger.message_handler' ]
+    arguments:
+      $lockFactory: '@strix.ergonode.lock-factory'
+
+  Strix\Ergonode\Service\ScheduledTask\CategoryTreeSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
       $lockFactory: '@strix.ergonode.lock-factory'
