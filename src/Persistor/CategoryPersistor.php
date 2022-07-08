@@ -10,8 +10,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Strix\Ergonode\Entity\ErgonodeCategoryMappingExtension\ErgonodeCategoryMappingExtensionEntity;
 use Strix\Ergonode\Extension\ErgonodeCategoryMappingExtension;
-use Strix\Ergonode\Struct\ErgonodeCategoryCollection;
 use Strix\Ergonode\Provider\CategoryProvider;
+use Strix\Ergonode\Struct\ErgonodeCategoryCollection;
 
 class CategoryPersistor
 {
@@ -55,6 +55,52 @@ class CategoryPersistor
         }
     }
 
+    /**
+     * Persists category without translation value. If the category does not exist, it creates it with a name of
+     * {CODE}_{LOCALE}. If it exists, only parentId and afterCategoryId are updated
+     */
+    public function persistStub(string $code, ?string $parentCode, string $locale, Context $context): void
+    {
+        $existingCategory = $this->categoryProvider->getCategoryByMapping($code, $locale, $context);
+        $parentId = null === $parentCode ? null : $this->getParentId($parentCode, $locale);
+        $categoryId = null;
+
+        if (null === $existingCategory) {
+            $writeResult = $this->categoryRepository->create(
+                [
+                    [
+                        'name' => $code . '_' . $locale,
+                        'parentId' => $parentId,
+                        'afterCategoryId' => $this->lastChildMapping[$parentId] ?? null,
+                        ErgonodeCategoryMappingExtension::EXTENSION_NAME => [
+                            'code' => $code,
+                            'locale' => $locale
+                        ]
+                    ]
+                ],
+                $context
+            );
+
+            $categoryId = $writeResult->getPrimaryKeys(CategoryDefinition::ENTITY_NAME)[0];
+        } else {
+            $this->categoryRepository->update(
+                [
+                    [
+                        'id' => $existingCategory->getId(),
+                        'parentId' => $parentId,
+                        'afterCategoryId' => $this->lastChildMapping[$parentId] ?? null,
+                    ]
+                ],
+                $context
+            );
+
+            $categoryId = $existingCategory->getId();
+        }
+
+        $this->setParentMapping($code, $locale, $categoryId);
+        $this->lastChildMapping[$parentId] = $categoryId;
+    }
+
     public function persistCollection(ErgonodeCategoryCollection $categoryCollection, Context $context): void
     {
         foreach ($categoryCollection as $category) {
@@ -87,6 +133,14 @@ class CategoryPersistor
                 $this->lastChildMapping[$parentId] = $categoryId;
             }
         }
+    }
+
+    public function deleteIds(array $ids, Context $context): void
+    {
+        $this->categoryRepository->delete(
+            \array_map(fn($id) => ['id' => $id], $ids),
+            $context
+        );
     }
 
     private function setParentMapping(string $code, string $locale, string $parentId): void
