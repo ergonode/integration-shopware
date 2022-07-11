@@ -151,3 +151,4 @@ services:
         - '@Strix\Ergonode\Transformer\ProductMediaTransformer'
         - '@Strix\Ergonode\Transformer\ProductCustomFieldTransformer'
         - '@Strix\Ergonode\Transformer\ProductPropertiesTransformer'
+        - '@Strix\Ergonode\Transformer\ProductCrossSellingTransformer'

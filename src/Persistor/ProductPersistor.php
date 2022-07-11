@@ -62,7 +62,11 @@ class ProductPersistor
     protected function persistProduct(array $productData, ?string $parentId, Context $context): string
     {
         $sku = $productData['sku'];
-        $existingProduct = $this->productProvider->getProductBySku($sku, $context, ['media', 'properties']);
+        $existingProduct = $this->productProvider->getProductBySku($sku, $context, [
+            'media',
+            'properties',
+            'crossSellings.assignedProducts',
+        ]);
 
         $dto = new ProductTransformationDTO($productData);
         $dto->setIsVariant($parentId !== null);

@@ -16,7 +16,7 @@ use Strix\Ergonode\Extension\PropertyGroup\PropertyGroupExtension;
 use Strix\Ergonode\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
 use Strix\Ergonode\Provider\PropertyGroupProvider;
 use Strix\Ergonode\Util\Constants;
-use Strix\Ergonode\Util\PropertyGroupOptionUtil;
+use Strix\Ergonode\Util\CodeBuilderUtil;
 
 use function array_merge_recursive;
 
@@ -67,7 +67,7 @@ class PropertyGroupTransformer
                         'extensions' => [
                             AbstractErgonodeMappingExtension::EXTENSION_NAME => [
                                 'id' => $existingOption ? $this->getEntityExtensionId($existingOption) : null,
-                                'code' => PropertyGroupOptionUtil::buildOptionCode($code, $option['code']),
+                                'code' => CodeBuilderUtil::buildOptionCode($code, $option['code']),
                                 'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                             ],
                         ],
@@ -118,7 +118,7 @@ class PropertyGroupTransformer
             if (
                 $extension instanceof ErgonodeMappingExtensionEntity &&
                 $groupExtension instanceof ErgonodeMappingExtensionEntity &&
-                PropertyGroupOptionUtil::buildOptionCode($groupExtension->getCode(), $code) === $extension->getCode()
+                CodeBuilderUtil::buildOptionCode($groupExtension->getCode(), $code) === $extension->getCode()
             ) {
                 return $option;
             }

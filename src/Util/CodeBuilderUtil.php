@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Util;
 
-class PropertyGroupOptionUtil
+class CodeBuilderUtil
 {
     public static function buildOptionCode(string $prefix, string $suffix): string
     {

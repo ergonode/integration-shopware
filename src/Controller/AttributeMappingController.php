@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Controller;
 
+use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Strix\Ergonode\Service\AttributeMapper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,9 +27,20 @@ class AttributeMappingController extends AbstractController
     /**
      * @Route("/api/strix/ergonode/ergonode-attributes", name="api.strix.ergonode.ergonodeAttributes", methods={"GET"})
      */
-    public function ergonodeAttributes(): JsonResponse
+    public function ergonodeAttributes(RequestDataBag $dataBag): JsonResponse
     {
-        $attributes = $this->attributeMapper->getAllErgonodeAttributes();
+        $types = $dataBag->get('types', []);
+        if ($types instanceof RequestDataBag) {
+            $types = $types->all();
+        }
+
+        if (!is_array($types)) {
+            return new JsonResponse([
+                'message' => 'Field types must be array.',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $attributes = $this->attributeMapper->getAllErgonodeAttributes($types);
 
         return new JsonResponse([
             'data' => $attributes,

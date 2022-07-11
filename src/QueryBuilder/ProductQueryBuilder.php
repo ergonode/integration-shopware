@@ -12,7 +12,6 @@ class ProductQueryBuilder
 {
     private const ATTRIBUTE_LIST_COUNT = 1000;
 
-    // methods copied from magento module TODO change method names and optimize queries - query only needed data
     public function build(int $count, ?string $cursor = null): Query
     {
         $arguments = [
@@ -61,10 +60,7 @@ class ProductQueryBuilder
                                                                             ->setSelectionSet([
                                                                                 (new Query('node'))
                                                                                     ->setSelectionSet([
-                                                                                        (new Query('attribute'))
-                                                                                            ->setSelectionSet([
-                                                                                                'code',
-                                                                                            ]),
+                                                                                        $this->getAttributeFragment(),
                                                                                         (new Query('valueTranslations'))
                                                                                             ->setSelectionSet([
                                                                                                 'inherited',
@@ -469,6 +465,11 @@ class ProductQueryBuilder
                 (new InlineFragment('ProductRelationAttribute'))
                     ->setSelectionSet([
                         new Query('code', AttributeTypesEnum::RELATION),
+                        (new Query('label'))
+                            ->setSelectionSet([
+                                'language',
+                                'value'
+                            ]),
                     ]),
                 (new InlineFragment('TextareaAttribute'))
                     ->setSelectionSet([

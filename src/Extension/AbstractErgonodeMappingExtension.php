@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Extension;
 
-use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityExtension;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\CascadeDelete;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
-use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
 use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionDefinition;
 
 abstract class AbstractErgonodeMappingExtension extends EntityExtension

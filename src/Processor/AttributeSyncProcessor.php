@@ -67,7 +67,7 @@ class AttributeSyncProcessor
     private function persistCustomFields(AttributeStreamResultsProxy $attributes, Context $context): array
     {
         $customFields = $attributes->filterByCodes(
-            $this->configProvider->getErgonodeCustomFields()
+            $this->configProvider->getErgonodeCustomFieldKeys()
         );
 
         if ($customFields instanceof AttributeStreamResultsProxy) {

@@ -11,7 +11,7 @@ use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntit
 use Strix\Ergonode\Enum\AttributeTypesEnum;
 use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
 use Strix\Ergonode\Provider\PropertyGroupOptionProvider;
-use Strix\Ergonode\Util\PropertyGroupOptionUtil;
+use Strix\Ergonode\Util\CodeBuilderUtil;
 
 use function array_filter;
 use function array_flip;
@@ -96,7 +96,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
             }
 
             foreach ($value as &$optionCode) {
-                $optionCode = PropertyGroupOptionUtil::buildOptionCode($node['attribute']['code'], $optionCode);
+                $optionCode = CodeBuilderUtil::buildOptionCode($node['attribute']['code'], $optionCode);
             }
 
             $transformed = array_merge($transformed, $value);

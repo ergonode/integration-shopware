@@ -81,6 +81,10 @@ class ProductTransformationDTO
 
     public function addEntitiesToDelete(string $entityName, array $payload): void
     {
+        if (empty($payload)) {
+            return;
+        }
+
         if (!isset($this->entitiesToDelete[$entityName])) {
             $this->entitiesToDelete[$entityName] = [];
         }

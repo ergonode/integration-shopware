@@ -120,7 +120,7 @@ class ConfigProviderTest extends TestCase
             ->with('StrixErgonode.config.customFieldKeys')
             ->willReturn($mockReturn);
 
-        $output = $this->configProvider->getErgonodeCustomFields();
+        $output = $this->configProvider->getErgonodeCustomFieldKeys();
 
         $this->assertSame($expectedOutput, $output);
     }
