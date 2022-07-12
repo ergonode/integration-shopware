@@ -89,7 +89,7 @@ class ProductTransformationDTO
             $this->entitiesToDelete[$entityName] = [];
         }
 
-        $this->entitiesToDelete[$entityName] = array_merge(
+        $this->entitiesToDelete[$entityName] = array_merge_recursive(
             $this->entitiesToDelete[$entityName],
             $payload
         );

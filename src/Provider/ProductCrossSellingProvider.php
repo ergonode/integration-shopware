@@ -22,8 +22,12 @@ class ProductCrossSellingProvider
         $this->productCrossSellingRepository = $productCrossSellingRepository;
     }
 
-    public function getProductCrossSellingByMapping(string $productId, string $code, Context $context): ?ProductCrossSellingEntity
-    {
+    public function getProductCrossSellingByMapping(
+        string $productId,
+        string $code,
+        Context $context,
+        array $associations = []
+    ): ?ProductCrossSellingEntity {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('productId', $productId));
         $criteria->addFilter(new EqualsFilter(AbstractErgonodeMappingExtension::EXTENSION_NAME . '.code', $code));
@@ -32,9 +36,8 @@ class ProductCrossSellingProvider
             ProductCrossSellingExtension::ERGONODE_TYPE
         ));
 
-        $criteria->addAssociations([
-            AbstractErgonodeMappingExtension::EXTENSION_NAME,
-        ]);
+        $criteria->addAssociation(AbstractErgonodeMappingExtension::EXTENSION_NAME);
+        $criteria->addAssociations($associations);
 
         return $this->productCrossSellingRepository->search($criteria, $context)->first();
     }

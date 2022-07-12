@@ -6,6 +6,7 @@ namespace Strix\Ergonode\Transformer;
 
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSelling\ProductCrossSellingDefinition;
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSelling\ProductCrossSellingEntity;
+use Shopware\Core\Content\Product\Aggregate\ProductCrossSellingAssignedProducts\ProductCrossSellingAssignedProductsDefinition;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\DTO\ProductTransformationDTO;
@@ -75,16 +76,17 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 
             $existingCrossSelling = $this->getProductCrossSelling($productData->getSwProduct(), $code, $context);
 
+            $assignedProducts = array_values(
+                $this->getAssignedProductsPayload($existingCrossSelling, $productIds, $productData)
+            );
+
             $crossSellings[] = [
                 'id' => $existingCrossSelling ? $existingCrossSelling->getId() : null,
                 'active' => true,
                 'type' => ProductCrossSellingDefinition::TYPE_PRODUCT_LIST,
                 'sortBy' => ProductCrossSellingDefinition::SORT_BY_NAME,
                 'position' => $key,
-                'assignedProducts' => array_map(fn(int $key, string $id) => [
-                    'productId' => $id,
-                    'position' => $key,
-                ], array_keys($productIds), $productIds),
+                'assignedProducts' => $assignedProducts,
                 'translations' => $this->translationTransformer->transform($node['attribute']['label'], 'name'),
                 'extensions' => [
                     AbstractErgonodeMappingExtension::EXTENSION_NAME => [
@@ -118,8 +120,11 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
         );
     }
 
-    private function getProductCrossSelling(?ProductEntity $swProduct, string $code, Context $context): ?ProductCrossSellingEntity
-    {
+    private function getProductCrossSelling(
+        ?ProductEntity $swProduct,
+        string $code,
+        Context $context
+    ): ?ProductCrossSellingEntity {
         if (null === $swProduct) {
             return null;
         }
@@ -127,7 +132,8 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
         return $this->productCrossSellingProvider->getProductCrossSellingByMapping(
             $swProduct->getId(),
             CodeBuilderUtil::buildOptionCode($swProduct->getProductNumber(), $code),
-            $context
+            $context,
+            ['assignedProducts']
         );
     }
 
@@ -156,5 +162,42 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
         $idsToDelete = array_diff($crossSellingIds, $newCrossSellingIds);
 
         return array_map(fn(string $id) => ['id' => $id], $idsToDelete);
+    }
+
+    private function getAssignedProductsPayload(
+        ?ProductCrossSellingEntity $existingCrossSelling,
+        array $newProductIds,
+        ProductTransformationDTO $productData
+    ): array {
+        $assignedProducts = [];
+        foreach ($newProductIds as $index => $newProductId) {
+            $assignedProducts[$newProductId] = [
+                'productId' => $newProductId,
+                'position' => $index,
+            ];
+        }
+
+        if (null === $existingCrossSelling) {
+            return $assignedProducts;
+        }
+
+        $idsToDelete = [];
+        foreach ($existingCrossSelling->getAssignedProducts() ?? [] as $assignedProduct) {
+            if (
+                isset($assignedProducts[$assignedProduct->getProductId()]) &&
+                !isset($assignedProducts[$assignedProduct->getProductId()]['id'])
+            ) {
+                $assignedProducts[$assignedProduct->getProductId()]['id'] = $assignedProduct->getId();
+                continue;
+            }
+            $idsToDelete[] = $assignedProduct->getId();
+        }
+
+        $productData->addEntitiesToDelete(
+            ProductCrossSellingAssignedProductsDefinition::ENTITY_NAME,
+            array_map(fn (string $id) => ['id' => $id], $idsToDelete)
+        );
+
+        return $assignedProducts;
     }
 }
