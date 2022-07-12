@@ -9,52 +9,53 @@ use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
-use Strix\Ergonode\Processor\CategoryTreeSyncProcessor;
+use Strix\Ergonode\Persistor\CategoryPersistor;
 use Strix\Ergonode\Provider\ConfigProvider;
+use Strix\Ergonode\Provider\ErgonodeCategoryProvider;
 use Symfony\Component\Lock\LockFactory;
 
-class CategoryTreeSyncTaskHandler extends ScheduledTaskHandler
+class BuildFullCategoryTreeTaskHandler extends ScheduledTaskHandler
 {
-    private const MAX_PAGES_PER_RUN = 25;
-
     private ConfigProvider $configProvider;
     private LoggerInterface $logger;
     private LockFactory $lockFactory;
-    private CategoryTreeSyncProcessor $categoryTreeSyncProcessor;
+    private ErgonodeCategoryProvider $categoryProvider;
+    private CategoryPersistor $categoryPersistor;
 
     public function __construct(
         EntityRepositoryInterface $scheduledTaskRepository,
-        CategoryTreeSyncProcessor $categoryTreeSyncProcessor,
         ConfigProvider $configProvider,
         LoggerInterface $syncLogger,
-        LockFactory $lockFactory
+        LockFactory $lockFactory,
+        ErgonodeCategoryProvider $categoryProvider,
+        CategoryPersistor $categoryPersistor
     ) {
         parent::__construct($scheduledTaskRepository);
         $this->configProvider = $configProvider;
         $this->logger = $syncLogger;
         $this->lockFactory = $lockFactory;
-        $this->categoryTreeSyncProcessor = $categoryTreeSyncProcessor;
+        $this->categoryProvider = $categoryProvider;
+        $this->categoryPersistor = $categoryPersistor;
     }
 
     public static function getHandledMessages(): iterable
     {
-        return [CategoryTreeSyncTask::class];
+        return [BuildFullCategoryTreeTask::class];
     }
 
     public function run(): void
     {
-        $lock = $this->lockFactory->createLock('strix.ergonode.category-tree-sync-lock');
+        $lock = $this->lockFactory->createLock('strix.ergonode.build-full-category-tree-lock');
 
         if (false === $lock->acquire()) {
-            $this->logger->info('CategoryTreeSyncTask is locked');
+            $this->logger->info('BuildFullCategoryTreeTaskHandler is locked');
 
             return;
         }
 
-        $this->logger->info('Starting CategoryTreeSyncTask...');
+        $this->logger->info('Starting BuildFullCategoryTreeTaskHandler...');
 
         $context = new Context(new SystemSource());
-        $currentPage = 0;
 
         $categoryTreeCode = $this->configProvider->getCategoryTreeCode();
         if (empty($categoryTreeCode)) {
@@ -64,11 +65,21 @@ class CategoryTreeSyncTaskHandler extends ScheduledTaskHandler
         }
 
         try {
-            while ($this->categoryTreeSyncProcessor->processStream($context)) {
-                if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
-                    break;
-                }
+            $categoryCollection = $this->categoryProvider->provideCategoryTree($categoryTreeCode);
+
+            if (empty($categoryCollection)) {
+                $this->logger->error('Request failed');
+
+                return;
             }
+
+            $this->categoryPersistor->persistCollection($categoryCollection, $context);
+
+            $this->logger->info('Processed category tree',
+                [
+                    'categoryCount' => $categoryCollection->count()
+                ]
+            );
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
         }
