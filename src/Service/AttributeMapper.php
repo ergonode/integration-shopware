@@ -57,7 +57,7 @@ class AttributeMapper
         return Constants::SW_PRODUCT_MAPPABLE_FIELDS;
     }
 
-    public function getAllErgonodeAttributes(array $types): array
+    public function getAllErgonodeAttributes(array $types = []): array
     {
         $attributeCodes = [];
 
