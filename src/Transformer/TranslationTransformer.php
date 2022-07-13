@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Strix\Ergonode\Transformer;
 
+use Shopware\Core\Framework\Context;
+use Strix\Ergonode\Provider\LanguageProvider;
 use Strix\Ergonode\Util\ArrayUnfoldUtil;
 use Strix\Ergonode\Util\ErgonodeApiValueKeyResolverUtil;
 use Strix\Ergonode\Util\IsoCodeConverter;
@@ -12,6 +14,16 @@ use function stristr;
 
 class TranslationTransformer
 {
+    private string $defaultLocale;
+
+    private LanguageProvider $languageProvider;
+
+    public function __construct(
+        LanguageProvider $languageProvider
+    ) {
+        $this->languageProvider = $languageProvider;
+    }
+
     public function transform(array $ergonodeTranslation, ?string $shopwareKey = null): array
     {
         $translations = [];
@@ -50,5 +62,25 @@ class TranslationTransformer
         }
 
         return $translations;
+    }
+
+    public function transformDefaultLocale(array $ergonodeTranslation, Context $context): array
+    {
+        if (!isset($this->defaultLocale)) {
+            $this->defaultLocale = IsoCodeConverter::shopwareToErgonodeIso(
+                $this->languageProvider->getDefaultLanguageLocale($context)
+            );
+        }
+
+        foreach ($ergonodeTranslation as $translation) {
+            if ($this->defaultLocale === $translation['language']) {
+                $key = ErgonodeApiValueKeyResolverUtil::resolve($translation['__typename']);
+                return $translation[$key];
+            }
+        }
+
+        // default translation not found; return first one
+        $value = reset($ergonodeTranslation);
+        return $value[ErgonodeApiValueKeyResolverUtil::resolve($value['__typename'])];
     }
 }
