@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Api;
+namespace Ergonode\IntegrationShopware\Api;
 
-use Strix\Ergonode\Api\AbstractStreamResultsProxy;
-use Strix\Ergonode\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 
 class AttributeStreamResultsProxy extends AbstractStreamResultsProxy
 {

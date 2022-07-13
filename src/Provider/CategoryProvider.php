@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Provider;
+namespace Ergonode\IntegrationShopware\Provider;
 
+use Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension;
 use Shopware\Core\Content\Category\CategoryCollection;
 use Shopware\Core\Content\Category\CategoryEntity;
 use Shopware\Core\Framework\Context;
@@ -12,7 +13,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
-use Strix\Ergonode\Extension\ErgonodeCategoryMappingExtension;
 
 class CategoryProvider
 {

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\DependencyInjection\CompilerPass;
+namespace Ergonode\IntegrationShopware\DependencyInjection\CompilerPass;
 
-use Strix\Ergonode\Api\Client\CachedErgonodeGqlClient;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
+use Ergonode\IntegrationShopware\Api\Client\CachedErgonodeGqlClient;
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClient;
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

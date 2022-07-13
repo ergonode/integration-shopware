@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Transformer;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Transformer;
 
+use Ergonode\IntegrationShopware\Tests\Fixture\GqlAttributeResponse;
+use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
 use PHPUnit\Framework\TestCase;
-use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
-use Strix\Ergonode\Transformer\TranslationTransformer;
 
 class TranslationTransformerTest extends TestCase
 {

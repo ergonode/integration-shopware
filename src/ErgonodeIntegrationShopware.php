@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode;
+namespace Ergonode\IntegrationShopware;
 
+use Ergonode\IntegrationShopware\DependencyInjection\CompilerPass\GqlClientCacheCompilerPass;
 use Shopware\Core\Framework\Plugin;
-use Strix\Ergonode\DependencyInjection\CompilerPass\GqlClientCacheCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 if (file_exists(dirname(__DIR__) . '/vendor/autoload.php')) {
     require_once dirname(__DIR__) . '/vendor/autoload.php';
 }
 
-class StrixErgonode extends Plugin
+class ErgonodeIntegrationShopware extends Plugin
 {
     public function build(ContainerBuilder $container): void
     {

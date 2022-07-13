@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Resolver;
+namespace Ergonode\IntegrationShopware\Resolver;
 
-use Strix\Ergonode\Transformer\CustomField\CustomFieldTransformerInterface;
-use Strix\Ergonode\Transformer\CustomField\TextCustomFieldTransformer;
+use Ergonode\IntegrationShopware\Transformer\CustomField\CustomFieldTransformerInterface;
+use Ergonode\IntegrationShopware\Transformer\CustomField\TextCustomFieldTransformer;
 
 class CustomFieldTransformerResolver
 {

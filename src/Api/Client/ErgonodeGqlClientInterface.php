@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Api\Client;
+namespace Ergonode\IntegrationShopware\Api\Client;
 
 use GraphQL\Query;
 use GraphQL\Results;

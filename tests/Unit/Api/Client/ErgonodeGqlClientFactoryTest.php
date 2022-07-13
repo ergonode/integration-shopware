@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Api\Client;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Api\Client;
 
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClient;
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory;
+use Ergonode\IntegrationShopware\Api\Client\HttpGqlClientFactory;
+use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
+use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClientFactory;
-use Strix\Ergonode\Api\Client\HttpGqlClientFactory;
-use Strix\Ergonode\Api\ErgonodeAccessData;
-use Strix\Ergonode\Provider\ConfigProvider;
 
 class ErgonodeGqlClientFactoryTest extends TestCase
 {

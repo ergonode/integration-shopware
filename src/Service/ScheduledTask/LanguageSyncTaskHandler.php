@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Service\ScheduledTask;
+namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
+use Ergonode\IntegrationShopware\Processor\LanguageSyncProcessor;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
-use Strix\Ergonode\Processor\LanguageSyncProcessor;
 use Symfony\Component\Lock\LockFactory;
 use Throwable;
 

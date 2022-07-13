@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Persistor;
+namespace Ergonode\IntegrationShopware\Persistor;
 
+use Ergonode\IntegrationShopware\Entity\ErgonodeCategoryMappingExtension\ErgonodeCategoryMappingExtensionEntity;
+use Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension;
+use Ergonode\IntegrationShopware\Provider\CategoryProvider;
+use Ergonode\IntegrationShopware\Struct\ErgonodeCategoryCollection;
 use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Strix\Ergonode\Entity\ErgonodeCategoryMappingExtension\ErgonodeCategoryMappingExtensionEntity;
-use Strix\Ergonode\Extension\ErgonodeCategoryMappingExtension;
-use Strix\Ergonode\Provider\CategoryProvider;
-use Strix\Ergonode\Struct\ErgonodeCategoryCollection;
 
 class CategoryPersistor
 {

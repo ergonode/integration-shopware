@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Transformer;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Provider\TaxProvider;
+use Ergonode\IntegrationShopware\Transformer\ProductTaxTransformer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\Tax\TaxEntity;
-use Strix\Ergonode\DTO\ProductTransformationDTO;
-use Strix\Ergonode\Provider\TaxProvider;
-use Strix\Ergonode\Transformer\ProductTaxTransformer;
 
 class ProductTaxTransformerTest extends TestCase
 {

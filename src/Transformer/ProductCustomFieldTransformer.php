@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Resolver\ProductCustomFieldTransformerResolver;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\DTO\ProductTransformationDTO;
-use Strix\Ergonode\Provider\ConfigProvider;
-use Strix\Ergonode\Resolver\ProductCustomFieldTransformerResolver;
 
 use function array_filter;
 use function array_merge_recursive;

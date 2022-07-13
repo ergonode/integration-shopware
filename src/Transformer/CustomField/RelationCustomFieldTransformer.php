@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer\CustomField;
+namespace Ergonode\IntegrationShopware\Transformer\CustomField;
 
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
-use Strix\Ergonode\Enum\AttributeTypesEnum;
 
 class RelationCustomFieldTransformer implements CustomFieldTransformerInterface
 {

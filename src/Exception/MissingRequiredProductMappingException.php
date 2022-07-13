@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Exception;
+namespace Ergonode\IntegrationShopware\Exception;
 
 class MissingRequiredProductMappingException extends \Exception
 {

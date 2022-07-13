@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Service;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Service;
 
+use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
+use Ergonode\IntegrationShopware\Service\AttributeMapper;
+use Ergonode\IntegrationShopware\Tests\Fixture\ErgonodeAttributeMappingFixture;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Service\AttributeMapper;
-use Strix\Ergonode\Provider\AttributeMappingProvider;
-use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
-use Strix\Ergonode\Tests\Fixture\ErgonodeAttributeMappingFixture;
 
 class AttributeMapperTest extends TestCase
 {
