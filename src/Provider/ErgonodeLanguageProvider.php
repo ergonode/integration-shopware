@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Provider;
+namespace Ergonode\IntegrationShopware\Provider;
 
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
+use Ergonode\IntegrationShopware\Api\LanguageListStreamResultsProxy;
+use Ergonode\IntegrationShopware\QueryBuilder\LanguageQueryBuilder;
 use Generator;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
-use Strix\Ergonode\Api\LanguageListStreamResultsProxy;
-use Strix\Ergonode\QueryBuilder\LanguageQueryBuilder;
 
 class ErgonodeLanguageProvider
 {

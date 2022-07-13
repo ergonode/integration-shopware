@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Processor;
+namespace Ergonode\IntegrationShopware\Processor;
 
+use Ergonode\IntegrationShopware\Api\CategoryStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
+use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
+use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
+use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
-use Strix\Ergonode\Manager\ErgonodeCursorManager;
-use Strix\Ergonode\Api\CategoryStreamResultsProxy;
-use Strix\Ergonode\QueryBuilder\CategoryQueryBuilder;
-use Strix\Ergonode\Persistor\CategoryPersistor;
 
 class CategorySyncProcessor
 {

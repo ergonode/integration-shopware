@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Processor;
+namespace Ergonode\IntegrationShopware\Processor;
 
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
+use Ergonode\IntegrationShopware\Api\ProductStreamResultsProxy;
+use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
+use Ergonode\IntegrationShopware\Persistor\ProductPersistor;
+use Ergonode\IntegrationShopware\QueryBuilder\ProductQueryBuilder;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
-use Strix\Ergonode\Manager\ErgonodeCursorManager;
-use Strix\Ergonode\Api\ProductStreamResultsProxy;
-use Strix\Ergonode\QueryBuilder\ProductQueryBuilder;
-use Strix\Ergonode\Persistor\ProductPersistor;
 
 class ProductSyncProcessor
 {

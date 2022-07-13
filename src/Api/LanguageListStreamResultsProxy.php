@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Api;
+namespace Ergonode\IntegrationShopware\Api;
 
-use Strix\Ergonode\Util\IsoCodeConverter;
+use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 
 class LanguageListStreamResultsProxy extends AbstractStreamResultsProxy
 {

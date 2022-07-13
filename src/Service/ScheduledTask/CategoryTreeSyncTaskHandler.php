@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Service\ScheduledTask;
+namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
+use Ergonode\IntegrationShopware\Processor\CategoryTreeSyncProcessor;
+use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
-use Strix\Ergonode\Processor\CategoryTreeSyncProcessor;
-use Strix\Ergonode\Provider\ConfigProvider;
 use Symfony\Component\Lock\LockFactory;
 
 class CategoryTreeSyncTaskHandler extends ScheduledTaskHandler

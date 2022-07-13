@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Fixture;
+namespace Ergonode\IntegrationShopware\Tests\Fixture;
 
+use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionCollection;
+use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
 use Ramsey\Uuid\Uuid;
-use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
-use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionCollection;
 
 class ErgonodeMappingExtensionFixture
 {

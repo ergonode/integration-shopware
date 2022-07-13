@@ -2,8 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Transformer;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Transformer;
 
+use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
+use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
+use Ergonode\IntegrationShopware\Extension\PropertyGroup\PropertyGroupExtension;
+use Ergonode\IntegrationShopware\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
+use Ergonode\IntegrationShopware\Provider\PropertyGroupProvider;
+use Ergonode\IntegrationShopware\Tests\Fixture\GqlAttributeResponse;
+use Ergonode\IntegrationShopware\Transformer\PropertyGroupTransformer;
+use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionCollection;
@@ -12,14 +20,6 @@ use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Content\Property\PropertyGroupEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
-use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
-use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
-use Strix\Ergonode\Extension\PropertyGroup\PropertyGroupExtension;
-use Strix\Ergonode\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
-use Strix\Ergonode\Provider\PropertyGroupProvider;
-use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
-use Strix\Ergonode\Transformer\PropertyGroupTransformer;
-use Strix\Ergonode\Transformer\TranslationTransformer;
 
 class AttributeNodeTransformerTest extends TestCase
 {

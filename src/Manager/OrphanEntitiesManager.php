@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Manager;
+namespace Ergonode\IntegrationShopware\Manager;
 
+use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
+use Ergonode\IntegrationShopware\Persistor\PropertyGroupPersistor;
+use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Api\AttributeDeletedStreamResultsProxy;
-use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
-use Strix\Ergonode\Persistor\PropertyGroupPersistor;
 
 class OrphanEntitiesManager
 {
