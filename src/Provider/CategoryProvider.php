@@ -9,7 +9,9 @@ use Shopware\Core\Content\Category\CategoryEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Strix\Ergonode\Extension\ErgonodeCategoryMappingExtension;
 
 class CategoryProvider
@@ -43,5 +45,20 @@ class CategoryProvider
         $criteria->addAssociations($associations);
 
         return $this->categoryRepository->search($criteria, $context)->getEntities();
+    }
+
+    public function getCategoryIdsNotInArray(array $notIn, Context $context): array
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(
+            new NotFilter(
+                NotFilter::CONNECTION_OR,
+                [
+                    new EqualsAnyFilter(ErgonodeCategoryMappingExtension::EXTENSION_NAME . '.code', $notIn)
+                ]
+            )
+        );
+
+        return $this->categoryRepository->searchIds($criteria, $context)->getIds();
     }
 }

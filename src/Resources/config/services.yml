@@ -96,14 +96,20 @@ services:
   Strix\Ergonode\Service\ScheduledTask\CategorySyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
+  Strix\Ergonode\Service\ScheduledTask\CategoryTreeSyncTask:
+    tags: [ 'shopware.scheduled.task' ]
+
   Strix\Ergonode\Service\ScheduledTask\AttributeSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
   Strix\Ergonode\Service\ScheduledTask\LanguageSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
-  Strix\Ergonode\Service\ScheduledTask\CategoryTreeSyncTask:
-    tags: [ 'shopware.scheduled.task' ]
+  # This task is disabled because CategoryTreeSyncTask and CategorySyncTask together are building the full tree.
+  # Can be removed completely if both tasks are working correctly. The task handler could be left for debug purposes.
+  # (See SWERG-44, SWERG-49)
+  #  Strix\Ergonode\Service\ScheduledTask\BuildFullCategoryTreeTask:
+  #    tags: [ 'shopware.scheduled.task' ]
 
   Strix\Ergonode\Service\ScheduledTask\ProductSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
@@ -120,6 +126,11 @@ services:
     arguments:
       $lockFactory: '@strix.ergonode.lock-factory'
 
+  Strix\Ergonode\Service\ScheduledTask\CategoryTreeSyncTaskHandler:
+    tags: [ 'messenger.message_handler' ]
+    arguments:
+      $lockFactory: '@strix.ergonode.lock-factory'
+
   Strix\Ergonode\Service\ScheduledTask\AttributeSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
@@ -130,7 +141,7 @@ services:
     arguments:
       $lockFactory: '@strix.ergonode.lock-factory'
 
-  Strix\Ergonode\Service\ScheduledTask\CategoryTreeSyncTaskHandler:
+  Strix\Ergonode\Service\ScheduledTask\BuildFullCategoryTreeTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
       $lockFactory: '@strix.ergonode.lock-factory'

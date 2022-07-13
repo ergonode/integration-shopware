@@ -8,6 +8,7 @@ use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\System\Language\LanguageCollection;
 use Shopware\Core\System\Language\LanguageEntity;
 
 class LanguageProvider
@@ -35,5 +36,13 @@ class LanguageProvider
         }
 
         return $languageEntity->getLocale()->getCode();
+    }
+
+    public function getActiveLanguages(Context $context): LanguageCollection
+    {
+        $criteria = new Criteria();
+        $criteria->addAssociation('locale');
+
+        return $this->languageRepository->search($criteria, $context)->getEntities();
     }
 }
