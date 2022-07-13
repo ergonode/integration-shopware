@@ -146,6 +146,11 @@ services:
     arguments:
       $lockFactory: '@strix.ergonode.lock-factory'
 
+  # SERVICE
+  Strix\Ergonode\Service\SyncHistoryLogger:
+    arguments:
+      $repository: '@strix_ergonode_sync_history.repository'
+
   # SUBSCRIBER
   Strix\Ergonode\Subscriber\Subscriber:
     tags: [ 'kernel.event_subscriber' ]
