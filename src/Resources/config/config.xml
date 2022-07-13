@@ -23,7 +23,7 @@
         <title>Fields mapping</title>
         <title lang="de-DE">Fields mapping</title>
 
-        <component name="strix-ergonode-attributes-multiselect">
+        <component name="strix-ergonode-customfieldkeys-multiselect">
             <name>customFieldKeys</name>
             <label>Ergonode attributes as custom fields</label>
             <label lang="de-DE">Ergonode attributes as custom fields</label>
