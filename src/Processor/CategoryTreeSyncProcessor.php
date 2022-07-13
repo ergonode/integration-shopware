@@ -96,18 +96,21 @@ class CategoryTreeSyncProcessor
 
             try {
                 foreach ($activeLanguages as $language) {
+                    $locale = IsoCodeConverter::shopwareToErgonodeIso($language->getLocale()->getCode());
+
                     foreach ($node['categoryTreeLeafList']['edges'] as $leafEdge) {
                         $leafNode = $leafEdge['node'];
                         $this->categoryPersistor->persistStub(
                             $leafNode['category']['code'],
                             $leafNode['parentCategory']['code'] ?? $treeCode,
-                            IsoCodeConverter::shopwareToErgonodeIso($language->getLocale()->getCode()),
+                            $locale,
                             $context
                         );
                     }
 
                     $this->logger->info('Processed category', [
                         'code' => $node['code'],
+                        'locale' => $locale
                     ]);
                 }
 
@@ -118,6 +121,12 @@ class CategoryTreeSyncProcessor
                 $categoryCodes[] = $treeCode;
 
                 $idsToRemove = $this->categoryProvider->getCategoryIdsNotInArray($categoryCodes, $context);
+
+                $this->logger->info('Removing following categories not found in Ergonode tree', [
+                    'treeCode' => $treeCode,
+                    'categoryIds' => $idsToRemove
+                ]);
+
                 $this->categoryPersistor->deleteIds(
                     $idsToRemove,
                     $context
