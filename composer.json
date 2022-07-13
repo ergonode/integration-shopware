@@ -5,7 +5,7 @@
     "type": "shopware-platform-plugin",
     "license": "MIT",
     "extra": {
-        "shopware-plugin-class": "ErgonodeIntegrationShopware",
+        "shopware-plugin-class": "Ergonode\\IntegrationShopware\\ErgonodeIntegrationShopware",
         "author": "Strix",
         "label": {
             "de-DE": "Shopware Ergonode Integration",
