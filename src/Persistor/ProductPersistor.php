@@ -11,6 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityRepositoryNotFoundException;
 use Strix\Ergonode\DTO\ProductTransformationDTO;
 use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
+use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
 use Strix\Ergonode\Provider\ProductProvider;
 use Strix\Ergonode\Transformer\ProductTransformerChain;
 
@@ -66,6 +67,7 @@ class ProductPersistor
             'media',
             'properties',
             'crossSellings.assignedProducts',
+            'crossSellings.' . AbstractErgonodeMappingExtension::EXTENSION_NAME,
         ]);
 
         $dto = new ProductTransformationDTO($productData);

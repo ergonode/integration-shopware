@@ -10,6 +10,7 @@ use Shopware\Core\Content\Product\Aggregate\ProductCrossSellingAssignedProducts\
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 use Strix\Ergonode\DTO\ProductTransformationDTO;
+use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionDefinition;
 use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
 use Strix\Ergonode\Extension\ProductCrossSelling\ProductCrossSellingExtension;
 use Strix\Ergonode\Manager\ExtensionManager;
@@ -109,6 +110,12 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
             $this->getCrossSellingDeletePayload($productData)
         );
 
+        // TODO remove after fixing delete cascade - SWERG-63
+        $productData->addEntitiesToDelete(
+            ErgonodeMappingExtensionDefinition::ENTITY_NAME,
+            $this->getExtensionDeletePayload($productData)
+        );
+
         return $productData;
     }
 
@@ -151,6 +158,10 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
         $swData = $productData->getShopwareData();
         $crossSellingIds = $crossSellings->getIds();
 
+        if (empty($crossSellingIds)) {
+            return [];
+        }
+
         if (!isset($swData[self::SW_PRODUCT_FIELD_CROSS_SELLING])) {
             return array_map(fn(string $id) => ['id' => $id], $crossSellingIds);
         }
@@ -160,6 +171,46 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
         );
 
         $idsToDelete = array_diff($crossSellingIds, $newCrossSellingIds);
+
+        return array_map(fn(string $id) => ['id' => $id], $idsToDelete);
+    }
+
+    private function getExtensionDeletePayload(ProductTransformationDTO $productData): array
+    {
+        if (null === $productData->getSwProduct()) {
+            return [];
+        }
+
+        $crossSellings = $productData->getSwProduct()->getCrossSellings();
+        if (null === $crossSellings || 0 === $crossSellings->count()) {
+            return [];
+        }
+
+        $swData = $productData->getShopwareData();
+        $extensionIds = [];
+        foreach ($crossSellings as $crossSelling) {
+            $id = $this->extensionManager->getEntityExtensionId($crossSelling);
+            if (null !== $id) {
+                $extensionIds[] = $id;
+            }
+        }
+
+        if (empty($extensionIds)) {
+            return [];
+        }
+
+        if (!isset($swData[self::SW_PRODUCT_FIELD_CROSS_SELLING])) {
+            return array_map(fn(string $id) => ['id' => $id], $extensionIds);
+        }
+
+        $newExtensionIds = array_filter(
+            array_map(
+                fn(array $crossSelling) => $crossSelling['extensions'][AbstractErgonodeMappingExtension::EXTENSION_NAME]['id'],
+                $swData[self::SW_PRODUCT_FIELD_CROSS_SELLING]
+            )
+        );
+
+        $idsToDelete = array_diff($extensionIds, $newExtensionIds);
 
         return array_map(fn(string $id) => ['id' => $id], $idsToDelete);
     }
@@ -195,7 +246,7 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 
         $productData->addEntitiesToDelete(
             ProductCrossSellingAssignedProductsDefinition::ENTITY_NAME,
-            array_map(fn (string $id) => ['id' => $id], $idsToDelete)
+            array_map(fn(string $id) => ['id' => $id], $idsToDelete)
         );
 
         return $assignedProducts;
