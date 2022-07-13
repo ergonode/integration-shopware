@@ -1,39 +1,45 @@
-import template from './strix-ergonode-customfieldkeys-multiselect.html.twig'
+import template from './strix-ergonode-custom-field-keys-multiselect.html.twig'
 
-const {Component, Mixin} = Shopware;
+const { Component, Mixin } = Shopware;
 
-Component.register('strix-ergonode-customfieldkeys-multiselect', {
-    template,
+Component.register('strix-ergonode-custom-field-keys-multiselect', {
     inject: ['ergonodeAttributeService'],
+
     mixins: [
         Mixin.getByName('notification'),
     ],
+
+    template,
+
     props: {
         value: {
             required: true,
-            validator(value) {
+            validator (value) {
                 return Array.isArray(value) || value === null || value === undefined;
             },
         },
     },
+
     computed: {
-        filteredValue() {
-            return this.value.filter(value => this.ergoAttributes.includes(value));
+        filteredValue () {
+            return (Array.isArray(this.value) ? this.value : [this.value]).filter(value => this.ergoAttributes.includes(value));
         },
-        options(){
+        options () {
             return this.ergoAttributes.map(attribute => {
                 return {value: attribute, label: attribute};
-            })
-        }
+            });
+        },
     },
+
     data() {
         return {
             isLoading: false,
             ergoAttributes: [],
-        }
+        };
     },
+
     methods: {
-        fetchErgoCustomAttributesOptions() {
+        fetchErgoCustomAttributesOptions () {
             this.isLoading = true;
             this.ergonodeAttributeService.getErgonodeAttributes()
                 .then(({data: {data: attributes}}) => {
@@ -46,11 +52,13 @@ Component.register('strix-ergonode-customfieldkeys-multiselect', {
                 })
                 .finally(() => this.isLoading = false);
         },
-        onChange(value) {
+
+        onChange (value) {
             this.$emit('change', value);
-        }
+        },
     },
-    created() {
+
+    created () {
         this.fetchErgoCustomAttributesOptions();
-    }
+    },
 });
