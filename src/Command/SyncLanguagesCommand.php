@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Command;
+namespace Ergonode\IntegrationShopware\Command;
 
+use Ergonode\IntegrationShopware\Processor\LanguageSyncProcessor;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Processor\LanguageSyncProcessor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
-use Strix\Ergonode\Struct\ErgonodeCategory;
-use Strix\Ergonode\Struct\ErgonodeCategoryCollection;
-use Strix\Ergonode\Transformer\ResponseTransformerInterface;
+use Ergonode\IntegrationShopware\Struct\ErgonodeCategory;
+use Ergonode\IntegrationShopware\Struct\ErgonodeCategoryCollection;
 
 class CategoryResponseTransformer implements ResponseTransformerInterface
 {

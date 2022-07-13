@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Provider;
+namespace Ergonode\IntegrationShopware\Provider;
 
+use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
+use Ergonode\IntegrationShopware\QueryBuilder\AttributeQueryBuilder;
 use Generator;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
-use Strix\Ergonode\Api\AttributeDeletedStreamResultsProxy;
-use Strix\Ergonode\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\QueryBuilder\AttributeQueryBuilder;
 
 class ErgonodeAttributeProvider
 {

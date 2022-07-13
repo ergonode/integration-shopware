@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Service;
+namespace Ergonode\IntegrationShopware\Service;
 
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;

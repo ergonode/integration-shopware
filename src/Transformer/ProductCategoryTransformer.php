@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Provider\CategoryProvider;
 use Shopware\Core\Content\Category\CategoryEntity;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\DTO\ProductTransformationDTO;
-use Strix\Ergonode\Provider\CategoryProvider;
 
 class ProductCategoryTransformer implements ProductDataTransformerInterface
 {

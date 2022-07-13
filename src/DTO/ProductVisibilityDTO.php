@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\DTO;
+namespace Ergonode\IntegrationShopware\DTO;
 
 class ProductVisibilityDTO
 {

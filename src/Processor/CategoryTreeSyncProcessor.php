@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Processor;
+namespace Ergonode\IntegrationShopware\Processor;
 
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
+use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
+use Ergonode\IntegrationShopware\Modules\Category\Api\CategoryTreeStreamResultsProxy;
+use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
+use Ergonode\IntegrationShopware\Provider\CategoryProvider;
+use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Provider\LanguageProvider;
+use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
+use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\Language\LanguageCollection;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
-use Strix\Ergonode\Manager\ErgonodeCursorManager;
-use Strix\Ergonode\Modules\Category\Api\CategoryTreeStreamResultsProxy;
-use Strix\Ergonode\Persistor\CategoryPersistor;
-use Strix\Ergonode\Provider\CategoryProvider;
-use Strix\Ergonode\Provider\ConfigProvider;
-use Strix\Ergonode\Provider\LanguageProvider;
-use Strix\Ergonode\QueryBuilder\CategoryQueryBuilder;
-use Strix\Ergonode\Util\IsoCodeConverter;
 
 class CategoryTreeSyncProcessor
 {
@@ -96,18 +96,21 @@ class CategoryTreeSyncProcessor
 
             try {
                 foreach ($activeLanguages as $language) {
+                    $locale = IsoCodeConverter::shopwareToErgonodeIso($language->getLocale()->getCode());
+
                     foreach ($node['categoryTreeLeafList']['edges'] as $leafEdge) {
                         $leafNode = $leafEdge['node'];
                         $this->categoryPersistor->persistStub(
                             $leafNode['category']['code'],
                             $leafNode['parentCategory']['code'] ?? $treeCode,
-                            IsoCodeConverter::shopwareToErgonodeIso($language->getLocale()->getCode()),
+                            $locale,
                             $context
                         );
                     }
 
                     $this->logger->info('Processed category', [
                         'code' => $node['code'],
+                        'locale' => $locale
                     ]);
                 }
 
@@ -118,6 +121,12 @@ class CategoryTreeSyncProcessor
                 $categoryCodes[] = $treeCode;
 
                 $idsToRemove = $this->categoryProvider->getCategoryIdsNotInArray($categoryCodes, $context);
+
+                $this->logger->info('Removing following categories not found in Ergonode tree', [
+                    'treeCode' => $treeCode,
+                    'categoryIds' => $idsToRemove
+                ]);
+
                 $this->categoryPersistor->deleteIds(
                     $idsToRemove,
                     $context

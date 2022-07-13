@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Command;
+namespace Ergonode\IntegrationShopware\Command;
 
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
+use Ergonode\IntegrationShopware\Api\ProductResultsProxy;
+use Ergonode\IntegrationShopware\Persistor\ProductPersistor;
+use Ergonode\IntegrationShopware\QueryBuilder\ProductQueryBuilder;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
-use Strix\Ergonode\Api\ProductResultsProxy;
-use Strix\Ergonode\QueryBuilder\ProductQueryBuilder;
-use Strix\Ergonode\Persistor\ProductPersistor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

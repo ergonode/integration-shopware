@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Service\ScheduledTask;
+namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
+use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
+use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Provider\ErgonodeCategoryProvider;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
-use Strix\Ergonode\Persistor\CategoryPersistor;
-use Strix\Ergonode\Provider\ConfigProvider;
-use Strix\Ergonode\Provider\ErgonodeCategoryProvider;
 use Symfony\Component\Lock\LockFactory;
 
 class BuildFullCategoryTreeTaskHandler extends ScheduledTaskHandler

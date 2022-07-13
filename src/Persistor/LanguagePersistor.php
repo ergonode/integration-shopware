@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Persistor;
+namespace Ergonode\IntegrationShopware\Persistor;
 
+use Ergonode\IntegrationShopware\Api\LanguageListStreamResultsProxy;
+use Ergonode\IntegrationShopware\Provider\LocaleProvider;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\Language\LanguageDefinition;
 use Shopware\Core\System\Locale\LocaleCollection;
 use Shopware\Core\System\Locale\LocaleEntity;
-use Strix\Ergonode\Api\LanguageListStreamResultsProxy;
-use Strix\Ergonode\Provider\LocaleProvider;
 
 class LanguagePersistor
 {
