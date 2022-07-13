@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Entity\ErgonodeSyncHistory;
+namespace Ergonode\IntegrationShopware\Entity\ErgonodeSyncHistory;
 
 use DateTimeInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
@@ -10,7 +10,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 
 class ErgonodeSyncHistoryEntity extends Entity
 {
-    public const STATUS_PROCESSING = 'processing';
+    public const STATUS_STARTED = 'started';
     public const STATUS_FINISHED = 'finished';
 
     use EntityIdTrait;

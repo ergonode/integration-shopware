@@ -3,7 +3,8 @@ monolog:
  handlers:
   sync:
    type: rotating_file
-   path: "%kernel.logs_dir%/sync.%kernel.environment%.log"
+   path: "%kernel.logs_dir%/ergonode/sync.%kernel.environment%.log"
    level: debug
    max_files: 10
+   formatter: 'monolog.formatter.json'
    channels: [ sync ]

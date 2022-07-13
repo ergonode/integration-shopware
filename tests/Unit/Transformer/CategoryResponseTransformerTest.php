@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Tests\Unit\Modules\Category\Transformer;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Transformer;
 
 use Ergonode\IntegrationShopware\Tests\Fixture\GqlCategoryResponse;
 use Ergonode\IntegrationShopware\Transformer\CategoryResponseTransformer;

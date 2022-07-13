@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Modules\Category\Api;
-
-use Ergonode\IntegrationShopware\Api\AbstractStreamResultsProxy;
+namespace Ergonode\IntegrationShopware\Api;
 
 class CategoryTreeStreamResultsProxy extends AbstractStreamResultsProxy
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Entity\ErgonodeSyncHistory;
+namespace Ergonode\IntegrationShopware\Entity\ErgonodeSyncHistory;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 

@@ -45,20 +45,15 @@ class DebugPersistSegmentMapping extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $events = $this->productVisibilitySyncProcessor->processStream($this->context);
+        $count = $this->productVisibilitySyncProcessor->processStream($this->context);
 
-        if (empty($events)) {
+        if (0 === $count) {
             $io->info('No actions performed.');
 
             return self::SUCCESS;
         }
 
         $io->success('Product visibility (segments) synced (Ergonode->Shopware).');
-        foreach ($events as $event => $ids) {
-            if (!empty($ids)) {
-                $io->success(["Performed $event for IDs:", ...$ids]);
-            }
-        }
 
         return self::SUCCESS;
     }

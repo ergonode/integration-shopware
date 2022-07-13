@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Entity\ErgonodeSyncHistory;
+namespace Ergonode\IntegrationShopware\Entity\ErgonodeSyncHistory;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\DateField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\DateTimeField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
@@ -35,8 +35,8 @@ class ErgonodeSyncHistoryDefinition extends EntityDefinition
             (new StringField('status', 'status', 128))->addFlags(new Required()),
             (new IntField('total_success', 'totalSuccess'))->addFlags(new Required()),
             (new IntField('total_error', 'totalError'))->addFlags(new Required()),
-            (new DateField('start_date', 'startDate'))->addFlags(new Required()),
-            new DateField('end_date', 'endDate'),
+            (new DateTimeField('start_date', 'startDate'))->addFlags(new Required()),
+            new DateTimeField('end_date', 'endDate'),
         ]);
     }
 }

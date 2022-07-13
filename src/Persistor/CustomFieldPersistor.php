@@ -41,7 +41,7 @@ class CustomFieldPersistor
     {
         $payloads = [];
 
-        $entities = $this->persistCustomFieldSet($context);
+        $this->persistCustomFieldSet($context);
 
         foreach ($attributes->getEdges() as $attribute) {
             if (empty($node = $attribute['node'])) {
@@ -62,21 +62,16 @@ class CustomFieldPersistor
 
         $written = $this->customFieldRepository->upsert($payloads, $context);
 
-        return array_merge_recursive(
-            $entities,
-            [
-                CustomFieldDefinition::ENTITY_NAME => $written->getPrimaryKeys(CustomFieldDefinition::ENTITY_NAME),
-            ]
-        );
+        return $written->getPrimaryKeys(CustomFieldDefinition::ENTITY_NAME);
     }
 
-    public function persistCustomFieldSet(Context $context): array
+    public function persistCustomFieldSet(Context $context): string
     {
         if ($this->customFieldProvider->getCustomFieldSet($context) instanceof CustomFieldSetEntity) {
-            return [];
+            return '';
         }
 
-        $written = $this->customFieldSetRepository->create([
+        $created = $this->customFieldSetRepository->create([
             [
                 'name' => Constants::PRODUCT_CUSTOM_FIELD_SET_NAME,
                 'config' => [
@@ -92,8 +87,8 @@ class CustomFieldPersistor
             ],
         ], $context);
 
-        return [
-            CustomFieldSetDefinition::ENTITY_NAME => $written->getPrimaryKeys(CustomFieldSetDefinition::ENTITY_NAME),
-        ];
+        $ids = $created->getPrimaryKeys(CustomFieldSetDefinition::ENTITY_NAME);
+
+        return reset($ids);
     }
 }

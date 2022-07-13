@@ -6,34 +6,32 @@ namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
 use Ergonode\IntegrationShopware\Processor\CategorySyncProcessor;
 use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\Api\Context\SystemSource;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Symfony\Component\Lock\LockFactory;
+use Throwable;
 
-class CategorySyncTaskHandler extends ScheduledTaskHandler
+class CategorySyncTaskHandler extends AbstractSyncTaskHandler
 {
     private const MAX_PAGES_PER_RUN = 25;
 
     private CategorySyncProcessor $categorySyncProcessor;
+
     private ConfigProvider $configProvider;
-    private LoggerInterface $logger;
-    private LockFactory $lockFactory;
 
     public function __construct(
         EntityRepositoryInterface $scheduledTaskRepository,
-        CategorySyncProcessor $categorySyncProcessor,
-        ConfigProvider $configProvider,
+        SyncHistoryLogger $syncHistoryService,
         LoggerInterface $syncLogger,
-        LockFactory $lockFactory
+        LockFactory $lockFactory,
+        CategorySyncProcessor $categorySyncProcessor,
+        ConfigProvider $configProvider
     ) {
-        parent::__construct($scheduledTaskRepository);
+        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $syncLogger);
+
         $this->categorySyncProcessor = $categorySyncProcessor;
         $this->configProvider = $configProvider;
-        $this->logger = $syncLogger;
-        $this->lockFactory = $lockFactory;
     }
 
     public static function getHandledMessages(): iterable
@@ -41,36 +39,36 @@ class CategorySyncTaskHandler extends ScheduledTaskHandler
         return [CategorySyncTask::class];
     }
 
-    public function run(): void
+    public function runSync(): int
     {
-        $lock = $this->lockFactory->createLock('strix.ergonode.category-sync-lock');
-
-        if (false === $lock->acquire()) {
-            $this->logger->info('CategorySyncTask is locked');
-
-            return;
-        }
-
-        $this->logger->info('Starting CategorySyncTask...');
-
-        $context = new Context(new SystemSource());
         $currentPage = 0;
+        $count = 0;
 
         $categoryTreeCode = $this->configProvider->getCategoryTreeCode();
         if (empty($categoryTreeCode)) {
             $this->logger->error('Could not find category tree code in plugin config.');
 
-            return;
+            return 0;
         }
 
         try {
-            while ($this->categorySyncProcessor->processStream($categoryTreeCode, $context)) {
+            do {
+                $result = $this->categorySyncProcessor->processStream($categoryTreeCode, $this->context);
+
+                if (null === $result) {
+                    break;
+                }
+
+                $count += $result->getProcessedEntityCount();
+
                 if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
                     break;
                 }
-            }
-        } catch (\Throwable $e) {
+            } while ($result->hasNextPage());
+        } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
         }
+
+        return $count;
     }
 }

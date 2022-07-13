@@ -32,7 +32,7 @@ class SyncTriggerController extends AbstractController
      *     name="api.admin.strix.ergonode.trigger-sync",
      *     methods={"POST"},
      *     defaults={"_route_scope"={"administration"}}
-     *     )
+     * )
      * @return JsonResponse
      */
     public function triggerSync(): JsonResponse
