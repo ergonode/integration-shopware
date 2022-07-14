@@ -10,15 +10,16 @@ prevent infinite loop when something goes wrong.
 
 ProductSyncProcessor might not properly handle variants that were "detached" since last sync.
 
+When uninstalling plugin and selecting "Remove all app data permanently", all plugin tables and mappings will be
+removed. This means that all mappings will be lost and next synchronization will create duplicated entities.
+
 ### Testing
 
 In Shopware root run:
 
 `php /var/www/html/vendor/phpunit/phpunit/phpunit --configuration /var/www/html/custom/plugins/StrixErgonode/phpunit.xml`
 
-### GQL Request Cache (needs fixing)
-
-> Currently the cache does not work with GraphQL\Results proxies
+### GQL Request Cache
 
 In order to cache Ergonode GQL API requests you need to change the parameter `strix.ergonode.use_gql_cache` in
 `src/Resources/config/parameters.yml` to `true` and use `Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface` in your
