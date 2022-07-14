@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Manager;
+namespace Ergonode\IntegrationShopware\Manager;
 
+use Ergonode\IntegrationShopware\Service\FileDownloader;
 use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\MediaService;
 use Shopware\Core\Content\Product\ProductDefinition;
@@ -11,7 +12,6 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Strix\Ergonode\Service\FileDownloader;
 
 class FileManager
 {

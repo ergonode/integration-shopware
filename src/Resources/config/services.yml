@@ -10,50 +10,50 @@ services:
 
   _instanceof:
     # EXTENSION
-    Strix\Ergonode\Extension\AbstractErgonodeMappingExtension:
+    Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension:
       tags: [ 'shopware.entity.extension' ]
 
     # TRANSFORMER
-    Strix\Ergonode\Transformer\CustomField\CustomFieldTransformerInterface:
+    Ergonode\IntegrationShopware\Transformer\CustomField\CustomFieldTransformerInterface:
       tags: ['strix_ergonode.custom_field_transformer']
 
-    Strix\Ergonode\Transformer\ProductCustomField\ProductCustomFieldTransformerInterface:
+    Ergonode\IntegrationShopware\Transformer\ProductCustomField\ProductCustomFieldTransformerInterface:
       tags: [ 'strix_ergonode.product_custom_field_transformer' ]
 
   # WIRE WHOLE NAMESPACE
-  Strix\Ergonode\:
+  Ergonode\IntegrationShopware\:
     resource: '../../'
 
   # API
-  Strix\Ergonode\Api\Client\ErgonodeGqlClient:
-    factory: [ '@Strix\Ergonode\Api\Client\ErgonodeGqlClientFactory', 'createFromPluginConfig' ]
+  Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClient:
+    factory: [ '@Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory', 'createFromPluginConfig' ]
 
-  Strix\Ergonode\Api\Client\ErgonodeGqlClientFactory:
+  Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory:
 
   # CONTROLLER
-  Strix\Ergonode\Controller\AttributeMappingController:
+  Ergonode\IntegrationShopware\Controller\AttributeMappingController:
     tags: [ 'controller.service_arguments' ]
 
   # COMMAND
-  Strix\Ergonode\Command\CreateAttributeMappingCommand:
+  Ergonode\IntegrationShopware\Command\CreateAttributeMappingCommand:
     arguments:
       $repository: '@strix_ergonode_attribute_mapping.repository'
 
   # ENTITY DEFINITION
-  Strix\Ergonode\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition:
+  Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition:
     tags: [ 'shopware.entity.definition' ]
 
-  Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionDefinition:
+  Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionDefinition:
     tags: [ 'shopware.entity.definition' ]
 
-  Strix\Ergonode\Entity\ErgonodeCategoryMappingExtension\ErgonodeCategoryMappingExtensionDefinition:
+  Ergonode\IntegrationShopware\Entity\ErgonodeCategoryMappingExtension\ErgonodeCategoryMappingExtensionDefinition:
     tags: [ 'shopware.entity.definition' ]
 
-  Strix\Ergonode\Entity\ErgonodeCursor\ErgonodeCursorDefinition:
+  Ergonode\IntegrationShopware\Entity\ErgonodeCursor\ErgonodeCursorDefinition:
     tags: [ 'shopware.entity.definition' ]
 
   # EXTENSION
-  Strix\Ergonode\Extension\ErgonodeCategoryMappingExtension:
+  Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension:
     tags: [ 'shopware.entity.extension' ]
 
   # LOCK
@@ -68,97 +68,93 @@ services:
       - setLogger: [ '@monolog.logger.sync' ]
 
   # MANAGER
-  Strix\Ergonode\Manager\ErgonodeCursorManager:
+  Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager:
     arguments:
       $repository: '@strix_ergonode_cursor.repository'
 
   # PROVIDER
-  Strix\Ergonode\Provider\AttributeMappingProvider:
+  Ergonode\IntegrationShopware\Provider\AttributeMappingProvider:
     arguments:
       $repository: '@strix_ergonode_attribute_mapping.repository'
 
   # RESOLVER
-  Strix\Ergonode\Resolver\CustomFieldTransformerResolver:
+  Ergonode\IntegrationShopware\Resolver\CustomFieldTransformerResolver:
     arguments:
       - !tagged_iterator { tag: 'strix_ergonode.custom_field_transformer' }
 
-  Strix\Ergonode\Resolver\ProductCustomFieldTransformerResolver:
+  Ergonode\IntegrationShopware\Resolver\ProductCustomFieldTransformerResolver:
     arguments:
       - !tagged_iterator { tag: 'strix_ergonode.product_custom_field_transformer' }
 
   # SCHEDULED TASK
-  Strix\Ergonode\Service\ScheduledTask\ProductSyncTask:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
-  Strix\Ergonode\Service\ScheduledTask\ProductVisibilitySyncTask:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\ProductVisibilitySyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
-  Strix\Ergonode\Service\ScheduledTask\CategorySyncTask:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
-  Strix\Ergonode\Service\ScheduledTask\CategoryTreeSyncTask:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\CategoryTreeSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
-  Strix\Ergonode\Service\ScheduledTask\AttributeSyncTask:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\AttributeSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
-  Strix\Ergonode\Service\ScheduledTask\LanguageSyncTask:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\LanguageSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
   # This task is disabled because CategoryTreeSyncTask and CategorySyncTask together are building the full tree.
   # Can be removed completely if both tasks are working correctly. The task handler could be left for debug purposes.
   # (See SWERG-44, SWERG-49)
-  #  Strix\Ergonode\Service\ScheduledTask\BuildFullCategoryTreeTask:
+  #  Ergonode\IntegrationShopware\Service\ScheduledTask\BuildFullCategoryTreeTask:
   #    tags: [ 'shopware.scheduled.task' ]
 
-  Strix\Ergonode\Service\ScheduledTask\ProductSyncTaskHandler:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
       $lockFactory: '@strix.ergonode.lock-factory'
 
-  Strix\Ergonode\Service\ScheduledTask\ProductVisibilitySyncTaskHandler:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\ProductVisibilitySyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
       $lockFactory: '@strix.ergonode.lock-factory'
 
-  Strix\Ergonode\Service\ScheduledTask\CategorySyncTaskHandler:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
       $lockFactory: '@strix.ergonode.lock-factory'
 
-  Strix\Ergonode\Service\ScheduledTask\CategoryTreeSyncTaskHandler:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\CategoryTreeSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
       $lockFactory: '@strix.ergonode.lock-factory'
 
-  Strix\Ergonode\Service\ScheduledTask\AttributeSyncTaskHandler:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\AttributeSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
       $lockFactory: '@strix.ergonode.lock-factory'
 
-  Strix\Ergonode\Service\ScheduledTask\LanguageSyncTaskHandler:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\LanguageSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
       $lockFactory: '@strix.ergonode.lock-factory'
 
-  Strix\Ergonode\Service\ScheduledTask\BuildFullCategoryTreeTaskHandler:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\BuildFullCategoryTreeTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
       $lockFactory: '@strix.ergonode.lock-factory'
-
-  # SUBSCRIBER
-  Strix\Ergonode\Subscriber\Subscriber:
-    tags: [ 'kernel.event_subscriber' ]
 
   # TRANSFORMER
-  Strix\Ergonode\Transformer\ProductTransformerChain:
+  Ergonode\IntegrationShopware\Transformer\ProductTransformerChain:
     arguments:
       $transformers:
-        - '@Strix\Ergonode\Transformer\ProductTransformer'
-        - '@Strix\Ergonode\Transformer\ProductCategoryTransformer'
-        - '@Strix\Ergonode\Transformer\ProductTaxTransformer'
-        - '@Strix\Ergonode\Transformer\ProductPriceTransformer'
-        - '@Strix\Ergonode\Transformer\ProductDefaultValuesTransformer'
-        - '@Strix\Ergonode\Transformer\ProductMediaTransformer'
-        - '@Strix\Ergonode\Transformer\ProductCustomFieldTransformer'
-        - '@Strix\Ergonode\Transformer\ProductPropertiesTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductCategoryTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductTaxTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductPriceTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductDefaultValuesTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductMediaTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductCustomFieldTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductPropertiesTransformer'

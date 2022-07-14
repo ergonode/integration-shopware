@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Persistor;
+namespace Ergonode\IntegrationShopware\Persistor;
 
+use Ergonode\IntegrationShopware\DTO\ProductVisibilityDTO;
+use Ergonode\IntegrationShopware\Transformer\ProductVisibilityTransformer;
 use Shopware\Core\Content\Product\Aggregate\ProductVisibility\ProductVisibilityDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Strix\Ergonode\DTO\ProductVisibilityDTO;
-use Strix\Ergonode\Transformer\ProductVisibilityTransformer;
 
 class ProductVisibilityPersistor
 {

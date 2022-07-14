@@ -2,10 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Struct;
-
-use Strix\Ergonode\Struct\AbstractErgonodeEntityCollection;
-use Strix\Ergonode\Struct\ErgonodeCategory;
+namespace Ergonode\IntegrationShopware\Struct;
 
 /**
  * @method void add(ErgonodeCategory $entity)

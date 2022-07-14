@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Controller;
+namespace Ergonode\IntegrationShopware\Controller;
 
-use Strix\Ergonode\Service\AttributeMapper;
+use Ergonode\IntegrationShopware\Service\AttributeMapper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;

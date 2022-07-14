@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Entity\ErgonodeCategoryMappingExtension;
+namespace Ergonode\IntegrationShopware\Entity\ErgonodeCategoryMappingExtension;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 

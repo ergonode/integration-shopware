@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Util;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Util;
 
+use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
-use Strix\Ergonode\Util\IsoCodeConverter;
 
 class IsoCodeConverterTest extends TestCase
 {

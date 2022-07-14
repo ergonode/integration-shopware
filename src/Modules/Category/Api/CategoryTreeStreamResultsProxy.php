@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Modules\Category\Api;
+namespace Ergonode\IntegrationShopware\Modules\Category\Api;
 
-use Strix\Ergonode\Api\AbstractStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\AbstractStreamResultsProxy;
 
 class CategoryTreeStreamResultsProxy extends AbstractStreamResultsProxy
 {

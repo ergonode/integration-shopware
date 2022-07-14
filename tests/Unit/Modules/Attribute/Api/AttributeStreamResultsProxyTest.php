@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Modules\Attribute\Api;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Modules\Attribute\Api;
 
+use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Tests\Fixture\GqlAttributeResponse;
 use GraphQL\Results;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Strix\Ergonode\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\Enum\AttributeTypesEnum;
-use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
 
 class AttributeStreamResultsProxyTest extends TestCase
 {

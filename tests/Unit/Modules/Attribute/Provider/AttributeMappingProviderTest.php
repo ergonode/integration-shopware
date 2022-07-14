@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Modules\Attribute\Provider;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Modules\Attribute\Provider;
 
+use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
+use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Ergonode\IntegrationShopware\Tests\Fixture\ErgonodeAttributeMappingFixture;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Product\ProductCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
-use Strix\Ergonode\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
-use Strix\Ergonode\Provider\AttributeMappingProvider;
-use Strix\Ergonode\Tests\Fixture\ErgonodeAttributeMappingFixture;
 
 class AttributeMappingProviderTest extends TestCase
 {

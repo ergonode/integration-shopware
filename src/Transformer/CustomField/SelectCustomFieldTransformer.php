@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer\CustomField;
+namespace Ergonode\IntegrationShopware\Transformer\CustomField;
 
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
 use Shopware\Core\Defaults;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
-use Strix\Ergonode\Transformer\TranslationTransformer;
-use Strix\Ergonode\Enum\AttributeTypesEnum;
 
 use function in_array;
 

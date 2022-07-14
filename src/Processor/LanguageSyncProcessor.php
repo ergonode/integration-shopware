@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Processor;
+namespace Ergonode\IntegrationShopware\Processor;
 
+use Ergonode\IntegrationShopware\Persistor\LanguagePersistor;
+use Ergonode\IntegrationShopware\Provider\ErgonodeLanguageProvider;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Persistor\LanguagePersistor;
-use Strix\Ergonode\Provider\ErgonodeLanguageProvider;
 
 class LanguageSyncProcessor
 {

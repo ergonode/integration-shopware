@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Fixture;
+namespace Ergonode\IntegrationShopware\Tests\Fixture;
 
 class GqlAttributeResponse
 {

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Persistor;
+namespace Ergonode\IntegrationShopware\Persistor;
 
+use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
+use Ergonode\IntegrationShopware\DTO\PropertyGroupTransformationDTO;
+use Ergonode\IntegrationShopware\Provider\PropertyGroupProvider;
+use Ergonode\IntegrationShopware\Transformer\PropertyGroupTransformer;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionDefinition;
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Strix\Ergonode\Api\AttributeDeletedStreamResultsProxy;
-use Strix\Ergonode\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\DTO\PropertyGroupTransformationDTO;
-use Strix\Ergonode\Provider\PropertyGroupProvider;
-use Strix\Ergonode\Transformer\PropertyGroupTransformer;
 
 class PropertyGroupPersistor
 {
