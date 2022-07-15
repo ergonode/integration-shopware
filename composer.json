@@ -1,11 +1,11 @@
 {
-    "name": "strix/ergonode",
+    "name": "ergonode/integration-shopware",
     "description": "Shopware Ergonode Integration",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "type": "shopware-platform-plugin",
     "license": "MIT",
     "extra": {
-        "shopware-plugin-class": "Strix\\Ergonode\\StrixErgonode",
+        "shopware-plugin-class": "Ergonode\\IntegrationShopware\\ErgonodeIntegrationShopware",
         "author": "Strix",
         "label": {
             "de-DE": "Shopware Ergonode Integration",
@@ -25,13 +25,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Strix\\Ergonode\\": "src/"
+            "Ergonode\\IntegrationShopware\\": "src/"
         },
         "exclude-from-classmap": ["src/DependencyInjection/*"]
     },
     "autoload-dev": {
         "psr-4": {
-            "Strix\\Ergonode\\Tests\\": "tests/"
+            "Ergonode\\IntegrationShopware\\Tests\\": "tests/"
         }
     }
 }

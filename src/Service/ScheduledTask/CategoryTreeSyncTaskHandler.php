@@ -2,40 +2,38 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Service\ScheduledTask;
+namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
+use Ergonode\IntegrationShopware\Processor\CategoryTreeSyncProcessor;
+use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
-use Strix\Ergonode\Persistor\CategoryPersistor;
-use Strix\Ergonode\Provider\ConfigProvider;
-use Strix\Ergonode\Provider\ErgonodeCategoryProvider;
 use Symfony\Component\Lock\LockFactory;
 
 class CategoryTreeSyncTaskHandler extends ScheduledTaskHandler
 {
+    private const MAX_PAGES_PER_RUN = 25;
+
     private ConfigProvider $configProvider;
     private LoggerInterface $logger;
     private LockFactory $lockFactory;
-    private ErgonodeCategoryProvider $categoryProvider;
-    private CategoryPersistor $categoryPersistor;
+    private CategoryTreeSyncProcessor $categoryTreeSyncProcessor;
 
     public function __construct(
         EntityRepositoryInterface $scheduledTaskRepository,
+        CategoryTreeSyncProcessor $categoryTreeSyncProcessor,
         ConfigProvider $configProvider,
         LoggerInterface $syncLogger,
-        LockFactory $lockFactory,
-        ErgonodeCategoryProvider $categoryProvider,
-        CategoryPersistor $categoryPersistor
+        LockFactory $lockFactory
     ) {
         parent::__construct($scheduledTaskRepository);
         $this->configProvider = $configProvider;
         $this->logger = $syncLogger;
         $this->lockFactory = $lockFactory;
-        $this->categoryProvider = $categoryProvider;
-        $this->categoryPersistor = $categoryPersistor;
+        $this->categoryTreeSyncProcessor = $categoryTreeSyncProcessor;
     }
 
     public static function getHandledMessages(): iterable
@@ -56,6 +54,7 @@ class CategoryTreeSyncTaskHandler extends ScheduledTaskHandler
         $this->logger->info('Starting CategoryTreeSyncTask...');
 
         $context = new Context(new SystemSource());
+        $currentPage = 0;
 
         $categoryTreeCode = $this->configProvider->getCategoryTreeCode();
         if (empty($categoryTreeCode)) {
@@ -65,21 +64,11 @@ class CategoryTreeSyncTaskHandler extends ScheduledTaskHandler
         }
 
         try {
-            $categoryCollection = $this->categoryProvider->provideCategoryTree($categoryTreeCode);
-
-            if (empty($categoryCollection)) {
-                $this->logger->error('Request failed');
-
-                return;
+            while ($this->categoryTreeSyncProcessor->processStream($context)) {
+                if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
+                    break;
+                }
             }
-
-            $this->categoryPersistor->persistCollection($categoryCollection, $context);
-
-            $this->logger->info('Processed category tree',
-                [
-                    'categoryCount' => $categoryCollection->count()
-                ]
-            );
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
         }

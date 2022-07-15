@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Provider;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Provider;
 
+use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
+use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use Generator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -14,8 +16,6 @@ use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SystemConfig\SystemConfigCollection;
 use Shopware\Core\System\SystemConfig\SystemConfigEntity;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
-use Strix\Ergonode\Api\ErgonodeAccessData;
-use Strix\Ergonode\Provider\ConfigProvider;
 
 class ConfigProviderTest extends TestCase
 {

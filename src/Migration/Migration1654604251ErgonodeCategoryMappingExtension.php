@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Migration;
+namespace Ergonode\IntegrationShopware\Migration;
 
 use Doctrine\DBAL\Connection;
+use Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension;
 use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Migration\InheritanceUpdaterTrait;
 use Shopware\Core\Framework\Migration\MigrationStep;
-use Strix\Ergonode\Extension\ErgonodeCategoryMappingExtension;
 
 class Migration1654604251ErgonodeCategoryMappingExtension extends MigrationStep
 {

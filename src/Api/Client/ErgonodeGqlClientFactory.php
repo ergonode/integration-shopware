@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Api\Client;
+namespace Ergonode\IntegrationShopware\Api\Client;
 
+use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
+use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use Generator;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Api\ErgonodeAccessData;
-use Strix\Ergonode\Provider\ConfigProvider;
 
 class ErgonodeGqlClientFactory
 {

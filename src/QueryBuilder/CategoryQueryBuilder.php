@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\QueryBuilder;
+namespace Ergonode\IntegrationShopware\QueryBuilder;
 
 use GraphQL\Query;
 
@@ -83,6 +83,54 @@ class CategoryQueryBuilder
                                         'value',
                                         'language',
                                     ]),
+                            ])
+                    ])
+            ]);
+    }
+
+    public function buildTreeStream(int $count, ?string $cursor): Query
+    {
+        $listArguments = ['first' => $count];
+        if ($cursor !== null) {
+            $listArguments['after'] = $cursor;
+        }
+        return (new Query('categoryTreeStream'))
+            ->setArguments($listArguments)
+            ->setSelectionSet([
+                'totalCount',
+                (new Query('pageInfo'))
+                    ->setSelectionSet([
+                        'endCursor',
+                        'hasNextPage',
+                    ]),
+                (new Query('edges'))
+                    ->setSelectionSet([
+                        'cursor',
+                        (new Query('node'))
+                            ->setSelectionSet([
+                                'code',
+                                (new Query('categoryTreeLeafList'))
+                                    ->setSelectionSet([
+                                        (new Query('pageInfo'))
+                                            ->setSelectionSet([
+                                                'endCursor',
+                                                'hasNextPage',
+                                            ]),
+                                        (new Query('edges'))
+                                            ->setSelectionSet([
+                                                (new Query('node'))
+                                                    ->setSelectionSet([
+                                                        (new Query('category'))
+                                                            ->setSelectionSet([
+                                                                'code',
+                                                            ]),
+                                                        (new Query('parentCategory'))
+                                                            ->setSelectionSet([
+                                                                'code',
+                                                            ]),
+                                                    ]),
+                                            ]),
+                                    ])
                             ])
                     ])
             ]);

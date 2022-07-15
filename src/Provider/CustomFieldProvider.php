@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Provider;
+namespace Ergonode\IntegrationShopware\Provider;
 
+use Ergonode\IntegrationShopware\Util\Constants;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetEntity;
 use Shopware\Core\System\CustomField\CustomFieldEntity;
-use Strix\Ergonode\Util\Constants;
 
 class CustomFieldProvider
 {

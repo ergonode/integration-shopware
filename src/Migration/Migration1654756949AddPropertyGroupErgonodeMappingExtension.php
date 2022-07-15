@@ -1,10 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Migration;
+namespace Ergonode\IntegrationShopware\Migration;
 
 use Doctrine\DBAL\Connection;
-use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Migration\InheritanceUpdaterTrait;
 use Shopware\Core\Framework\Migration\MigrationStep;
