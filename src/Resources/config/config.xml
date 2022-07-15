@@ -23,7 +23,7 @@
         <title>Fields mapping</title>
         <title lang="de-DE">Fields mapping</title>
 
-        <component name="strix-ergonode-custom-field-keys-multiselect">
+        <component name="strix-ergonode-fields-mapping-multiselect">
             <name>customFieldKeys</name>
             <label>Ergonode attributes as custom fields</label>
             <label lang="de-DE">Ergonode attributes as custom fields</label>
@@ -31,8 +31,9 @@
             <helpText lang="de-DE">Every selected attribute will be fetched as product custom field</helpText>
         </component>
 
-        <component name="strix-ergonode-cross-selling-keys-multiselect">
+        <component name="strix-ergonode-fields-mapping-multiselect">
             <name>crossSellingKeys</name>
+            <attributesType>type_relation</attributesType>
             <label>Ergonode attributes as cross selling</label>
             <label lang="de-DE">Ergonode attributes as cross selling</label>
             <helpText>Every selected attribute will create a separate cross-selling collection</helpText>

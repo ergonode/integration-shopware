@@ -1,8 +1,8 @@
-import template from './strix-ergonode-custom-field-keys-multiselect.html.twig'
+import template from './strix-ergonode-fields-mapping-multiselect.html.twig'
 
 const { Component, Mixin } = Shopware;
 
-Component.register('strix-ergonode-custom-field-keys-multiselect', {
+Component.register('strix-ergonode-fields-mapping-multiselect', {
     inject: ['ergonodeAttributeService'],
 
     mixins: [
@@ -12,6 +12,9 @@ Component.register('strix-ergonode-custom-field-keys-multiselect', {
     template,
 
     props: {
+        attributesType: {
+            type: String,
+        },
         value: {
             required: true,
             validator (value) {
@@ -20,10 +23,18 @@ Component.register('strix-ergonode-custom-field-keys-multiselect', {
         },
     },
 
+    data () {
+        return {
+            isLoading: false,
+            ergoAttributes: [],
+        };
+    },
+
     computed: {
         filteredValue () {
             return (Array.isArray(this.value) ? this.value : [this.value]).filter(value => this.ergoAttributes.includes(value));
         },
+
         options () {
             return this.ergoAttributes.map(attribute => {
                 return {value: attribute, label: attribute};
@@ -31,18 +42,11 @@ Component.register('strix-ergonode-custom-field-keys-multiselect', {
         },
     },
 
-    data() {
-        return {
-            isLoading: false,
-            ergoAttributes: [],
-        };
-    },
-
     methods: {
-        fetchErgoCustomAttributesOptions () {
+        async fetchErgoAttributesOptions () {
             this.isLoading = true;
-            this.ergonodeAttributeService.getErgonodeAttributes()
-                .then(({data: {data: attributes}}) => {
+            this.ergonodeAttributeService.getErgonodeAttributes(this.attributesType ? [this.attributesType] : [])
+                .then(({ data: { data: attributes } }) => {
                     this.ergoAttributes = attributes;
                 })
                 .catch(() => {
@@ -59,6 +63,6 @@ Component.register('strix-ergonode-custom-field-keys-multiselect', {
     },
 
     created () {
-        this.fetchErgoCustomAttributesOptions();
+        this.fetchErgoAttributesOptions();
     },
 });
