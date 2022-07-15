@@ -2,20 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Modules\Attribute\Provider;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Modules\Attribute\Provider;
 
-use GraphQL\Results;
-use GuzzleHttp\Psr7\Utils;
+use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\Client\CachedErgonodeGqlClient;
+use Ergonode\IntegrationShopware\Api\ProductStreamResultsProxy;
+use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
+use Ergonode\IntegrationShopware\QueryBuilder\AttributeQueryBuilder;
+use Ergonode\IntegrationShopware\Tests\Fixture\GqlAttributeResponse;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseInterface;
-use Strix\Ergonode\Api\Client\CachedErgonodeGqlClient;
-use Strix\Ergonode\Api\AttributeDeletedStreamResultsProxy;
-use Strix\Ergonode\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
-use Strix\Ergonode\QueryBuilder\AttributeQueryBuilder;
-use Strix\Ergonode\Api\ProductStreamResultsProxy;
-use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
 
 class ErgonodeAttributeProviderTest extends TestCase
 {

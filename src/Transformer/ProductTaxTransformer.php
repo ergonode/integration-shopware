@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Provider\TaxProvider;
+use RuntimeException;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\DTO\ProductTransformationDTO;
-use Strix\Ergonode\Provider\TaxProvider;
 
 class ProductTaxTransformer implements ProductDataTransformerInterface
 {
@@ -25,7 +26,7 @@ class ProductTaxTransformer implements ProductDataTransformerInterface
 
         $defaultTax = $this->taxProvider->getDefaultTax($context);
         if (null === $defaultTax) {
-            throw new \RuntimeException('Could not load default tax entity');
+            throw new RuntimeException('Could not load default tax entity');
         }
 
         $swData = $productData->getShopwareData();

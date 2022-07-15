@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
+use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingException;
+use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Ergonode\IntegrationShopware\Provider\LanguageProvider;
+use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
+use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
+use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\DTO\ProductTransformationDTO;
-use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
-use Strix\Ergonode\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
-use Strix\Ergonode\Provider\AttributeMappingProvider;
-use Strix\Ergonode\Provider\LanguageProvider;
-use Strix\Ergonode\Util\ArrayUnfoldUtil;
-use Strix\Ergonode\Util\ErgonodeApiValueKeyResolverUtil;
-use Strix\Ergonode\Util\IsoCodeConverter;
 
 use function array_key_exists;
 use function array_merge_recursive;

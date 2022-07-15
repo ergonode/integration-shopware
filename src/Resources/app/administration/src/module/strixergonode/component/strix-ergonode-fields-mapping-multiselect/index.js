@@ -20,6 +20,7 @@ Component.register('strix-ergonode-fields-mapping-multiselect', {
             validator (value) {
                 return Array.isArray(value) || value === null || value === undefined;
             },
+            default: () => [],
         },
     },
 
@@ -31,8 +32,13 @@ Component.register('strix-ergonode-fields-mapping-multiselect', {
     },
 
     computed: {
-        filteredValue () {
-            return (Array.isArray(this.value) ? this.value : [this.value]).filter(value => this.ergoAttributes.includes(value));
+        filteredValue() {
+            return (Array.isArray(this.value)
+                    ?
+                    this.value
+                    :
+                    [this.value]
+                ).filter(value => this.ergoAttributes.includes(value));
         },
 
         options () {
@@ -43,7 +49,7 @@ Component.register('strix-ergonode-fields-mapping-multiselect', {
     },
 
     methods: {
-        async fetchErgoAttributesOptions () {
+        fetchErgoAttributesOptions () {
             this.isLoading = true;
             this.ergonodeAttributeService.getErgonodeAttributes(this.attributesType ? [this.attributesType] : [])
                 .then(({ data: { data: attributes } }) => {

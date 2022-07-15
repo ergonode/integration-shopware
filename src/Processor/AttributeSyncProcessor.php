@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Processor;
+namespace Ergonode\IntegrationShopware\Processor;
 
+use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Persistor\CustomFieldPersistor;
+use Ergonode\IntegrationShopware\Persistor\PropertyGroupPersistor;
+use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Enum\AttributeTypesEnum;
-use Strix\Ergonode\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
-use Strix\Ergonode\Persistor\CustomFieldPersistor;
-use Strix\Ergonode\Persistor\PropertyGroupPersistor;
-use Strix\Ergonode\Provider\ConfigProvider;
 
 class AttributeSyncProcessor
 {

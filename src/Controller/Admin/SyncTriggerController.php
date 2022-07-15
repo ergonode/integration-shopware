@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Controller\Admin;
+namespace Ergonode\IntegrationShopware\Controller\Admin;
 
+use Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTask;
+use Ergonode\IntegrationShopware\Service\ScheduledTask\CategoryTreeSyncTask;
+use Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTask;
+use Ergonode\IntegrationShopware\Service\ScheduledTask\ProductVisibilitySyncTask;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
-use Strix\Ergonode\Service\ScheduledTask\CategoryTreeSyncTask;
-use Strix\Ergonode\Service\ScheduledTask\ProductSyncTask;
-use Strix\Ergonode\Service\ScheduledTask\ProductVisibilitySyncTask;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -37,9 +38,7 @@ class SyncTriggerController extends AbstractController
     public function triggerSync(): JsonResponse
     {
         $this->messageBus->dispatch(new CategoryTreeSyncTask());
-        // TODO once CategoryTreeSyncTask uses categoryTreeStream instead of pulling whole category tree, the following
-        // line should be uncommented (see SWERG-54, SWERG-49)
-        // $this->messageBus->dispatch(new CategorySyncTask());
+        $this->messageBus->dispatch(new CategorySyncTask());
         $this->messageBus->dispatch(new ProductSyncTask());
         $this->messageBus->dispatch(new ProductVisibilitySyncTask());
 

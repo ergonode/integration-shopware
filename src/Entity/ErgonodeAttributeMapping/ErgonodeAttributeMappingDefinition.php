@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Entity\ErgonodeAttributeMapping;
+namespace Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\ApiAware;

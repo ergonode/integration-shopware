@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Struct;
+namespace Ergonode\IntegrationShopware\Struct;
 
 class ErgonodeCategory extends AbstractErgonodeEntity
 {

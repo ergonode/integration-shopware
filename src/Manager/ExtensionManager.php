@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Manager;
+namespace Ergonode\IntegrationShopware\Manager;
 
+use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
+use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
-use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
-use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
 
 class ExtensionManager
 {

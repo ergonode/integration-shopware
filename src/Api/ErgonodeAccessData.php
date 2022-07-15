@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Api;
+namespace Ergonode\IntegrationShopware\Api;
 
 class ErgonodeAccessData
 {

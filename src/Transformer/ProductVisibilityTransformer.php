@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductVisibilityDTO;
+use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Shopware\Core\Content\Product\Aggregate\ProductVisibility\ProductVisibilityDefinition;
 use Shopware\Core\Content\Product\Aggregate\ProductVisibility\ProductVisibilityEntity;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\DTO\ProductVisibilityDTO;
-use Strix\Ergonode\Provider\ProductProvider;
 
 use function array_values;
 use function in_array;

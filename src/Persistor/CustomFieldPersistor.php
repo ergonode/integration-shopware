@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Persistor;
+namespace Ergonode\IntegrationShopware\Persistor;
 
+use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
+use Ergonode\IntegrationShopware\Provider\CustomFieldProvider;
+use Ergonode\IntegrationShopware\Transformer\CustomFieldTransformer;
+use Ergonode\IntegrationShopware\Util\Constants;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetDefinition;
 use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetEntity;
 use Shopware\Core\System\CustomField\CustomFieldDefinition;
-use Strix\Ergonode\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\Provider\CustomFieldProvider;
-use Strix\Ergonode\Transformer\CustomFieldTransformer;
-use Strix\Ergonode\Util\Constants;
 
 class CustomFieldPersistor
 {
