@@ -1,0 +1,17 @@
+<div class="strix-ergonode-api-key-validator">
+    <sw-button-process
+        :processSuccess="success"
+        :isLoading="isLoading"
+        @click="verify()"
+    >
+        {{ buttonLabel }}
+    </sw-button-process>
+    <sw-label
+        :variant="variant"
+    >
+        <sw-color-badge
+            :color="color"
+        ></sw-color-badge>
+        {{ message }}
+    </sw-label>
+</div>
