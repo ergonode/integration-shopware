@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class RemoveOrphanAttributesCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:attributes:remove-orphan';
+    protected static $defaultName = 'ergonode:attributes:remove-orphan';
 
     private Context $context;
 

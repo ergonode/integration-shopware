@@ -10,7 +10,7 @@ class ProductVisibilitySyncTask extends ScheduledTask
 {
     public static function getTaskName(): string
     {
-        return 'strix.ergonode.product_visibility_sync_task';
+        return 'ergonode.product_visibility_sync_task';
     }
 
     public static function getDefaultInterval(): int

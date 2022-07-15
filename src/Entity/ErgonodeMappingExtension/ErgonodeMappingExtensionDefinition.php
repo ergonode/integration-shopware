@@ -13,7 +13,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
 class ErgonodeMappingExtensionDefinition extends EntityDefinition
 {
-    public const ENTITY_NAME = 'strix_ergonode_mapping_extension';
+    public const ENTITY_NAME = 'ergonode_mapping_extension';
 
     public function getEntityName(): string
     {

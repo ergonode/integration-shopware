@@ -1,9 +1,9 @@
-import template from './strix-ergonode-attribute-mapping.html.twig';
-import './strix-ergonode-attribute-mapping.scss';
+import template from './ergonode-attribute-mapping.html.twig';
+import './ergonode-attribute-mapping.scss';
 
 const { Component, Context, Data: { Criteria }, Mixin } = Shopware;
 
-Component.register('strix-ergonode-attribute-mapping', {
+Component.register('ergonode-attribute-mapping', {
     inject: ['acl', 'repositoryFactory', 'ergonodeAttributeService'],
 
     mixins: [
@@ -27,19 +27,19 @@ Component.register('strix-ergonode-attribute-mapping', {
 
     computed: {
         repository () {
-            return this.repositoryFactory.create('strix_ergonode_attribute_mapping');
+            return this.repositoryFactory.create('ergonode_attribute_mapping');
         },
 
         columns () {
             return [
                 {
                     property: 'shopwareKey',
-                    label: this.$t('StrixErgonode.mappings.shopwareAttribute'),
+                    label: this.$t('ErgonodeIntegrationShopware.mappings.shopwareAttribute'),
                     inlineEdit: false,
                 },
                 {
                     property: 'ergonodeKey',
-                    label: this.$t('StrixErgonode.mappings.ergonodeAttribute'),
+                    label: this.$t('ErgonodeIntegrationShopware.mappings.ergonodeAttribute'),
                     inlineEdit: false,
                 },
             ];
@@ -94,7 +94,7 @@ Component.register('strix-ergonode-attribute-mapping', {
             this.isCreateLoading = true;
             try {
                 if (this.mappingAttributeOccupied) {
-                    throw new Error(this.$t('StrixErgonode.mappings.messages.shopwareAttributesMustBeUnique'));
+                    throw new Error(this.$t('ErgonodeIntegrationShopware.mappings.messages.shopwareAttributesMustBeUnique'));
                 }
                 let createdMapping = this.repository?.create(Context.Api);
                 createdMapping.ergonodeKey = this.createErgonodeAttribute;
@@ -105,12 +105,12 @@ Component.register('strix-ergonode-attribute-mapping', {
                 await this.fetchMappings();
 
                 this.createNotificationSuccess({
-                    message: this.$t('StrixErgonode.mappings.messages.mappingCreationSuccessful'),
+                    message: this.$t('ErgonodeIntegrationShopware.mappings.messages.mappingCreationSuccessful'),
                 });
             } catch (e) {
                 console.error(e);
                 this.createNotificationError({
-                    message: e?.message || this.$t('StrixErgonode.mappings.messages.mappingCreationFailure')
+                    message: e?.message || this.$t('ErgonodeIntegrationShopware.mappings.messages.mappingCreationFailure')
                 });
             } finally {
                 this.isCreateLoading = false;

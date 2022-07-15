@@ -1,9 +1,9 @@
 {
-  "StrixErgonode": {
+  "ErgonodeIntegrationShopware": {
     "mainMenuItemGeneral": "Integracja z Ergonode",
     "tabs": {
       "attributeMappings": "Mapowania atrybutów",
-      "synchronisation": "Synchronizacja"
+      "synchronization": "Synchronizacja"
       },
     "mappings": {
       "attributeMappingGeneral": "Mapowanie atrybutów",
@@ -19,9 +19,9 @@
         "ergonodeAttributeFetchFailure": "Wystąpił błąd podczas pobierania atrybutów Ergonode. Proszę sprawdzić czy ustawiania Ergonode API są prawidłowe."
       }
     },
-    "synchronisation": {
-      "synchronisation": "Synchronizacja",
-      "synchronise": "Synchronizuj",
+    "synchronization": {
+      "synchronization": "Synchronizacja",
+      "synchronize": "Synchronizuj",
       "messages": {
         "executed": "Pomyślnie wywołano wyzwalacz"
       }
@@ -29,7 +29,7 @@
   },
   "sw-privileges": {
     "additional_permissions": {
-      "strix_ergonode_synchronisation": {
+      "ergonode_synchronization": {
         "label": "Integracja z Ergonode",
         "triggerer": "Wyzwalanie synchronizacji"
       }

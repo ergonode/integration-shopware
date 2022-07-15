@@ -44,7 +44,7 @@ class LanguageSyncTaskHandler extends ScheduledTaskHandler
 
     public function run(): void
     {
-        $lock = $this->lockFactory->createLock('strix.ergonode.language-sync-lock');
+        $lock = $this->lockFactory->createLock('ergonode_integration.language-sync-lock');
 
         if (!$lock->acquire()) {
             $this->logger->info('LanguageSyncTask is locked');

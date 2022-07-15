@@ -6,11 +6,14 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Strix\\Ergonode\\' => array($baseDir . '/src'),
-    'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-message/src', $vendorDir . '/psr/http-factory/src'),
-    'Psr\\Http\\Client\\' => array($vendorDir . '/psr/http-client/src'),
-    'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),
-    'GuzzleHttp\\Promise\\' => array($vendorDir . '/guzzlehttp/promises/src'),
-    'GuzzleHttp\\' => array($vendorDir . '/guzzlehttp/guzzle/src'),
     'GraphQL\\' => array($vendorDir . '/gmostafa/php-graphql-client/src'),
+    'Ergonode\\IntegrationShopware\\Tests\\' => array($baseDir . '/tests'),
+    'Ergonode\\IntegrationShopware\\' => array($baseDir . '/src'),
+    'Composer\\XdebugHandler\\' => array($vendorDir . '/composer/xdebug-handler/src'),
+    'Composer\\Spdx\\' => array($vendorDir . '/composer/spdx-licenses/src'),
+    'Composer\\Semver\\' => array($vendorDir . '/composer/semver/src'),
+    'Composer\\Pcre\\' => array($vendorDir . '/composer/pcre/src'),
+    'Composer\\MetadataMinifier\\' => array($vendorDir . '/composer/metadata-minifier/src'),
+    'Composer\\CaBundle\\' => array($vendorDir . '/composer/ca-bundle/src'),
+    'Composer\\' => array($vendorDir . '/composer/composer/src/Composer'),
 );

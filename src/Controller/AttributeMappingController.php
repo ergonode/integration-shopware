@@ -24,7 +24,7 @@ class AttributeMappingController extends AbstractController
     }
 
     /**
-     * @Route("/api/strix/ergonode/ergonode-attributes", name="api.strix.ergonode.ergonodeAttributes", methods={"GET"})
+     * @Route("/api/ergonode/ergonode-attributes", name="api.ergonode.ergonodeAttributes", methods={"GET"})
      */
     public function ergonodeAttributes(): JsonResponse
     {
@@ -36,7 +36,7 @@ class AttributeMappingController extends AbstractController
     }
 
     /**
-     * @Route("/api/strix/ergonode/shopware-attributes", name="api.strix.ergonode.shopwareAttributes", methods={"GET"})
+     * @Route("/api/ergonode/shopware-attributes", name="api.ergonode.shopwareAttributes", methods={"GET"})
      */
     public function shopwareAttributes(): JsonResponse
     {

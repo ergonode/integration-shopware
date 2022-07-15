@@ -12,7 +12,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class QueryProductsCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:query:products';
+    protected static $defaultName = 'ergonode:query:products';
 
     private ErgonodeProductProvider $productProvider;
 

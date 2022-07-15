@@ -4,63 +4,70 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitc719105fde7c7e53206ae85370af8d72
+class ComposerStaticInitadc286071bc3a7fdce0f7a16865e3688
 {
-    public static $files = array (
-        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
-        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
-    );
-
     public static $prefixLengthsPsr4 = array (
-        'S' => 
-        array (
-            'Strix\\Ergonode\\' => 15,
-        ),
-        'P' => 
-        array (
-            'Psr\\Http\\Message\\' => 17,
-            'Psr\\Http\\Client\\' => 16,
-        ),
         'G' => 
         array (
-            'GuzzleHttp\\Psr7\\' => 16,
-            'GuzzleHttp\\Promise\\' => 19,
-            'GuzzleHttp\\' => 11,
             'GraphQL\\' => 8,
+        ),
+        'E' => 
+        array (
+            'Ergonode\\IntegrationShopware\\Tests\\' => 35,
+            'Ergonode\\IntegrationShopware\\' => 29,
+        ),
+        'C' => 
+        array (
+            'Composer\\XdebugHandler\\' => 23,
+            'Composer\\Spdx\\' => 14,
+            'Composer\\Semver\\' => 16,
+            'Composer\\Pcre\\' => 14,
+            'Composer\\MetadataMinifier\\' => 26,
+            'Composer\\CaBundle\\' => 18,
+            'Composer\\' => 9,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Strix\\Ergonode\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/src',
-        ),
-        'Psr\\Http\\Message\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
-        ),
-        'Psr\\Http\\Client\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/http-client/src',
-        ),
-        'GuzzleHttp\\Psr7\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
-        ),
-        'GuzzleHttp\\Promise\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
-        ),
-        'GuzzleHttp\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
-        ),
         'GraphQL\\' => 
         array (
             0 => __DIR__ . '/..' . '/gmostafa/php-graphql-client/src',
+        ),
+        'Ergonode\\IntegrationShopware\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/tests',
+        ),
+        'Ergonode\\IntegrationShopware\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src',
+        ),
+        'Composer\\XdebugHandler\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/xdebug-handler/src',
+        ),
+        'Composer\\Spdx\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/spdx-licenses/src',
+        ),
+        'Composer\\Semver\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/semver/src',
+        ),
+        'Composer\\Pcre\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/pcre/src',
+        ),
+        'Composer\\MetadataMinifier\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/metadata-minifier/src',
+        ),
+        'Composer\\CaBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/ca-bundle/src',
+        ),
+        'Composer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/composer/src/Composer',
         ),
     );
 
@@ -71,9 +78,9 @@ class ComposerStaticInitc719105fde7c7e53206ae85370af8d72
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitc719105fde7c7e53206ae85370af8d72::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitc719105fde7c7e53206ae85370af8d72::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitc719105fde7c7e53206ae85370af8d72::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitadc286071bc3a7fdce0f7a16865e3688::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitadc286071bc3a7fdce0f7a16865e3688::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitadc286071bc3a7fdce0f7a16865e3688::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -11,6 +11,7 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Throwable;
 
 /**
  * @RouteScope(scopes={"administration"})
@@ -26,8 +27,8 @@ class TestCredentialsController extends AbstractController
 
     /**
      * @Route(
-     *     "/api/_action/strix/ergonode/test-credentials",
-     *     name="api.admin.strix.ergonode.test-credentials",
+     *     "/api/_action/ergonode/test-credentials",
+     *     name="api.admin.ergonode.test-credentials",
      *     methods={"POST"},
      *     defaults={"_route_scope"={"administration"}}
      * )
@@ -44,7 +45,7 @@ class TestCredentialsController extends AbstractController
         $success = true;
         try {
             $client->runRawQuery('');
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $success = false;
         }
 
