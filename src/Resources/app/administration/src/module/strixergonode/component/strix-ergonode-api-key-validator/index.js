@@ -59,8 +59,8 @@ Component.register('strix-ergonode-api-key-validator', {
             this.isLoading = true;
             try {
                 const config = {
-                    baseUrl: this.pluginConfig['StrixErgonode.config.ergonodeBaseUrl'],
-                    apiKey: this.pluginConfig['StrixErgonode.config.ergonodeApiKey'],
+                    baseUrl: this.pluginConfig['ErgonodeIntegrationShopware.config.ergonodeBaseUrl'],
+                    apiKey: this.pluginConfig['ErgonodeIntegrationShopware.config.ergonodeApiKey'],
                 };
 
                 let result = await this.ergonodeConfigurationService.verifyCredentials(config);
