@@ -95,21 +95,6 @@ class ProductMediaTransformerTest extends TestCase
     }
 
     /**
-     * @dataProvider validProductDataProvider
-     */
-    public function testTransformMethodWhenNoSwProductInDto(array $input)
-    {
-        $this->mockSuccessfulFileManagerPersist($input);
-
-        $dto = new ProductTransformationDTO([], $input);
-        $dto->setSwProduct(null);
-
-        $output = $this->transformer->transform($dto, $this->contextMock);
-
-        $this->assertArrayNotHasKey('media', $output->getShopwareData());
-    }
-
-    /**
      * @dataProvider toDeleteProductDataProvider
      */
     public function testIfOrphanMediaAreQueuedToBeUnlinkedFromProduct(
