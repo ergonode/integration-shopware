@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Controller\Admin;
+namespace Ergonode\IntegrationShopware\Controller\Admin;
 
+use Ergonode\IntegrationShopware\Api\Client\HttpGqlClientFactory;
+use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
-use Strix\Ergonode\Api\Client\HttpGqlClientFactory;
-use Strix\Ergonode\Api\ErgonodeAccessData;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;

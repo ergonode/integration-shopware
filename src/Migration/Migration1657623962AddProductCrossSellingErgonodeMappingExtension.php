@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Migration;
+namespace Ergonode\IntegrationShopware\Migration;
 
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSelling\ProductCrossSellingDefinition;

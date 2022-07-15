@@ -2,23 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionDefinition;
+use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
+use Ergonode\IntegrationShopware\Extension\ProductCrossSelling\ProductCrossSellingExtension;
+use Ergonode\IntegrationShopware\Manager\ExtensionManager;
+use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Provider\ProductCrossSellingProvider;
+use Ergonode\IntegrationShopware\Provider\ProductProvider;
+use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSelling\ProductCrossSellingDefinition;
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSelling\ProductCrossSellingEntity;
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSellingAssignedProducts\ProductCrossSellingAssignedProductsDefinition;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\DTO\ProductTransformationDTO;
-use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionDefinition;
-use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
-use Strix\Ergonode\Extension\ProductCrossSelling\ProductCrossSellingExtension;
-use Strix\Ergonode\Manager\ExtensionManager;
-use Strix\Ergonode\Provider\ConfigProvider;
-use Strix\Ergonode\Provider\ProductCrossSellingProvider;
-use Strix\Ergonode\Provider\ProductProvider;
-use Strix\Ergonode\Util\CodeBuilderUtil;
-use Strix\Ergonode\Util\ErgonodeApiValueKeyResolverUtil;
 
 class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 {

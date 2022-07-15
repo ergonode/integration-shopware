@@ -9,9 +9,8 @@ use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMapping
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Extension\PropertyGroup\PropertyGroupExtension;
 use Ergonode\IntegrationShopware\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
-use Ergonode\IntegrationShopware\Provider\PropertyGroupProvider;
+use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Ergonode\IntegrationShopware\Util\Constants;
-use Ergonode\IntegrationShopware\Util\PropertyGroupOptionUtil;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionEntity;
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Content\Property\PropertyGroupEntity;
@@ -22,15 +21,11 @@ use function array_merge_recursive;
 
 class PropertyGroupTransformer
 {
-    private PropertyGroupProvider $propertyGroupProvider;
-
     private TranslationTransformer $translationTransformer;
 
     public function __construct(
-        PropertyGroupProvider $propertyGroupProvider,
         TranslationTransformer $translationTransformer
     ) {
-        $this->propertyGroupProvider = $propertyGroupProvider;
         $this->translationTransformer = $translationTransformer;
     }
 

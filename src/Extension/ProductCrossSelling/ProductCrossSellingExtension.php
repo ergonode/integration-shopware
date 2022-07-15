@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Extension\ProductCrossSelling;
+namespace Ergonode\IntegrationShopware\Extension\ProductCrossSelling;
 
+use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSelling\ProductCrossSellingDefinition;
-use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
 
 class ProductCrossSellingExtension extends AbstractErgonodeMappingExtension
 {

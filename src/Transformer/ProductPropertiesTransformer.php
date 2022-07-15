@@ -9,7 +9,7 @@ use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMapping
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Provider\PropertyGroupOptionProvider;
-use Ergonode\IntegrationShopware\Util\PropertyGroupOptionUtil;
+use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Shopware\Core\Content\Product\Aggregate\ProductProperty\ProductPropertyDefinition;
 use Shopware\Core\Framework\Context;
 
@@ -17,6 +17,7 @@ use function array_filter;
 use function array_flip;
 use function array_intersect_key;
 use function array_values;
+use function is_array;
 
 class ProductPropertiesTransformer implements ProductDataTransformerInterface
 {
@@ -91,7 +92,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
                 continue;
             }
 
-            if (!\is_array($value)) {
+            if (!is_array($value)) {
                 $value = [$value];
             }
 
