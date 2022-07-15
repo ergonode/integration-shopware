@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Service;
+namespace Ergonode\IntegrationShopware\Service;
 
+use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
+use Ergonode\IntegrationShopware\Util\Constants;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Provider\AttributeMappingProvider;
-use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
-use Strix\Ergonode\Util\Constants;
 
 class AttributeMapper
 {

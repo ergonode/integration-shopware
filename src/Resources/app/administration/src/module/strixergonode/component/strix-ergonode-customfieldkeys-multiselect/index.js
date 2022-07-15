@@ -14,17 +14,23 @@ Component.register('strix-ergonode-customfieldkeys-multiselect', {
             validator(value) {
                 return Array.isArray(value) || value === null || value === undefined;
             },
+            default: () => [],
         },
     },
     computed: {
         filteredValue() {
-            return this.value.filter(value => this.ergoAttributes.includes(value));
+            return (Array.isArray(this.value)
+                    ?
+                    this.value
+                    :
+                    [this.value]
+                ).filter(value => this.ergoAttributes.includes(value));
         },
         options(){
             return this.ergoAttributes.map(attribute => {
                 return {value: attribute, label: attribute};
             })
-        }
+        },
     },
     data() {
         return {

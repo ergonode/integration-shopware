@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Processor;
+namespace Ergonode\IntegrationShopware\Processor;
 
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory;
+use Ergonode\IntegrationShopware\Persistor\ProductVisibilityPersistor;
+use Ergonode\IntegrationShopware\Provider\ErgonodeProductProvider;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClientFactory;
-use Strix\Ergonode\Provider\ErgonodeProductProvider;
-use Strix\Ergonode\Persistor\ProductVisibilityPersistor;
 
 class ProductVisibilitySyncProcessor
 {

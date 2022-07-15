@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
+use Ergonode\IntegrationShopware\Provider\PropertyGroupOptionProvider;
+use Ergonode\IntegrationShopware\Util\PropertyGroupOptionUtil;
 use Shopware\Core\Content\Product\Aggregate\ProductProperty\ProductPropertyDefinition;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\DTO\ProductTransformationDTO;
-use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
-use Strix\Ergonode\Enum\AttributeTypesEnum;
-use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
-use Strix\Ergonode\Provider\PropertyGroupOptionProvider;
-use Strix\Ergonode\Util\CodeBuilderUtil;
 
 use function array_filter;
 use function array_flip;

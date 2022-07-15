@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Util;
+namespace Ergonode\IntegrationShopware\Tests\Util;
 
 use Generator;
 

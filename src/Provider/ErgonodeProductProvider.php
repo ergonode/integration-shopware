@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Provider;
+namespace Ergonode\IntegrationShopware\Provider;
 
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClient;
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
+use Ergonode\IntegrationShopware\Api\ProductStreamResultsProxy;
+use Ergonode\IntegrationShopware\QueryBuilder\ProductQueryBuilder;
 use Generator;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
-use Strix\Ergonode\Api\ProductStreamResultsProxy;
-use Strix\Ergonode\QueryBuilder\ProductQueryBuilder;
 
 class ErgonodeProductProvider
 {

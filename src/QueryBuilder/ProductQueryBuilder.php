@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\QueryBuilder;
+namespace Ergonode\IntegrationShopware\QueryBuilder;
 
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use GraphQL\InlineFragment;
 use GraphQL\Query;
-use Strix\Ergonode\Enum\AttributeTypesEnum;
 
 class ProductQueryBuilder
 {

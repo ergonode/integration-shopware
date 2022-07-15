@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Manager;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Manager;
 
+use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
+use Ergonode\IntegrationShopware\Entity\ErgonodeCursor\ErgonodeCursorEntity;
+use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
+use Ergonode\IntegrationShopware\Manager\OrphanEntitiesManager;
+use Ergonode\IntegrationShopware\Persistor\PropertyGroupPersistor;
+use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
+use Ergonode\IntegrationShopware\Tests\Fixture\GqlAttributeResponse;
+use Ergonode\IntegrationShopware\Tests\Util\DataConverter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionDefinition;
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
-use Strix\Ergonode\Entity\ErgonodeCursor\ErgonodeCursorEntity;
-use Strix\Ergonode\Manager\ErgonodeCursorManager;
-use Strix\Ergonode\Manager\OrphanEntitiesManager;
-use Strix\Ergonode\Api\AttributeDeletedStreamResultsProxy;
-use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
-use Strix\Ergonode\Persistor\PropertyGroupPersistor;
-use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
-use Strix\Ergonode\Tests\Util\DataConverter;
 
 class OrphanEntitiesManagerTest extends TestCase
 {

@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
-use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Provider\LanguageProvider;
-use Strix\Ergonode\Util\ArrayUnfoldUtil;
-use Strix\Ergonode\Util\ErgonodeApiValueKeyResolverUtil;
-use Strix\Ergonode\Util\IsoCodeConverter;
+use Ergonode\IntegrationShopware\Provider\LanguageProvider;
+use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
+use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
+use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 
 use function stristr;
 

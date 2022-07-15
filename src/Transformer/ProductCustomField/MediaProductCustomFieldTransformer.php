@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer\ProductCustomField;
+namespace Ergonode\IntegrationShopware\Transformer\ProductCustomField;
 
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Manager\FileManager;
+use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
+use Ergonode\IntegrationShopware\Util\CustomFieldUtil;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Enum\AttributeTypesEnum;
-use Strix\Ergonode\Manager\FileManager;
-use Strix\Ergonode\Transformer\TranslationTransformer;
-use Strix\Ergonode\Util\CustomFieldUtil;
 
 use function in_array;
 use function is_array;

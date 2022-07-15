@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Util;
+namespace Ergonode\IntegrationShopware\Util;
 
 use InvalidArgumentException;
 
