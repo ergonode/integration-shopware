@@ -1,6 +1,14 @@
 {
   "ErgonodeIntegrationShopware": {
     "mainMenuItemGeneral": "Integracja z Ergonode",
+    "configuration": {
+      "verifyCredentials": {
+        "verifyCredentials": "Zweryfikuj uprawnienia",
+        "credentialsCorrect": "Uprawnienia poprawne",
+        "credentialsIncorrect": "Uprawnienia niepoprawne",
+        "couldNotVerify": "Weryfikacja się nie powiodła."
+      }
+    },
     "tabs": {
       "attributeMappings": "Mapowania atrybutów",
       "synchronization": "Synchronizacja"

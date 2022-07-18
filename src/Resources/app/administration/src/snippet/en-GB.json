@@ -1,6 +1,14 @@
 {
   "ErgonodeIntegrationShopware": {
     "mainMenuItemGeneral": "Ergonode integration",
+    "configuration": {
+      "verifyCredentials": {
+        "verifyCredentials": "Verify credentials",
+        "credentialsCorrect": "Credentials correct",
+        "credentialsIncorrect": "Credentials incorrect",
+        "couldNotVerify": "Could not verify credentials."
+      }
+    },
     "tabs": {
       "attributeMappings": "Attribute mappings",
       "synchronization": "Synchronization"
