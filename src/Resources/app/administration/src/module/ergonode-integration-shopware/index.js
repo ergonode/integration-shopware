@@ -33,25 +33,24 @@ Shopware.Module.register('ergonode-integration-shopware', {
     navigation: [
         {
             id: 'ergonode-integration',
-            path: 'ergonode.attributeMapping',
+            path: 'ergonode.integration.shopware.attributeMapping',
             label: 'ErgonodeIntegrationShopware.mainMenuItemGeneral',
             parent: 'sw-settings',
             privilege: 'ergonode_attribute_mapping.viewer',
         },
         {
             id: 'ergonode.mapping',
-            path: 'ergonode.attributeMapping',
+            path: 'ergonode.integration.shopware.attributeMapping',
             label: 'ErgonodeIntegrationShopware.tabs.attributeMappings',
             parent: 'ergonode-integration',
             privilege: 'ergonode_attribute_mapping.viewer',
         },
         {
             id: 'ergonode.synchronization',
-            path: 'ergonode.synchronization',
+            path: 'ergonode.integration.shopware.synchronization',
             label: 'ErgonodeIntegrationShopware.tabs.synchronization',
             parent: 'ergonode-integration',
             privilege: 'ergonode_synchronization.triggerer',
         },
-
     ],
 })

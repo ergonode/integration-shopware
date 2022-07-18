@@ -6,7 +6,7 @@ export default class ErgonodeConfigurationService extends ApiService {
     }
 
     async verifyCredentials (config = {}) {
-        return await this.client.post('_action/strix/ergonode/test-credentials', {
+        return await this.client.post('_action/ergonode/test-credentials', {
             baseUrl: config?.baseUrl,
             apiKey: config?.apiKey,
         },{

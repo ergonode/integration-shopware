@@ -1,8 +1,8 @@
-import template from './strix-ergonode-api-key-validator.html.twig';
+import template from './ergonode-api-key-validator.html.twig';
 
 const { Component, Mixin } = Shopware;
 
-Component.register('strix-ergonode-api-key-validator', {
+Component.register('ergonode-api-key-validator', {
     inject: ['ergonodeConfigurationService'],
 
     mixins: [
@@ -36,7 +36,7 @@ Component.register('strix-ergonode-api-key-validator', {
         },
 
         buttonLabel () {
-            return this.$t('StrixErgonode.configuration.verifyCredentials.verifyCredentials');
+            return this.$t('ErgonodeIntegrationShopware.configuration.verifyCredentials.verifyCredentials');
         },
 
         message () {
@@ -45,12 +45,12 @@ Component.register('strix-ergonode-api-key-validator', {
                 (
                     this.success
                     ?
-                    this.$t('StrixErgonode.configuration.verifyCredentials.credentialsCorrect')
+                    this.$t('ErgonodeIntegrationShopware.configuration.verifyCredentials.credentialsCorrect')
                     :
-                        this.$t('StrixErgonode.configuration.verifyCredentials.credentialsIncorrect')
+                        this.$t('ErgonodeIntegrationShopware.configuration.verifyCredentials.credentialsIncorrect')
                 )
                 :
-                this.$t('StrixErgonode.configuration.verifyCredentials.verifyCredentials');
+                this.$t('ErgonodeIntegrationShopware.configuration.verifyCredentials.verifyCredentials');
         },
     },
 
@@ -66,13 +66,13 @@ Component.register('strix-ergonode-api-key-validator', {
                 let result = await this.ergonodeConfigurationService.verifyCredentials(config);
 
                 if (!result?.data || typeof result.data.success !== 'boolean') {
-                    throw new Error(this.$t('StrixErgonode.configuration.verifyCredentials.couldNotVerify'));
+                    throw new Error(this.$t('ErgonodeIntegrationShopware.configuration.verifyCredentials.couldNotVerify'));
                 }
                 this.success = result.data.success;
                 this.notify();
             } catch ({ message }) {
                 console.error(message);
-                this.notify(this.$t('StrixErgonode.configuration.verifyCredentials.couldNotVerify'));
+                this.notify(this.$t('ErgonodeIntegrationShopware.configuration.verifyCredentials.couldNotVerify'));
                 this.success = undefined;
             } finally {
                 this.isLoading = false;

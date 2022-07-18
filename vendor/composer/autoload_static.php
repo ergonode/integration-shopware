@@ -16,16 +16,6 @@ class ComposerStaticInitadc286071bc3a7fdce0f7a16865e3688
             'Ergonode\\IntegrationShopware\\Tests\\' => 35,
             'Ergonode\\IntegrationShopware\\' => 29,
         ),
-        'C' => 
-        array (
-            'Composer\\XdebugHandler\\' => 23,
-            'Composer\\Spdx\\' => 14,
-            'Composer\\Semver\\' => 16,
-            'Composer\\Pcre\\' => 14,
-            'Composer\\MetadataMinifier\\' => 26,
-            'Composer\\CaBundle\\' => 18,
-            'Composer\\' => 9,
-        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -40,34 +30,6 @@ class ComposerStaticInitadc286071bc3a7fdce0f7a16865e3688
         'Ergonode\\IntegrationShopware\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
-        ),
-        'Composer\\XdebugHandler\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/xdebug-handler/src',
-        ),
-        'Composer\\Spdx\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/spdx-licenses/src',
-        ),
-        'Composer\\Semver\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/semver/src',
-        ),
-        'Composer\\Pcre\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/pcre/src',
-        ),
-        'Composer\\MetadataMinifier\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/metadata-minifier/src',
-        ),
-        'Composer\\CaBundle\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/ca-bundle/src',
-        ),
-        'Composer\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/composer/src/Composer',
         ),
     );
 

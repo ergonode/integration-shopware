@@ -18,8 +18,8 @@
             <label lang="de-DE">Ergonode API key</label>
         </input-field>
 
-        <component name="strix-ergonode-api-key-validator">
-            <name>strixErgonodeApiKeyValidator</name>
+        <component name="ergonode-api-key-validator">
+            <name>ergonodeApiKeyValidator</name>
         </component>
     </card>
 
