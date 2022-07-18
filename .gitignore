@@ -1,4 +1,8 @@
 src/Resources/app/storefront/node_modules/
 src/Resources/app/storefront/dist/
-src/Resources/public/administration/js
-src/Resources/public/administration/css
+src/Resources/public/administration/js/*
+src/Resources/public/administration/css/*
+build/*
+!build/composer-dist
+!build/build-zip.sh
+vendor/

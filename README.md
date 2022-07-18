@@ -19,6 +19,14 @@ In Shopware root run:
 
 `php /var/www/html/vendor/phpunit/phpunit/phpunit --configuration /var/www/html/custom/plugins/StrixErgonode/phpunit.xml`
 
+### Building ZIP
+
+To build Store package execute:
+
+`bash <PLUGIN_DIR>/build/build-zip.sh`
+
+NOTE: The script uses absolute paths. It does not matter in which directory it is executed. 
+
 ### GQL Request Cache
 
 In order to cache Ergonode GQL API requests you need to change the parameter `strix.ergonode.use_gql_cache` in
