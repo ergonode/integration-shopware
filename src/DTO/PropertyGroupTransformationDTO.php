@@ -41,11 +41,6 @@ class PropertyGroupTransformationDTO
         $this->swPropertyGroup = $swPropertyGroup;
     }
 
-    public function hasPropertyGroupPayload(): bool
-    {
-        return !empty($this->propertyGroupPayload);
-    }
-
     public function getPropertyGroupPayload(): array
     {
         return $this->propertyGroupPayload;

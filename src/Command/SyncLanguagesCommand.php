@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class SyncLanguagesCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:languages:sync';
+    protected static $defaultName = 'ergonode:languages:sync';
 
     private Context $context;
 
@@ -40,20 +40,15 @@ class SyncLanguagesCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $entities = $this->processor->process($this->context);
+        $result = $this->processor->process($this->context);
 
-        if (empty($entities)) {
-            $io->info('No new languages created.');
+        if (0 === $result->getProcessedEntityCount()) {
+            $io->info('No entities processed.');
 
             return self::SUCCESS;
         }
 
         $io->success('Languages synchronized (Ergonode->Shopware).');
-        foreach ($entities as $entity => $ids) {
-            if (!empty($ids)) {
-                $io->success(["Created $entity:", ...$ids]);
-            }
-        }
 
         return self::SUCCESS;
     }

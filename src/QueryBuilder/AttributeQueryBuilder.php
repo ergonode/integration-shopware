@@ -130,40 +130,6 @@ class AttributeQueryBuilder
             ]);
     }
 
-    public function buildOptions(string $attributeCode): Query
-    {
-        return (new Query('attribute'))
-            ->setArguments([
-                'code' => $attributeCode,
-            ])
-            ->setSelectionSet([
-                (new InlineFragment('SelectAttribute'))
-                    ->setSelectionSet([
-                        (new Query('options'))
-                            ->setSelectionSet([
-                                'code',
-                                (new Query('label'))
-                                    ->setSelectionSet([
-                                        'language',
-                                        'value',
-                                    ]),
-                            ]),
-                    ]),
-                (new InlineFragment('MultiSelectAttribute'))
-                    ->setSelectionSet([
-                        (new Query('options'))
-                            ->setSelectionSet([
-                                'code',
-                                (new Query('label'))
-                                    ->setSelectionSet([
-                                        'language',
-                                        'value',
-                                    ]),
-                            ]),
-                    ]),
-            ]);
-    }
-
     public function buildDeleted(?int $count = null, ?string $cursor = null): Query
     {
         $arguments = [];

@@ -38,6 +38,6 @@ class ErgonodeLanguageProvider
             yield $results;
 
             $endCursor = $results->getEndCursor();
-        } while ($results->hasNextPage());
+        } while (null !== $results && $results->hasNextPage());
     }
 }

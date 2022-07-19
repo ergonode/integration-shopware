@@ -18,7 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DebugPersistCategoryTreeStream extends Command
 {
-    protected static $defaultName = 'strix:debug:category-tree-persist-stream';
+    protected static $defaultName = 'ergonode:debug:category-tree-persist-stream';
 
     private CategoryTreeSyncProcessor $categoryTreeSyncProcessor;
 

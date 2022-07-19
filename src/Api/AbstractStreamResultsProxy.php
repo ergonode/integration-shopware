@@ -11,6 +11,11 @@ abstract class AbstractStreamResultsProxy extends AbstractResultsProxy
         return $this->getMainData()['edges'] ?? [];
     }
 
+    public function countEdges(): int
+    {
+        return count($this->getEdges());
+    }
+
     public function hasEndCursor(): bool
     {
         return null !== $this->getEndCursor();

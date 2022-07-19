@@ -39,7 +39,7 @@ class ErgonodeAttributeProvider
             yield $results;
 
             $endCursor = $results->getEndCursor();
-        } while ($results->hasNextPage());
+        } while (null !== $results && $results->hasNextPage());
     }
 
     public function provideDeletedAttributes(?string $endCursor = null): Generator
@@ -55,6 +55,6 @@ class ErgonodeAttributeProvider
             yield $results;
 
             $endCursor = $results->getEndCursor();
-        } while ($results->hasNextPage());
+        } while (null !== $results && $results->hasNextPage());
     }
 }

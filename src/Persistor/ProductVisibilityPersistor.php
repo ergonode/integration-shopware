@@ -30,13 +30,9 @@ class ProductVisibilityPersistor
         $dto = $this->transformer->transform($dto, $context);
 
         $created = $this->productVisibilityRepository->create($dto->getCreatePayload(), $context);
-        $deleted = $this->productVisibilityRepository->delete($dto->getDeletePayload(), $context);
 
-        return [
-            ProductVisibilityDefinition::ENTITY_NAME . '.created' =>
-                $created->getPrimaryKeys(ProductVisibilityDefinition::ENTITY_NAME),
-            ProductVisibilityDefinition::ENTITY_NAME . '.deleted' =>
-                $deleted->getPrimaryKeys(ProductVisibilityDefinition::ENTITY_NAME),
-        ];
+        $this->productVisibilityRepository->delete($dto->getDeletePayload(), $context);
+
+        return $created->getPrimaryKeys(ProductVisibilityDefinition::ENTITY_NAME);
     }
 }
