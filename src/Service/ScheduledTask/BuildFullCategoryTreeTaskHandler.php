@@ -7,33 +7,32 @@ namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use Ergonode\IntegrationShopware\Provider\ErgonodeCategoryProvider;
+use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\Api\Context\SystemSource;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Symfony\Component\Lock\LockFactory;
+use Throwable;
 
-class BuildFullCategoryTreeTaskHandler extends ScheduledTaskHandler
+class BuildFullCategoryTreeTaskHandler extends AbstractSyncTaskHandler
 {
     private ConfigProvider $configProvider;
-    private LoggerInterface $logger;
-    private LockFactory $lockFactory;
+
     private ErgonodeCategoryProvider $categoryProvider;
+
     private CategoryPersistor $categoryPersistor;
 
     public function __construct(
         EntityRepositoryInterface $scheduledTaskRepository,
-        ConfigProvider $configProvider,
-        LoggerInterface $syncLogger,
+        SyncHistoryLogger $syncHistoryLogger,
         LockFactory $lockFactory,
+        LoggerInterface $syncLogger,
+        ConfigProvider $configProvider,
         ErgonodeCategoryProvider $categoryProvider,
         CategoryPersistor $categoryPersistor
     ) {
-        parent::__construct($scheduledTaskRepository);
+        parent::__construct($scheduledTaskRepository, $syncHistoryLogger, $lockFactory, $syncLogger);
+
         $this->configProvider = $configProvider;
-        $this->logger = $syncLogger;
-        $this->lockFactory = $lockFactory;
         $this->categoryProvider = $categoryProvider;
         $this->categoryPersistor = $categoryPersistor;
     }
@@ -43,45 +42,35 @@ class BuildFullCategoryTreeTaskHandler extends ScheduledTaskHandler
         return [BuildFullCategoryTreeTask::class];
     }
 
-    public function run(): void
+    public function runSync(): int
     {
-        $lock = $this->lockFactory->createLock('ergonode_integration.build-full-category-tree-lock');
-
-        if (false === $lock->acquire()) {
-            $this->logger->info('BuildFullCategoryTreeTaskHandler is locked');
-
-            return;
-        }
-
-        $this->logger->info('Starting BuildFullCategoryTreeTaskHandler...');
-
-        $context = new Context(new SystemSource());
-
         $categoryTreeCode = $this->configProvider->getCategoryTreeCode();
         if (empty($categoryTreeCode)) {
             $this->logger->error('Could not find category tree code in plugin config.');
 
-            return;
+            return 0;
         }
 
         try {
             $categoryCollection = $this->categoryProvider->provideCategoryTree($categoryTreeCode);
 
             if (empty($categoryCollection)) {
-                $this->logger->error('Request failed');
+                $this->logger->error('Ergonode request failed.');
 
-                return;
+                return 0;
             }
 
-            $this->categoryPersistor->persistCollection($categoryCollection, $context);
+            $this->categoryPersistor->persistCollection($categoryCollection, $this->context);
 
-            $this->logger->info('Processed category tree',
-                [
-                    'categoryCount' => $categoryCollection->count()
-                ]
-            );
-        } catch (\Throwable $e) {
+            $this->logger->info('Processed category tree.', [
+                'categoryCount' => $categoryCollection->count(),
+            ]);
+
+            return $categoryCollection->count();
+        } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
         }
+
+        return 0;
     }
 }

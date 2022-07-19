@@ -30,10 +30,6 @@ services:
 
   Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory:
 
-  # CONTROLLER
-  Ergonode\IntegrationShopware\Controller\AttributeMappingController:
-    tags: [ 'controller.service_arguments' ]
-
   # COMMAND
   Ergonode\IntegrationShopware\Command\CreateAttributeMappingCommand:
     arguments:
@@ -50,6 +46,9 @@ services:
     tags: [ 'shopware.entity.definition' ]
 
   Ergonode\IntegrationShopware\Entity\ErgonodeCursor\ErgonodeCursorDefinition:
+    tags: [ 'shopware.entity.definition' ]
+
+  Ergonode\IntegrationShopware\Entity\ErgonodeSyncHistory\ErgonodeSyncHistoryDefinition:
     tags: [ 'shopware.entity.definition' ]
 
   # EXTENSION
@@ -147,6 +146,13 @@ services:
     tags: [ 'messenger.message_handler' ]
     arguments:
       $lockFactory: '@ergonode_integration.lock_factory'
+
+  # SERVICE
+  Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger:
+    arguments:
+      $kernelLogsDir: '%kernel.logs_dir%'
+      $kernelEnv: '%kernel.environment%'
+      $repository: '@ergonode_sync_history.repository'
 
   # TRANSFORMER
   Ergonode\IntegrationShopware\Transformer\ProductTransformerChain:

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Tests\Unit\Modules\Attribute\Provider;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Provider;
 
 use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;

@@ -14,6 +14,10 @@ use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
+use function array_filter;
+use function array_map;
+use function array_merge;
+
 class PropertyGroupPersistor
 {
     private EntityRepositoryInterface $propertyGroupRepository;
@@ -69,14 +73,10 @@ class PropertyGroupPersistor
         }
 
         $upserted = $this->propertyGroupRepository->upsert($propertyGroupPayloads, $context);
-        $deleted = $this->propertyGroupOptionRepository->delete(array_merge([], ...$optionDeletePayloads), $context);
 
-        return [
-            PropertyGroupDefinition::ENTITY_NAME . '.upserted' =>
-                $upserted->getPrimaryKeys(PropertyGroupDefinition::ENTITY_NAME),
-            PropertyGroupOptionDefinition::ENTITY_NAME . '.deleted' =>
-                $deleted->getPrimaryKeys(PropertyGroupOptionDefinition::ENTITY_NAME),
-        ];
+        $this->propertyGroupOptionRepository->delete(array_merge([], ...$optionDeletePayloads), $context);
+
+        return $upserted->getPrimaryKeys(PropertyGroupDefinition::ENTITY_NAME);
     }
 
     public function remove(AttributeDeletedStreamResultsProxy $attributes, Context $context): array

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Processor;
 
+use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Persistor\LanguagePersistor;
 use Ergonode\IntegrationShopware\Provider\ErgonodeLanguageProvider;
 use Shopware\Core\Framework\Context;
@@ -22,18 +23,17 @@ class LanguageSyncProcessor
         $this->languagePersistor = $languagePersistor;
     }
 
-    public function process(Context $context): array
+    public function process(Context $context): SyncCounterDTO
     {
         $generator = $this->ergonodeLanguageProvider->provideActiveLanguages();
-        $entities = [];
+        $counter = new SyncCounterDTO();
 
         foreach ($generator as $languages) {
-            $entities = array_merge_recursive(
-                $entities,
-                $this->languagePersistor->persistStream($languages, $context)
+            $counter->incrProcessedEntityCount(
+                count($this->languagePersistor->persistStream($languages, $context))
             );
         }
 
-        return $entities;
+        return $counter;
     }
 }

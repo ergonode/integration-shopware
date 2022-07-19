@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Tests\Unit\Modules\Attribute\Api;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Api;
 
 use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;

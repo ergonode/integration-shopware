@@ -6,4 +6,5 @@ monolog:
    path: "%kernel.logs_dir%/ergonode_integration/sync.%kernel.environment%.log"
    level: debug
    max_files: 14
+   formatter: 'monolog.formatter.json'
    channels: [ sync ]

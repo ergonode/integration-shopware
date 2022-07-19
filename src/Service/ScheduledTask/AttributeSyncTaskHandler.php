@@ -5,36 +5,26 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
 use Ergonode\IntegrationShopware\Processor\AttributeSyncProcessor;
+use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\Api\Context\SystemSource;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Symfony\Component\Lock\LockFactory;
 use Throwable;
 
-class AttributeSyncTaskHandler extends ScheduledTaskHandler
+class AttributeSyncTaskHandler extends AbstractSyncTaskHandler
 {
-    private Context $context;
-
     private AttributeSyncProcessor $attributeSyncProcessor;
-
-    private LoggerInterface $logger;
-
-    private LockFactory $lockFactory;
 
     public function __construct(
         EntityRepositoryInterface $scheduledTaskRepository,
-        AttributeSyncProcessor $attributeSyncProcessor,
+        SyncHistoryLogger $syncHistoryLogger,
+        LockFactory $lockFactory,
         LoggerInterface $syncLogger,
-        LockFactory $lockFactory
+        AttributeSyncProcessor $attributeSyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository);
+        parent::__construct($scheduledTaskRepository, $syncHistoryLogger, $lockFactory, $syncLogger);
 
-        $this->context = new Context(new SystemSource());
         $this->attributeSyncProcessor = $attributeSyncProcessor;
-        $this->logger = $syncLogger;
-        $this->lockFactory = $lockFactory;
     }
 
     public static function getHandledMessages(): iterable
@@ -42,20 +32,17 @@ class AttributeSyncTaskHandler extends ScheduledTaskHandler
         return [AttributeSyncTask::class];
     }
 
-    public function run(): void
+    public function runSync(): int
     {
-        $lock = $this->lockFactory->createLock('ergonode_integration.attribute-sync-lock');
-
-        if (!$lock->acquire()) {
-            $this->logger->info('AttributeSyncTask is locked');
-
-            return;
-        }
+        $count = 0;
 
         try {
-            $this->attributeSyncProcessor->process($this->context);
+            $result = $this->attributeSyncProcessor->process($this->context);
+            $count = $result->getProcessedEntityCount();
         } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
         }
+
+        return $count;
     }
 }
