@@ -13,7 +13,7 @@ SHOPWARE_PATH=$(realpath "$PLUGIN_PATH/../../../")
 
 ZIP_PATH="$SCRIPT_PATH/$PLUGIN_NAME-$TAG.zip"
 
-DIRS_EXCLUDED_FROM_ZIP=( "build" ".git" ".gitignore" )
+DIRS_EXCLUDED_FROM_ZIP=("build" ".git" ".gitignore" "*.css.map" "*.js.map")
 
 # actual script
 echo -e "1/6 \e[33mRemoving old release(s)...\e[39m"
@@ -33,15 +33,18 @@ bash "$SHOPWARE_PATH/bin/build-administration.sh"
 echo -e "\e[32mOK\e[39m\n"
 
 echo -e "4/6 \e[33mCopying files...\e[39m"
-rsync -av --progress "$PLUGIN_PATH" "$BUILD_PATH" "${DIRS_EXCLUDED_FROM_ZIP[@]/#/--exclude=}"
+rsync -av --progress "$PLUGIN_PATH" "$SCRIPT_PATH" "${DIRS_EXCLUDED_FROM_ZIP[@]/#/--exclude=}"
 echo -e "\e[32mOK\e[39m\n"
 
 echo -e "5/6 \e[33mZipping...\e[39m"
-zip -rq "$ZIP_PATH" "$BUILD_PATH"
+cd "$SCRIPT_PATH" # prevent zipping whole file structure from current dir
+zip -rq "$ZIP_PATH" "$PLUGIN_NAME"
+cd - # keep original working dir
 echo -e "\e[32mOK\e[39m\n"
 
 echo -e "6/6 \e[33mCleaning build directory...\e[39m"
 rm -rf "$BUILD_PATH"
+rm -rf "$COMPOSER_DIST_PATH"
 echo -e "\e[32mOK\e[39m\n"
 
 echo -e "\e[32mZip file build completed! :)\e[39m"
