@@ -26,7 +26,7 @@ use function str_replace;
 
 class SyncHistoryLogger
 {
-    private const LOG_DIR_NAME = 'ergonode/history';
+    private const LOG_DIR_NAME = 'ergonode_integration/history';
 
     private string $kernelLogsDir;
 

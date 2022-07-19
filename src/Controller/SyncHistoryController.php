@@ -24,8 +24,8 @@ class SyncHistoryController extends AbstractController
 
     /**
      * @Route(
-     *     "/api/strix/ergonode/sync-history-log/{id}",
-     *     name="api.strix.ergonode.syncHistoryLog",
+     *     "/api/ergonode/sync-history-log/{id}",
+     *     name="api.ergonode.syncHistoryLog",
      *     methods={"GET"}
      * )
      *

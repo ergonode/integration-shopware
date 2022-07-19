@@ -152,7 +152,7 @@ services:
     arguments:
       $kernelLogsDir: '%kernel.logs_dir%'
       $kernelEnv: '%kernel.environment%'
-      $repository: '@strix_ergonode_sync_history.repository'
+      $repository: '@ergonode_sync_history.repository'
 
   # TRANSFORMER
   Ergonode\IntegrationShopware\Transformer\ProductTransformerChain:

@@ -15,7 +15,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
 class ErgonodeSyncHistoryDefinition extends EntityDefinition
 {
-    public const ENTITY_NAME = 'strix_ergonode_sync_history';
+    public const ENTITY_NAME = 'ergonode_sync_history';
 
     public function getEntityName(): string
     {

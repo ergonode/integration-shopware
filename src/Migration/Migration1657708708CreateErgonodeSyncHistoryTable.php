@@ -15,7 +15,7 @@ class Migration1657708708CreateErgonodeSyncHistoryTable extends MigrationStep
     public function update(Connection $connection): void
     {
         $connection->executeStatement('
-            CREATE TABLE IF NOT EXISTS `strix_ergonode_sync_history` (
+            CREATE TABLE IF NOT EXISTS `ergonode_sync_history` (
               `id` BINARY(16) NOT NULL,
               `name` VARCHAR(128) NOT NULL,
               `status` VARCHAR(128) NOT NULL,
