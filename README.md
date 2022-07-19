@@ -28,16 +28,3 @@ classes instead of concrete `Ergonode\IntegrationShopware\Api\Client\ErgonodeGql
 `src/Resources/config/packages/cache.yml`.
 
 In order to clear request cache run `bin/console cache:pool:clear gql_request_cache`.
-
-### Updating composer deps
-
-Current composer deps list:
- - gmostafa/php-graphql-client
-
-Execute all commands in plugin root dir:
-1. Execute `composer update` or `composer install`
-2. Remove all dependencies, except those listed above and composer directory (adjust find command if needed)
-   - Execute `find vendor -mindepth 1 -maxdepth 1 -type d -not -name 'composer' -and -not -name 'gmostafa' -print -exec rm -rf {} \;` 
-   - Execute `find vendor/composer -mindepth 1 -maxdepth 1 -type d -print -exec rm -rf {} \;`
-4. Execute `composer dumpautoload`
-5. Remove composer.lock - `rm composer.lock`
