@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Controller;
 
 use Ergonode\IntegrationShopware\Service\AttributeMapper;
+use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,9 +27,20 @@ class AttributeMappingController extends AbstractController
     /**
      * @Route("/api/ergonode/ergonode-attributes", name="api.ergonode.ergonodeAttributes", methods={"GET"})
      */
-    public function ergonodeAttributes(): JsonResponse
+    public function ergonodeAttributes(QueryDataBag $dataBag): JsonResponse
     {
-        $attributes = $this->attributeMapper->getAllErgonodeAttributes();
+        $types = $dataBag->get('types', []);
+        if ($types instanceof QueryDataBag) {
+            $types = $types->all();
+        }
+
+        if (!is_array($types)) {
+            return new JsonResponse([
+                'message' => 'Field types must be array.',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $attributes = $this->attributeMapper->getAllErgonodeAttributes($types);
 
         return new JsonResponse([
             'data' => $attributes,

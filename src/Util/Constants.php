@@ -28,15 +28,15 @@ class Constants
         'metaDescription',
         'keywords',
         'purchaseSteps',
-		'maxPurchase',
-		'minPurchase',
+        'maxPurchase',
+        'minPurchase',
         'packUnit',
         'packUnitPlural',
         'purchaseUnit',
-		'referenceUnit',
+        'referenceUnit',
         'isCloseout',
         'shippingFree',
         'restockTime',
-        'markAsTopseller'
+        'markAsTopseller',
     ];
 }

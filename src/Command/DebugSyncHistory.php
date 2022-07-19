@@ -15,7 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class DebugSyncHistory extends Command
 {
-    protected static $defaultName = 'strix:debug:history';
+    protected static $defaultName = 'ergonode:debug:history';
 
     private Context $context;
 

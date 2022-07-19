@@ -166,3 +166,4 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductMediaTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductCustomFieldTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductPropertiesTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductCrossSellingTransformer'
