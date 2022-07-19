@@ -64,7 +64,7 @@ class ConfigProvider
 
     public function getErgonodeCrossSellingKeys(): array
     {
-        $keys = $this->configService->get(self::STRIX_ERGONODE_CONFIG_NAMESPACE . 'crossSellingKeys');
+        $keys = $this->configService->get(self::CONFIG_NAMESPACE . 'crossSellingKeys');
         if (is_array($keys)) {
             return $keys;
         }
