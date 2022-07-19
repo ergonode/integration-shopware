@@ -45,7 +45,7 @@ class BuildFullCategoryTreeTaskHandler extends ScheduledTaskHandler
 
     public function run(): void
     {
-        $lock = $this->lockFactory->createLock('strix.ergonode.build-full-category-tree-lock');
+        $lock = $this->lockFactory->createLock('ergonode_integration.build-full-category-tree-lock');
 
         if (false === $lock->acquire()) {
             $this->logger->info('BuildFullCategoryTreeTaskHandler is locked');

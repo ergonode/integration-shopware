@@ -1,8 +1,8 @@
-import template from './strix-ergonode-customfieldkeys-multiselect.html.twig'
+import template from './ergonode-customfieldkeys-multiselect.html.twig'
 
 const {Component, Mixin} = Shopware;
 
-Component.register('strix-ergonode-customfieldkeys-multiselect', {
+Component.register('ergonode-customfieldkeys-multiselect', {
     template,
     inject: ['ergonodeAttributeService'],
     mixins: [
@@ -47,7 +47,7 @@ Component.register('strix-ergonode-customfieldkeys-multiselect', {
                 })
                 .catch(() => {
                     this.createNotificationError({
-                        message: this.$tc('StrixErgonode.mappings.messages.ergonodeAttributeFetchFailure'),
+                        message: this.$tc('ErgonodeIntegrationShopware.mappings.messages.ergonodeAttributeFetchFailure'),
                     });
                 })
                 .finally(() => this.isLoading = false);

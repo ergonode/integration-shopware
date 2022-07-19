@@ -10,7 +10,7 @@ class LanguageSyncTask extends ScheduledTask
 {
     public static function getTaskName(): string
     {
-        return 'strix.ergonode.language_sync_task';
+        return 'ergonode.language_sync_task';
     }
 
     public static function getDefaultInterval(): int

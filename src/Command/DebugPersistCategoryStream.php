@@ -19,7 +19,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DebugPersistCategoryStream extends Command
 {
-    protected static $defaultName = 'strix:debug:category-persist-stream';
+    protected static $defaultName = 'ergonode:debug:category-persist-stream';
 
     private CategorySyncProcessor $categorySyncProcessor;
 

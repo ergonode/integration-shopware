@@ -10,7 +10,7 @@ class AttributeSyncTask extends ScheduledTask
 {
     public static function getTaskName(): string
     {
-        return 'strix.ergonode.attribute_sync_task';
+        return 'ergonode.attribute_sync_task';
     }
 
     public static function getDefaultInterval(): int

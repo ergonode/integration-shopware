@@ -43,7 +43,7 @@ class CategorySyncTaskHandler extends ScheduledTaskHandler
 
     public function run(): void
     {
-        $lock = $this->lockFactory->createLock('strix.ergonode.category-sync-lock');
+        $lock = $this->lockFactory->createLock('ergonode_integration.category-sync-lock');
 
         if (false === $lock->acquire()) {
             $this->logger->info('CategorySyncTask is locked');

@@ -39,7 +39,7 @@ class ProductSyncTaskHandler extends ScheduledTaskHandler
 
     public function run(): void
     {
-        $lock = $this->lockFactory->createLock('strix.ergonode.product-sync-lock');
+        $lock = $this->lockFactory->createLock('ergonode_integration.product-sync-lock');
 
         if (false === $lock->acquire()) {
             $this->logger->info('ProductSyncTask is locked');

@@ -1,2 +1,2 @@
 import './core/service'
-import './module/strixergonode'
+import './module/ergonode-integration-shopware'

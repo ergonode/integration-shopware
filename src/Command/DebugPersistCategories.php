@@ -19,7 +19,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DebugPersistCategories extends Command
 {
-    protected static $defaultName = 'strix:debug:category-persist';
+    protected static $defaultName = 'ergonode:debug:category-persist';
 
     private ErgonodeCategoryProvider $categoryProvider;
 

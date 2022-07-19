@@ -1,0 +1,34 @@
+{% block ergonode_synchronization_page %}
+    <sw-page class="ergonode__synchronization-page">
+        <template slot="content">
+            <sw-card-view>
+                <sw-tabs>
+                    <sw-tabs-item
+                        :route="{ path: 'mapping' }"
+                        :active="false"
+                        :disabled="!acl.can('ergonode_attribute_mapping.viewer')"
+                    >{{ $t('ErgonodeIntegrationShopware.tabs.attributeMappings') }}</sw-tabs-item>
+                    <sw-tabs-item
+                        :route="{ path: 'synchronization' }"
+                        :active="true"
+                    >{{ $t('ErgonodeIntegrationShopware.tabs.synchronization') }}</sw-tabs-item>
+                </sw-tabs>
+                <sw-card v-if="acl.can('ergonode_attribute_mapping.viewer')"
+                    :title="$t('ErgonodeIntegrationShopware.synchronization.synchronization')"
+                >
+                    <sw-button-group v-if="triggers">
+                        <ergonode-trigger-button v-for="trigger, triggerIndex in triggers"
+                            :key="triggerIndex"
+                            variant="ghost"
+                            size="large"
+                            :endpoint="trigger.endpoint"
+                            :disabled="!acl.can('ergonode_attribute_mapping.viewer')"
+                        >
+                            {{ trigger.label }}
+                        </ergonode-trigger-button>
+                    </sw-button-group>
+                </sw-card>
+            </sw-card-view>
+        </template>
+    </sw-page>
+{% endblock %}

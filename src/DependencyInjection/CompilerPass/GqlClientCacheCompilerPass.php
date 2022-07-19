@@ -14,7 +14,7 @@ class GqlClientCacheCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $useCache = $container->getParameter('strix.ergonode.use_gql_cache') ?? false;
+        $useCache = $container->getParameter('ergonode_integration.use_gql_cache') ?? false;
         $container->setDefinition(
             ErgonodeGqlClientInterface::class,
             $container->getDefinition(

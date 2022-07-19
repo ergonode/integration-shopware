@@ -44,7 +44,7 @@ class ProductVisibilitySyncTaskHandler extends ScheduledTaskHandler
 
     public function run(): void
     {
-        $lock = $this->lockFactory->createLock('strix.ergonode.product-visibility-sync-lock');
+        $lock = $this->lockFactory->createLock('ergonode_integration.product-visibility-sync-lock');
 
         if (!$lock->acquire()) {
             $this->logger->info('ProductVisibilitySyncTask is locked');

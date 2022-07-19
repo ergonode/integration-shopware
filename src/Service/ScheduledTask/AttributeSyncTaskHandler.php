@@ -44,7 +44,7 @@ class AttributeSyncTaskHandler extends ScheduledTaskHandler
 
     public function run(): void
     {
-        $lock = $this->lockFactory->createLock('strix.ergonode.attribute-sync-lock');
+        $lock = $this->lockFactory->createLock('ergonode_integration.attribute-sync-lock');
 
         if (!$lock->acquire()) {
             $this->logger->info('AttributeSyncTask is locked');

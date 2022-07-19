@@ -18,8 +18,8 @@
             <label lang="de-DE">Ergonode API key</label>
         </input-field>
 
-        <component name="strix-ergonode-api-key-validator">
-            <name>strixErgonodeApiKeyValidator</name>
+        <component name="ergonode-api-key-validator">
+            <name>ergonodeApiKeyValidator</name>
         </component>
     </card>
 
@@ -27,7 +27,7 @@
         <title>Fields mapping</title>
         <title lang="de-DE">Fields mapping</title>
 
-        <component name="strix-ergonode-customfieldkeys-multiselect">
+        <component name="ergonode-customfieldkeys-multiselect">
             <name>customFieldKeys</name>
             <label>Ergonode attributes as custom fields</label>
             <label lang="de-DE">Ergonode attributes as custom fields</label>
