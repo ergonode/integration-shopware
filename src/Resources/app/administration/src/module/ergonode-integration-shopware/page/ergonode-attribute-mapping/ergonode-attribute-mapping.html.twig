@@ -1,31 +1,31 @@
-{% block strix_ergonode_attribute_mapping_page %}
-    <sw-page class="strix-ergonode__attribute-mapping-page">
+{% block ergonode_attribute_mapping_page %}
+    <sw-page class="ergonode__attribute-mapping-page">
         <template slot="content">
             <sw-card-view>
                 <sw-tabs>
                     <sw-tabs-item
                         :route="{ path: 'mapping' }"
                         :active="true"
-                    >{{ $t('StrixErgonode.tabs.attributeMappings') }}</sw-tabs-item>
+                    >{{ $t('ErgonodeIntegrationShopware.tabs.attributeMappings') }}</sw-tabs-item>
                     <sw-tabs-item
-                        :route="{ path: 'synchronisation' }"
+                        :route="{ path: 'synchronization' }"
                         :active="false"
-                        :disabled="!acl.can('strix_ergonode_synchronisation.viewer')"
-                    >{{ $t('StrixErgonode.tabs.synchronisation') }}</sw-tabs-item>
+                        :disabled="!acl.can('ergonode_synchronization.viewer')"
+                    >{{ $t('ErgonodeIntegrationShopware.tabs.synchronization') }}</sw-tabs-item>
                 </sw-tabs>
                 <sw-skeleton v-if="isLoading"></sw-skeleton>
                 <template v-else>
-                    <sw-card v-if="acl.can('strix_ergonode_attribute_mapping.creator')"
-                        :title="$t('StrixErgonode.mappings.addAttributeMapping')"
+                    <sw-card v-if="acl.can('ergonode_attribute_mapping.creator')"
+                        :title="$t('ErgonodeIntegrationShopware.mappings.addAttributeMapping')"
                     >
                         <sw-single-select
-                            :label="$t('StrixErgonode.mappings.shopwareAttribute')"
+                            :label="$t('ErgonodeIntegrationShopware.mappings.shopwareAttribute')"
                             :options="shopwareAttributesSelectOptions"
                             v-model="createShopwareAttribute"
                         >
                         </sw-single-select>
                         <sw-single-select
-                            :label="$t('StrixErgonode.mappings.ergonodeAttribute')"
+                            :label="$t('ErgonodeIntegrationShopware.mappings.ergonodeAttribute')"
                             :options="ergonodeAttributesSelectOptions"
                             v-model="createErgonodeAttribute"
                         >
@@ -36,26 +36,26 @@
                             :disabled="buttonDisabled"
                             @click="addMapping"
                         >
-                            {{ $t('StrixErgonode.mappings.addAttributeMapping') }}
+                            {{ $t('ErgonodeIntegrationShopware.mappings.addAttributeMapping') }}
                         </sw-button>
                         <sw-label v-if="mappingAlreadyExists"
                                   variant="danger"
                         >
-                            {{ $t('StrixErgonode.mappings.messages.mappingAlreadyExists') }}
+                            {{ $t('ErgonodeIntegrationShopware.mappings.messages.mappingAlreadyExists') }}
                         </sw-label>
                     </sw-card>
-                    <sw-card v-if="acl.can('strix_ergonode_attribute_mapping.viewer')"
-                        class="strix-ergonode__attribute-mapping-grid-card"
-                        :title="$t('StrixErgonode.mappings.attributeMappings')"
+                    <sw-card v-if="acl.can('ergonode_attribute_mapping.viewer')"
+                        class="ergonode__attribute-mapping-grid-card"
+                        :title="$t('ErgonodeIntegrationShopware.mappings.attributeMappings')"
                     >
                         <template #default>
                             <sw-entity-listing
-                                class="strix-ergonode__attribute-mapping-grid"
+                                class="ergonode__attribute-mapping-grid"
                                 :columns="columns"
                                 :items="mappings"
                                 :repository="repository"
                                 :fullPage="false"
-                                :allow-delete="acl.can('strix_ergonode_attribute_mapping.deleter')"
+                                :allow-delete="acl.can('ergonode_attribute_mapping.deleter')"
                                 :allow-edit="false"
                                 :allow-inline-edit="false"
                                 :is-loading="isMappingLoading"

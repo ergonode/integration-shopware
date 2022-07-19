@@ -1,8 +1,8 @@
-import template from './strix-ergonode-synchronisation.html.twig';
+import template from './ergonode-synchronization.html.twig';
 
 const { Component } = Shopware;
 
-Component.register('strix-ergonode-synchronisation', {
+Component.register('ergonode-synchronization', {
     inject: ['acl'],
 
     template,
@@ -12,7 +12,7 @@ Component.register('strix-ergonode-synchronisation', {
             triggers: [
                 {
                     endpoint: 'trigger-sync',
-                    label: this.$t('StrixErgonode.synchronisation.synchronise'),
+                    label: this.$t('ErgonodeIntegrationShopware.synchronization.synchronize'),
                 },
             ],
         };

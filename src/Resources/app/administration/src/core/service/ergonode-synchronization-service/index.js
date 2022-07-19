@@ -1,12 +1,12 @@
 const ApiService = Shopware.Classes.ApiService;
 
-export default class ErgonodeSynchronisationService extends ApiService {
+export default class ErgonodeSynchronizationService extends ApiService {
     constructor (httpClient, loginService, apiEndpoint = 'test') {
         super(httpClient, loginService, apiEndpoint);
     }
 
-    async triggerSynchronisation (endpoint) {
-        return await this.client.post(`_action/strix/ergonode/${endpoint}`, null,{
+    async triggerSynchronization (endpoint) {
+        return await this.client.post(`_action/ergonode/${endpoint}`, null,{
             headers: this.getBasicHeaders(),
         });
     }

@@ -28,8 +28,8 @@ class SyncTriggerController extends AbstractController
 
     /**
      * @Route(
-     *     "/api/_action/strix/ergonode/trigger-sync",
-     *     name="api.admin.strix.ergonode.trigger-sync",
+     *     "/api/_action/ergonode/trigger-sync",
+     *     name="api.admin.ergonode.trigger-sync",
      *     methods={"POST"},
      *     defaults={"_route_scope"={"administration"}}
      * )

@@ -17,7 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DebugPersistSegmentMapping extends Command
 {
-    protected static $defaultName = 'strix:debug:segment-mapping';
+    protected static $defaultName = 'ergonode:debug:segment-mapping';
 
     private Context $context;
 

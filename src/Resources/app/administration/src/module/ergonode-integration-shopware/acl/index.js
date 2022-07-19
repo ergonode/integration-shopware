@@ -1,11 +1,11 @@
 Shopware.Service('privileges').addPrivilegeMappingEntry({
     category: 'additional_permissions',
     parent: null,
-    key: 'strix_ergonode_synchronisation',
+    key: 'ergonode_synchronization',
     roles: {
         triggerer: {
             privileges: [
-                'strix_ergonode_synchronisation:triggerer',
+                'ergonode_synchronization:triggerer',
             ],
             dependencies: [],
         },

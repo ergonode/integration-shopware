@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class SyncAttributesCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:attributes:sync';
+    protected static $defaultName = 'ergonode:attributes:sync';
 
     private Context $context;
 

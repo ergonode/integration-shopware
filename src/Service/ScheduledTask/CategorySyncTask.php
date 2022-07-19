@@ -10,7 +10,7 @@ class CategorySyncTask extends ScheduledTask
 {
     public static function getTaskName(): string
     {
-        return 'strix.ergonode.category_sync_task';
+        return 'ergonode.category_sync_task';
     }
 
     public static function getDefaultInterval(): int

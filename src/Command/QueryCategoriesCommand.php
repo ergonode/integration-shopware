@@ -12,7 +12,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class QueryCategoriesCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:query:categories';
+    protected static $defaultName = 'ergonode:query:categories';
 
     private ErgonodeCategoryProvider $categoryProvider;
 

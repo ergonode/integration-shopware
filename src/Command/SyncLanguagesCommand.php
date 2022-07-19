@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class SyncLanguagesCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:languages:sync';
+    protected static $defaultName = 'ergonode:languages:sync';
 
     private Context $context;
 
