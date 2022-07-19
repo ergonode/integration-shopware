@@ -65,13 +65,13 @@ class CustomFieldPersistor
         return $written->getPrimaryKeys(CustomFieldDefinition::ENTITY_NAME);
     }
 
-    public function persistCustomFieldSet(Context $context): string
+    private function persistCustomFieldSet(Context $context): void
     {
-        if ($this->customFieldProvider->getCustomFieldSet($context) instanceof CustomFieldSetEntity) {
-            return '';
+        if (null !== $this->customFieldProvider->getCustomFieldSet($context)) {
+            return;
         }
 
-        $created = $this->customFieldSetRepository->create([
+        $this->customFieldSetRepository->create([
             [
                 'name' => Constants::PRODUCT_CUSTOM_FIELD_SET_NAME,
                 'config' => [
@@ -86,9 +86,5 @@ class CustomFieldPersistor
                 ],
             ],
         ], $context);
-
-        $ids = $created->getPrimaryKeys(CustomFieldSetDefinition::ENTITY_NAME);
-
-        return reset($ids);
     }
 }
