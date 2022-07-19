@@ -31,7 +31,7 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
     {
         $swData = $productData->getShopwareData();
 
-        $codes = $this->configProvider->getErgonodeCustomFields();
+        $codes = $this->configProvider->getErgonodeCustomFieldKeys();
 
         $attributes = $this->getAttributesByCodes($productData->getErgonodeData(), $codes);
 

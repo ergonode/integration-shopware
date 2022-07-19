@@ -52,9 +52,19 @@ class ConfigProvider
         );
     }
 
-    public function getErgonodeCustomFields(): array
+    public function getErgonodeCustomFieldKeys(): array
     {
         $keys = $this->configService->get(self::CONFIG_NAMESPACE . 'customFieldKeys');
+        if (is_array($keys)) {
+            return $keys;
+        }
+
+        return [];
+    }
+
+    public function getErgonodeCrossSellingKeys(): array
+    {
+        $keys = $this->configService->get(self::CONFIG_NAMESPACE . 'crossSellingKeys');
         if (is_array($keys)) {
             return $keys;
         }

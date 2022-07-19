@@ -18,7 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DebugPersistProductStream extends Command
 {
-    protected static $defaultName = 'strix:debug:product-persist-stream';
+    protected static $defaultName = 'ergonode:debug:product-persist-stream';
 
     private ProductSyncProcessor $productSyncProcessor;
 

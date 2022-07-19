@@ -6,6 +6,7 @@ namespace Ergonode\IntegrationShopware\Persistor;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingException;
+use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Transformer\ProductTransformerChain;
 use Shopware\Core\Content\Product\ProductDefinition;
@@ -62,7 +63,12 @@ class ProductPersistor
     protected function persistProduct(array $productData, ?string $parentId, Context $context): string
     {
         $sku = $productData['sku'];
-        $existingProduct = $this->productProvider->getProductBySku($sku, $context, ['media', 'properties']);
+        $existingProduct = $this->productProvider->getProductBySku($sku, $context, [
+            'media',
+            'properties',
+            'crossSellings.assignedProducts',
+            'crossSellings.' . AbstractErgonodeMappingExtension::EXTENSION_NAME,
+        ]);
 
         $dto = new ProductTransformationDTO($productData);
         $dto->setIsVariant($parentId !== null);

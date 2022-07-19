@@ -57,13 +57,17 @@ class AttributeMapper
         return Constants::SW_PRODUCT_MAPPABLE_FIELDS;
     }
 
-    public function getAllErgonodeAttributes(): array
+    public function getAllErgonodeAttributes(array $types = []): array
     {
         $attributeCodes = [];
 
         $generator = $this->ergonodeAttributeProvider->provideProductAttributes();
 
         foreach ($generator as $attributes) {
+            if (!empty($types)) {
+                $attributes = $attributes->filterByAttributeTypes($types);
+            }
+
             foreach ($attributes->getEdges() as $attribute) {
                 $attributeCodes[] = $attribute['node']['code'] ?? '';
             }

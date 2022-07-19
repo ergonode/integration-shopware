@@ -10,7 +10,7 @@ class BuildFullCategoryTreeTask extends ScheduledTask
 {
     public static function getTaskName(): string
     {
-        return 'strix.ergonode.build_full_category_tree_task';
+        return 'ergonode.build_full_category_tree_task';
     }
 
     public static function getDefaultInterval(): int

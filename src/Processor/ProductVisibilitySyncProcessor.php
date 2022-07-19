@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Processor;
 
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory;
+use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Persistor\ProductVisibilityPersistor;
 use Ergonode\IntegrationShopware\Provider\ErgonodeProductProvider;
 use Shopware\Core\Framework\Context;
@@ -29,8 +30,10 @@ class ProductVisibilitySyncProcessor
         $this->ergonodeProductProvider = $ergonodeProductProvider;
     }
 
-    public function processStream(Context $context, int $productCount = self::DEFAULT_PRODUCT_COUNT): array
+    public function processStream(Context $context, int $productCount = self::DEFAULT_PRODUCT_COUNT): SyncCounterDTO
     {
+        $counter = new SyncCounterDTO();
+
         $gqlClientGenerator = $this->gqlClientFactory->createForEverySalesChannel($context);
 
         $skuSalesChannelsMap = [];
@@ -49,11 +52,12 @@ class ProductVisibilitySyncProcessor
             }
         }
 
-        $newEvents = [];
         foreach ($skuSalesChannelsMap as $sku => $salesChannelIds) {
-            $newEvents[] = $this->persistor->persist(strval($sku), $salesChannelIds, $context);
+            $counter->incrProcessedEntityCount(
+                count($this->persistor->persist(strval($sku), $salesChannelIds, $context))
+            );
         }
 
-        return array_merge_recursive([], ...$newEvents);
+        return $counter;
     }
 }

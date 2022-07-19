@@ -1,9 +1,17 @@
 {
     "name": "ergonode/integration-shopware",
     "description": "Shopware Ergonode Integration",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "type": "shopware-platform-plugin",
-    "license": "MIT",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Strix",
+            "homepage": "https://www.strix.net/",
+            "email": "sales@strix.net",
+            "role": "Developer"
+        }
+    ],
     "extra": {
         "shopware-plugin-class": "Ergonode\\IntegrationShopware\\ErgonodeIntegrationShopware",
         "author": "Strix",
