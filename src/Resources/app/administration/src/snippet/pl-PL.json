@@ -3,8 +3,33 @@
     "mainMenuItemGeneral": "Integracja z Ergonode",
     "tabs": {
       "attributeMappings": "Mapowania atrybutów",
+      "importHistory": "Historia importów",
       "synchronisation": "Synchronizacja"
       },
+    "importHistory": {
+      "importHistory": "Historia importów",
+      "grid": {
+        "name": "Nazwa",
+        "status": "Status",
+        "startedOn": "Rozpoczęto",
+        "endedOn": "Zakończono"
+      },
+      "status": {
+        "status": "Status",
+        "created": "Utworzono",
+        "processed": "Przetworzono",
+        "ended": "Zakończono"
+      },
+      "details": {
+        "importDetails": "Szczegóły importu",
+        "details": "Szczegóły",
+        "importDetails": "Szczegóły importu",
+        "processed": "Przetworzonych",
+        "errors": "Błędów",
+        "message": "Komunikat",
+        "createdAt": "Utworzono"
+      }
+    },
     "mappings": {
       "attributeMappingGeneral": "Mapowanie atrybutów",
       "attributeMappings": "Mapowania atrybutów",

@@ -1,0 +1,95 @@
+<sw-page
+    class="strix-ergonode-import-history__page"
+>
+    <template slot="content">
+        <sw-card-view>
+            <strix-ergonode-tabs></strix-ergonode-tabs>
+
+            <sw-card
+                class="strix-ergonode-import-history__grid-card"
+                :title="$t('StrixErgonode.importHistory.importHistory')"
+            >
+                <template #default>
+                    <sw-data-grid
+                        class="strix-ergonode-import-history__grid"
+{#                        :repository="repository"#}
+{#                        :items="data"#}
+                        :is-loading="isListingLoading"
+                        :show-selection="false"
+                        :skeletonItemAmount="6"
+                        :dataSource="data"
+                        :columns="ListingColumns"
+                        :plainAppearance="true"
+                    >
+                        <template #column-status="{ item }">
+                            {{ String(item.status).toUpperCase() }}
+                        </template>
+                        <template #column-startDate="{ item }">
+                            {{ formatDate(item.startDate) }}
+                        </template>
+                        <template #column-endDate="{ item }">
+                            {{ formatDate(item.endDate) }}
+                        </template>
+                        <template #actions="{ item }">
+                            <sw-context-menu-item
+                                @click="detailsId = item.id;"
+                            >
+                                {{ $t('StrixErgonode.importHistory.details.details') }}
+                            </sw-context-menu-item>
+                        </template>
+                    </sw-data-grid>
+                    <sw-modal v-if="detailsId"
+                        :title="'Import details'"
+                        :closable="true"
+                        @modal-close="detailsId = null;"
+                    >
+                        <sw-label v-if="detailsEntity.startDate"
+                            variant="neutral"
+                            :ghost="true"
+                        >
+                            <b>{{ $t('StrixErgonode.importHistory.grid.startedOn') }}</b> {{ formatDate(detailsEntity.startDate) }}
+                        </sw-label>
+                        <sw-label v-if="detailsEntity.endedOn"
+                            variant="neutral"
+                            :ghost="true"
+                        >
+                            <b>{{ $t('StrixErgonode.importHistory.grid.endedOn') }}</b> {{ formatDate(detailsEntity.endedOn) }}
+                        </sw-label>
+                        <sw-label v-if="detailsEntity.status"
+                            variant="neutral"
+                            :ghost="true"
+                        >
+                            <b>{{ $t('StrixErgonode.importHistory.status.status') }}</b> {{ String(detailsEntity.status).toUpperCase() }}
+                        </sw-label>
+                        <sw-label v-if="detailsEntity.processed"
+                            variant="neutral"
+                            :ghost="true"
+                        >
+                            <b>{{ $t('StrixErgonode.importHistory.details.processed') }}</b> {{ detailsEntity.processed }}
+                        </sw-label>
+                        <sw-label v-if="detailsEntity.errors"
+                            variant="neutral"
+                            :ghost="true"
+                        >
+                            <b>{{ $t('StrixErgonode.importHistory.details.errors') }}</b> {{ detailsEntity.errors }}
+                        </sw-label>
+
+                        <sw-data-grid
+                            :is-loading="false"
+                            :show-selection="false"
+                            :show-actions="false"
+                            :skeletonItemAmount="10"
+                            :dataSource="detailsEntity.log"
+                            :columns="detailsColumns"
+                            :plainAppearance="true"
+                        >
+                            <template #column-datetime="{ item }">
+                                {{ formatDate(item.datetime) }}
+                            </template>
+                        </sw-data-grid>
+                    </sw-modal>
+                </template>
+            </sw-card>
+        </sw-card-view>
+    </template>
+</sw-page>

@@ -3,6 +3,7 @@
     "mainMenuItemGeneral": "Ergonode integration",
     "tabs": {
       "attributeMappings": "Attribute mappings",
+      "importHistory": "Import history",
       "synchronisation": "Synchronisation"
     },
     "mappings": {
@@ -19,19 +20,43 @@
         "ergonodeAttributeFetchFailure": "Failed to fetch Ergonode attributes. Please, check if Ergonode API Settings are correct."
       }
     },
+    "importHistory": {
+      "importHistory": "Import history",
+      "grid": {
+        "name": "Name",
+        "status": "Status",
+        "startedOn": "Started on",
+        "endedOn": "Ended on"
+      },
+      "status": {
+        "status": "Status",
+        "created": "Created",
+        "processed": "Processed",
+        "ended": "Ended"
+      },
+      "details": {
+        "importDetails": "Import details",
+        "details": "Details",
+        "importDetails": "Import details",
+        "processed": "Processed",
+        "errors": "Errors",
+        "message": "Message",
+        "createdAt": "Created at"
+      }
+    },
     "synchronisation": {
       "synchronisation": "Synchronisation",
       "synchronise": "Synchronise",
       "messages": {
         "executed": "Trigger executed successfully"
       }
-    }
-  },
-  "sw-privileges": {
-    "additional_permissions": {
-      "strix_ergonode_synchronisation": {
-        "label": "Ergonode integration",
-        "triggerer": "Trigger synchronisation"
+    },
+    "sw-privileges": {
+      "additional_permissions": {
+        "strix_ergonode_synchronisation": {
+          "label": "Ergonode integration",
+          "triggerer": "Trigger synchronisation"
+        }
       }
     }
   }
