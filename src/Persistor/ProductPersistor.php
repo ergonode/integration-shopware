@@ -14,7 +14,6 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityRepositoryNotFoundException;
-
 use function array_filter;
 use function array_merge_recursive;
 use function array_values;
@@ -55,6 +54,14 @@ class ProductPersistor
         }
 
         return $productId;
+    }
+
+    public function deleteProductIds(array $productIds, Context $context): void
+    {
+        $this->productRepository->delete(
+            \array_map(fn($id) => ['id' => $id], $productIds),
+            $context
+        );
     }
 
     /**

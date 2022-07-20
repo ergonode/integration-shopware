@@ -38,6 +38,6 @@ class ProductProvider
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsAnyFilter('productNumber', $skus));
 
-        return $this->productRepository->search($criteria, $context)->getIds();
+        return $this->productRepository->searchIds($criteria, $context)->getIds();
     }
 }

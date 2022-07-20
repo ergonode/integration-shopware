@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Command;
 
-use Ergonode\IntegrationShopware\Processor\ProductSyncProcessor;
+use Ergonode\IntegrationShopware\Processor\DeletedProductSyncProcessor;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\Console\Command\Command;
@@ -16,18 +16,17 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Temporary debug command
  */
-class DebugPersistProductStream extends Command
+class DebugProductDeletedStream extends Command
 {
-    protected static $defaultName = 'ergonode:debug:product-persist-stream';
+    protected static $defaultName = 'ergonode:debug:product-deleted-stream';
 
-    private ProductSyncProcessor $productSyncProcessor;
+    private DeletedProductSyncProcessor $deletedProductSyncProcessor;
 
     public function __construct(
-        ProductSyncProcessor $productSyncProcessor
+        DeletedProductSyncProcessor $deletedProductSyncProcessor
     ) {
         parent::__construct();
-
-        $this->productSyncProcessor = $productSyncProcessor;
+        $this->deletedProductSyncProcessor = $deletedProductSyncProcessor;
     }
 
     protected function configure()
@@ -35,14 +34,14 @@ class DebugPersistProductStream extends Command
         parent::configure();
 
         $this->setHelp(
-            'This debug command fetches Ergonode product stream.'
+            'This debug command removed products from Shopware found in Ergonode productDeletedStream.'
         );
 
         $this->addOption(
             'limit',
             'l',
             InputOption::VALUE_OPTIONAL,
-            'Limits how many pages of products are fetched from the stream'
+            'Limits how many pages of deleted products are fetched from the stream'
         );
     }
 
@@ -56,7 +55,7 @@ class DebugPersistProductStream extends Command
 
         $processedPages = 0;
         try {
-            while ($this->productSyncProcessor->processStream($context)->hasNextPage()) {
+            while ($this->deletedProductSyncProcessor->processStream($context)->hasNextPage()) {
                 $io->progressAdvance();
                 if ($processedPages++ >= $limit && $limit !== null) {
                     break;
