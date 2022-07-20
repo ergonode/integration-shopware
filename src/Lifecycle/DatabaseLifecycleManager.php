@@ -8,15 +8,17 @@ use Doctrine\DBAL\Connection;
 use Psr\Container\ContainerInterface;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 
+use function sprintf;
+
 class DatabaseLifecycleManager
 {
     private static ?self $instance = null;
 
     private static array $tableNames = [
-        'strix_ergonode_attribute_mapping',
+        'ergonode_attribute_mapping',
         'ergonode_category_mapping_extension',
-        'strix_ergonode_mapping_extension',
-        'strix_ergonode_cursor'
+        'ergonode_mapping_extension',
+        'ergonode_cursor'
     ];
 
     private static array $extendedTableNames = [
@@ -57,7 +59,7 @@ class DatabaseLifecycleManager
     {
         foreach (self::$tableNames as $tableName) {
             $this->connection->executeStatement(
-                \sprintf('DROP TABLE IF EXISTS `%s`', $tableName)
+                sprintf('DROP TABLE IF EXISTS `%s`', $tableName)
             );
         }
     }
@@ -66,7 +68,7 @@ class DatabaseLifecycleManager
     {
         foreach (self::$extendedTableNames as $tableName => $fieldName) {
             $this->connection->executeStatement(
-                \sprintf('ALTER TABLE `%s` DROP COLUMN %s', $tableName, $fieldName)
+                sprintf('ALTER TABLE `%s` DROP COLUMN %s', $tableName, $fieldName)
             );
         }
     }

@@ -15,7 +15,7 @@ class Migration1654869132AddErgonodeMappingExtensionTypeColumn extends Migration
     public function update(Connection $connection): void
     {
         $connection->executeStatement('
-            ALTER TABLE `strix_ergonode_mapping_extension`
+            ALTER TABLE `ergonode_mapping_extension`
             ADD COLUMN `type` VARCHAR(128) NOT NULL AFTER `code`
         ');
     }

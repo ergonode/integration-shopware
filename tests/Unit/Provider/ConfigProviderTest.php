@@ -117,7 +117,7 @@ class ConfigProviderTest extends TestCase
     {
         $this->systemConfigServiceMock->expects($this->once())
             ->method('get')
-            ->with('StrixErgonode.config.customFieldKeys')
+            ->with('ErgonodeIntegrationShopware.config.customFieldKeys')
             ->willReturn($mockReturn);
 
         $output = $this->configProvider->getErgonodeCustomFieldKeys();
@@ -140,51 +140,8 @@ class ConfigProviderTest extends TestCase
             [
                 [
                     'some_base_url',
-                    'sales_channel_1',
-                    'api_key_1',
-                ],
-            ],
-        ];
-        yield [
-            [
-                $this->mockSystemConfigEntity('sales_channel_1', 'api_key_1'),
-                $this->mockSystemConfigEntity('sales_channel_2', 'api_key_2'),
-                $this->mockSystemConfigEntity('sales_channel_3', 'api_key_3'),
-            ],
-            [
-                [
-                    'some_base_url',
-                    'sales_channel_1',
-                    'api_key_1',
-                ],
-                [
-                    'some_base_url',
-                    'sales_channel_2',
-                    'api_key_2',
-                ],
-                [
-                    'some_base_url',
-                    'sales_channel_3',
-                    'api_key_3',
-                ],
-            ],
-        ];
-        yield [
-            [
-                $this->mockSystemConfigEntity('sales_channel_1', 'api_key_1'),
-                $this->mockSystemConfigEntity(null, 'api_key_2'),
-                $this->mockSystemConfigEntity('sales_channel_3', 'api_key_3'),
-            ],
-            [
-                [
-                    'some_base_url',
-                    'sales_channel_1',
-                    'api_key_1',
-                ],
-                [
-                    'some_base_url',
-                    'sales_channel_3',
-                    'api_key_3',
+                    '',
+                    'some_api_key',
                 ],
             ],
         ];
@@ -204,11 +161,11 @@ class ConfigProviderTest extends TestCase
 
     private function mockSystemConfigServiceReturnsAccessData(): void
     {
-        $this->systemConfigServiceMock->expects($this->exactly(2))
+        $this->systemConfigServiceMock
             ->method('getString')
             ->withConsecutive(
-                ['StrixErgonode.config.ergonodeBaseUrl'],
-                ['StrixErgonode.config.ergonodeApiKey'],
+                ['ErgonodeIntegrationShopware.config.ergonodeBaseUrl'],
+                ['ErgonodeIntegrationShopware.config.ergonodeApiKey'],
             )
             ->willReturnOnConsecutiveCalls(
                 'some_base_url',

@@ -13,7 +13,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
 class ErgonodeCursorDefinition extends EntityDefinition
 {
-    public const ENTITY_NAME = 'strix_ergonode_cursor';
+    public const ENTITY_NAME = 'ergonode_cursor';
 
     public function getEntityName(): string
     {

@@ -19,7 +19,7 @@ class Migration1654734251CreateErgonodeMappingExtensionTable extends MigrationSt
     public function update(Connection $connection): void
     {
         $connection->executeStatement('
-            CREATE TABLE IF NOT EXISTS `strix_ergonode_mapping_extension` (
+            CREATE TABLE IF NOT EXISTS `ergonode_mapping_extension` (
               `id` BINARY(16) NOT NULL,
               `code` VARCHAR(128) NOT NULL,
               `created_at` DATETIME(3) NOT NULL,

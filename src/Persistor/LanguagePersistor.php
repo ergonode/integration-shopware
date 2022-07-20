@@ -46,9 +46,7 @@ class LanguagePersistor
 
         $written = $this->languageRepository->create(array_values($languagesPayload), $context);
 
-        return [
-            LanguageDefinition::ENTITY_NAME => $written->getPrimaryKeys(LanguageDefinition::ENTITY_NAME),
-        ];
+        return $written->getPrimaryKeys(LanguageDefinition::ENTITY_NAME);
     }
 
     private function filterNewLocales(array $isoCodes, Context $context): LocaleCollection

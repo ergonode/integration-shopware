@@ -40,7 +40,6 @@ class ErgonodeGqlClient implements ErgonodeGqlClientInterface
             return $results;
         } catch (ClientExceptionInterface $e) {
             // TODO log
-            dump($e);
         }
 
         return null;

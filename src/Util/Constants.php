@@ -9,7 +9,7 @@ class Constants
     public const ATTRIBUTE_SCOPE_GLOBAL = 'GLOBAL';
     public const ATTRIBUTE_SCOPE_LOCAL = 'LOCAL';
 
-    public const PRODUCT_CUSTOM_FIELD_SET_NAME = 'strix_ergonode_custom_fields';
+    public const PRODUCT_CUSTOM_FIELD_SET_NAME = 'ergonode_integration_custom_fields';
 
     public const SW_PRODUCT_MAPPABLE_FIELDS = [
         'active',

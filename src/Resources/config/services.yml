@@ -15,10 +15,10 @@ services:
 
     # TRANSFORMER
     Ergonode\IntegrationShopware\Transformer\CustomField\CustomFieldTransformerInterface:
-      tags: ['strix_ergonode.custom_field_transformer']
+      tags: [ 'ergonode_integration.custom_field_transformer' ]
 
     Ergonode\IntegrationShopware\Transformer\ProductCustomField\ProductCustomFieldTransformerInterface:
-      tags: [ 'strix_ergonode.product_custom_field_transformer' ]
+      tags: [ 'ergonode_integration.product_custom_field_transformer' ]
 
   # WIRE WHOLE NAMESPACE
   Ergonode\IntegrationShopware\:
@@ -30,14 +30,10 @@ services:
 
   Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory:
 
-  # CONTROLLER
-  Ergonode\IntegrationShopware\Controller\AttributeMappingController:
-    tags: [ 'controller.service_arguments' ]
-
   # COMMAND
   Ergonode\IntegrationShopware\Command\CreateAttributeMappingCommand:
     arguments:
-      $repository: '@strix_ergonode_attribute_mapping.repository'
+      $repository: '@ergonode_attribute_mapping.repository'
 
   # ENTITY DEFINITION
   Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition:
@@ -52,39 +48,42 @@ services:
   Ergonode\IntegrationShopware\Entity\ErgonodeCursor\ErgonodeCursorDefinition:
     tags: [ 'shopware.entity.definition' ]
 
+  Ergonode\IntegrationShopware\Entity\ErgonodeSyncHistory\ErgonodeSyncHistoryDefinition:
+    tags: [ 'shopware.entity.definition' ]
+
   # EXTENSION
   Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension:
     tags: [ 'shopware.entity.extension' ]
 
   # LOCK
-  strix.ergonode.flock-store:
+  ergonode_integration.flock_store:
     class: Symfony\Component\Lock\Store\FlockStore
 
-  strix.ergonode.lock-factory:
+  ergonode_integration.lock_factory:
     class: Symfony\Component\Lock\LockFactory
     arguments:
-      - '@strix.ergonode.flock-store'
+      - '@ergonode_integration.flock_store'
     calls:
       - setLogger: [ '@monolog.logger.sync' ]
 
   # MANAGER
   Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager:
     arguments:
-      $repository: '@strix_ergonode_cursor.repository'
+      $repository: '@ergonode_cursor.repository'
 
   # PROVIDER
   Ergonode\IntegrationShopware\Provider\AttributeMappingProvider:
     arguments:
-      $repository: '@strix_ergonode_attribute_mapping.repository'
+      $repository: '@ergonode_attribute_mapping.repository'
 
   # RESOLVER
   Ergonode\IntegrationShopware\Resolver\CustomFieldTransformerResolver:
     arguments:
-      - !tagged_iterator { tag: 'strix_ergonode.custom_field_transformer' }
+      - !tagged_iterator { tag: 'ergonode_integration.custom_field_transformer' }
 
   Ergonode\IntegrationShopware\Resolver\ProductCustomFieldTransformerResolver:
     arguments:
-      - !tagged_iterator { tag: 'strix_ergonode.product_custom_field_transformer' }
+      - !tagged_iterator { tag: 'ergonode_integration.product_custom_field_transformer' }
 
   # SCHEDULED TASK
   Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTask:
@@ -110,41 +109,50 @@ services:
   # (See SWERG-44, SWERG-49)
   #  Ergonode\IntegrationShopware\Service\ScheduledTask\BuildFullCategoryTreeTask:
   #    tags: [ 'shopware.scheduled.task' ]
+  #    arguments:
+  #      $lockFactory: '@ergonode_integration.lock_factory'
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
-      $lockFactory: '@strix.ergonode.lock-factory'
+      $lockFactory: '@ergonode_integration.lock_factory'
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\ProductVisibilitySyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
-      $lockFactory: '@strix.ergonode.lock-factory'
+      $lockFactory: '@ergonode_integration.lock_factory'
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
-      $lockFactory: '@strix.ergonode.lock-factory'
+      $lockFactory: '@ergonode_integration.lock_factory'
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\CategoryTreeSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
-      $lockFactory: '@strix.ergonode.lock-factory'
+      $lockFactory: '@ergonode_integration.lock_factory'
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\AttributeSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
-      $lockFactory: '@strix.ergonode.lock-factory'
+      $lockFactory: '@ergonode_integration.lock_factory'
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\LanguageSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
-      $lockFactory: '@strix.ergonode.lock-factory'
+      $lockFactory: '@ergonode_integration.lock_factory'
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\BuildFullCategoryTreeTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
-      $lockFactory: '@strix.ergonode.lock-factory'
+      $lockFactory: '@ergonode_integration.lock_factory'
+
+  # SERVICE
+  Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger:
+    arguments:
+      $kernelLogsDir: '%kernel.logs_dir%'
+      $kernelEnv: '%kernel.environment%'
+      $repository: '@ergonode_sync_history.repository'
 
   # TRANSFORMER
   Ergonode\IntegrationShopware\Transformer\ProductTransformerChain:

@@ -22,7 +22,7 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 class DebugPersistSingleProduct extends Command
 {
-    protected static $defaultName = 'strix:debug:product-persist';
+    protected static $defaultName = 'ergonode:debug:product-persist';
 
     private ErgonodeGqlClientInterface $gqlClient;
     private ProductQueryBuilder $productQueryBuilder;

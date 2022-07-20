@@ -5,36 +5,26 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
 use Ergonode\IntegrationShopware\Processor\LanguageSyncProcessor;
+use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\Api\Context\SystemSource;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Symfony\Component\Lock\LockFactory;
 use Throwable;
 
-class LanguageSyncTaskHandler extends ScheduledTaskHandler
+class LanguageSyncTaskHandler extends AbstractSyncTaskHandler
 {
-    private Context $context;
-
     private LanguageSyncProcessor $languageSyncProcessor;
-
-    private LoggerInterface $logger;
-
-    private LockFactory $lockFactory;
 
     public function __construct(
         EntityRepositoryInterface $scheduledTaskRepository,
-        LanguageSyncProcessor $languageSyncProcessor,
+        SyncHistoryLogger $syncHistoryService,
+        LockFactory $lockFactory,
         LoggerInterface $syncLogger,
-        LockFactory $lockFactory
+        LanguageSyncProcessor $languageSyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository);
+        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $syncLogger);
 
-        $this->context = new Context(new SystemSource());
         $this->languageSyncProcessor = $languageSyncProcessor;
-        $this->logger = $syncLogger;
-        $this->lockFactory = $lockFactory;
     }
 
     public static function getHandledMessages(): iterable
@@ -42,20 +32,17 @@ class LanguageSyncTaskHandler extends ScheduledTaskHandler
         return [LanguageSyncTask::class];
     }
 
-    public function run(): void
+    public function runSync(): int
     {
-        $lock = $this->lockFactory->createLock('strix.ergonode.language-sync-lock');
-
-        if (!$lock->acquire()) {
-            $this->logger->info('LanguageSyncTask is locked');
-
-            return;
-        }
+        $count = 0;
 
         try {
-            $this->languageSyncProcessor->process($this->context);
+            $result = $this->languageSyncProcessor->process($this->context);
+            $count = $result->getProcessedEntityCount();
         } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
         }
+
+        return $count;
     }
 }

@@ -6,13 +6,13 @@ export default class ErgonodeAttributeService extends ApiService {
     }
 
     async getShopwareAttributes () {
-        return await this.client.get('strix/ergonode/shopware-attributes', {
+        return await this.client.get('ergonode/shopware-attributes', {
             headers: this.getBasicHeaders(),
         });
     }
 
     async getErgonodeAttributes (types = []) {
-        return await this.client.get('strix/ergonode/ergonode-attributes', {
+        return await this.client.get('ergonode/ergonode-attributes', {
             headers: this.getBasicHeaders(),
             params: {
                 ...(types?.length && { types }),
