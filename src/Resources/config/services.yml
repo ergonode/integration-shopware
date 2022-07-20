@@ -167,3 +167,7 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductCustomFieldTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductPropertiesTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductCrossSellingTransformer'
+
+  # SUBSCRIBER
+  Ergonode\IntegrationShopware\Subscriber\PropertyErgonodeMappingExtensionSubscriber:
+    tags: [ 'kernel.event_subscriber' ]
