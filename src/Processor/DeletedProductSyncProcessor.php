@@ -87,8 +87,9 @@ class DeletedProductSyncProcessor
         $idsToDelete = $this->productProvider->getProductIdsBySkus($deletedProductCodes, $context);
         $this->productPersistor->deleteProductIds($idsToDelete, $context);
 
+        $processedEntityCount = \count($idsToDelete);
         $this->logger->info('Processed deleted products', [
-            'deletedProductCount' => \count($idsToDelete),
+            'deletedProductCount' => $processedEntityCount,
             'deletedProductCodes' => $deletedProductCodes,
             'deletedShopwareIds' => $idsToDelete
         ]);
@@ -96,6 +97,7 @@ class DeletedProductSyncProcessor
         $this->cursorManager->persist($endCursor, ProductDeletedStreamResultsProxy::MAIN_FIELD, $context);
 
         $counter->setHasNextPage($result->hasNextPage());
+        $counter->incrProcessedEntityCount($processedEntityCount);
 
         return $counter;
     }
