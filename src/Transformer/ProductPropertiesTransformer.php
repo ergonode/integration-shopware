@@ -2,21 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
+use Ergonode\IntegrationShopware\Provider\PropertyGroupOptionProvider;
+use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Shopware\Core\Content\Product\Aggregate\ProductProperty\ProductPropertyDefinition;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\DTO\ProductTransformationDTO;
-use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
-use Strix\Ergonode\Enum\AttributeTypesEnum;
-use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
-use Strix\Ergonode\Provider\PropertyGroupOptionProvider;
-use Strix\Ergonode\Util\PropertyGroupOptionUtil;
 
 use function array_filter;
 use function array_flip;
 use function array_intersect_key;
 use function array_values;
+use function is_array;
 
 class ProductPropertiesTransformer implements ProductDataTransformerInterface
 {
@@ -91,12 +92,12 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
                 continue;
             }
 
-            if (!\is_array($value)) {
+            if (!is_array($value)) {
                 $value = [$value];
             }
 
             foreach ($value as &$optionCode) {
-                $optionCode = PropertyGroupOptionUtil::buildOptionCode($node['attribute']['code'], $optionCode);
+                $optionCode = CodeBuilderUtil::buildOptionCode($node['attribute']['code'], $optionCode);
             }
 
             $transformed = array_merge($transformed, $value);

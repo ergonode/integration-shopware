@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Provider;
+namespace Ergonode\IntegrationShopware\Provider;
 
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class ProductProvider
@@ -27,5 +28,16 @@ class ProductProvider
         $criteria->addAssociations($associations);
 
         return $this->productRepository->search($criteria, $context)->first();
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getProductIdsBySkus(array $skus, Context $context): array
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsAnyFilter('productNumber', $skus));
+
+        return $this->productRepository->search($criteria, $context)->getIds();
     }
 }

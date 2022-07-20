@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\Provider\CustomFieldProvider;
+use Ergonode\IntegrationShopware\Resolver\CustomFieldTransformerResolver;
+use Ergonode\IntegrationShopware\Util\CustomFieldUtil;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Provider\CustomFieldProvider;
-use Strix\Ergonode\Resolver\CustomFieldTransformerResolver;
-use Strix\Ergonode\Util\Constants;
-use Strix\Ergonode\Util\CustomFieldUtil;
 
 class CustomFieldTransformer
 {

@@ -2,20 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Processor;
+namespace Ergonode\IntegrationShopware\Processor;
 
+use Ergonode\IntegrationShopware\Api\CategoryTreeStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
+use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
+use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
+use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
+use Ergonode\IntegrationShopware\Provider\CategoryProvider;
+use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Provider\LanguageProvider;
+use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
+use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\Language\LanguageCollection;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
-use Strix\Ergonode\Manager\ErgonodeCursorManager;
-use Strix\Ergonode\Modules\Category\Api\CategoryTreeStreamResultsProxy;
-use Strix\Ergonode\Persistor\CategoryPersistor;
-use Strix\Ergonode\Provider\CategoryProvider;
-use Strix\Ergonode\Provider\ConfigProvider;
-use Strix\Ergonode\Provider\LanguageProvider;
-use Strix\Ergonode\QueryBuilder\CategoryQueryBuilder;
-use Strix\Ergonode\Util\IsoCodeConverter;
+use Throwable;
+
+use function array_map;
+use function count;
 
 class CategoryTreeSyncProcessor
 {
@@ -52,15 +58,16 @@ class CategoryTreeSyncProcessor
 
     /**
      * @param int $categoryCount Number of categories to process (categories per page)
-     * @return bool Returns true if source has next page and false otherwise
      */
     public function processStream(
         Context $context,
         int $categoryCount = self::DEFAULT_CATEGORY_COUNT
-    ): bool {
+    ): ?SyncCounterDTO {
+        $counter = new SyncCounterDTO();
+
         $treeCode = $this->configProvider->getCategoryTreeCode();
         if (empty($treeCode)) {
-            throw new \RuntimeException('Could not find category tree code in plugin config.');
+            throw new RuntimeException('Could not find category tree code in plugin config.');
         }
 
         $cursorEntity = $this->cursorManager->getCursorEntity(CategoryTreeStreamResultsProxy::MAIN_FIELD, $context);
@@ -71,16 +78,17 @@ class CategoryTreeSyncProcessor
         $result = $this->gqlClient->query($query, CategoryTreeStreamResultsProxy::class);
 
         if (null === $result) {
-            throw new \RuntimeException('Request failed');
+            throw new RuntimeException('Request failed.');
         }
 
-        if (0 === \count($result->getEdges())) {
-            throw new \RuntimeException('End of stream');
+        if (0 === count($result->getEdges())) {
+            $this->logger->info('End of stream reached.');
+            return null;
         }
 
         $endCursor = $result->getEndCursor();
         if (null === $endCursor) {
-            throw new \RuntimeException('Could not retrieve end cursor from the response');
+            throw new RuntimeException('Could not retrieve end cursor from the response.');
         }
 
         $activeLanguages = $this->languageProvider->getActiveLanguages($context);
@@ -96,34 +104,45 @@ class CategoryTreeSyncProcessor
 
             try {
                 foreach ($activeLanguages as $language) {
+                    $locale = IsoCodeConverter::shopwareToErgonodeIso($language->getLocale()->getCode());
+
                     foreach ($node['categoryTreeLeafList']['edges'] as $leafEdge) {
                         $leafNode = $leafEdge['node'];
                         $this->categoryPersistor->persistStub(
                             $leafNode['category']['code'],
                             $leafNode['parentCategory']['code'] ?? $treeCode,
-                            IsoCodeConverter::shopwareToErgonodeIso($language->getLocale()->getCode()),
+                            $locale,
                             $context
                         );
                     }
 
-                    $this->logger->info('Processed category', [
+                    $this->logger->info('Processed category.', [
                         'code' => $node['code'],
+                        'locale' => $locale
                     ]);
+
+                    $counter->incrProcessedEntityCount();
                 }
 
-                $categoryCodes = \array_map(
+                $categoryCodes = array_map(
                     fn($item) => $item['node']['category']['code'],
                     $node['categoryTreeLeafList']['edges']
                 );
                 $categoryCodes[] = $treeCode;
 
                 $idsToRemove = $this->categoryProvider->getCategoryIdsNotInArray($categoryCodes, $context);
+
+                $this->logger->info('Removing following categories not found in Ergonode tree.', [
+                    'treeCode' => $treeCode,
+                    'categoryIds' => $idsToRemove
+                ]);
+
                 $this->categoryPersistor->deleteIds(
                     $idsToRemove,
                     $context
                 );
-            } catch (\Throwable $e) {
-                $this->logger->error('Error while persisting category', [
+            } catch (Throwable $e) {
+                $this->logger->error('Error while persisting category.', [
                     'message' => $e->getMessage(),
                     'file' => $e->getFile() . ':' . $e->getLine(),
                     'code' => $node['code'],
@@ -133,7 +152,9 @@ class CategoryTreeSyncProcessor
 
         $this->cursorManager->persist($endCursor, CategoryTreeStreamResultsProxy::MAIN_FIELD, $context);
 
-        return $result->hasNextPage();
+        $counter->setHasNextPage($result->hasNextPage());
+
+        return $counter;
     }
 
     private function persistTreeRootStub($treeCode, LanguageCollection $activeLanguages, Context $context)

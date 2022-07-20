@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Entity\ErgonodeAttributeMapping;
+namespace Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\ApiAware;
@@ -14,7 +14,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
 class ErgonodeAttributeMappingDefinition extends EntityDefinition
 {
-    public const ENTITY_NAME = 'strix_ergonode_attribute_mapping';
+    public const ENTITY_NAME = 'ergonode_attribute_mapping';
 
     public function getEntityName(): string
     {

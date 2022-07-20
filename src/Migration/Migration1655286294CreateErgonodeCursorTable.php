@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Strix\Ergonode\Migration;
+namespace Ergonode\IntegrationShopware\Migration;
 
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Migration\MigrationStep;
@@ -15,7 +15,7 @@ class Migration1655286294CreateErgonodeCursorTable extends MigrationStep
     public function update(Connection $connection): void
     {
         $connection->executeStatement('
-            CREATE TABLE IF NOT EXISTS `strix_ergonode_cursor` (
+            CREATE TABLE IF NOT EXISTS `ergonode_cursor` (
               `id` BINARY(16) NOT NULL,
               `cursor` VARCHAR(128) NOT NULL,
               `query` VARCHAR(128) NOT NULL UNIQUE,

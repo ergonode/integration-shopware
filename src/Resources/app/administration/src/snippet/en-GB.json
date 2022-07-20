@@ -1,10 +1,18 @@
 {
-  "StrixErgonode": {
+  "ErgonodeIntegrationShopware": {
     "mainMenuItemGeneral": "Ergonode integration",
+    "configuration": {
+      "verifyCredentials": {
+        "verifyCredentials": "Verify credentials",
+        "credentialsCorrect": "Credentials correct",
+        "credentialsIncorrect": "Credentials incorrect",
+        "couldNotVerify": "Could not verify credentials."
+      }
+    },
     "tabs": {
       "attributeMappings": "Attribute mappings",
       "importHistory": "Import history",
-      "synchronisation": "Synchronisation"
+      "synchronization": "Synchronization"
     },
     "mappings": {
       "attributeMappingGeneral": "Attribute mapping",
@@ -44,19 +52,19 @@
         "createdAt": "Created at"
       }
     },
-    "synchronisation": {
-      "synchronisation": "Synchronisation",
-      "synchronise": "Synchronise",
+    "synchronization": {
+      "synchronization": "Synchronization",
+      "synchronize": "Synchronize",
       "messages": {
         "executed": "Trigger executed successfully"
       }
-    },
-    "sw-privileges": {
-      "additional_permissions": {
-        "strix_ergonode_synchronisation": {
-          "label": "Ergonode integration",
-          "triggerer": "Trigger synchronisation"
-        }
+    }
+  },
+  "sw-privileges": {
+    "additional_permissions": {
+      "ergonode_synchronization": {
+        "label": "Ergonode integration",
+        "triggerer": "Trigger synchronization"
       }
     }
   }

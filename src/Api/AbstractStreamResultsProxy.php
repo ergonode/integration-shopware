@@ -2,13 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Api;
+namespace Ergonode\IntegrationShopware\Api;
 
 abstract class AbstractStreamResultsProxy extends AbstractResultsProxy
 {
     public function getEdges(): array
     {
         return $this->getMainData()['edges'] ?? [];
+    }
+
+    public function countEdges(): int
+    {
+        return count($this->getEdges());
     }
 
     public function hasEndCursor(): bool

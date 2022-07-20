@@ -2,15 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Processor;
+namespace Ergonode\IntegrationShopware\Processor;
 
+use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
+use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Persistor\CustomFieldPersistor;
+use Ergonode\IntegrationShopware\Persistor\PropertyGroupPersistor;
+use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Enum\AttributeTypesEnum;
-use Strix\Ergonode\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
-use Strix\Ergonode\Persistor\CustomFieldPersistor;
-use Strix\Ergonode\Persistor\PropertyGroupPersistor;
-use Strix\Ergonode\Provider\ConfigProvider;
+
+use function count;
 
 class AttributeSyncProcessor
 {
@@ -34,23 +37,24 @@ class AttributeSyncProcessor
         $this->configProvider = $configProvider;
     }
 
-    public function process(Context $context): array
+    public function process(Context $context): SyncCounterDTO
     {
         $generator = $this->ergonodeAttributeProvider->provideProductAttributes();
-        $entities = [];
+        $counter = new SyncCounterDTO();
 
         foreach ($generator as $attributeStream) {
-            $entities = array_merge_recursive(
-                $entities,
-                $this->persistBindingAttributes($attributeStream, $context),
+            $counter->incrProcessedEntityCount(
+                $this->persistBindingAttributes($attributeStream, $context)
+            );
+            $counter->incrProcessedEntityCount(
                 $this->persistCustomFields($attributeStream, $context)
             );
         }
 
-        return $entities;
+        return $counter;
     }
 
-    private function persistBindingAttributes(AttributeStreamResultsProxy $attributes, Context $context): array
+    private function persistBindingAttributes(AttributeStreamResultsProxy $attributes, Context $context): int
     {
         $bindingAttributes = $attributes->filterByAttributeTypes([
             AttributeTypesEnum::SELECT,
@@ -58,22 +62,22 @@ class AttributeSyncProcessor
         ]);
 
         if ($bindingAttributes instanceof AttributeStreamResultsProxy) {
-            return $this->propertyGroupPersistor->persistStream($bindingAttributes, $context);
+            return count($this->propertyGroupPersistor->persistStream($bindingAttributes, $context));
         }
 
-        return [];
+        return 0;
     }
 
-    private function persistCustomFields(AttributeStreamResultsProxy $attributes, Context $context): array
+    private function persistCustomFields(AttributeStreamResultsProxy $attributes, Context $context): int
     {
         $customFields = $attributes->filterByCodes(
-            $this->configProvider->getErgonodeCustomFields()
+            $this->configProvider->getErgonodeCustomFieldKeys()
         );
 
         if ($customFields instanceof AttributeStreamResultsProxy) {
-            return $this->customFieldManager->persistStream($customFields, $context);
+            return count($this->customFieldManager->persistStream($customFields, $context));
         }
 
-        return [];
+        return 0;
     }
 }

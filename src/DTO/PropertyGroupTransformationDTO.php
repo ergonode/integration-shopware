@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\DTO;
+namespace Ergonode\IntegrationShopware\DTO;
 
 use Shopware\Core\Content\Property\PropertyGroupEntity;
 
@@ -39,11 +39,6 @@ class PropertyGroupTransformationDTO
     public function setSwPropertyGroup(?PropertyGroupEntity $swPropertyGroup): void
     {
         $this->swPropertyGroup = $swPropertyGroup;
-    }
-
-    public function hasPropertyGroupPayload(): bool
-    {
-        return !empty($this->propertyGroupPayload);
     }
 
     public function getPropertyGroupPayload(): array

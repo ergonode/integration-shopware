@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Command;
+namespace Ergonode\IntegrationShopware\Command;
 
+use Ergonode\IntegrationShopware\Processor\LanguageSyncProcessor;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Processor\LanguageSyncProcessor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class SyncLanguagesCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:languages:sync';
+    protected static $defaultName = 'ergonode:languages:sync';
 
     private Context $context;
 
@@ -40,20 +40,15 @@ class SyncLanguagesCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $entities = $this->processor->process($this->context);
+        $result = $this->processor->process($this->context);
 
-        if (empty($entities)) {
-            $io->info('No new languages created.');
+        if (0 === $result->getProcessedEntityCount()) {
+            $io->info('No entities processed.');
 
             return self::SUCCESS;
         }
 
         $io->success('Languages synchronized (Ergonode->Shopware).');
-        foreach ($entities as $entity => $ids) {
-            if (!empty($ids)) {
-                $io->success(["Created $entity:", ...$ids]);
-            }
-        }
 
         return self::SUCCESS;
     }

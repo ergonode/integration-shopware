@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Command;
+namespace Ergonode\IntegrationShopware\Command;
 
+use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition;
+use Ergonode\IntegrationShopware\Service\AttributeMapper;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Strix\Ergonode\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition;
-use Strix\Ergonode\Service\AttributeMapper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CreateAttributeMappingCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:attributes:create-mapping';
+    protected static $defaultName = 'ergonode:attributes:create-mapping';
 
     private Context $context;
 

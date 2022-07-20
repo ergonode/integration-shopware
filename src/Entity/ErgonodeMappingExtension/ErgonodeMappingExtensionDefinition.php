@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Entity\ErgonodeMappingExtension;
+namespace Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
@@ -13,7 +13,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
 class ErgonodeMappingExtensionDefinition extends EntityDefinition
 {
-    public const ENTITY_NAME = 'strix_ergonode_mapping_extension';
+    public const ENTITY_NAME = 'ergonode_mapping_extension';
 
     public function getEntityName(): string
     {

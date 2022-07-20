@@ -2,35 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\PropertyGroupTransformationDTO;
+use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
+use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
+use Ergonode\IntegrationShopware\Extension\PropertyGroup\PropertyGroupExtension;
+use Ergonode\IntegrationShopware\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
+use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
+use Ergonode\IntegrationShopware\Util\Constants;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionEntity;
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Content\Property\PropertyGroupEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
-use Strix\Ergonode\DTO\PropertyGroupTransformationDTO;
-use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
-use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
-use Strix\Ergonode\Extension\PropertyGroup\PropertyGroupExtension;
-use Strix\Ergonode\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
-use Strix\Ergonode\Provider\PropertyGroupProvider;
-use Strix\Ergonode\Util\Constants;
-use Strix\Ergonode\Util\PropertyGroupOptionUtil;
 
 use function array_merge_recursive;
 
 class PropertyGroupTransformer
 {
-    private PropertyGroupProvider $propertyGroupProvider;
-
     private TranslationTransformer $translationTransformer;
 
     public function __construct(
-        PropertyGroupProvider $propertyGroupProvider,
         TranslationTransformer $translationTransformer
     ) {
-        $this->propertyGroupProvider = $propertyGroupProvider;
         $this->translationTransformer = $translationTransformer;
     }
 
@@ -67,7 +62,7 @@ class PropertyGroupTransformer
                         'extensions' => [
                             AbstractErgonodeMappingExtension::EXTENSION_NAME => [
                                 'id' => $existingOption ? $this->getEntityExtensionId($existingOption) : null,
-                                'code' => PropertyGroupOptionUtil::buildOptionCode($code, $option['code']),
+                                'code' => CodeBuilderUtil::buildOptionCode($code, $option['code']),
                                 'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                             ],
                         ],
@@ -118,7 +113,7 @@ class PropertyGroupTransformer
             if (
                 $extension instanceof ErgonodeMappingExtensionEntity &&
                 $groupExtension instanceof ErgonodeMappingExtensionEntity &&
-                PropertyGroupOptionUtil::buildOptionCode($groupExtension->getCode(), $code) === $extension->getCode()
+                CodeBuilderUtil::buildOptionCode($groupExtension->getCode(), $code) === $extension->getCode()
             ) {
                 return $option;
             }

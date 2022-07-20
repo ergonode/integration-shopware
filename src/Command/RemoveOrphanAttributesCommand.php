@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Command;
+namespace Ergonode\IntegrationShopware\Command;
 
+use Ergonode\IntegrationShopware\Manager\OrphanEntitiesManager;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Manager\OrphanEntitiesManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class RemoveOrphanAttributesCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:attributes:remove-orphan';
+    protected static $defaultName = 'ergonode:attributes:remove-orphan';
 
     private Context $context;
 

@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Persistor;
+namespace Ergonode\IntegrationShopware\Persistor;
 
+use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
+use Ergonode\IntegrationShopware\Provider\CustomFieldProvider;
+use Ergonode\IntegrationShopware\Transformer\CustomFieldTransformer;
+use Ergonode\IntegrationShopware\Util\Constants;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetDefinition;
 use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetEntity;
 use Shopware\Core\System\CustomField\CustomFieldDefinition;
-use Strix\Ergonode\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\Provider\CustomFieldProvider;
-use Strix\Ergonode\Transformer\CustomFieldTransformer;
-use Strix\Ergonode\Util\Constants;
 
 class CustomFieldPersistor
 {
@@ -41,7 +41,7 @@ class CustomFieldPersistor
     {
         $payloads = [];
 
-        $entities = $this->persistCustomFieldSet($context);
+        $this->persistCustomFieldSet($context);
 
         foreach ($attributes->getEdges() as $attribute) {
             if (empty($node = $attribute['node'])) {
@@ -62,21 +62,16 @@ class CustomFieldPersistor
 
         $written = $this->customFieldRepository->upsert($payloads, $context);
 
-        return array_merge_recursive(
-            $entities,
-            [
-                CustomFieldDefinition::ENTITY_NAME => $written->getPrimaryKeys(CustomFieldDefinition::ENTITY_NAME),
-            ]
-        );
+        return $written->getPrimaryKeys(CustomFieldDefinition::ENTITY_NAME);
     }
 
-    public function persistCustomFieldSet(Context $context): array
+    private function persistCustomFieldSet(Context $context): void
     {
-        if ($this->customFieldProvider->getCustomFieldSet($context) instanceof CustomFieldSetEntity) {
-            return [];
+        if (null !== $this->customFieldProvider->getCustomFieldSet($context)) {
+            return;
         }
 
-        $written = $this->customFieldSetRepository->create([
+        $this->customFieldSetRepository->create([
             [
                 'name' => Constants::PRODUCT_CUSTOM_FIELD_SET_NAME,
                 'config' => [
@@ -91,9 +86,5 @@ class CustomFieldPersistor
                 ],
             ],
         ], $context);
-
-        return [
-            CustomFieldSetDefinition::ENTITY_NAME => $written->getPrimaryKeys(CustomFieldSetDefinition::ENTITY_NAME),
-        ];
     }
 }

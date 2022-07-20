@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Util;
+namespace Ergonode\IntegrationShopware\Util;
 
 class Constants
 {
     public const ATTRIBUTE_SCOPE_GLOBAL = 'GLOBAL';
     public const ATTRIBUTE_SCOPE_LOCAL = 'LOCAL';
 
-    public const PRODUCT_CUSTOM_FIELD_SET_NAME = 'strix_ergonode_custom_fields';
+    public const PRODUCT_CUSTOM_FIELD_SET_NAME = 'ergonode_integration_custom_fields';
 
     public const SW_PRODUCT_MAPPABLE_FIELDS = [
         'active',
@@ -28,15 +28,15 @@ class Constants
         'metaDescription',
         'keywords',
         'purchaseSteps',
-		'maxPurchase',
-		'minPurchase',
+        'maxPurchase',
+        'minPurchase',
         'packUnit',
         'packUnitPlural',
         'purchaseUnit',
-		'referenceUnit',
+        'referenceUnit',
         'isCloseout',
         'shippingFree',
         'restockTime',
-        'markAsTopseller'
+        'markAsTopseller',
     ];
 }

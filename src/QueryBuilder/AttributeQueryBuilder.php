@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\QueryBuilder;
+namespace Ergonode\IntegrationShopware\QueryBuilder;
 
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use GraphQL\InlineFragment;
 use GraphQL\Query;
-use Strix\Ergonode\Enum\AttributeTypesEnum;
 
 class AttributeQueryBuilder
 {
@@ -124,40 +124,6 @@ class AttributeQueryBuilder
                                                 'name',
                                                 'symbol',
                                             ]),
-                                    ]),
-                            ]),
-                    ]),
-            ]);
-    }
-
-    public function buildOptions(string $attributeCode): Query
-    {
-        return (new Query('attribute'))
-            ->setArguments([
-                'code' => $attributeCode,
-            ])
-            ->setSelectionSet([
-                (new InlineFragment('SelectAttribute'))
-                    ->setSelectionSet([
-                        (new Query('options'))
-                            ->setSelectionSet([
-                                'code',
-                                (new Query('label'))
-                                    ->setSelectionSet([
-                                        'language',
-                                        'value',
-                                    ]),
-                            ]),
-                    ]),
-                (new InlineFragment('MultiSelectAttribute'))
-                    ->setSelectionSet([
-                        (new Query('options'))
-                            ->setSelectionSet([
-                                'code',
-                                (new Query('label'))
-                                    ->setSelectionSet([
-                                        'language',
-                                        'value',
                                     ]),
                             ]),
                     ]),

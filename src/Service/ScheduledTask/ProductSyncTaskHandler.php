@@ -2,34 +2,31 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Service\ScheduledTask;
+namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
+use Ergonode\IntegrationShopware\Processor\ProductSyncProcessor;
+use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\Api\Context\SystemSource;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
-use Strix\Ergonode\Processor\ProductSyncProcessor;
 use Symfony\Component\Lock\LockFactory;
+use Throwable;
 
-class ProductSyncTaskHandler extends ScheduledTaskHandler
+class ProductSyncTaskHandler extends AbstractSyncTaskHandler
 {
     private const MAX_PAGES_PER_RUN = 25;
 
     private ProductSyncProcessor $productSyncProcessor;
-    private LoggerInterface $logger;
-    private LockFactory $lockFactory;
 
     public function __construct(
         EntityRepositoryInterface $scheduledTaskRepository,
-        ProductSyncProcessor $productSyncProcessor,
+        SyncHistoryLogger $syncHistoryService,
+        LockFactory $lockFactory,
         LoggerInterface $syncLogger,
-        LockFactory $lockFactory
+        ProductSyncProcessor $productSyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository);
+        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $syncLogger);
+
         $this->productSyncProcessor = $productSyncProcessor;
-        $this->logger = $syncLogger;
-        $this->lockFactory = $lockFactory;
     }
 
     public static function getHandledMessages(): iterable
@@ -37,29 +34,25 @@ class ProductSyncTaskHandler extends ScheduledTaskHandler
         return [ProductSyncTask::class];
     }
 
-    public function run(): void
+    public function runSync(): int
     {
-        $lock = $this->lockFactory->createLock('strix.ergonode.product-sync-lock');
-
-        if (false === $lock->acquire()) {
-            $this->logger->info('ProductSyncTask is locked');
-
-            return;
-        }
-
-        $this->logger->info('Starting ProductSyncTask...');
-
-        $context = new Context(new SystemSource());
         $currentPage = 0;
+        $count = 0;
 
         try {
-            while ($this->productSyncProcessor->processStream($context)) {
+            do {
+                $result = $this->productSyncProcessor->processStream($this->context);
+
+                $count += $result->getProcessedEntityCount();
+
                 if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
                     break;
                 }
-            }
-        } catch (\Throwable $e) {
+            } while ($result->hasNextPage());
+        } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
         }
+
+        return $count;
     }
 }

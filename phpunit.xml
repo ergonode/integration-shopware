@@ -6,7 +6,7 @@
          cacheResult="false">
 
     <testsuites>
-        <testsuite name="Strix Ergonode Plugin Tests">
+        <testsuite name="ErgonodeIntegrationShopware Plugin Tests">
             <directory>tests/Unit</directory>
         </testsuite>
     </testsuites>

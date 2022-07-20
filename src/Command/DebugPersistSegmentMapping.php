@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Command;
+namespace Ergonode\IntegrationShopware\Command;
 
+use Ergonode\IntegrationShopware\Processor\ProductVisibilitySyncProcessor;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Processor\ProductVisibilitySyncProcessor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DebugPersistSegmentMapping extends Command
 {
-    protected static $defaultName = 'strix:debug:segment-mapping';
+    protected static $defaultName = 'ergonode:debug:segment-mapping';
 
     private Context $context;
 
@@ -45,20 +45,15 @@ class DebugPersistSegmentMapping extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $events = $this->productVisibilitySyncProcessor->processStream($this->context);
+        $count = $this->productVisibilitySyncProcessor->processStream($this->context);
 
-        if (empty($events)) {
+        if (0 === $count) {
             $io->info('No actions performed.');
 
             return self::SUCCESS;
         }
 
         $io->success('Product visibility (segments) synced (Ergonode->Shopware).');
-        foreach ($events as $event => $ids) {
-            if (!empty($ids)) {
-                $io->success(["Performed $event for IDs:", ...$ids]);
-            }
-        }
 
         return self::SUCCESS;
     }

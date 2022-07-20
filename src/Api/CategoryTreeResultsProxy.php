@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Api;
-
-use Strix\Ergonode\Api\AbstractResultsProxy;
+namespace Ergonode\IntegrationShopware\Api;
 
 class CategoryTreeResultsProxy extends AbstractResultsProxy
 {

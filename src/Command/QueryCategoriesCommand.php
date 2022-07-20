@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Command;
+namespace Ergonode\IntegrationShopware\Command;
 
-use Strix\Ergonode\Provider\ErgonodeCategoryProvider;
+use Ergonode\IntegrationShopware\Provider\ErgonodeCategoryProvider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,7 +12,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class QueryCategoriesCommand extends Command
 {
-    protected static $defaultName = 'strix:ergonode:query:categories';
+    protected static $defaultName = 'ergonode:query:categories';
 
     private ErgonodeCategoryProvider $categoryProvider;
 

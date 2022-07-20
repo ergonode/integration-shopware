@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer\CustomField;
+namespace Ergonode\IntegrationShopware\Transformer\CustomField;
 
 interface CustomFieldTransformerInterface
 {

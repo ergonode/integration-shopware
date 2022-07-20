@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Transformer;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Manager\FileManager;
+use Ergonode\IntegrationShopware\Provider\ProductMediaProvider;
+use Ergonode\IntegrationShopware\Transformer\ProductMediaTransformer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaCollection;
@@ -11,10 +15,6 @@ use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaDefinition;
 use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\DTO\ProductTransformationDTO;
-use Strix\Ergonode\Manager\FileManager;
-use Strix\Ergonode\Provider\ProductMediaProvider;
-use Strix\Ergonode\Transformer\ProductMediaTransformer;
 
 class ProductMediaTransformerTest extends TestCase
 {
@@ -88,21 +88,6 @@ class ProductMediaTransformerTest extends TestCase
 
         $dto = new ProductTransformationDTO([], $input);
         $dto->setSwProduct($this->getSwProductMock());
-
-        $output = $this->transformer->transform($dto, $this->contextMock);
-
-        $this->assertArrayNotHasKey('media', $output->getShopwareData());
-    }
-
-    /**
-     * @dataProvider validProductDataProvider
-     */
-    public function testTransformMethodWhenNoSwProductInDto(array $input)
-    {
-        $this->mockSuccessfulFileManagerPersist($input);
-
-        $dto = new ProductTransformationDTO([], $input);
-        $dto->setSwProduct(null);
 
         $output = $this->transformer->transform($dto, $this->contextMock);
 
