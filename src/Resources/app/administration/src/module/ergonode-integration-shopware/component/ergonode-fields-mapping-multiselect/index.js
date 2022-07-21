@@ -1,22 +1,36 @@
-import template from './ergonode-customfieldkeys-multiselect.html.twig'
+import template from './ergonode-fields-mapping-multiselect.html.twig'
 
-const {Component, Mixin} = Shopware;
+const { Component, Mixin } = Shopware;
 
-Component.register('ergonode-customfieldkeys-multiselect', {
-    template,
+Component.register('ergonode-fields-mapping-multiselect', {
     inject: ['ergonodeAttributeService'],
+
     mixins: [
         Mixin.getByName('notification'),
     ],
+
+    template,
+
     props: {
+        attributesType: {
+            type: String,
+        },
         value: {
             required: true,
-            validator(value) {
+            validator (value) {
                 return Array.isArray(value) || value === null || value === undefined;
             },
             default: () => [],
         },
     },
+
+    data () {
+        return {
+            isLoading: false,
+            ergoAttributes: [],
+        };
+    },
+
     computed: {
         filteredValue() {
             return (Array.isArray(this.value)
@@ -26,37 +40,35 @@ Component.register('ergonode-customfieldkeys-multiselect', {
                     [this.value]
                 ).filter(value => this.ergoAttributes.includes(value));
         },
-        options(){
+
+        options () {
             return this.ergoAttributes.map(attribute => {
                 return {value: attribute, label: attribute};
-            })
+            });
         },
     },
-    data() {
-        return {
-            isLoading: false,
-            ergoAttributes: [],
-        }
-    },
+
     methods: {
-        fetchErgoCustomAttributesOptions() {
+        fetchErgoAttributesOptions () {
             this.isLoading = true;
-            this.ergonodeAttributeService.getErgonodeAttributes()
-                .then(({data: {data: attributes}}) => {
+            this.ergonodeAttributeService.getErgonodeAttributes(this.attributesType ? [this.attributesType] : [])
+                .then(({ data: { data: attributes } }) => {
                     this.ergoAttributes = attributes;
                 })
                 .catch(() => {
                     this.createNotificationError({
-                        message: this.$tc('ErgonodeIntegrationShopware.mappings.messages.ergonodeAttributeFetchFailure'),
+                        message: this.$tc('StrixErgonode.mappings.messages.ergonodeAttributeFetchFailure'),
                     });
                 })
                 .finally(() => this.isLoading = false);
         },
-        onChange(value) {
+
+        onChange (value) {
             this.$emit('change', value);
-        }
+        },
     },
-    created() {
-        this.fetchErgoCustomAttributesOptions();
-    }
+
+    created () {
+        this.fetchErgoAttributesOptions();
+    },
 });

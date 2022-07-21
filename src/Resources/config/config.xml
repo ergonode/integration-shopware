@@ -27,7 +27,7 @@
         <title>Fields mapping</title>
         <title lang="de-DE">Fields mapping</title>
 
-        <component name="ergonode-customfieldkeys-multiselect">
+        <component name="ergonode-fields-mapping-multiselect">
             <name>customFieldKeys</name>
             <label>Ergonode attributes as custom fields</label>
             <label lang="de-DE">Ergonode attributes as custom fields</label>
@@ -35,27 +35,14 @@
             <helpText lang="de-DE">Every selected attribute will be fetched as product custom field</helpText>
         </component>
 
-        <input-field type="multi-select">
+        <component name="ergonode-fields-mapping-multiselect">
             <name>crossSellingKeys</name>
+            <attributesType>type_relation</attributesType>
             <label>Ergonode attributes as cross selling</label>
             <label lang="de-DE">Ergonode attributes as cross selling</label>
             <helpText>Every selected attribute will create a separate cross-selling collection</helpText>
             <helpText lang="de-DE">Every selected attribute will create a separate cross-selling collection</helpText>
-            <options>
-                <option>
-                    <id>fko_cross_selling_global</id>
-                    <name>fko_cross_selling_global</name>
-                </option>
-                <option>
-                    <id>fko_cross_selling_global_2</id>
-                    <name>fko_cross_selling_global_2</name>
-                </option>
-                <option>
-                    <id>fko_cross_selling_global_3</id>
-                    <name>fko_cross_selling_global_3</name>
-                </option>
-            </options>
-        </input-field>
+        </component>
     </card>
     <card>
         <title>Category Sync</title>
