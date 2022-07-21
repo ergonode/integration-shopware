@@ -104,6 +104,9 @@ services:
   Ergonode\IntegrationShopware\Service\ScheduledTask\LanguageSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
+  Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTask:
+    tags: [ 'shopware.scheduled.task' ]
+
   # This task is disabled because CategoryTreeSyncTask and CategorySyncTask together are building the full tree.
   # Can be removed completely if both tasks are working correctly. The task handler could be left for debug purposes.
   # (See SWERG-44, SWERG-49)
@@ -143,6 +146,11 @@ services:
       $lockFactory: '@ergonode_integration.lock_factory'
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\BuildFullCategoryTreeTaskHandler:
+    tags: [ 'messenger.message_handler' ]
+    arguments:
+      $lockFactory: '@ergonode_integration.lock_factory'
+
+  Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
       $lockFactory: '@ergonode_integration.lock_factory'

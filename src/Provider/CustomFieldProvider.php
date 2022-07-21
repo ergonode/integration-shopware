@@ -8,6 +8,7 @@ use Ergonode\IntegrationShopware\Util\Constants;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetEntity;
 use Shopware\Core\System\CustomField\CustomFieldEntity;
@@ -57,5 +58,17 @@ class CustomFieldProvider
         $criteria->addFilter(new EqualsFilter('name', Constants::PRODUCT_CUSTOM_FIELD_SET_NAME));
 
         return $this->customFieldSetRepository->search($criteria, $context)->first();
+    }
+
+    /**
+     * @param string[] $codes
+     */
+    public function getIdsByCodes(array $codes, Context $context): array
+    {
+        $codes = \array_map(fn($code) => Constants::PRODUCT_CUSTOM_FIELD_SET_NAME . '_' . $code, $codes);
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsAnyFilter('name', $codes));
+
+        return $this->customFieldRepository->searchIds($criteria, $context)->getIds();
     }
 }

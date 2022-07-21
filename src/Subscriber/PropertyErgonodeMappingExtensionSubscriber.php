@@ -16,16 +16,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PropertyErgonodeMappingExtensionSubscriber implements EventSubscriberInterface
 {
-    private EntityRepositoryInterface $strixErgonodeMappingExtensionRepository;
+    private EntityRepositoryInterface $ergonodeMappingExtensionRepository;
     private EntityRepositoryInterface $propertyGroupRepository;
     private EntityRepositoryInterface $propertyGroupOptionRepository;
 
     public function __construct(
-        EntityRepositoryInterface $strixErgonodeMappingExtensionRepository,
+        EntityRepositoryInterface $ergonodeMappingExtensionRepository,
         EntityRepositoryInterface $propertyGroupRepository,
         EntityRepositoryInterface $propertyGroupOptionRepository
     ) {
-        $this->strixErgonodeMappingExtensionRepository = $strixErgonodeMappingExtensionRepository;
+        $this->ergonodeMappingExtensionRepository = $ergonodeMappingExtensionRepository;
         $this->propertyGroupRepository = $propertyGroupRepository;
         $this->propertyGroupOptionRepository = $propertyGroupOptionRepository;
     }
@@ -79,6 +79,6 @@ class PropertyErgonodeMappingExtensionSubscriber implements EventSubscriberInter
             return;
         }
 
-        $this->strixErgonodeMappingExtensionRepository->delete(\array_values($extensionIds), $event->getContext());
+        $this->ergonodeMappingExtensionRepository->delete(\array_values($extensionIds), $event->getContext());
     }
 }

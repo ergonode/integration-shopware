@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Persistor;
 
+use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
 use Ergonode\IntegrationShopware\Provider\CustomFieldProvider;
 use Ergonode\IntegrationShopware\Transformer\CustomFieldTransformer;
@@ -11,8 +12,6 @@ use Ergonode\IntegrationShopware\Util\Constants;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetDefinition;
-use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetEntity;
 use Shopware\Core\System\CustomField\CustomFieldDefinition;
 
 class CustomFieldPersistor
@@ -86,5 +85,23 @@ class CustomFieldPersistor
                 ],
             ],
         ], $context);
+    }
+
+    public function remove(AttributeDeletedStreamResultsProxy $attributes, Context $context): array
+    {
+        $codes = $attributes->map(fn(array $node) => $node['node'] ?? null);
+        $codes = array_filter($codes);
+
+        $ids = $this->customFieldProvider->getIdsByCodes($codes, $context);
+
+        if (empty($ids)) {
+            return [];
+        }
+
+        $deleted = $this->customFieldRepository->delete(array_map(fn($id) => ['id' => $id], $ids), $context);
+
+        return [
+            CustomFieldDefinition::ENTITY_NAME => $deleted->getPrimaryKeys(CustomFieldDefinition::ENTITY_NAME)
+        ];
     }
 }
