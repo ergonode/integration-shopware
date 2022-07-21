@@ -44,7 +44,7 @@ echo -e "\e[32mOK\e[39m\n"
 
 echo -e "6/6 \e[33mCleaning build directory...\e[39m"
 rm -rf "$BUILD_PATH"
-rm -rf "$COMPOSER_DIST_PATH"
+rm -rf "$COMPOSER_DIST_PATH/vendor"
 echo -e "\e[32mOK\e[39m\n"
 
 echo -e "\e[32mZip file build completed! :)\e[39m"
