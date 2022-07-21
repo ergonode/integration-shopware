@@ -1,0 +1,10 @@
+{
+    "name": "ergonode/integration-shopware-composer-dist",
+    "description": "Small project just to omit installing whole shopware/symfony stack while building plugin zip. Has to be updated every time new dependency is added in plugin main composer.json!",
+    "type": "project",
+    "require": {
+        "php": ">= 7.4",
+        "ext-json": "*",
+        "gmostafa/php-graphql-client": "^1.13"
+    }
+}
