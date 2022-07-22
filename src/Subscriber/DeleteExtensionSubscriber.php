@@ -57,12 +57,20 @@ class DeleteExtensionSubscriber implements EventSubscriberInterface
                 continue;
             }
 
+            $payloads = $this->getExtensionDeletePayloads($entityName, $ids, $event->getContext());
+            if (empty($payloads)) {
+                continue;
+            }
+
             $entityExtensionDeletePayloads[] = $this->getExtensionDeletePayloads($entityName, $ids, $event->getContext());
         }
 
         $entityExtensionDeletePayloads = array_merge([], ...$entityExtensionDeletePayloads);
 
-        $this->ergonodeMappingExtensionRepository->delete(array_values($entityExtensionDeletePayloads), $event->getContext());
+        $context = $event->getContext();
+        $event->addSuccess(function() use ($entityExtensionDeletePayloads, $context) {
+            $this->ergonodeMappingExtensionRepository->delete(array_values($entityExtensionDeletePayloads), $context);
+        });
     }
 
     private function getExtensionDeletePayloads(string $entityName, array $ids, Context $context): array
