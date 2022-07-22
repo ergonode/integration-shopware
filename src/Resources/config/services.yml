@@ -171,3 +171,6 @@ services:
   # SUBSCRIBER
   Ergonode\IntegrationShopware\Subscriber\DeleteExtensionSubscriber:
     tags: [ 'kernel.event_subscriber' ]
+
+  Ergonode\IntegrationShopware\Subscriber\DeleteCategoryExtensionSubscriber:
+    tags: [ 'kernel.event_subscriber' ]
