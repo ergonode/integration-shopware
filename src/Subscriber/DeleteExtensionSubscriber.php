@@ -65,7 +65,11 @@ class DeleteExtensionSubscriber implements EventSubscriberInterface
             $entityExtensionDeletePayloads[] = $this->getExtensionDeletePayloads($entityName, $ids, $event->getContext());
         }
 
-        $entityExtensionDeletePayloads = array_merge([], ...$entityExtensionDeletePayloads);
+        if (empty($entityExtensionDeletePayloads)) {
+            return;
+        }
+
+        $entityExtensionDeletePayloads = array_merge(...$entityExtensionDeletePayloads);
 
         $context = $event->getContext();
         $event->addSuccess(function() use ($entityExtensionDeletePayloads, $context) {
