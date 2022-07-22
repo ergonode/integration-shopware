@@ -68,8 +68,8 @@ class DeleteExtensionSubscriber implements EventSubscriberInterface
         $entityExtensionDeletePayloads = array_merge([], ...$entityExtensionDeletePayloads);
 
         $context = $event->getContext();
-        $event->addSuccess(function() use ($entityExtensionDeletePayloads, $context) {
-            $this->ergonodeMappingExtensionRepository->delete(array_values($entityExtensionDeletePayloads), $context);
+        $event->addSuccess(function () use ($entityExtensionDeletePayloads, $context) {
+            $this->ergonodeMappingExtensionRepository->delete($entityExtensionDeletePayloads, $context);
         });
     }
 
@@ -77,18 +77,21 @@ class DeleteExtensionSubscriber implements EventSubscriberInterface
     {
         $repository = $this->definitionInstanceRegistry->getRepository($entityName);
 
-        return array_filter(
-            $repository->search(new Criteria($ids), $context)
-                ->map(function (Entity $entity) {
-                    $extensionId = $entity->get(AbstractErgonodeMappingExtension::PROPERTY_NAME);
-                    if (null === $extensionId) {
-                        return false;
-                    }
+        return array_values(
+            array_filter(
+                $repository
+                    ->search(new Criteria($ids), $context)
+                    ->map(function (Entity $entity) {
+                        $extensionId = $entity->get(AbstractErgonodeMappingExtension::PROPERTY_NAME);
+                        if (null === $extensionId) {
+                            return false;
+                        }
 
-                    return [
-                        'id' => $extensionId,
-                    ];
-                })
+                        return [
+                            'id' => $extensionId,
+                        ];
+                    })
+            )
         );
     }
 }

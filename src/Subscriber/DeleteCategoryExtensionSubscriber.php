@@ -6,9 +6,8 @@ namespace Ergonode\IntegrationShopware\Subscriber;
 
 use Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension;
 use Shopware\Core\Content\Category\CategoryDefinition;
-use Shopware\Core\Content\Product\Aggregate\ProductCategoryTree\ProductCategoryTreeDefinition;
+use Shopware\Core\Content\Category\CategoryEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\BeforeDeleteEvent;
@@ -17,25 +16,25 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use function array_filter;
 use function array_merge;
+use function array_search;
+use function array_slice;
 use function array_values;
+use function explode;
+use function reset;
+use function trim;
 
 class DeleteCategoryExtensionSubscriber implements EventSubscriberInterface
 {
-    private const SUPPORTED_ENTITIES = [
-        CategoryDefinition::ENTITY_NAME,
-        ProductCategoryTreeDefinition::ENTITY_NAME
-    ];
-
     private EntityRepositoryInterface $ergonodeCategoryMappingExtensionRepository;
 
-    private DefinitionInstanceRegistry $definitionInstanceRegistry;
+    private EntityRepositoryInterface $categoryRepository;
 
     public function __construct(
         EntityRepositoryInterface $ergonodeCategoryMappingExtensionRepository,
-        DefinitionInstanceRegistry $definitionInstanceRegistry
+        EntityRepositoryInterface $categoryRepository
     ) {
         $this->ergonodeCategoryMappingExtensionRepository = $ergonodeCategoryMappingExtensionRepository;
-        $this->definitionInstanceRegistry = $definitionInstanceRegistry;
+        $this->categoryRepository = $categoryRepository;
     }
 
     public static function getSubscribedEvents(): array
@@ -47,43 +46,86 @@ class DeleteCategoryExtensionSubscriber implements EventSubscriberInterface
 
     public function onEntityBeforeDelete(BeforeDeleteEvent $event): void
     {
-        $entityExtensionDeletePayloads = [];
-
-        foreach (self::SUPPORTED_ENTITIES as $entityName) {
-            $ids = $event->getIds($entityName);
-            if (empty($ids)) {
-                continue;
-            }
-
-            $payloads = $this->getExtensionDeletePayloads($entityName, $ids, $event->getContext());
-            if (empty($payloads)) {
-                continue;
-            }
-
-            $entityExtensionDeletePayloads[] = $this->getExtensionDeletePayloads($entityName, $ids, $event->getContext());
+        $ids = $this->getAllDeletedCategoryIds($event);
+        if (empty($ids)) {
+            return;
         }
 
-        $entityExtensionDeletePayloads = array_merge([], ...$entityExtensionDeletePayloads);
+        $deletePayloads = $this->getCategoryExtensionDeletePayloads($ids, $event->getContext());
+        if (empty($deletePayloads)) {
+            return;
+        }
 
-        $this->ergonodeCategoryMappingExtensionRepository->delete(array_values($entityExtensionDeletePayloads), $event->getContext());
+        $context = $event->getContext();
+        $event->addSuccess(function () use ($deletePayloads, $context) {
+            $this->ergonodeCategoryMappingExtensionRepository->delete(array_values($deletePayloads), $context);
+        });
     }
 
-    private function getExtensionDeletePayloads(string $entityName, array $ids, Context $context): array
+    /**
+     * @return string[]
+     */
+    private function getAllDeletedCategoryIds(BeforeDeleteEvent $event): array
     {
-        $repository = $this->definitionInstanceRegistry->getRepository($entityName);
+        $ids = $event->getIds(CategoryDefinition::ENTITY_NAME);
+        if (empty($ids)) {
+            return [];
+        }
 
+        $paths = $this->getCategoryPaths($ids, $event->getContext());
+
+        $mainId = reset($ids);
+
+        foreach ($paths as &$path) {
+            $fromIndex = array_search($mainId, $path);
+            if (false === $fromIndex) {
+                $path = [];
+            }
+
+            $path = array_slice($path, $fromIndex + 1);
+        }
+
+        return array_merge(
+            $ids,
+            ...array_values($paths)
+        );
+    }
+
+    private function getCategoryPaths(array $categoryIds, Context $context): array
+    {
         return array_filter(
-            $repository->search(new Criteria($ids), $context)
-                ->map(function (Entity $entity) {
-                    $extensionId = $entity->get(ErgonodeCategoryMappingExtension::PROPERTY_NAME);
-                    if (null === $extensionId) {
+            $this->categoryRepository
+                ->search(new Criteria($categoryIds), $context)
+                ->map(static function (CategoryEntity $category) {
+                    $path = $category->getPath();
+                    if (null === $path) {
                         return false;
                     }
 
-                    return [
-                        'id' => $extensionId,
-                    ];
+                    $pathStr = trim($path, '|');
+
+                    return explode('|', $pathStr);
                 })
+        );
+    }
+
+    private function getCategoryExtensionDeletePayloads(array $ids, Context $context): array
+    {
+        return array_values(
+            array_filter(
+                $this->categoryRepository
+                    ->search(new Criteria($ids), $context)
+                    ->map(static function (Entity $entity) {
+                        $extensionId = $entity->get(ErgonodeCategoryMappingExtension::PROPERTY_NAME);
+                        if (null === $extensionId) {
+                            return false;
+                        }
+
+                        return [
+                            'id' => $extensionId,
+                        ];
+                    })
+            )
         );
     }
 }
