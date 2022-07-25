@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
-use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionDefinition;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Extension\ProductCrossSelling\ProductCrossSellingExtension;
 use Ergonode\IntegrationShopware\Manager\ExtensionManager;
@@ -123,12 +122,6 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
             $this->getCrossSellingDeletePayload($productData)
         );
 
-        // TODO remove after fixing delete cascade - SWERG-63
-        $productData->addEntitiesToDelete(
-            ErgonodeMappingExtensionDefinition::ENTITY_NAME,
-            $this->getExtensionDeletePayload($productData)
-        );
-
         return $productData;
     }
 
@@ -184,46 +177,6 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
         );
 
         $idsToDelete = array_diff($crossSellingIds, $newCrossSellingIds);
-
-        return array_map(fn(string $id) => ['id' => $id], $idsToDelete);
-    }
-
-    private function getExtensionDeletePayload(ProductTransformationDTO $productData): array
-    {
-        if (null === $productData->getSwProduct()) {
-            return [];
-        }
-
-        $crossSellings = $productData->getSwProduct()->getCrossSellings();
-        if (null === $crossSellings || 0 === $crossSellings->count()) {
-            return [];
-        }
-
-        $swData = $productData->getShopwareData();
-        $extensionIds = [];
-        foreach ($crossSellings as $crossSelling) {
-            $id = $this->extensionManager->getEntityExtensionId($crossSelling);
-            if (null !== $id) {
-                $extensionIds[] = $id;
-            }
-        }
-
-        if (empty($extensionIds)) {
-            return [];
-        }
-
-        if (!isset($swData[self::SW_PRODUCT_FIELD_CROSS_SELLING])) {
-            return array_map(fn(string $id) => ['id' => $id], $extensionIds);
-        }
-
-        $newExtensionIds = array_filter(
-            array_map(
-                fn(array $crossSelling) => $crossSelling['extensions'][AbstractErgonodeMappingExtension::EXTENSION_NAME]['id'],
-                $swData[self::SW_PRODUCT_FIELD_CROSS_SELLING]
-            )
-        );
-
-        $idsToDelete = array_diff($extensionIds, $newExtensionIds);
 
         return array_map(fn(string $id) => ['id' => $id], $idsToDelete);
     }
