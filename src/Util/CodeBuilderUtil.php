@@ -6,7 +6,7 @@ namespace Ergonode\IntegrationShopware\Util;
 
 class CodeBuilderUtil
 {
-    public static function buildOptionCode(string $prefix, string $suffix): string
+    public static function build(string $prefix, string $suffix): string
     {
         return sprintf('%s_%s', $prefix, $suffix);
     }

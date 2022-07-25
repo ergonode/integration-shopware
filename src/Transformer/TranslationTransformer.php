@@ -75,12 +75,14 @@ class TranslationTransformer
         foreach ($ergonodeTranslation as $translation) {
             if ($this->defaultLocale === $translation['language']) {
                 $key = ErgonodeApiValueKeyResolverUtil::resolve($translation['__typename']);
+
                 return $translation[$key];
             }
         }
 
         // default translation not found; return first one
         $value = reset($ergonodeTranslation);
+
         return $value[ErgonodeApiValueKeyResolverUtil::resolve($value['__typename'])];
     }
 }

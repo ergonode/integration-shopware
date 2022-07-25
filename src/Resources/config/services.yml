@@ -177,5 +177,5 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductCrossSellingTransformer'
 
   # SUBSCRIBER
-  Ergonode\IntegrationShopware\Subscriber\PropertyErgonodeMappingExtensionSubscriber:
+  Ergonode\IntegrationShopware\Subscriber\DeleteExtensionSubscriber:
     tags: [ 'kernel.event_subscriber' ]

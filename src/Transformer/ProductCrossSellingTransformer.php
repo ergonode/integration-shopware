@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
-use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionDefinition;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Extension\ProductCrossSelling\ProductCrossSellingExtension;
 use Ergonode\IntegrationShopware\Manager\ExtensionManager;
 use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Provider\ProductCrossSellingProvider;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
@@ -33,22 +33,30 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 
     private ExtensionManager $extensionManager;
 
+    private LanguageProvider $languageProvider;
+
     public function __construct(
         ConfigProvider $configProvider,
         ProductProvider $productProvider,
         TranslationTransformer $translationTransformer,
         ProductCrossSellingProvider $productCrossSellingProvider,
-        ExtensionManager $extensionManager
+        ExtensionManager $extensionManager,
+        LanguageProvider $languageProvider
     ) {
         $this->configProvider = $configProvider;
         $this->productProvider = $productProvider;
         $this->translationTransformer = $translationTransformer;
         $this->productCrossSellingProvider = $productCrossSellingProvider;
         $this->extensionManager = $extensionManager;
+        $this->languageProvider = $languageProvider;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
+        if ($productData->isVariant()) {
+            return $productData; // cross-selling for variants is not supported by Shopware
+        }
+
         $swData = $productData->getShopwareData();
 
         $codes = $this->configProvider->getErgonodeCrossSellingKeys();
@@ -76,6 +84,15 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
                 $this->getAssignedProductsPayload($existingCrossSelling, $productIds, $productData)
             );
 
+            $defaultLocale = $this->languageProvider->getDefaultLanguageLocale($context);
+            $translations = $this->translationTransformer->transform($node['attribute']['label'], 'name');
+            if (!isset($translations[$defaultLocale])) {
+                // prevent error when missing default language translation in Ergonode, use code as name
+                $translations[$defaultLocale] = [
+                    'name' => $code
+                ];
+            }
+
             $crossSellings[] = [
                 'id' => $existingCrossSelling ? $existingCrossSelling->getId() : null,
                 'active' => true,
@@ -83,11 +100,11 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
                 'sortBy' => ProductCrossSellingDefinition::SORT_BY_NAME,
                 'position' => $key,
                 'assignedProducts' => $assignedProducts,
-                'translations' => $this->translationTransformer->transform($node['attribute']['label'], 'name'),
+                'translations' => $translations,
                 'extensions' => [
                     AbstractErgonodeMappingExtension::EXTENSION_NAME => [
                         'id' => $existingCrossSelling ? $this->extensionManager->getEntityExtensionId($existingCrossSelling) : null,
-                        'code' => CodeBuilderUtil::buildOptionCode($productData->getErgonodeData()['sku'], $code),
+                        'code' => CodeBuilderUtil::build($productData->getErgonodeData()['sku'], $code),
                         'type' => ProductCrossSellingExtension::ERGONODE_TYPE,
                     ],
                 ],
@@ -103,12 +120,6 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
         $productData->addEntitiesToDelete(
             ProductCrossSellingDefinition::ENTITY_NAME,
             $this->getCrossSellingDeletePayload($productData)
-        );
-
-        // TODO remove after fixing delete cascade - SWERG-63
-        $productData->addEntitiesToDelete(
-            ErgonodeMappingExtensionDefinition::ENTITY_NAME,
-            $this->getExtensionDeletePayload($productData)
         );
 
         return $productData;
@@ -133,7 +144,7 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 
         return $this->productCrossSellingProvider->getProductCrossSellingByMapping(
             $swProduct->getId(),
-            CodeBuilderUtil::buildOptionCode($swProduct->getProductNumber(), $code),
+            CodeBuilderUtil::build($swProduct->getProductNumber(), $code),
             $context,
             ['assignedProducts']
         );
@@ -166,46 +177,6 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
         );
 
         $idsToDelete = array_diff($crossSellingIds, $newCrossSellingIds);
-
-        return array_map(fn(string $id) => ['id' => $id], $idsToDelete);
-    }
-
-    private function getExtensionDeletePayload(ProductTransformationDTO $productData): array
-    {
-        if (null === $productData->getSwProduct()) {
-            return [];
-        }
-
-        $crossSellings = $productData->getSwProduct()->getCrossSellings();
-        if (null === $crossSellings || 0 === $crossSellings->count()) {
-            return [];
-        }
-
-        $swData = $productData->getShopwareData();
-        $extensionIds = [];
-        foreach ($crossSellings as $crossSelling) {
-            $id = $this->extensionManager->getEntityExtensionId($crossSelling);
-            if (null !== $id) {
-                $extensionIds[] = $id;
-            }
-        }
-
-        if (empty($extensionIds)) {
-            return [];
-        }
-
-        if (!isset($swData[self::SW_PRODUCT_FIELD_CROSS_SELLING])) {
-            return array_map(fn(string $id) => ['id' => $id], $extensionIds);
-        }
-
-        $newExtensionIds = array_filter(
-            array_map(
-                fn(array $crossSelling) => $crossSelling['extensions'][AbstractErgonodeMappingExtension::EXTENSION_NAME]['id'],
-                $swData[self::SW_PRODUCT_FIELD_CROSS_SELLING]
-            )
-        );
-
-        $idsToDelete = array_diff($extensionIds, $newExtensionIds);
 
         return array_map(fn(string $id) => ['id' => $id], $idsToDelete);
     }
