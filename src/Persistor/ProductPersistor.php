@@ -59,7 +59,7 @@ class ProductPersistor
     public function deleteProductIds(array $productIds, Context $context): void
     {
         $this->productRepository->delete(
-            \array_map(fn($id) => ['id' => $id], $productIds),
+            \array_map(static fn($id) => ['id' => $id], $productIds),
             $context
         );
     }
