@@ -155,8 +155,8 @@ services:
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
-      arguments:
-        $lockFactory: '@ergonode_integration.lock_factory'
+    arguments:
+      $lockFactory: '@ergonode_integration.lock_factory'
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
