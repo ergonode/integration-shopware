@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Manager;
 
 use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
+use Ergonode\IntegrationShopware\Persistor\CustomFieldPersistor;
 use Ergonode\IntegrationShopware\Persistor\PropertyGroupPersistor;
 use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
 use Shopware\Core\Framework\Context;
@@ -17,17 +18,21 @@ class OrphanEntitiesManager
 
     private PropertyGroupPersistor $propertyGroupPersistor;
 
+    private CustomFieldPersistor $customFieldPersistor;
+
     public function __construct(
         ErgonodeCursorManager $ergonodeCursorManager,
         ErgonodeAttributeProvider $ergonodeAttributeProvider,
-        PropertyGroupPersistor $propertyGroupPersistor
+        PropertyGroupPersistor $propertyGroupPersistor,
+        CustomFieldPersistor $customFieldPersistor
     ) {
         $this->ergonodeCursorManager = $ergonodeCursorManager;
         $this->ergonodeAttributeProvider = $ergonodeAttributeProvider;
         $this->propertyGroupPersistor = $propertyGroupPersistor;
+        $this->customFieldPersistor = $customFieldPersistor;
     }
 
-    public function cleanPropertyGroups(Context $context): array
+    public function cleanAttributes(Context $context): array
     {
         $entities = [];
 
@@ -38,7 +43,8 @@ class OrphanEntitiesManager
         foreach ($generator as $deletedAttributes) {
             $entities = array_merge_recursive(
                 $entities,
-                $this->propertyGroupPersistor->remove($deletedAttributes, $context)
+                $this->propertyGroupPersistor->remove($deletedAttributes, $context),
+                $this->customFieldPersistor->remove($deletedAttributes, $context)
             );
         }
 
