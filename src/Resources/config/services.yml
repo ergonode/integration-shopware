@@ -104,6 +104,9 @@ services:
   Ergonode\IntegrationShopware\Service\ScheduledTask\LanguageSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
+  Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTask:
+    tags: [ 'shopware.scheduled.task' ]
+
   Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
@@ -150,6 +153,11 @@ services:
     arguments:
       $lockFactory: '@ergonode_integration.lock_factory'
 
+  Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTaskHandler:
+    tags: [ 'messenger.message_handler' ]
+      arguments:
+        $lockFactory: '@ergonode_integration.lock_factory'
+
   Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
@@ -177,5 +185,5 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductCrossSellingTransformer'
 
   # SUBSCRIBER
-  Ergonode\IntegrationShopware\Subscriber\PropertyErgonodeMappingExtensionSubscriber:
+  Ergonode\IntegrationShopware\Subscriber\DeleteExtensionSubscriber:
     tags: [ 'kernel.event_subscriber' ]
