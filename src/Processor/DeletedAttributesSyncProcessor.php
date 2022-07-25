@@ -29,10 +29,10 @@ class DeletedAttributesSyncProcessor
         $processedEntityCount = 0;
 
         try {
-            $result = $this->orphanEntitiesManager->cleanPropertyGroups($context);
+            $result = $this->orphanEntitiesManager->cleanAttributes($context);
 
             if (false === empty($result)) {
-                $processedEntityCount = \array_reduce($result, fn($carry, $item) => $carry + \count($item));
+                $processedEntityCount = \array_reduce($result, static fn($carry, $item) => $carry + \count($item));
             }
 
             $this->logger->info('Processed deleted attributes', [

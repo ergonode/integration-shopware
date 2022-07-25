@@ -75,7 +75,7 @@ class OrphanEntitiesManagerTest extends TestCase
         $this->mockPropertyGroupPersistor($results, $mockDeletedPropertyGroups);
         $this->mockErgonodeCursorPersistor($cursorToPersist, AttributeDeletedStreamResultsProxy::MAIN_FIELD);
 
-        $output = $this->manager->cleanPropertyGroups($this->contextMock);
+        $output = $this->manager->cleanAttributes($this->contextMock);
 
         $this->assertSame($expectedOutput, $output);
     }

@@ -65,7 +65,7 @@ class CustomFieldProvider
      */
     public function getIdsByCodes(array $codes, Context $context): array
     {
-        $codes = \array_map(fn($code) => Constants::PRODUCT_CUSTOM_FIELD_SET_NAME . '_' . $code, $codes);
+        $codes = \array_map(static fn($code) => Constants::PRODUCT_CUSTOM_FIELD_SET_NAME . '_' . $code, $codes);
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsAnyFilter('name', $codes));
 

@@ -89,7 +89,7 @@ class CustomFieldPersistor
 
     public function remove(AttributeDeletedStreamResultsProxy $attributes, Context $context): array
     {
-        $codes = $attributes->map(fn(array $node) => $node['node'] ?? null);
+        $codes = $attributes->map(static fn(array $node) => $node['node'] ?? null);
         $codes = array_filter($codes);
 
         $ids = $this->customFieldProvider->getIdsByCodes($codes, $context);
@@ -98,7 +98,7 @@ class CustomFieldPersistor
             return [];
         }
 
-        $deleted = $this->customFieldRepository->delete(array_map(fn($id) => ['id' => $id], $ids), $context);
+        $deleted = $this->customFieldRepository->delete(array_map(static fn($id) => ['id' => $id], $ids), $context);
 
         return [
             CustomFieldDefinition::ENTITY_NAME => $deleted->getPrimaryKeys(CustomFieldDefinition::ENTITY_NAME)

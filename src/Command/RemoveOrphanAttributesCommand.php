@@ -40,7 +40,7 @@ class RemoveOrphanAttributesCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $entities = $this->orphanEntitiesManager->cleanPropertyGroups($this->context);
+        $entities = $this->orphanEntitiesManager->cleanAttributes($this->context);
 
         if (empty($entities)) {
             $io->info('Could not find any orphan property groups');

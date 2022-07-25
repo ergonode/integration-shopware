@@ -32,7 +32,7 @@ class OrphanEntitiesManager
         $this->customFieldPersistor = $customFieldPersistor;
     }
 
-    public function cleanPropertyGroups(Context $context): array
+    public function cleanAttributes(Context $context): array
     {
         $entities = [];
 
