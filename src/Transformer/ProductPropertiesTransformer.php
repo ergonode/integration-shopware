@@ -97,7 +97,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
             }
 
             foreach ($value as &$optionCode) {
-                $optionCode = CodeBuilderUtil::buildOptionCode($node['attribute']['code'], $optionCode);
+                $optionCode = CodeBuilderUtil::build($node['attribute']['code'], $optionCode);
             }
 
             $transformed = array_merge($transformed, $value);
