@@ -62,7 +62,7 @@ class PropertyGroupTransformer
                         'extensions' => [
                             AbstractErgonodeMappingExtension::EXTENSION_NAME => [
                                 'id' => $existingOption ? $this->getEntityExtensionId($existingOption) : null,
-                                'code' => CodeBuilderUtil::buildOptionCode($code, $option['code']),
+                                'code' => CodeBuilderUtil::build($code, $option['code']),
                                 'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                             ],
                         ],
@@ -113,7 +113,7 @@ class PropertyGroupTransformer
             if (
                 $extension instanceof ErgonodeMappingExtensionEntity &&
                 $groupExtension instanceof ErgonodeMappingExtensionEntity &&
-                CodeBuilderUtil::buildOptionCode($groupExtension->getCode(), $code) === $extension->getCode()
+                CodeBuilderUtil::build($groupExtension->getCode(), $code) === $extension->getCode()
             ) {
                 return $option;
             }
