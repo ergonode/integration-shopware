@@ -83,7 +83,7 @@ class DeleteExtensionSubscriber implements EventSubscriberInterface
 
         return array_filter(
             $repository->search(new Criteria($ids), $context)
-                ->map(function (Entity $entity) {
+                ->map(static function (Entity $entity) {
                     $extensionId = $entity->get(AbstractErgonodeMappingExtension::PROPERTY_NAME);
                     if (null === $extensionId) {
                         return false;
