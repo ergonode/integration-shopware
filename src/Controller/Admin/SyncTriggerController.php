@@ -6,6 +6,7 @@ namespace Ergonode\IntegrationShopware\Controller\Admin;
 
 use Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\CategoryTreeSyncTask;
+use Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\ProductVisibilitySyncTask;
@@ -42,6 +43,7 @@ class SyncTriggerController extends AbstractController
         $this->messageBus->dispatch(new CategorySyncTask());
         $this->messageBus->dispatch(new ProductSyncTask());
         $this->messageBus->dispatch(new ProductVisibilitySyncTask());
+        $this->messageBus->dispatch(new DeletedProductSyncTask());
         $this->messageBus->dispatch(new DeletedAttributeSyncTask());
 
         return new JsonResponse([
