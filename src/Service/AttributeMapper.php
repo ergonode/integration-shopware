@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Service;
+namespace Ergonode\IntegrationShopware\Service;
 
+use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
+use Ergonode\IntegrationShopware\Util\Constants;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Provider\AttributeMappingProvider;
-use Strix\Ergonode\Provider\ErgonodeAttributeProvider;
-use Strix\Ergonode\Util\Constants;
 
 class AttributeMapper
 {
@@ -57,13 +57,17 @@ class AttributeMapper
         return Constants::SW_PRODUCT_MAPPABLE_FIELDS;
     }
 
-    public function getAllErgonodeAttributes(): array
+    public function getAllErgonodeAttributes(array $types = []): array
     {
         $attributeCodes = [];
 
         $generator = $this->ergonodeAttributeProvider->provideProductAttributes();
 
         foreach ($generator as $attributes) {
+            if (!empty($types)) {
+                $attributes = $attributes->filterByAttributeTypes($types);
+            }
+
             foreach ($attributes->getEdges() as $attribute) {
                 $attributeCodes[] = $attribute['node']['code'] ?? '';
             }

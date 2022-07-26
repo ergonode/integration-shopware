@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Provider;
+namespace Ergonode\IntegrationShopware\Provider;
 
+use Ergonode\IntegrationShopware\Api\CategoryTreeResultsProxy;
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
+use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
+use Ergonode\IntegrationShopware\Struct\ErgonodeCategoryCollection;
+use Ergonode\IntegrationShopware\Transformer\CategoryResponseTransformer;
 use RuntimeException;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
-use Strix\Ergonode\Api\CategoryTreeResultsProxy;
-use Strix\Ergonode\QueryBuilder\CategoryQueryBuilder;
-use Strix\Ergonode\Struct\ErgonodeCategoryCollection;
-use Strix\Ergonode\Transformer\CategoryResponseTransformer;
 
 class ErgonodeCategoryProvider
 {

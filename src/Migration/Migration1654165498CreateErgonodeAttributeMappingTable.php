@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Strix\Ergonode\Migration;
+namespace Ergonode\IntegrationShopware\Migration;
 
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Migration\MigrationStep;
@@ -15,7 +15,7 @@ class Migration1654165498CreateErgonodeAttributeMappingTable extends MigrationSt
     public function update(Connection $connection): void
     {
         $connection->executeStatement('
-            CREATE TABLE IF NOT EXISTS `strix_ergonode_attribute_mapping` (
+            CREATE TABLE IF NOT EXISTS `ergonode_attribute_mapping` (
               `id` BINARY(16) NOT NULL,
               `shopware_key` VARCHAR(128) NOT NULL UNIQUE,
               `ergonode_key` VARCHAR(128) NOT NULL,

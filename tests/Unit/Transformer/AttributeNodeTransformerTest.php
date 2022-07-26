@@ -2,8 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Transformer;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\PropertyGroupTransformationDTO;
+use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
+use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
+use Ergonode\IntegrationShopware\Extension\PropertyGroup\PropertyGroupExtension;
+use Ergonode\IntegrationShopware\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
+use Ergonode\IntegrationShopware\Provider\PropertyGroupProvider;
+use Ergonode\IntegrationShopware\Tests\Fixture\GqlAttributeResponse;
+use Ergonode\IntegrationShopware\Transformer\PropertyGroupTransformer;
+use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionCollection;
@@ -12,14 +21,6 @@ use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Content\Property\PropertyGroupEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
-use Strix\Ergonode\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
-use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
-use Strix\Ergonode\Extension\PropertyGroup\PropertyGroupExtension;
-use Strix\Ergonode\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
-use Strix\Ergonode\Provider\PropertyGroupProvider;
-use Strix\Ergonode\Tests\Fixture\GqlAttributeResponse;
-use Strix\Ergonode\Transformer\PropertyGroupTransformer;
-use Strix\Ergonode\Transformer\TranslationTransformer;
 
 class AttributeNodeTransformerTest extends TestCase
 {
@@ -55,9 +56,12 @@ class AttributeNodeTransformerTest extends TestCase
         $this->mockTranslationTransformation(2 + count($nodeInput['options']));
         $this->mockPropertyGroupProvider($providerReturnValue);
 
-        $output = $this->transformer->transformAttributeNode($nodeInput, $this->contextMock);
+        $output = $this->transformer->transformAttributeNode(
+            new PropertyGroupTransformationDTO($nodeInput),
+            $this->contextMock
+        );
 
-        $this->assertSame($expectedOutput, $output);
+        $this->assertSame($expectedOutput, $output->getPropertyGroupPayload());
     }
 
     public function bindingAttributeDataProvider(): array
@@ -175,7 +179,7 @@ class AttributeNodeTransformerTest extends TestCase
                     'getExtension' => $this->createMock(Entity::class),
                 ]),
                 [
-                    'id' => '9',
+                    'id' => null,
                     'displayType' => PropertyGroupDefinition::DISPLAY_TYPE_TEXT,
                     'sortingType' => PropertyGroupDefinition::SORTING_TYPE_ALPHANUMERIC,
                     'name' => 'color',
@@ -286,7 +290,7 @@ class AttributeNodeTransformerTest extends TestCase
                     'getOptions' => new PropertyGroupOptionCollection(),
                 ]),
                 [
-                    'id' => '9',
+                    'id' => null,
                     'displayType' => PropertyGroupDefinition::DISPLAY_TYPE_TEXT,
                     'sortingType' => PropertyGroupDefinition::SORTING_TYPE_ALPHANUMERIC,
                     'name' => 'size',
@@ -380,7 +384,7 @@ class AttributeNodeTransformerTest extends TestCase
                     ],
                     'extensions' => [
                         AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                            'id' => '99',
+                            'id' => null,
                             'code' => 'size',
                             'type' => PropertyGroupExtension::ERGONODE_TYPE,
                         ],
@@ -431,13 +435,13 @@ class AttributeNodeTransformerTest extends TestCase
                     ]),
                 ]),
                 [
-                    'id' => '9',
+                    'id' => null,
                     'displayType' => PropertyGroupDefinition::DISPLAY_TYPE_TEXT,
                     'sortingType' => PropertyGroupDefinition::SORTING_TYPE_ALPHANUMERIC,
                     'name' => 'size',
                     'options' => [
                         [
-                            'id' => '1',
+                            'id' => null,
                             'name' => 's',
                             'translations' => [
                                 'pl-PL' => [
@@ -449,14 +453,14 @@ class AttributeNodeTransformerTest extends TestCase
                             ],
                             'extensions' => [
                                 AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                                    'id' => '11',
+                                    'id' => null,
                                     'code' => 'size_s',
                                     'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                                 ],
                             ],
                         ],
                         [
-                            'id' => '2',
+                            'id' => null,
                             'name' => 'm',
                             'translations' => [
                                 'pl-PL' => [
@@ -468,14 +472,14 @@ class AttributeNodeTransformerTest extends TestCase
                             ],
                             'extensions' => [
                                 AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                                    'id' => '22',
+                                    'id' => null,
                                     'code' => 'size_m',
                                     'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                                 ],
                             ],
                         ],
                         [
-                            'id' => '3',
+                            'id' => null,
                             'name' => 'l',
                             'translations' => [
                                 'pl-PL' => [
@@ -487,14 +491,14 @@ class AttributeNodeTransformerTest extends TestCase
                             ],
                             'extensions' => [
                                 AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                                    'id' => '33',
+                                    'id' => null,
                                     'code' => 'size_l',
                                     'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                                 ],
                             ],
                         ],
                         [
-                            'id' => '4',
+                            'id' => null,
                             'name' => 'xl',
                             'translations' => [
                                 'pl-PL' => [
@@ -506,7 +510,7 @@ class AttributeNodeTransformerTest extends TestCase
                             ],
                             'extensions' => [
                                 AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                                    'id' => '44',
+                                    'id' => null,
                                     'code' => 'size_xl',
                                     'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                                 ],
@@ -525,7 +529,7 @@ class AttributeNodeTransformerTest extends TestCase
                     ],
                     'extensions' => [
                         AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                            'id' => '99',
+                            'id' => null,
                             'code' => 'size',
                             'type' => PropertyGroupExtension::ERGONODE_TYPE,
                         ],
@@ -568,13 +572,13 @@ class AttributeNodeTransformerTest extends TestCase
                     ]),
                 ]),
                 [
-                    'id' => '9',
+                    'id' => null,
                     'displayType' => PropertyGroupDefinition::DISPLAY_TYPE_TEXT,
                     'sortingType' => PropertyGroupDefinition::SORTING_TYPE_ALPHANUMERIC,
                     'name' => 'size',
                     'options' => [
                         [
-                            'id' => '1',
+                            'id' => null,
                             'name' => 's',
                             'translations' => [
                                 'pl-PL' => [
@@ -586,14 +590,14 @@ class AttributeNodeTransformerTest extends TestCase
                             ],
                             'extensions' => [
                                 AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                                    'id' => '11',
+                                    'id' => null,
                                     'code' => 'size_s',
                                     'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                                 ],
                             ],
                         ],
                         [
-                            'id' => '2',
+                            'id' => null,
                             'name' => 'm',
                             'translations' => [
                                 'pl-PL' => [
@@ -605,14 +609,14 @@ class AttributeNodeTransformerTest extends TestCase
                             ],
                             'extensions' => [
                                 AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                                    'id' => '22',
+                                    'id' => null,
                                     'code' => 'size_m',
                                     'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                                 ],
                             ],
                         ],
                         [
-                            'id' => '3',
+                            'id' => null,
                             'name' => 'l',
                             'translations' => [
                                 'pl-PL' => [
@@ -624,7 +628,7 @@ class AttributeNodeTransformerTest extends TestCase
                             ],
                             'extensions' => [
                                 AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                                    'id' => '33',
+                                    'id' => null,
                                     'code' => 'size_l',
                                     'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                                 ],
@@ -662,7 +666,7 @@ class AttributeNodeTransformerTest extends TestCase
                     ],
                     'extensions' => [
                         AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                            'id' => '99',
+                            'id' => null,
                             'code' => 'size',
                             'type' => PropertyGroupExtension::ERGONODE_TYPE,
                         ],
@@ -683,7 +687,6 @@ class AttributeNodeTransformerTest extends TestCase
     private function mockPropertyGroupProvider(?PropertyGroupEntity $returnValue): void
     {
         $this->propertyGroupProviderMock
-            ->expects($this->once())
             ->method('getPropertyGroupByMapping')
             ->willReturn($returnValue);
     }

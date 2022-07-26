@@ -1,11 +1,19 @@
 {
     "name": "ergonode/integration-shopware",
     "description": "Shopware Ergonode Integration",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "type": "shopware-platform-plugin",
-    "license": "MIT",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Strix",
+            "homepage": "https://www.strix.net/",
+            "email": "sales@strix.net",
+            "role": "Developer"
+        }
+    ],
     "extra": {
-        "shopware-plugin-class": "Strix\\Ergonode\\StrixErgonode",
+        "shopware-plugin-class": "Ergonode\\IntegrationShopware\\ErgonodeIntegrationShopware",
         "author": "Strix",
         "label": {
             "de-DE": "Shopware Ergonode Integration",
@@ -15,9 +23,8 @@
     "require": {
         "php": ">= 7.4",
         "ext-json": "*",
-        "shopware/administration": "*",
-        "shopware/core": "*",
-        "shopware/storefront": "*",
+        "shopware/administration": "~6.4.11",
+        "shopware/core": "~6.4.11",
         "gmostafa/php-graphql-client": "^1.13"
     },
     "require-dev": {
@@ -25,13 +32,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Strix\\Ergonode\\": "src/"
+            "Ergonode\\IntegrationShopware\\": "src/"
         },
         "exclude-from-classmap": ["src/DependencyInjection/*"]
     },
     "autoload-dev": {
         "psr-4": {
-            "Strix\\Ergonode\\Tests\\": "tests/"
+            "Ergonode\\IntegrationShopware\\Tests\\": "tests/"
         }
     }
 }

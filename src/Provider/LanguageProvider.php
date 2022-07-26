@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Provider;
+namespace Ergonode\IntegrationShopware\Provider;
 
+use RuntimeException;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\System\Language\LanguageCollection;
 use Shopware\Core\System\Language\LanguageEntity;
 
 class LanguageProvider
@@ -31,9 +33,20 @@ class LanguageProvider
         $languageEntity = $this->languageRepository->search($criteria, $context)->first();
 
         if (null === $languageEntity) {
-            throw new \RuntimeException('Could not load default system language entity');
+            throw new RuntimeException('Could not load default system language entity');
         }
 
         return $languageEntity->getLocale()->getCode();
+    }
+
+    public function getActiveLanguages(Context $context): LanguageCollection
+    {
+        $criteria = new Criteria();
+        $criteria->addAssociation('locale');
+
+        /** @var LanguageCollection $result */
+        $result = $this->languageRepository->search($criteria, $context)->getEntities();
+
+        return $result;
     }
 }

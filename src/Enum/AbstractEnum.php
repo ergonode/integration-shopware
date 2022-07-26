@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Enum;
+namespace Ergonode\IntegrationShopware\Enum;
 
 use ReflectionClass;
 

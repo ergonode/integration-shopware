@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\DTO;
+namespace Ergonode\IntegrationShopware\DTO;
 
 use Shopware\Core\Content\Product\ProductEntity;
 
@@ -81,11 +81,15 @@ class ProductTransformationDTO
 
     public function addEntitiesToDelete(string $entityName, array $payload): void
     {
+        if (empty($payload)) {
+            return;
+        }
+
         if (!isset($this->entitiesToDelete[$entityName])) {
             $this->entitiesToDelete[$entityName] = [];
         }
 
-        $this->entitiesToDelete[$entityName] = array_merge(
+        $this->entitiesToDelete[$entityName] = array_merge_recursive(
             $this->entitiesToDelete[$entityName],
             $payload
         );

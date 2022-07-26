@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Migration;
+namespace Ergonode\IntegrationShopware\Migration;
 
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Migration\MigrationStep;
@@ -16,7 +16,7 @@ class Migration1655194393AddUniqueIndexCodeTypeInErgonodeMappingEntity extends M
     public function update(Connection $connection): void
     {
         $connection->executeStatement("
-            ALTER TABLE `strix_ergonode_mapping_extension`
+            ALTER TABLE `ergonode_mapping_extension`
             ADD UNIQUE (`code`, `type`);
         ");
     }

@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Persistor;
+namespace Ergonode\IntegrationShopware\Persistor;
 
+use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingException;
+use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
+use Ergonode\IntegrationShopware\Provider\ProductProvider;
+use Ergonode\IntegrationShopware\Transformer\ProductTransformerChain;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityRepositoryNotFoundException;
-use Strix\Ergonode\DTO\ProductTransformationDTO;
-use Strix\Ergonode\Exception\MissingRequiredProductMappingException;
-use Strix\Ergonode\Provider\ProductProvider;
-use Strix\Ergonode\Transformer\ProductTransformerChain;
 
 use function array_filter;
 use function array_merge_recursive;
@@ -62,7 +63,12 @@ class ProductPersistor
     protected function persistProduct(array $productData, ?string $parentId, Context $context): string
     {
         $sku = $productData['sku'];
-        $existingProduct = $this->productProvider->getProductBySku($sku, $context, ['media', 'properties']);
+        $existingProduct = $this->productProvider->getProductBySku($sku, $context, [
+            'media',
+            'properties',
+            'crossSellings.assignedProducts',
+            'crossSellings.' . AbstractErgonodeMappingExtension::EXTENSION_NAME,
+        ]);
 
         $dto = new ProductTransformationDTO($productData);
         $dto->setIsVariant($parentId !== null);

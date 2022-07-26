@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Provider;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Provider;
 
+use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
+use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use Generator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -14,8 +16,6 @@ use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SystemConfig\SystemConfigCollection;
 use Shopware\Core\System\SystemConfig\SystemConfigEntity;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
-use Strix\Ergonode\Api\ErgonodeAccessData;
-use Strix\Ergonode\Provider\ConfigProvider;
 
 class ConfigProviderTest extends TestCase
 {
@@ -117,10 +117,10 @@ class ConfigProviderTest extends TestCase
     {
         $this->systemConfigServiceMock->expects($this->once())
             ->method('get')
-            ->with('StrixErgonode.config.customFieldKeys')
+            ->with('ErgonodeIntegrationShopware.config.customFieldKeys')
             ->willReturn($mockReturn);
 
-        $output = $this->configProvider->getErgonodeCustomFields();
+        $output = $this->configProvider->getErgonodeCustomFieldKeys();
 
         $this->assertSame($expectedOutput, $output);
     }
@@ -140,51 +140,8 @@ class ConfigProviderTest extends TestCase
             [
                 [
                     'some_base_url',
-                    'sales_channel_1',
-                    'api_key_1',
-                ],
-            ],
-        ];
-        yield [
-            [
-                $this->mockSystemConfigEntity('sales_channel_1', 'api_key_1'),
-                $this->mockSystemConfigEntity('sales_channel_2', 'api_key_2'),
-                $this->mockSystemConfigEntity('sales_channel_3', 'api_key_3'),
-            ],
-            [
-                [
-                    'some_base_url',
-                    'sales_channel_1',
-                    'api_key_1',
-                ],
-                [
-                    'some_base_url',
-                    'sales_channel_2',
-                    'api_key_2',
-                ],
-                [
-                    'some_base_url',
-                    'sales_channel_3',
-                    'api_key_3',
-                ],
-            ],
-        ];
-        yield [
-            [
-                $this->mockSystemConfigEntity('sales_channel_1', 'api_key_1'),
-                $this->mockSystemConfigEntity(null, 'api_key_2'),
-                $this->mockSystemConfigEntity('sales_channel_3', 'api_key_3'),
-            ],
-            [
-                [
-                    'some_base_url',
-                    'sales_channel_1',
-                    'api_key_1',
-                ],
-                [
-                    'some_base_url',
-                    'sales_channel_3',
-                    'api_key_3',
+                    '',
+                    'some_api_key',
                 ],
             ],
         ];
@@ -204,11 +161,11 @@ class ConfigProviderTest extends TestCase
 
     private function mockSystemConfigServiceReturnsAccessData(): void
     {
-        $this->systemConfigServiceMock->expects($this->exactly(2))
+        $this->systemConfigServiceMock
             ->method('getString')
             ->withConsecutive(
-                ['StrixErgonode.config.ergonodeBaseUrl'],
-                ['StrixErgonode.config.ergonodeApiKey'],
+                ['ErgonodeIntegrationShopware.config.ergonodeBaseUrl'],
+                ['ErgonodeIntegrationShopware.config.ergonodeApiKey'],
             )
             ->willReturnOnConsecutiveCalls(
                 'some_base_url',

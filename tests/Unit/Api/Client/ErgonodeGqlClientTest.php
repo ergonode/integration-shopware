@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Tests\Unit\Api\Client;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Api\Client;
 
+use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClient;
+use Ergonode\IntegrationShopware\Tests\Fixture\GqlQueryFixture;
 use GraphQL\Client;
 use GraphQL\Query;
 use GraphQL\Results;
@@ -13,9 +16,6 @@ use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClient;
-use Strix\Ergonode\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\Tests\Fixture\GqlQueryFixture;
 
 class ErgonodeGqlClientTest extends TestCase
 {

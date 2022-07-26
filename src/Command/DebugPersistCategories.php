@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Command;
+namespace Ergonode\IntegrationShopware\Command;
 
+use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
+use Ergonode\IntegrationShopware\Provider\ErgonodeCategoryProvider;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Provider\ErgonodeCategoryProvider;
-use Strix\Ergonode\Persistor\CategoryPersistor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DebugPersistCategories extends Command
 {
-    protected static $defaultName = 'strix:debug:category-persist';
+    protected static $defaultName = 'ergonode:debug:category-persist';
 
     private ErgonodeCategoryProvider $categoryProvider;
 

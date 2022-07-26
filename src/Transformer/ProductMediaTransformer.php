@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Manager\FileManager;
+use Ergonode\IntegrationShopware\Provider\ProductMediaProvider;
 use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Strix\Ergonode\DTO\ProductTransformationDTO;
-use Strix\Ergonode\Manager\FileManager;
-use Strix\Ergonode\Provider\ProductMediaProvider;
 
 use function array_diff;
 use function array_filter;

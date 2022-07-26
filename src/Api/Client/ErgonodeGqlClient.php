@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Api\Client;
+namespace Ergonode\IntegrationShopware\Api\Client;
 
 use GraphQL\Client;
 use GraphQL\Query;
@@ -40,7 +40,6 @@ class ErgonodeGqlClient implements ErgonodeGqlClientInterface
             return $results;
         } catch (ClientExceptionInterface $e) {
             // TODO log
-            dump($e);
         }
 
         return null;

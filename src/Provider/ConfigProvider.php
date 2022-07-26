@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Provider;
+namespace Ergonode\IntegrationShopware\Provider;
 
+use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
-use Strix\Ergonode\Api\ErgonodeAccessData;
 
 class ConfigProvider
 {
-    private const STRIX_ERGONODE_CONFIG_NAMESPACE = 'StrixErgonode.config.';
+    private const CONFIG_NAMESPACE = 'ErgonodeIntegrationShopware.config.';
 
     private SystemConfigService $configService;
 
@@ -46,15 +46,25 @@ class ConfigProvider
     public function getErgonodeAccessData(?string $salesChannelId = null): ErgonodeAccessData
     {
         return new ErgonodeAccessData(
-            $this->configService->getString(self::STRIX_ERGONODE_CONFIG_NAMESPACE . 'ergonodeBaseUrl'), // always use global url
-            $this->configService->getString(self::STRIX_ERGONODE_CONFIG_NAMESPACE . 'ergonodeApiKey', $salesChannelId),
+            $this->configService->getString(self::CONFIG_NAMESPACE . 'ergonodeBaseUrl'), // always use global url
+            $this->configService->getString(self::CONFIG_NAMESPACE . 'ergonodeApiKey', $salesChannelId),
             $salesChannelId
         );
     }
 
-    public function getErgonodeCustomFields(): array
+    public function getErgonodeCustomFieldKeys(): array
     {
-        $keys = $this->configService->get(self::STRIX_ERGONODE_CONFIG_NAMESPACE . 'customFieldKeys');
+        $keys = $this->configService->get(self::CONFIG_NAMESPACE . 'customFieldKeys');
+        if (is_array($keys)) {
+            return $keys;
+        }
+
+        return [];
+    }
+
+    public function getErgonodeCrossSellingKeys(): array
+    {
+        $keys = $this->configService->get(self::CONFIG_NAMESPACE . 'crossSellingKeys');
         if (is_array($keys)) {
             return $keys;
         }
@@ -64,6 +74,6 @@ class ConfigProvider
 
     public function getCategoryTreeCode(): string
     {
-        return $this->configService->getString(self::STRIX_ERGONODE_CONFIG_NAMESPACE . 'categoryTreeCode');
+        return $this->configService->getString(self::CONFIG_NAMESPACE . 'categoryTreeCode');
     }
 }

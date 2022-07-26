@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer\ProductCustomField;
+namespace Ergonode\IntegrationShopware\Transformer\ProductCustomField;
 
 use Shopware\Core\Framework\Context;
 

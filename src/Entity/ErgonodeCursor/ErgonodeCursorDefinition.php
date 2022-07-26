@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Entity\ErgonodeCursor;
+namespace Ergonode\IntegrationShopware\Entity\ErgonodeCursor;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
@@ -13,7 +13,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
 class ErgonodeCursorDefinition extends EntityDefinition
 {
-    public const ENTITY_NAME = 'strix_ergonode_cursor';
+    public const ENTITY_NAME = 'ergonode_cursor';
 
     public function getEntityName(): string
     {

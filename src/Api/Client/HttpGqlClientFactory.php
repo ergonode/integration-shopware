@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Api\Client;
+namespace Ergonode\IntegrationShopware\Api\Client;
 
+use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
 use GraphQL\Client;
-use Strix\Ergonode\Api\ErgonodeAccessData;
 
 class HttpGqlClientFactory
 {

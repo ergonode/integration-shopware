@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\QueryBuilder;
+namespace Ergonode\IntegrationShopware\QueryBuilder;
 
 use GraphQL\Query;
 

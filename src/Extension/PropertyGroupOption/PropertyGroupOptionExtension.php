@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Extension\PropertyGroupOption;
+namespace Ergonode\IntegrationShopware\Extension\PropertyGroupOption;
 
+use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionDefinition;
-use Strix\Ergonode\Extension\AbstractErgonodeMappingExtension;
 
 class PropertyGroupOptionExtension extends AbstractErgonodeMappingExtension
 {

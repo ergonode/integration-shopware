@@ -2,39 +2,29 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Service\ScheduledTask;
+namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
+use Ergonode\IntegrationShopware\Processor\ProductVisibilitySyncProcessor;
+use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\Api\Context\SystemSource;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
-use Strix\Ergonode\Processor\ProductVisibilitySyncProcessor;
 use Symfony\Component\Lock\LockFactory;
 use Throwable;
 
-class ProductVisibilitySyncTaskHandler extends ScheduledTaskHandler
+class ProductVisibilitySyncTaskHandler extends AbstractSyncTaskHandler
 {
-    private Context $context;
-
     private ProductVisibilitySyncProcessor $productVisibilitySyncProcessor;
-
-    private LoggerInterface $logger;
-
-    private LockFactory $lockFactory;
 
     public function __construct(
         EntityRepositoryInterface $scheduledTaskRepository,
-        ProductVisibilitySyncProcessor $productVisibilitySyncProcessor,
+        SyncHistoryLogger $syncHistoryService,
         LoggerInterface $syncLogger,
-        LockFactory $lockFactory
+        LockFactory $lockFactory,
+        ProductVisibilitySyncProcessor $productVisibilitySyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository);
+        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $syncLogger);
 
-        $this->context = new Context(new SystemSource());
         $this->productVisibilitySyncProcessor = $productVisibilitySyncProcessor;
-        $this->logger = $syncLogger;
-        $this->lockFactory = $lockFactory;
     }
 
     public static function getHandledMessages(): iterable
@@ -42,20 +32,17 @@ class ProductVisibilitySyncTaskHandler extends ScheduledTaskHandler
         return [ProductVisibilitySyncTask::class];
     }
 
-    public function run(): void
+    public function runSync(): int
     {
-        $lock = $this->lockFactory->createLock('strix.ergonode.product-visibility-sync-lock');
-
-        if (!$lock->acquire()) {
-            $this->logger->info('ProductVisibilitySyncTask is locked');
-
-            return;
-        }
+        $count = 0;
 
         try {
-            $this->productVisibilitySyncProcessor->processStream($this->context);
+            $result = $this->productVisibilitySyncProcessor->processStream($this->context);
+            $count = $result->getProcessedEntityCount();
         } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
         }
+
+        return $count;
     }
 }

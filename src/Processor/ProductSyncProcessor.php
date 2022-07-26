@@ -2,24 +2,33 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Processor;
+namespace Ergonode\IntegrationShopware\Processor;
 
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
+use Ergonode\IntegrationShopware\Api\ProductStreamResultsProxy;
+use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
+use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
+use Ergonode\IntegrationShopware\Persistor\ProductPersistor;
+use Ergonode\IntegrationShopware\QueryBuilder\ProductQueryBuilder;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Shopware\Core\Framework\Context;
-use Strix\Ergonode\Api\Client\ErgonodeGqlClientInterface;
-use Strix\Ergonode\Manager\ErgonodeCursorManager;
-use Strix\Ergonode\Api\ProductStreamResultsProxy;
-use Strix\Ergonode\QueryBuilder\ProductQueryBuilder;
-use Strix\Ergonode\Persistor\ProductPersistor;
+use Throwable;
+
+use function count;
 
 class ProductSyncProcessor
 {
     public const DEFAULT_PRODUCT_COUNT = 10;
 
     private ErgonodeGqlClientInterface $gqlClient;
+
     private ProductQueryBuilder $productQueryBuilder;
+
     private ProductPersistor $productPersistor;
+
     private ErgonodeCursorManager $cursorManager;
+
     private LoggerInterface $logger;
 
     public function __construct(
@@ -38,10 +47,11 @@ class ProductSyncProcessor
 
     /**
      * @param int $productCount Number of products to process (products per page)
-     * @return bool Returns true if source has next page and false otherwise
      */
-    public function processStream(Context $context, int $productCount = self::DEFAULT_PRODUCT_COUNT): bool
+    public function processStream(Context $context, int $productCount = self::DEFAULT_PRODUCT_COUNT): SyncCounterDTO
     {
+        $counter = new SyncCounterDTO();
+
         $cursorEntity = $this->cursorManager->getCursorEntity(ProductStreamResultsProxy::MAIN_FIELD, $context);
         $cursor = null === $cursorEntity ? null : $cursorEntity->getCursor();
 
@@ -50,16 +60,17 @@ class ProductSyncProcessor
         $result = $this->gqlClient->query($query, ProductStreamResultsProxy::class);
 
         if (null === $result) {
-            throw new \RuntimeException('Request failed');
+            throw new RuntimeException('Request failed.');
         }
 
-        if (0 === \count($result->getProductData()['edges'])) {
-            throw new \RuntimeException('End of stream');
+        if (0 === count($result->getProductData()['edges'])) {
+            $this->logger->info('End of stream reached.');
+            return $counter;
         }
 
         $endCursor = $result->getEndCursor();
         if (null === $endCursor) {
-            throw new \RuntimeException('Could not retrieve end cursor from the response');
+            throw new RuntimeException('Could not retrieve end cursor from the response.');
         }
 
         foreach ($result->getProductData()['edges'] as $edge) {
@@ -67,12 +78,14 @@ class ProductSyncProcessor
             try {
                 $productId = $this->productPersistor->persist($node, $context);
 
-                $this->logger->info('Processed product', [
+                $this->logger->info('Processed product.', [
                     'sku' => $node['sku'],
-                    'productId' => $productId
+                    'productId' => $productId,
                 ]);
-            } catch (\Throwable $e) {
-                $this->logger->error('Error while persisting product', [
+
+                $counter->incrProcessedEntityCount();
+            } catch (Throwable $e) {
+                $this->logger->error('Error while persisting product.', [
                     'message' => $e->getMessage(),
                     'file' => $e->getFile() . ':' . $e->getLine(),
                     'sku' => $node['sku'] ?? null,
@@ -82,6 +95,8 @@ class ProductSyncProcessor
 
         $this->cursorManager->persist($endCursor, ProductStreamResultsProxy::MAIN_FIELD, $context);
 
-        return $result->hasNextPage();
+        $counter->setHasNextPage($result->hasNextPage());
+
+        return $counter;
     }
 }

@@ -2,17 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Persistor;
+namespace Ergonode\IntegrationShopware\Persistor;
 
+use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
+use Ergonode\IntegrationShopware\DTO\PropertyGroupTransformationDTO;
+use Ergonode\IntegrationShopware\Provider\PropertyGroupProvider;
+use Ergonode\IntegrationShopware\Transformer\PropertyGroupTransformer;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionDefinition;
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Strix\Ergonode\Api\AttributeDeletedStreamResultsProxy;
-use Strix\Ergonode\Api\AttributeStreamResultsProxy;
-use Strix\Ergonode\DTO\PropertyGroupTransformationDTO;
-use Strix\Ergonode\Provider\PropertyGroupProvider;
-use Strix\Ergonode\Transformer\PropertyGroupTransformer;
+
+use function array_filter;
+use function array_map;
+use function array_merge;
 
 class PropertyGroupPersistor
 {
@@ -69,14 +73,10 @@ class PropertyGroupPersistor
         }
 
         $upserted = $this->propertyGroupRepository->upsert($propertyGroupPayloads, $context);
-        $deleted = $this->propertyGroupOptionRepository->delete(array_merge([], ...$optionDeletePayloads), $context);
 
-        return [
-            PropertyGroupDefinition::ENTITY_NAME . '.upserted' =>
-                $upserted->getPrimaryKeys(PropertyGroupDefinition::ENTITY_NAME),
-            PropertyGroupOptionDefinition::ENTITY_NAME . '.deleted' =>
-                $deleted->getPrimaryKeys(PropertyGroupOptionDefinition::ENTITY_NAME),
-        ];
+        $this->propertyGroupOptionRepository->delete(array_merge([], ...$optionDeletePayloads), $context);
+
+        return $upserted->getPrimaryKeys(PropertyGroupDefinition::ENTITY_NAME);
     }
 
     public function remove(AttributeDeletedStreamResultsProxy $attributes, Context $context): array

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Strix\Ergonode\Transformer;
+namespace Ergonode\IntegrationShopware\Transformer;
 
-use Strix\Ergonode\Struct\AbstractErgonodeEntityCollection;
+use Ergonode\IntegrationShopware\Struct\AbstractErgonodeEntityCollection;
 
 interface ResponseTransformerInterface
 {
