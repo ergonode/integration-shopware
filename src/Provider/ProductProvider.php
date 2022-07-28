@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Provider;
 
+use Shopware\Core\Content\Product\ProductCollection;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -28,6 +29,15 @@ class ProductProvider
         $criteria->addAssociations($associations);
 
         return $this->productRepository->search($criteria, $context)->first();
+    }
+
+    public function getProductsBySkuList(array $skuList, Context $context, array $associations = []): ProductCollection
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsAnyFilter('productNumber', $skuList));
+        $criteria->addAssociations($associations);
+
+        return $this->productRepository->search($criteria, $context)->getEntities();
     }
 
     /**

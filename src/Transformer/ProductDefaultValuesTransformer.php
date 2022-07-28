@@ -18,7 +18,14 @@ class ProductDefaultValuesTransformer implements ProductDataTransformerInterface
         }
 
         $swData = $productData->getShopwareData();
-        $swData['name'] = $swData['name'] ?? $productData->getErgonodeData()['sku'];
+        $sku = $productData->getErgonodeData()['sku'] ?? null;
+
+        if (null === $sku) {
+            throw new \RuntimeException('Missing SKU from product data');
+        }
+
+        $swData['productNumber'] = $sku;
+        $swData['name'] = $swData['name'] ?? $sku;
         $swData['stock'] = $swData['stock'] ?? self::DEFAULT_STOCK_VALUE;
 
         $productData->setShopwareData($swData);
