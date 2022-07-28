@@ -13,8 +13,6 @@ use Ergonode\IntegrationShopware\QueryBuilder\ProductQueryBuilder;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
-use Throwable;
-
 use function count;
 
 class ProductSyncProcessor
@@ -73,25 +71,7 @@ class ProductSyncProcessor
             throw new RuntimeException('Could not retrieve end cursor from the response.');
         }
 
-        foreach ($result->getProductData()['edges'] as $edge) {
-            $node = $edge['node'] ?? null;
-            try {
-                $productId = $this->productPersistor->persist($node, $context);
-
-                $this->logger->info('Processed product.', [
-                    'sku' => $node['sku'],
-                    'productId' => $productId,
-                ]);
-
-                $counter->incrProcessedEntityCount();
-            } catch (Throwable $e) {
-                $this->logger->error('Error while persisting product.', [
-                    'message' => $e->getMessage(),
-                    'file' => $e->getFile() . ':' . $e->getLine(),
-                    'sku' => $node['sku'] ?? null,
-                ]);
-            }
-        }
+        $this->productPersistor->persist($result->getProductData()['edges'], $context);
 
         $this->cursorManager->persist($endCursor, ProductStreamResultsProxy::MAIN_FIELD, $context);
 

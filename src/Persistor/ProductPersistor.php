@@ -9,7 +9,6 @@ use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingExceptio
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Transformer\ProductTransformerChain;
-use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -45,15 +44,17 @@ class ProductPersistor
      * @return string Shopware product ID
      * @throws MissingRequiredProductMappingException
      */
-    public function persist(array $productData, Context $context): string
+    public function persist(array $productListData, Context $context): void
     {
-        $productId = $this->persistProduct($productData, null, $context);
-
-        foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
-            $this->persistProduct($variantData['node'], $productId, $context);
+        $payloads = [];
+        foreach ($productListData as $productData) {
+            $payloads[] = $this->persistProduct($productData, $context);
         }
 
-        return $productId;
+        $this->productRepository->upsert(
+            $payloads,
+            $context
+        );
     }
 
     public function deleteProductIds(array $productIds, Context $context): void
@@ -65,9 +66,10 @@ class ProductPersistor
     }
 
     /**
+     * @return array Payload
      * @throws MissingRequiredProductMappingException
      */
-    protected function persistProduct(array $productData, ?string $parentId, Context $context): string
+    protected function persistProduct(array $productData, Context $context): array
     {
         $sku = $productData['sku'];
         $existingProduct = $this->productProvider->getProductBySku($sku, $context, [
@@ -78,35 +80,44 @@ class ProductPersistor
         ]);
 
         $dto = new ProductTransformationDTO($productData);
-        $dto->setIsVariant($parentId !== null);
+        $dto->setIsVariant(false);
         $dto->setSwProduct($existingProduct);
 
         $transformedData = $this->productTransformerChain->transform(
             $dto,
             $context
         );
+        $this->deleteEntities($dto, $context);
+
+        $transformedVariants = [];
+        foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
+            $variantData = $variantData['node'];
+            $existingVariant = $this->productProvider->getProductBySku($variantData['sku'], $context, [
+                'media',
+                'properties',
+                'crossSellings.assignedProducts',
+                'crossSellings.' . AbstractErgonodeMappingExtension::EXTENSION_NAME,
+            ]);
+            $dto = new ProductTransformationDTO($variantData);
+            $dto->setIsVariant(true);
+            $dto->setSwProduct($existingVariant);
+
+            $transformedVariants[] = $this->productTransformerChain->transform(
+                $dto,
+                $context
+            )->getShopwareData();
+
+            $this->deleteEntities($dto, $context);
+        }
 
         $swProductData = array_merge_recursive(
             $transformedData->getShopwareData(),
             [
-                'id' => $dto->isUpdate() ? $existingProduct->getId() : null,
-                'parentId' => $parentId,
-                'productNumber' => $sku
+                'children' => $transformedVariants
             ]
         );
 
-        $swProductData = array_filter($swProductData);
-
-        $writtenProducts = $this->productRepository->upsert(
-            [$swProductData],
-            $context
-        );
-
-        $this->deleteEntities($dto, $context);
-
-        $ids = $writtenProducts->getPrimaryKeys(ProductDefinition::ENTITY_NAME);
-
-        return reset($ids);
+        return array_filter($swProductData);
     }
 
     private function deleteEntities(ProductTransformationDTO $dto, Context $context): void
