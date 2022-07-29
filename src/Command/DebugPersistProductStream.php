@@ -55,7 +55,7 @@ class DebugPersistProductStream extends Command
         $io = new SymfonyStyle($input, $output);
         $io->progressStart();
 
-        $processedPages = 0;
+        $processedPages = 1;
         $entityCount = 0;
         $stopwatch = new Stopwatch(true);
         $stopwatch->start('process');
@@ -66,7 +66,7 @@ class DebugPersistProductStream extends Command
 
                 $entityCount += $result->getProcessedEntityCount();
 
-                if ($processedPages++ >= $limit && $limit !== null) {
+                if ($limit !== null && $processedPages++ >= $limit) {
                     break;
                 }
             } while ($result->hasNextPage());
@@ -79,9 +79,14 @@ class DebugPersistProductStream extends Command
         }
         $stopwatchEvent = $stopwatch->stop('process');
 
-        $io->success(\sprintf('Processed %d page(s) and %d entities', $processedPages, $entityCount));
-        $io->info(\sprintf("Process time:\t%.02fms", $stopwatchEvent->getDuration()));
-        $io->info(\sprintf("Memory:\t%.02fMB", $stopwatchEvent->getMemory() / 1024 / 1024));
+        $io->success(\sprintf('Processed %d page(s) and %d entities', $processedPages - 1, $entityCount));
+        $io->info(
+            \sprintf(
+                "Process time:\t%.02fms\nMemory:\t\t%.02fMB",
+                $stopwatchEvent->getDuration(),
+                $stopwatchEvent->getMemory() / 1024 / 1024
+            )
+        );
 
         return Command::SUCCESS;
     }

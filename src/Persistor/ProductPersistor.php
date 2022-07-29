@@ -28,6 +28,8 @@ class ProductPersistor
 
     private DefinitionInstanceRegistry $definitionInstanceRegistry;
 
+    private array $existingProductCache = [];
+
     public function __construct(
         EntityRepositoryInterface $productRepository,
         ProductProvider $productProvider,
@@ -41,14 +43,14 @@ class ProductPersistor
     }
 
     /**
-     * @return string Shopware product ID
      * @throws MissingRequiredProductMappingException
      */
     public function persist(array $productListData, Context $context): void
     {
+        $this->loadExistingProductCache($productListData, $context);
         $payloads = [];
         foreach ($productListData as $productData) {
-            $payloads[] = $this->persistProduct($productData, $context);
+            $payloads[] = $this->persistProduct($productData['node'], $context);
         }
 
         $this->productRepository->upsert(
@@ -72,12 +74,7 @@ class ProductPersistor
     protected function persistProduct(array $productData, Context $context): array
     {
         $sku = $productData['sku'];
-        $existingProduct = $this->productProvider->getProductBySku($sku, $context, [
-            'media',
-            'properties',
-            'crossSellings.assignedProducts',
-            'crossSellings.' . AbstractErgonodeMappingExtension::EXTENSION_NAME,
-        ]);
+        $existingProduct = $this->existingProductCache[$sku] ?? null;
 
         $dto = new ProductTransformationDTO($productData);
         $dto->setIsVariant(false);
@@ -92,12 +89,7 @@ class ProductPersistor
         $transformedVariants = [];
         foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
             $variantData = $variantData['node'];
-            $existingVariant = $this->productProvider->getProductBySku($variantData['sku'], $context, [
-                'media',
-                'properties',
-                'crossSellings.assignedProducts',
-                'crossSellings.' . AbstractErgonodeMappingExtension::EXTENSION_NAME,
-            ]);
+            $existingVariant = $this->existingProductCache[$variantData['sku']] ?? null;
             $dto = new ProductTransformationDTO($variantData);
             $dto->setIsVariant(true);
             $dto->setSwProduct($existingVariant);
@@ -134,6 +126,28 @@ class ProductPersistor
             } catch (EntityRepositoryNotFoundException $e) {
                 continue;
             }
+        }
+    }
+
+    private function loadExistingProductCache(array $productListData, Context $context)
+    {
+        $skus = [];
+        foreach ($productListData as $productData) {
+            $skus[] = $productData['node']['sku'];
+            foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
+                $skus[] = $variantData['node']['sku'];
+            }
+        }
+        $this->existingProductCache = [];
+        $entities = $this->productProvider->getProductsBySkuList($skus, $context, [
+            'media',
+            'properties',
+            'crossSellings.assignedProducts',
+            'crossSellings.' . AbstractErgonodeMappingExtension::EXTENSION_NAME,
+        ]);
+
+        foreach ($entities as $productEntity) {
+            $this->existingProductCache[$productEntity->getProductNumber()] = $productEntity;
         }
     }
 }
