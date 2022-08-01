@@ -34,6 +34,7 @@
         "name": "Name",
         "status": "Status",
         "startedOn": "Started on",
+        "updatedAt": "Updated on",
         "endedOn": "Ended on"
       },
       "status": {
@@ -48,8 +49,9 @@
         "importDetails": "Import details",
         "processed": "Processed",
         "errors": "Errors",
-        "message": "Message",
-        "createdAt": "Created at"
+        "createdAt": "Created at",
+        "level": "Level",
+        "message": "Message"
       }
     },
     "synchronization": {

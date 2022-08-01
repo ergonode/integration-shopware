@@ -1,7 +1,5 @@
-.ergonode-import-history {
-  &__page &__grid-card {
-    .sw-card__content {
-      padding: 0 !important;
-    }
+.ergonode-import-history__grid-card {
+  .sw-card__content {
+    padding: 0;
   }
 }

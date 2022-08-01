@@ -11,14 +11,11 @@
                 <template #default>
                     <sw-data-grid
                         class="ergonode-import-history__grid"
-{#                        :repository="repository"#}
-{#                        :items="data"#}
+                        :repository="repository"
+                        :dataSource="imports"
                         :is-loading="isListingLoading"
+                        :columns="listingColumns"
                         :show-selection="false"
-                        :skeletonItemAmount="6"
-                        :dataSource="data"
-                        :columns="ListingColumns"
-                        :plainAppearance="true"
                     >
                         <template #column-status="{ item }">
                             {{ String(item.status).toUpperCase() }}
@@ -31,61 +28,74 @@
                         </template>
                         <template #actions="{ item }">
                             <sw-context-menu-item
-                                @click="detailsId = item.id;"
+                                @click="showDetails(item.id);"
                             >
                                 {{ $t('ErgonodeIntegrationShopware.importHistory.details.details') }}
                             </sw-context-menu-item>
                         </template>
                     </sw-data-grid>
                     <sw-modal v-if="detailsId"
-                        :title="'Import details'"
+                        :title="$t('ErgonodeIntegrationShopware.importHistory.importHistory')"
                         :closable="true"
                         @modal-close="detailsId = null;"
                     >
-                        <sw-label v-if="detailsEntity.startDate"
-                            variant="neutral"
-                            :ghost="true"
-                        >
-                            <b>{{ $t('ErgonodeIntegrationShopware.importHistory.grid.startedOn') }}</b> {{ formatDate(detailsEntity.startDate) }}
-                        </sw-label>
-                        <sw-label v-if="detailsEntity.endedOn"
-                            variant="neutral"
-                            :ghost="true"
-                        >
-                            <b>{{ $t('ErgonodeIntegrationShopware.importHistory.grid.endedOn') }}</b> {{ formatDate(detailsEntity.endedOn) }}
-                        </sw-label>
-                        <sw-label v-if="detailsEntity.status"
-                            variant="neutral"
-                            :ghost="true"
-                        >
-                            <b>{{ $t('ErgonodeIntegrationShopware.importHistory.status.status') }}</b> {{ String(detailsEntity.status).toUpperCase() }}
-                        </sw-label>
-                        <sw-label v-if="detailsEntity.processed"
-                            variant="neutral"
-                            :ghost="true"
-                        >
-                            <b>{{ $t('ErgonodeIntegrationShopware.importHistory.details.processed') }}</b> {{ detailsEntity.processed }}
-                        </sw-label>
-                        <sw-label v-if="detailsEntity.errors"
-                            variant="neutral"
-                            :ghost="true"
-                        >
-                            <b>{{ $t('ErgonodeIntegrationShopware.importHistory.details.errors') }}</b> {{ detailsEntity.errors }}
-                        </sw-label>
+                        <template v-if="isDetailsLoading">
+                            <sw-skeleton></sw-skeleton>
+                            <sw-skeleton></sw-skeleton>
+                        </template>
+                        <template v-else-if="detailsEntity">
+                            <sw-label v-if="detailsEntity.startDate"
+                                variant="neutral"
+                                :ghost="true"
+                            >
+                                <b>{{ $t('ErgonodeIntegrationShopware.importHistory.grid.startedOn') }}</b> {{ formatDate(detailsEntity.startDate) }}
+                            </sw-label>
+                            <sw-label v-if="detailsEntity.updatedAt"
+                                variant="neutral"
+                                :ghost="true"
+                            >
+                                <b>{{ $t('ErgonodeIntegrationShopware.importHistory.grid.updatedAt') }}</b> {{ formatDate(detailsEntity.updatedAt) }}
+                            </sw-label>
+                            <sw-label v-if="detailsEntity.endDate"
+                                variant="neutral"
+                                :ghost="true"
+                            >
+                                <b>{{ $t('ErgonodeIntegrationShopware.importHistory.grid.endedOn') }}</b> {{ formatDate(detailsEntity.endDate) }}
+                            </sw-label>
+                            <sw-label v-if="detailsEntity.status"
+                                variant="neutral"
+                                :ghost="true"
+                            >
+                                <b>{{ $t('ErgonodeIntegrationShopware.importHistory.status.status') }}</b> {{ String(detailsEntity.status).toUpperCase() }}
+                            </sw-label>
+                            <sw-label v-if="(typeof detailsEntity.totalSuccess === 'number')"
+                                variant="neutral"
+                                :ghost="true"
+                            >
+                                <b>{{ $t('ErgonodeIntegrationShopware.importHistory.details.processed') }}</b> {{ detailsEntity.totalSuccess }}
+                            </sw-label>
+                            <sw-label v-if="(typeof detailsEntity.totalError === 'number')"
+                                variant="neutral"
+                                :ghost="true"
+                            >
+                                <b>{{ $t('ErgonodeIntegrationShopware.importHistory.details.errors') }}</b> {{ detailsEntity.totalError }}
+                            </sw-label>
 
-                        <sw-data-grid
-                            :is-loading="false"
-                            :show-selection="false"
-                            :show-actions="false"
-                            :skeletonItemAmount="10"
-                            :dataSource="detailsEntity.log"
-                            :columns="detailsColumns"
-                            :plainAppearance="true"
-                        >
-                            <template #column-datetime="{ item }">
-                                {{ formatDate(item.datetime) }}
-                            </template>
-                        </sw-data-grid>
+
+                            <sw-data-grid
+                                :is-loading="isDetailsLoading"
+                                :show-selection="false"
+                                :show-actions="false"
+                                :skeletonItemAmount="10"
+                                :dataSource="detailsEntity?.logs"
+                                :columns="detailsColumns"
+                                :plainAppearance="true"
+                            >
+                                <template #column-datetime="{ item }">
+                                    {{ formatDate(item.datetime) }}
+                                </template>
+                            </sw-data-grid>
+                        </template>
                     </sw-modal>
                 </template>
             </sw-card>

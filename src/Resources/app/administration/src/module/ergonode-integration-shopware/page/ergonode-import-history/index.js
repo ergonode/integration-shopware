@@ -1,31 +1,41 @@
 import template from './ergonode-import-history.html.twig';
 import './ergonode-import-history.scss';
 
-const { Component } = Shopware;
+const { Component, Context, Data: { Criteria }, Mixin } = Shopware;
 
 Component.register('ergonode-import-history', {
+    inject: ['acl', 'repositoryFactory', 'ergonodeImportHistoryService'],
+
+    mixins: [
+        Mixin.getByName('notification'),
+    ],
+
     template,
 
     data () {
         return {
-            repository: {},
             isListingLoading: false,
             isDetailsLoading: false,
-            // mock data
-            data: (function () {
-                let statuses = ['finished', 'processing'];
-                let i = 0, len = 5, arr = [], date = new Date().toISOString();
-                for (; i < len; i++) {
-                    arr.push({
-                        id: i + 1,
-                        startDate: date,
-                        endDate: date,
-                        status: statuses[Math.round(Math.random())],
-                    })
-                }
-                return arr;
-            })(),
-            ListingColumns: [
+            imports: [],
+            detailsId: null,
+        };
+    },
+
+    computed: {
+        repository () {
+            return this.repositoryFactory.create('ergonode_sync_history');
+        },
+
+        detailsIndex () {
+            return this.detailsId ? this.imports.findIndex(entry => entry.id === this.detailsId) : null;
+        },
+
+        detailsEntity () {
+            return this.imports[this.detailsIndex];
+        },
+
+        listingColumns () {
+            return [
                 {
                     property: 'status',
                     label: this.$t('ErgonodeIntegrationShopware.importHistory.grid.status'),
@@ -41,58 +51,88 @@ Component.register('ergonode-import-history', {
                     label: this.$t('ErgonodeIntegrationShopware.importHistory.grid.endedOn'),
                     width: 'auto',
                 },
-            ],
-            detailsColumns: [
+            ];
+        },
+
+        detailsColumns () {
+            return [
                 {
                     property: 'datetime',
                     label: this.$t('ErgonodeIntegrationShopware.importHistory.details.createdAt'),
                 },
                 {
+                    property: 'level_name',
+                    label: this.$t('ErgonodeIntegrationShopware.importHistory.details.level'),
+                },
+                {
                     property: 'message',
                     label: this.$t('ErgonodeIntegrationShopware.importHistory.details.message'),
                 },
-            ],
-            detailsCache: {},
-            detailsId: null,
-        };
-    },
-
-    computed: {
-        // mock data
-        detailsEntity () {
-            return {
-                ...this.data[0],
-                log: (function () {
-                    let arr = [], i = 0, len = 10, messages = ['Lorem ipsum', 'dolor sit amet'];
-                    for (; i < len; i++) {
-                        arr.push({
-                            message: messages[Math.round(Math.random())],
-                            context: {
-                                syncHistoryId: Math.random() * 10000,
-                            },
-                            level: Math.random() * 10000 % 1000,
-                            level_name: ['ERROR', 'INFO'][Math.round(Math.random())],
-                            channel: 'sync',
-                            datetime: new Date().toISOString(),
-                        })
-                    }
-                    return arr;
-                })(),
-            };
+            ];
         },
     },
 
     methods: {
         formatDate (date) {
-            return (new Date(date))?.toISOString().substr(0, 19).replace('T', ' ');
+            if (!date) {
+                return '—';
+            }
+            try {
+                const dateObject = new Date(date);
+                return dateObject?.toISOString()?.substring(0, 19)?.replace('T', ' ');
+            } catch (e) {
+                console.error(`Error occurred while parsing date string '${date}'`);
+                return this.$t('global.default.error');
+            }
         },
 
-        // TODO detail fetching method
+        async fetchImports () {
+            this.isListingLoading = true;
+            const criteria = new Criteria()
+                .setLimit(null);
+            try {
+                this.imports = await this.repository.search(criteria, Context.Api);
+                // initialize logs arrays
+                this.imports.forEach((_, index) => this.imports[index].logs = []);
+            } catch ({ message }) {
+                console.error(message);
+                this.createNotificationError({
+                    message,
+                });
+            } finally {
+
+                this.isListingLoading = false;
+            }
+        },
+
+        async fetchLogs () {
+            this.isDetailsLoading = true;
+            try {
+                let result = await this.ergonodeImportHistoryService.fetchImportLog(this.detailsId);
+                if (result.status !== 200 || !result.data) {
+                    throw result;
+                }
+                this.imports[this.detailsIndex].logs = result.data;
+            } catch ({ message }) {
+                console.error(message);
+                this.createNotificationError({
+                    message,
+                });
+                this.detailsId = null; // hide the modal on failure
+            } finally {
+                this.isDetailsLoading = false;
+            }
+        },
+
+        showDetails (id) {
+            this.detailsId = id;
+            if (!this.imports[this.detailsIndex]?.logs.length) {
+                return this.fetchLogs();
+            }
+        },
     },
 
-    // TODO add watcher on detailsId property that fetches details with memoization in the 'detailsCache'
-
     created () {
-        // TODO prepare repository
+        return this.fetchImports();
     },
 });

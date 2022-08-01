@@ -20,6 +20,7 @@
         "name": "Nazwa",
         "status": "Status",
         "startedOn": "Rozpoczęto",
+        "updatedAt": "Zaktualizowano",
         "endedOn": "Zakończono"
       },
       "status": {
@@ -34,8 +35,9 @@
         "importDetails": "Szczegóły importu",
         "processed": "Przetworzonych",
         "errors": "Błędów",
-        "message": "Komunikat",
-        "createdAt": "Utworzono"
+        "createdAt": "Utworzono",
+        "level": "Poziom",
+        "message": "Komunikat"
       }
     },
     "mappings": {
