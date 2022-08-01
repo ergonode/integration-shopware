@@ -33,16 +33,23 @@
                                 {{ $t('ErgonodeIntegrationShopware.importHistory.details.details') }}
                             </sw-context-menu-item>
                         </template>
+                        <template #pagination>
+                            <sw-pagination
+                                :total="imports?.total"
+                                :page="listingPage"
+                                :limit="listingLimit"
+                                :steps="steps"
+                                :autoHide="true"
+                                @page-change="paginateListing"
+                            />
+                        </template>
                     </sw-data-grid>
                     <sw-modal v-if="detailsId"
                         :title="$t('ErgonodeIntegrationShopware.importHistory.importHistory')"
                         :closable="true"
-                        @modal-close="detailsId = null;"
+                        @modal-close="hideDetails"
                     >
-                        <template v-if="isDetailsLoading">
-                            <sw-skeleton></sw-skeleton>
-                            <sw-skeleton></sw-skeleton>
-                        </template>
+                        <sw-skeleton v-if="isDetailsLoading"></sw-skeleton>
                         <template v-else-if="detailsEntity">
                             <sw-label v-if="detailsEntity.startDate"
                                 variant="neutral"
@@ -87,12 +94,22 @@
                                 :show-selection="false"
                                 :show-actions="false"
                                 :skeletonItemAmount="10"
-                                :dataSource="detailsEntity?.logs"
+                                :dataSource="detailsListing"
                                 :columns="detailsColumns"
                                 :plainAppearance="true"
                             >
                                 <template #column-datetime="{ item }">
                                     {{ formatDate(item.datetime) }}
+                                </template>
+                                <template #pagination>
+                                    <sw-pagination
+                                        :total="detailsEntity.logs.length"
+                                        :page="detailsPage"
+                                        :limit="detailsLimit"
+                                        :steps="steps"
+                                        :autoHide="true"
+                                        @page-change="paginateDetails"
+                                    />
                                 </template>
                             </sw-data-grid>
                         </template>

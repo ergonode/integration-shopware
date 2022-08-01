@@ -18,6 +18,11 @@ Component.register('ergonode-import-history', {
             isDetailsLoading: false,
             imports: [],
             detailsId: null,
+            listingPage: 1,
+            listingLimit: 25,
+            detailsPage: 1,
+            detailsLimit: 25,
+            steps: [25, 50, 100, 200], // same as in ergonode
         };
     },
 
@@ -70,6 +75,15 @@ Component.register('ergonode-import-history', {
                 },
             ];
         },
+
+        detailsListing () {
+            const start = (this.detailsPage - 1) * this.detailsLimit;
+            const items = this.detailsEntity?.logs?.slice(start, start + this.detailsLimit);
+            if (this.isDetailsLoading) {
+                this.isDetailsLoading = false;
+            }
+            return items;
+        }
     },
 
     methods: {
@@ -89,7 +103,9 @@ Component.register('ergonode-import-history', {
         async fetchImports () {
             this.isListingLoading = true;
             const criteria = new Criteria()
-                .setLimit(null);
+                .setTotalCountMode(1)
+                .setPage(this.listingPage)
+                .setLimit(this.listingLimit);
             try {
                 this.imports = await this.repository.search(criteria, Context.Api);
                 // initialize logs arrays
@@ -126,9 +142,28 @@ Component.register('ergonode-import-history', {
 
         showDetails (id) {
             this.detailsId = id;
+
             if (!this.imports[this.detailsIndex]?.logs.length) {
                 return this.fetchLogs();
             }
+        },
+
+        hideDetails () {
+            this.detailsId = null;
+            this.detailsPage = 1;
+        },
+
+        paginateListing ({ page, limit }) {
+            this.listingPage = page;
+            this.listingLimit = limit;
+            return this.fetchImports();
+        },
+
+        paginateDetails ({ page, limit }) {
+            this.isDetailsLoading = true;
+            this.detailsPage = page;
+            this.detailsLimit = limit;
+            this.isDetailsLoading = false;
         },
     },
 
