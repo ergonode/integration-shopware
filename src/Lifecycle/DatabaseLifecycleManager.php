@@ -23,6 +23,7 @@ class DatabaseLifecycleManager
 
     private static array $extendedTableNames = [
         'category' => 'ergonode_category_mapping_extension_id',
+        'product_cross_selling' => 'ergonode_mapping_extension_id',
         'property_group' => 'ergonode_mapping_extension_id',
         'property_group_option' => 'ergonode_mapping_extension_id',
     ];
