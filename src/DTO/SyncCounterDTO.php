@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\DTO;
 
+use Symfony\Component\Stopwatch\Stopwatch;
+
 class SyncCounterDTO
 {
     private bool $hasNextPage = false;
 
     private int $processedEntityCount = 0;
+
+    private ?Stopwatch $stopwatch = null;
 
     public function hasNextPage(): bool
     {
@@ -28,5 +32,20 @@ class SyncCounterDTO
     public function incrProcessedEntityCount(int $incrCount = 1): void
     {
         $this->processedEntityCount += $incrCount;
+    }
+
+    public function getStopwatch(): ?Stopwatch
+    {
+        return $this->stopwatch;
+    }
+
+    public function setStopwatch(Stopwatch $stopwatch): void
+    {
+        $this->stopwatch = $stopwatch;
+    }
+
+    public function hasStopwatch(): bool
+    {
+        return null !== $this->stopwatch;
     }
 }

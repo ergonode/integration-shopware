@@ -12,7 +12,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Temporary debug command
@@ -57,14 +56,21 @@ class DebugPersistProductStream extends Command
 
         $processedPages = 1;
         $entityCount = 0;
-        $stopwatch = new Stopwatch(true);
-        $stopwatch->start('process');
+        $processTime = 0;
+        $peakProcessMemory = 0;
         try {
             do {
                 $io->progressAdvance();
                 $result = $this->productSyncProcessor->processStream($context);
 
                 $entityCount += $result->getProcessedEntityCount();
+                if ($result->hasStopwatch()) {
+                    $processEvent = $result->getStopwatch()->getSections()['__root__']->getEvent('process');
+                    if (null !== $processEvent) {
+                        $processTime += $processEvent->getDuration();
+                        $peakProcessMemory = \max($peakProcessMemory, $processEvent->getMemory());
+                    }
+                }
 
                 if ($limit !== null && $processedPages++ >= $limit) {
                     break;
@@ -77,14 +83,13 @@ class DebugPersistProductStream extends Command
 
             return Command::FAILURE;
         }
-        $stopwatchEvent = $stopwatch->stop('process');
 
         $io->success(\sprintf('Processed %d page(s) and %d entities', $processedPages - 1, $entityCount));
         $io->info(
             \sprintf(
-                "Process time:\t%.02fms\nMemory:\t\t%.02fMB",
-                $stopwatchEvent->getDuration(),
-                $stopwatchEvent->getMemory() / 1024 / 1024
+                "Process time:\t%.02fms\nPeak memory:\t\t%.02fMB",
+                $processTime,
+                $peakProcessMemory / 1024 / 1024
             )
         );
 

@@ -10,14 +10,16 @@ use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Persistor\ProductPersistor;
 use Ergonode\IntegrationShopware\QueryBuilder\ProductQueryBuilder;
+use Ergonode\IntegrationShopware\Util\SyncPerformanceLogger;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\Stopwatch\Stopwatch;
 use function count;
 
 class ProductSyncProcessor
 {
-    public const DEFAULT_PRODUCT_COUNT = 10;
+    public const DEFAULT_PRODUCT_COUNT = 25;
 
     private ErgonodeGqlClientInterface $gqlClient;
 
@@ -29,18 +31,22 @@ class ProductSyncProcessor
 
     private LoggerInterface $logger;
 
+    private SyncPerformanceLogger $performanceLogger;
+
     public function __construct(
         ErgonodeGqlClientInterface $gqlClient,
         ProductQueryBuilder $productQueryBuilder,
         ProductPersistor $productPersistor,
         ErgonodeCursorManager $cursorManager,
-        LoggerInterface $syncLogger
+        LoggerInterface $syncLogger,
+        SyncPerformanceLogger $performanceLogger
     ) {
         $this->gqlClient = $gqlClient;
         $this->productQueryBuilder = $productQueryBuilder;
         $this->productPersistor = $productPersistor;
         $this->cursorManager = $cursorManager;
         $this->logger = $syncLogger;
+        $this->performanceLogger = $performanceLogger;
     }
 
     /**
@@ -49,13 +55,16 @@ class ProductSyncProcessor
     public function processStream(Context $context, int $productCount = self::DEFAULT_PRODUCT_COUNT): SyncCounterDTO
     {
         $counter = new SyncCounterDTO();
+        $stopwatch = new Stopwatch();
 
         $cursorEntity = $this->cursorManager->getCursorEntity(ProductStreamResultsProxy::MAIN_FIELD, $context);
         $cursor = null === $cursorEntity ? null : $cursorEntity->getCursor();
 
+        $stopwatch->start('query');
         $query = $this->productQueryBuilder->build($productCount, $cursor);
         /** @var ProductStreamResultsProxy|null $result */
         $result = $this->gqlClient->query($query, ProductStreamResultsProxy::class);
+        $stopwatch->stop('query');
 
         if (null === $result) {
             throw new RuntimeException('Request failed.');
@@ -71,11 +80,15 @@ class ProductSyncProcessor
             throw new RuntimeException('Could not retrieve end cursor from the response.');
         }
 
+        $stopwatch->start('process');
         $this->productPersistor->persist($result->getProductData()['edges'], $context);
+        $stopwatch->stop('process');
 
         $this->cursorManager->persist($endCursor, ProductStreamResultsProxy::MAIN_FIELD, $context);
 
         $counter->setHasNextPage($result->hasNextPage());
+        $counter->setStopwatch($stopwatch);
+        $this->performanceLogger->logPerformance(self::class, $stopwatch);
 
         return $counter;
     }
