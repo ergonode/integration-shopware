@@ -9,17 +9,19 @@ use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingExceptio
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Transformer\ProductTransformerChain;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityRepositoryNotFoundException;
 use function array_filter;
-use function array_merge_recursive;
 use function array_values;
 use function is_array;
 
 class ProductPersistor
 {
+    private array $existingProductCache = [];
+
     private EntityRepositoryInterface $productRepository;
 
     private ProductProvider $productProvider;
@@ -28,18 +30,20 @@ class ProductPersistor
 
     private DefinitionInstanceRegistry $definitionInstanceRegistry;
 
-    private array $existingProductCache = [];
+    private LoggerInterface $logger;
 
     public function __construct(
         EntityRepositoryInterface $productRepository,
         ProductProvider $productProvider,
         ProductTransformerChain $productTransformerChain,
-        DefinitionInstanceRegistry $definitionInstanceRegistry
+        DefinitionInstanceRegistry $definitionInstanceRegistry,
+        LoggerInterface $syncLogger
     ) {
         $this->productRepository = $productRepository;
         $this->productProvider = $productProvider;
         $this->productTransformerChain = $productTransformerChain;
         $this->definitionInstanceRegistry = $definitionInstanceRegistry;
+        $this->logger = $syncLogger;
     }
 
     /**
@@ -50,7 +54,25 @@ class ProductPersistor
         $this->loadExistingProductCache($productListData, $context);
         $payloads = [];
         foreach ($productListData as $productData) {
-            $payloads[] = $this->persistProduct($productData['node'], $context);
+            try {
+                $mainProductPayload = $this->getProductPayload($productData['node'], false, $context);
+
+                foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
+                    $mainProductPayload['children'] = $this->getProductPayload($variantData, true, $context);
+                }
+
+                $payloads[] = $mainProductPayload;
+
+                $this->logger->info('Processed product.', [
+                    'sku' => $mainProductPayload['productNumber']
+                ]);
+            } catch (\Throwable $e) {
+                $this->logger->error('Error while transforming product.', [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile() . ':' . $e->getLine(),
+                    'sku' => $node['sku'] ?? null,
+                ]);
+            }
         }
 
         $this->productRepository->upsert(
@@ -68,16 +90,15 @@ class ProductPersistor
     }
 
     /**
-     * @return array Payload
      * @throws MissingRequiredProductMappingException
      */
-    protected function persistProduct(array $productData, Context $context): array
+    private function getProductPayload(array $productData, bool $isVariant, Context $context): array
     {
         $sku = $productData['sku'];
         $existingProduct = $this->existingProductCache[$sku] ?? null;
 
         $dto = new ProductTransformationDTO($productData);
-        $dto->setIsVariant(false);
+        $dto->setIsVariant($isVariant);
         $dto->setSwProduct($existingProduct);
 
         $transformedData = $this->productTransformerChain->transform(
@@ -86,30 +107,7 @@ class ProductPersistor
         );
         $this->deleteEntities($dto, $context);
 
-        $transformedVariants = [];
-        foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
-            $variantData = $variantData['node'];
-            $existingVariant = $this->existingProductCache[$variantData['sku']] ?? null;
-            $dto = new ProductTransformationDTO($variantData);
-            $dto->setIsVariant(true);
-            $dto->setSwProduct($existingVariant);
-
-            $transformedVariants[] = $this->productTransformerChain->transform(
-                $dto,
-                $context
-            )->getShopwareData();
-
-            $this->deleteEntities($dto, $context);
-        }
-
-        $swProductData = array_merge_recursive(
-            $transformedData->getShopwareData(),
-            [
-                'children' => $transformedVariants
-            ]
-        );
-
-        return array_filter($swProductData);
+        return array_filter($transformedData->getShopwareData());
     }
 
     private function deleteEntities(ProductTransformationDTO $dto, Context $context): void
