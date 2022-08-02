@@ -14,7 +14,7 @@ use Throwable;
 
 class ProductSyncTaskHandler extends AbstractSyncTaskHandler
 {
-    private const MAX_PAGES_PER_RUN = 20;
+    private const MAX_PAGES_PER_RUN = 4;
 
     private ProductSyncProcessor $productSyncProcessor;
     private MessageBusInterface $messageBus;
@@ -50,7 +50,7 @@ class ProductSyncTaskHandler extends AbstractSyncTaskHandler
 
                 $count += $result->getProcessedEntityCount();
 
-                if (self::MAX_PAGES_PER_RUN !== null && $currentPage++ >= self::MAX_PAGES_PER_RUN) {
+                if (self::MAX_PAGES_PER_RUN !== null && ++$currentPage >= self::MAX_PAGES_PER_RUN) {
                     break;
                 }
             } while ($result->hasNextPage());
