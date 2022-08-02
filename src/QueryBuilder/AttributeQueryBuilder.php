@@ -41,11 +41,6 @@ class AttributeQueryBuilder
                                         'language',
                                         'value',
                                     ]),
-                                (new Query('hint'))
-                                    ->setSelectionSet([
-                                        'language',
-                                        'value',
-                                    ]),
                                 (new Query('placeholder'))
                                     ->setSelectionSet([
                                         'language',
