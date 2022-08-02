@@ -41,11 +41,6 @@ class AttributeQueryBuilder
                                         'language',
                                         'value',
                                     ]),
-                                (new Query('placeholder'))
-                                    ->setSelectionSet([
-                                        'language',
-                                        'value',
-                                    ]),
                                 (new InlineFragment('DateAttribute'))
                                     ->setSelectionSet([
                                         new Query('code', AttributeTypesEnum::DATE),
