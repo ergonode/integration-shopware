@@ -11,6 +11,7 @@
     },
     "tabs": {
       "attributeMappings": "Attribute mappings",
+      "importHistory": "Import history",
       "synchronization": "Synchronization"
     },
     "mappings": {
@@ -25,6 +26,32 @@
         "mappingAlreadyExists": "A mapping of these attributes already exists.",
         "shopwareAttributesMustBeUnique": "For every Shopware attribute there may only be one mapping that includes it.",
         "ergonodeAttributeFetchFailure": "Failed to fetch Ergonode attributes. Please, check if Ergonode API Settings are correct."
+      }
+    },
+    "importHistory": {
+      "importHistory": "Import history",
+      "grid": {
+        "name": "Name",
+        "status": "Status",
+        "startedOn": "Started on",
+        "updatedAt": "Updated on",
+        "endedOn": "Ended on"
+      },
+      "status": {
+        "status": "Status",
+        "created": "Created",
+        "processed": "Processed",
+        "ended": "Ended"
+      },
+      "details": {
+        "importDetails": "Import details",
+        "details": "Details",
+        "importDetails": "Import details",
+        "processed": "Processed",
+        "errors": "Errors",
+        "createdAt": "Created at",
+        "level": "Level",
+        "message": "Message"
       }
     },
     "synchronization": {

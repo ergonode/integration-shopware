@@ -20,6 +20,12 @@ Shopware.Module.register('ergonode-integration-shopware', {
                 privilege: 'ergonode_attribute_mapping.viewer',
             }
         },
+        importHistory: {
+            name: 'ergonode-import-history',
+            component: 'ergonode-import-history',
+            path: 'imports',
+            // TODO: add privilege for import history viewing in routes
+        },
         synchronization: {
             name: 'ergonode-synchronization',
             component: 'ergonode-synchronization',
@@ -51,6 +57,13 @@ Shopware.Module.register('ergonode-integration-shopware', {
             label: 'ErgonodeIntegrationShopware.tabs.synchronization',
             parent: 'ergonode-integration',
             privilege: 'ergonode_synchronization.triggerer',
+        },
+        {
+            id: 'ergonode.imports',
+            path: 'ergonode.integration.shopware.importHistory',
+            label: 'ErgonodeIntegrationShopware.tabs.importHistory',
+            parent: 'ergonode-integration',
+            // TODO: add privilege for import history viewing in navigation
         },
     ],
 })
