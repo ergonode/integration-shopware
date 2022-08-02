@@ -39,13 +39,13 @@ class DeletedProductSyncProcessor
         ProductPersistor $productPersistor,
         ProductProvider $productProvider,
         ErgonodeCursorManager $cursorManager,
-        LoggerInterface $syncLogger
+        LoggerInterface $ergonodeSyncLogger
     ) {
         $this->gqlClient = $gqlClient;
         $this->productQueryBuilder = $productQueryBuilder;
         $this->productPersistor = $productPersistor;
         $this->cursorManager = $cursorManager;
-        $this->logger = $syncLogger;
+        $this->logger = $ergonodeSyncLogger;
         $this->productProvider = $productProvider;
     }
 

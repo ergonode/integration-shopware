@@ -21,10 +21,10 @@ class DeletedProductSyncTaskHandler extends AbstractSyncTaskHandler
         EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryService,
         LockFactory $lockFactory,
-        LoggerInterface $syncLogger,
+        LoggerInterface $ergonodeSyncLogger,
         DeletedProductSyncProcessor $deletedProductSyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $syncLogger);
+        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
         $this->deletedProductSyncProcessor = $deletedProductSyncProcessor;
     }

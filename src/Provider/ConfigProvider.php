@@ -46,7 +46,7 @@ class ConfigProvider
     public function getErgonodeAccessData(?string $salesChannelId = null): ErgonodeAccessData
     {
         return new ErgonodeAccessData(
-            $this->configService->getString(self::CONFIG_NAMESPACE . 'ergonodeBaseUrl'), // always use global url
+            $this->configService->getString(self::CONFIG_NAMESPACE . 'ergonodeApiEndpoint'), // always use global value
             $this->configService->getString(self::CONFIG_NAMESPACE . 'ergonodeApiKey', $salesChannelId),
             $salesChannelId
         );

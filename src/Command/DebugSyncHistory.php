@@ -25,13 +25,13 @@ class DebugSyncHistory extends Command
 
     public function __construct(
         SyncHistoryLogger $syncHistoryService,
-        LoggerInterface $syncLogger
+        LoggerInterface $ergonodeSyncLogger
     ) {
         parent::__construct();
 
         $this->context = new Context(new SystemSource());
         $this->syncHistoryService = $syncHistoryService;
-        $this->syncLogger = $syncLogger;
+        $this->syncLogger = $ergonodeSyncLogger;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
