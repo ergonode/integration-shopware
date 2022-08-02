@@ -5,23 +5,19 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Subscriber;
 
 use Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension;
+use Shopware\Core\Content\Category\CategoryCollection;
 use Shopware\Core\Content\Category\CategoryDefinition;
-use Shopware\Core\Content\Category\CategoryEntity;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\BeforeDeleteEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\OrFilter;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use function array_filter;
-use function array_merge;
-use function array_search;
-use function array_slice;
 use function array_values;
-use function explode;
-use function reset;
-use function trim;
 
 class DeleteCategoryExtensionSubscriber implements EventSubscriberInterface
 {
@@ -46,12 +42,12 @@ class DeleteCategoryExtensionSubscriber implements EventSubscriberInterface
 
     public function onEntityBeforeDelete(BeforeDeleteEvent $event): void
     {
-        $ids = $this->getAllDeletedCategoryIds($event);
-        if (empty($ids)) {
+        $categories = $this->getAllDeletedCategories($event);
+        if (0 === $categories->count()) {
             return;
         }
 
-        $deletePayloads = $this->getCategoryExtensionDeletePayloads($ids, $event->getContext());
+        $deletePayloads = $this->buildCategoryExtensionDeletePayloads($categories);
         if (empty($deletePayloads)) {
             return;
         }
@@ -62,69 +58,43 @@ class DeleteCategoryExtensionSubscriber implements EventSubscriberInterface
         });
     }
 
-    /**
-     * @return string[]
-     */
-    private function getAllDeletedCategoryIds(BeforeDeleteEvent $event): array
+    private function getAllDeletedCategories(BeforeDeleteEvent $event): CategoryCollection
     {
         $ids = $event->getIds(CategoryDefinition::ENTITY_NAME);
         if (empty($ids)) {
-            return [];
+            return new CategoryCollection();
         }
 
-        $paths = $this->getCategoryPaths($ids, $event->getContext());
-
-        $mainId = reset($ids);
-
-        foreach ($paths as &$path) {
-            $fromIndex = array_search($mainId, $path);
-            if (false === $fromIndex) {
-                $path = [];
-            }
-
-            $path = array_slice($path, $fromIndex + 1);
+        $criteria = new Criteria();
+        $criteria->addAssociation('children');
+        $orFilter = new OrFilter([
+            new EqualsAnyFilter('id', $ids) // include deleted parents
+        ]);
+        foreach ($ids as $id) {
+            $orFilter->addQuery(new ContainsFilter('path', $id)); // look for all descendants
         }
+        $criteria->addFilter($orFilter);
 
-        return array_merge(
-            $ids,
-            ...array_values($paths)
-        );
+        /** @var CategoryCollection $categories */
+        $categories = $this->categoryRepository->search($criteria, $event->getContext())->getEntities();
+
+        return $categories;
     }
 
-    private function getCategoryPaths(array $categoryIds, Context $context): array
-    {
-        return array_filter(
-            $this->categoryRepository
-                ->search(new Criteria($categoryIds), $context)
-                ->map(static function (CategoryEntity $category) {
-                    $path = $category->getPath();
-                    if (null === $path) {
-                        return false;
-                    }
-
-                    $pathStr = trim($path, '|');
-
-                    return explode('|', $pathStr);
-                })
-        );
-    }
-
-    private function getCategoryExtensionDeletePayloads(array $ids, Context $context): array
+    private function buildCategoryExtensionDeletePayloads(CategoryCollection $categories): array
     {
         return array_values(
             array_filter(
-                $this->categoryRepository
-                    ->search(new Criteria($ids), $context)
-                    ->map(static function (Entity $entity) {
-                        $extensionId = $entity->get(ErgonodeCategoryMappingExtension::PROPERTY_NAME);
-                        if (null === $extensionId) {
-                            return false;
-                        }
+                $categories->map(static function (Entity $entity) {
+                    $extensionId = $entity->get(ErgonodeCategoryMappingExtension::PROPERTY_NAME);
+                    if (null === $extensionId) {
+                        return false;
+                    }
 
-                        return [
-                            'id' => $extensionId,
-                        ];
-                    })
+                    return [
+                        'id' => $extensionId,
+                    ];
+                })
             )
         );
     }
