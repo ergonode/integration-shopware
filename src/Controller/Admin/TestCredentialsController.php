@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Controller\Admin;
 
-use Ergonode\IntegrationShopware\Api\Client\HttpGqlClientFactory;
+use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory;
 use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
-use Psr\Log\LoggerInterface;
+use Ergonode\IntegrationShopware\QueryBuilder\LanguageQueryBuilder;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,16 +18,16 @@ use Throwable;
  */
 class TestCredentialsController extends AbstractController
 {
-    private HttpGqlClientFactory $clientFactory;
+    private ErgonodeGqlClientFactory $clientFactory;
 
-    private LoggerInterface $apiLogger;
+    private LanguageQueryBuilder $queryBuilder;
 
     public function __construct(
-        HttpGqlClientFactory $clientFactory,
-        LoggerInterface $ergonodeApiLogger
+        ErgonodeGqlClientFactory $clientFactory,
+        LanguageQueryBuilder $languageQueryBuilder
     ) {
         $this->clientFactory = $clientFactory;
-        $this->apiLogger = $ergonodeApiLogger;
+        $this->queryBuilder = $languageQueryBuilder;
     }
 
     /**
@@ -46,13 +46,12 @@ class TestCredentialsController extends AbstractController
             )
         );
 
-        $success = true;
         try {
-            $client->runRawQuery('');
+            $query = $this->queryBuilder->buildActiveLanguages(1); // some random query
+            $result = $client->query($query);
+
+            $success = 200 === $result->getResponseObject()->getStatusCode();
         } catch (Throwable $e) {
-            $this->apiLogger->error('Error while testing credentials.', [
-                'message' => $e->getMessage(),
-            ]);
             $success = false;
         }
 
