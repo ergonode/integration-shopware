@@ -59,7 +59,7 @@ abstract class AbstractSyncTaskHandler extends ScheduledTaskHandler
     {
         $ref = new ReflectionClass($this);
 
-        return $ref->getShortName();
+        return str_replace('TaskHandler', '', $ref->getShortName());
     }
 
     protected function getLockName(): string
