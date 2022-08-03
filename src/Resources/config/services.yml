@@ -64,7 +64,7 @@ services:
     arguments:
       - '@ergonode_integration.flock_store'
     calls:
-      - setLogger: [ '@monolog.logger.sync' ]
+      - setLogger: [ '@monolog.logger.ergonodeSync' ]
 
   # MANAGER
   Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager:
@@ -102,6 +102,12 @@ services:
     tags: [ 'shopware.scheduled.task' ]
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\LanguageSyncTask:
+    tags: [ 'shopware.scheduled.task' ]
+
+  Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTask:
+    tags: [ 'shopware.scheduled.task' ]
+
+  Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
   # This task is disabled because CategoryTreeSyncTask and CategorySyncTask together are building the full tree.
@@ -147,6 +153,16 @@ services:
     arguments:
       $lockFactory: '@ergonode_integration.lock_factory'
 
+  Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTaskHandler:
+    tags: [ 'messenger.message_handler' ]
+    arguments:
+      $lockFactory: '@ergonode_integration.lock_factory'
+
+  Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTaskHandler:
+    tags: [ 'messenger.message_handler' ]
+    arguments:
+      $lockFactory: '@ergonode_integration.lock_factory'
+
   # SERVICE
   Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger:
     arguments:
@@ -170,4 +186,7 @@ services:
 
   # SUBSCRIBER
   Ergonode\IntegrationShopware\Subscriber\DeleteExtensionSubscriber:
+    tags: [ 'kernel.event_subscriber' ]
+
+  Ergonode\IntegrationShopware\Subscriber\DeleteCategoryExtensionSubscriber:
     tags: [ 'kernel.event_subscriber' ]

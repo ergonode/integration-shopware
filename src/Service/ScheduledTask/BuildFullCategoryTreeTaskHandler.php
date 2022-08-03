@@ -25,12 +25,12 @@ class BuildFullCategoryTreeTaskHandler extends AbstractSyncTaskHandler
         EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryLogger,
         LockFactory $lockFactory,
-        LoggerInterface $syncLogger,
+        LoggerInterface $ergonodeSyncLogger,
         ConfigProvider $configProvider,
         ErgonodeCategoryProvider $categoryProvider,
         CategoryPersistor $categoryPersistor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryLogger, $lockFactory, $syncLogger);
+        parent::__construct($scheduledTaskRepository, $syncHistoryLogger, $lockFactory, $ergonodeSyncLogger);
 
         $this->configProvider = $configProvider;
         $this->categoryProvider = $categoryProvider;

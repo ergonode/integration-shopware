@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Controller;
+namespace Ergonode\IntegrationShopware\Controller\Admin;
 
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

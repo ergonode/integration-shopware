@@ -5,14 +5,14 @@
         <title>API Settings</title>
         <title lang="de-DE">API Einstellungen</title>
 
-        <input-field type="text">
-            <name>ergonodeBaseUrl</name>
-            <label>Ergonode base URL</label>
-            <label lang="de-DE">Ergonode base URL</label>
-            <helpText>Base URL will always be inherited (from "All Sales Channels")!</helpText>
+        <input-field>
+            <name>ergonodeApiEndpoint</name>
+            <label>Ergonode GraphQL API endpoint</label>
+            <label lang="de-DE">Ergonode GraphQL API endpoint</label>
+            <helpText>The value will always be inherited (from "All Sales Channels")!</helpText>
         </input-field>
 
-        <input-field type="text">
+        <input-field>
             <name>ergonodeApiKey</name>
             <label>Ergonode API key</label>
             <label lang="de-DE">Ergonode API key</label>
@@ -47,7 +47,7 @@
     <card>
         <title>Category Sync</title>
         <title lang="de-DE">Category Sync</title>
-        <input-field type="text">
+        <input-field>
             <name>categoryTreeCode</name>
             <label>Code of the category tree to synchronize</label>
             <label lang="de-DE">Code of the category tree to synchronize</label>

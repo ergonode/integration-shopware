@@ -32,13 +32,13 @@ class CategorySyncProcessor
         CategoryQueryBuilder $categoryQueryBuilder,
         CategoryPersistor $categoryPersistor,
         ErgonodeCursorManager $cursorManager,
-        LoggerInterface $syncLogger
+        LoggerInterface $ergonodeSyncLogger
     ) {
         $this->gqlClient = $gqlClient;
         $this->categoryQueryBuilder = $categoryQueryBuilder;
         $this->categoryPersistor = $categoryPersistor;
         $this->cursorManager = $cursorManager;
-        $this->logger = $syncLogger;
+        $this->logger = $ergonodeSyncLogger;
     }
 
     /**

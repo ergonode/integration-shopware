@@ -21,10 +21,10 @@ class ProductSyncTaskHandler extends AbstractSyncTaskHandler
         EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryService,
         LockFactory $lockFactory,
-        LoggerInterface $syncLogger,
+        LoggerInterface $ergonodeSyncLogger,
         ProductSyncProcessor $productSyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $syncLogger);
+        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
         $this->productSyncProcessor = $productSyncProcessor;
     }

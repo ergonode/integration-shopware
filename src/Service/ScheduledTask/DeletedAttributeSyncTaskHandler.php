@@ -4,32 +4,32 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
-use Ergonode\IntegrationShopware\Processor\LanguageSyncProcessor;
+use Ergonode\IntegrationShopware\Processor\DeletedAttributesSyncProcessor;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Symfony\Component\Lock\LockFactory;
 use Throwable;
 
-class LanguageSyncTaskHandler extends AbstractSyncTaskHandler
+class DeletedAttributeSyncTaskHandler extends AbstractSyncTaskHandler
 {
-    private LanguageSyncProcessor $languageSyncProcessor;
+    private DeletedAttributesSyncProcessor $deletedAttributesSyncProcessor;
 
     public function __construct(
         EntityRepositoryInterface $scheduledTaskRepository,
-        SyncHistoryLogger $syncHistoryService,
+        SyncHistoryLogger $syncHistoryLogger,
         LockFactory $lockFactory,
         LoggerInterface $ergonodeSyncLogger,
-        LanguageSyncProcessor $languageSyncProcessor
+        DeletedAttributesSyncProcessor $deletedAttributesSyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $ergonodeSyncLogger);
+        parent::__construct($scheduledTaskRepository, $syncHistoryLogger, $lockFactory, $ergonodeSyncLogger);
 
-        $this->languageSyncProcessor = $languageSyncProcessor;
+        $this->deletedAttributesSyncProcessor = $deletedAttributesSyncProcessor;
     }
 
     public static function getHandledMessages(): iterable
     {
-        return [LanguageSyncTask::class];
+        return [DeletedAttributeSyncTask::class];
     }
 
     public function runSync(): int
@@ -37,7 +37,7 @@ class LanguageSyncTaskHandler extends AbstractSyncTaskHandler
         $count = 0;
 
         try {
-            $result = $this->languageSyncProcessor->process($this->context);
+            $result = $this->deletedAttributesSyncProcessor->process($this->context);
             $count = $result->getProcessedEntityCount();
         } catch (Throwable $e) {
             $this->logger->error($e->getMessage());

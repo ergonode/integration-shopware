@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Processor;
 
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
+use Ergonode\IntegrationShopware\Api\ProductDeletedStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\ProductStreamResultsProxy;
 use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Persistor\ProductPersistor;
+use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\QueryBuilder\ProductQueryBuilder;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
-use Throwable;
-
 use function count;
 
-class ProductSyncProcessor
+class DeletedProductSyncProcessor
 {
-    public const DEFAULT_PRODUCT_COUNT = 10;
+    public const DEFAULT_PRODUCT_COUNT = 100;
 
     private ErgonodeGqlClientInterface $gqlClient;
 
@@ -31,10 +31,13 @@ class ProductSyncProcessor
 
     private LoggerInterface $logger;
 
+    private ProductProvider $productProvider;
+
     public function __construct(
         ErgonodeGqlClientInterface $gqlClient,
         ProductQueryBuilder $productQueryBuilder,
         ProductPersistor $productPersistor,
+        ProductProvider $productProvider,
         ErgonodeCursorManager $cursorManager,
         LoggerInterface $ergonodeSyncLogger
     ) {
@@ -43,6 +46,7 @@ class ProductSyncProcessor
         $this->productPersistor = $productPersistor;
         $this->cursorManager = $cursorManager;
         $this->logger = $ergonodeSyncLogger;
+        $this->productProvider = $productProvider;
     }
 
     /**
@@ -52,19 +56,21 @@ class ProductSyncProcessor
     {
         $counter = new SyncCounterDTO();
 
-        $cursorEntity = $this->cursorManager->getCursorEntity(ProductStreamResultsProxy::MAIN_FIELD, $context);
+        $cursorEntity = $this->cursorManager->getCursorEntity(ProductDeletedStreamResultsProxy::MAIN_FIELD, $context);
         $cursor = null === $cursorEntity ? null : $cursorEntity->getCursor();
 
-        $query = $this->productQueryBuilder->build($productCount, $cursor);
+        $query = $this->productQueryBuilder->buildDeleted($productCount, $cursor);
         /** @var ProductStreamResultsProxy|null $result */
-        $result = $this->gqlClient->query($query, ProductStreamResultsProxy::class);
+        $result = $this->gqlClient->query($query, ProductDeletedStreamResultsProxy::class);
 
         if (null === $result) {
             throw new RuntimeException('Request failed.');
         }
 
-        if (0 === count($result->getProductData()['edges'])) {
+        $edges = $result->getData()['productDeletedStream']['edges'] ?? [];
+        if (0 === count($edges)) {
             $this->logger->info('End of stream reached.');
+
             return $counter;
         }
 
@@ -73,29 +79,25 @@ class ProductSyncProcessor
             throw new RuntimeException('Could not retrieve end cursor from the response.');
         }
 
-        foreach ($result->getProductData()['edges'] as $edge) {
-            $node = $edge['node'] ?? null;
-            try {
-                $productId = $this->productPersistor->persist($node, $context);
+        $deletedProductCodes = \array_map(
+            fn($item) => $item['node'] ?? null,
+            $edges
+        );
 
-                $this->logger->info('Processed product.', [
-                    'sku' => $node['sku'],
-                    'productId' => $productId,
-                ]);
+        $idsToDelete = $this->productProvider->getProductIdsBySkus($deletedProductCodes, $context);
+        $this->productPersistor->deleteProductIds($idsToDelete, $context);
 
-                $counter->incrProcessedEntityCount();
-            } catch (Throwable $e) {
-                $this->logger->error('Error while persisting product.', [
-                    'message' => $e->getMessage(),
-                    'file' => $e->getFile() . ':' . $e->getLine(),
-                    'sku' => $node['sku'] ?? null,
-                ]);
-            }
-        }
+        $processedEntityCount = \count($idsToDelete);
+        $this->logger->info('Processed deleted products', [
+            'deletedProductCount' => $processedEntityCount,
+            'deletedProductCodes' => $deletedProductCodes,
+            'deletedShopwareIds' => $idsToDelete
+        ]);
 
-        $this->cursorManager->persist($endCursor, ProductStreamResultsProxy::MAIN_FIELD, $context);
+        $this->cursorManager->persist($endCursor, ProductDeletedStreamResultsProxy::MAIN_FIELD, $context);
 
         $counter->setHasNextPage($result->hasNextPage());
+        $counter->incrProcessedEntityCount($processedEntityCount);
 
         return $counter;
     }

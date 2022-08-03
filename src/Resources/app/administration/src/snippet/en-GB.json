@@ -11,6 +11,7 @@
     },
     "tabs": {
       "attributeMappings": "Attribute mappings",
+      "importHistory": "Import history",
       "synchronization": "Synchronization"
     },
     "mappings": {
@@ -27,6 +28,32 @@
         "ergonodeAttributeFetchFailure": "Failed to fetch Ergonode attributes. Please, check if Ergonode API Settings are correct."
       }
     },
+    "importHistory": {
+      "importHistory": "Import history",
+      "grid": {
+        "name": "Name",
+        "status": "Status",
+        "startedOn": "Started on",
+        "updatedAt": "Updated on",
+        "endedOn": "Ended on"
+      },
+      "status": {
+        "status": "Status",
+        "created": "Created",
+        "processed": "Processed",
+        "ended": "Ended"
+      },
+      "details": {
+        "importDetails": "Import details",
+        "details": "Details",
+        "importDetails": "Import details",
+        "processed": "Processed",
+        "errors": "Errors",
+        "createdAt": "Created at",
+        "level": "Level",
+        "message": "Message"
+      }
+    },
     "synchronization": {
       "synchronization": "Synchronization",
       "synchronize": "Synchronize",
@@ -37,9 +64,10 @@
   },
   "sw-privileges": {
     "additional_permissions": {
-      "ergonode_synchronization": {
+      "ergonode": {
         "label": "Ergonode integration",
-        "triggerer": "Trigger synchronization"
+        "synchronisation_triggerer": "Trigger synchronization",
+        "history_viewer": "View import history"
       }
     }
   }
