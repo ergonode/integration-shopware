@@ -63,7 +63,6 @@ class ProductQueryBuilder
                                                                                         $this->getAttributeFragment(),
                                                                                         (new Query('valueTranslations'))
                                                                                             ->setSelectionSet([
-                                                                                                'inherited',
                                                                                                 'language',
                                                                                                 '__typename',
                                                                                                 (new InlineFragment('StringAttributeValue'))
@@ -119,10 +118,6 @@ class ProductQueryBuilder
                                                 'totalCount',
                                             ]),
                                     ]),
-                                (new Query('template'))
-                                    ->setSelectionSet([
-                                        'name',
-                                    ]),
                                 (new Query('categoryList'))
                                     ->setSelectionSet([
                                         (new Query('edges'))
@@ -143,7 +138,6 @@ class ProductQueryBuilder
                                                         $this->getAttributeFragment(),
                                                         (new Query('valueTranslations'))
                                                             ->setSelectionSet([
-                                                                'inherited',
                                                                 'language',
                                                                 '__typename',
                                                                 (new InlineFragment('StringAttributeValue'))
@@ -314,10 +308,6 @@ class ProductQueryBuilder
                                             ]),
                                     ]),
                             ]),
-                    ]),
-                (new Query('template'))
-                    ->setSelectionSet([
-                        'code',
                     ]),
                 (new Query('categoryList'))
                     ->setSelectionSet([
