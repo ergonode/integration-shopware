@@ -64,7 +64,7 @@ services:
     arguments:
       - '@ergonode_integration.flock_store'
     calls:
-      - setLogger: [ '@monolog.logger.sync' ]
+      - setLogger: [ '@monolog.logger.ergonodeSync' ]
 
   # MANAGER
   Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager:

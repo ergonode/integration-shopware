@@ -41,7 +41,7 @@ class CategoryTreeSyncProcessor
         CategoryQueryBuilder $categoryQueryBuilder,
         CategoryPersistor $categoryPersistor,
         ErgonodeCursorManager $cursorManager,
-        LoggerInterface $syncLogger,
+        LoggerInterface $ergonodeSyncLogger,
         ConfigProvider $configProvider,
         LanguageProvider $languageProvider,
         CategoryProvider $categoryProvider
@@ -50,7 +50,7 @@ class CategoryTreeSyncProcessor
         $this->categoryQueryBuilder = $categoryQueryBuilder;
         $this->categoryPersistor = $categoryPersistor;
         $this->cursorManager = $cursorManager;
-        $this->logger = $syncLogger;
+        $this->logger = $ergonodeSyncLogger;
         $this->configProvider = $configProvider;
         $this->languageProvider = $languageProvider;
         $this->categoryProvider = $categoryProvider;

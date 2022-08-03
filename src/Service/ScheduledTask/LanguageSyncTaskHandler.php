@@ -19,10 +19,10 @@ class LanguageSyncTaskHandler extends AbstractSyncTaskHandler
         EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryService,
         LockFactory $lockFactory,
-        LoggerInterface $syncLogger,
+        LoggerInterface $ergonodeSyncLogger,
         LanguageSyncProcessor $languageSyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $syncLogger);
+        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
         $this->languageSyncProcessor = $languageSyncProcessor;
     }

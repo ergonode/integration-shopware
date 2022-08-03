@@ -39,12 +39,12 @@ class SyncHistoryLogger
     public function __construct(
         string $kernelLogsDir,
         string $kernelEnv,
-        LoggerInterface $syncLogger,
+        LoggerInterface $ergonodeSyncLogger,
         EntityRepositoryInterface $repository
     ) {
         $this->kernelLogsDir = $kernelLogsDir;
         $this->kernelEnv = $kernelEnv;
-        $this->syncLogger = $syncLogger;
+        $this->syncLogger = $ergonodeSyncLogger;
         $this->repository = $repository;
     }
 

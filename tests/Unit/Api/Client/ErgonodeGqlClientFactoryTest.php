@@ -11,6 +11,8 @@ use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
 use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\Test\TestLogger;
 
 class ErgonodeGqlClientFactoryTest extends TestCase
 {
@@ -31,15 +33,19 @@ class ErgonodeGqlClientFactoryTest extends TestCase
 
     private ErgonodeGqlClientFactory $gqlClientFactory;
 
+    private LoggerInterface $testLogger;
+
     protected function setUp(): void
     {
         $this->accessDataMock = $this->createMock(ErgonodeAccessData::class);
         $this->configProviderMock = $this->getConfigProviderMock();
         $this->httpGqlClientFactoryMock = $this->createMock(HttpGqlClientFactory::class);
+        $this->testLogger = new TestLogger();
 
         $this->gqlClientFactory = new ErgonodeGqlClientFactory(
             $this->configProviderMock,
-            $this->httpGqlClientFactoryMock
+            $this->httpGqlClientFactoryMock,
+            $this->testLogger
         );
     }
 

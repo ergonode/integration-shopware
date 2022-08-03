@@ -19,10 +19,10 @@ class DeletedAttributeSyncTaskHandler extends AbstractSyncTaskHandler
         EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryLogger,
         LockFactory $lockFactory,
-        LoggerInterface $syncLogger,
+        LoggerInterface $ergonodeSyncLogger,
         DeletedAttributesSyncProcessor $deletedAttributesSyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryLogger, $lockFactory, $syncLogger);
+        parent::__construct($scheduledTaskRepository, $syncHistoryLogger, $lockFactory, $ergonodeSyncLogger);
 
         $this->deletedAttributesSyncProcessor = $deletedAttributesSyncProcessor;
     }

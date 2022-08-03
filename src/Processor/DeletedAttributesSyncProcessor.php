@@ -16,10 +16,10 @@ class DeletedAttributesSyncProcessor
     private OrphanEntitiesManager $orphanEntitiesManager;
 
     public function __construct(
-        LoggerInterface $syncLogger,
+        LoggerInterface $ergonodeSyncLogger,
         OrphanEntitiesManager $orphanEntitiesManager
     ) {
-        $this->logger = $syncLogger;
+        $this->logger = $ergonodeSyncLogger;
         $this->orphanEntitiesManager = $orphanEntitiesManager;
     }
 

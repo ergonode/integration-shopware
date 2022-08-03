@@ -18,11 +18,11 @@ class ProductVisibilitySyncTaskHandler extends AbstractSyncTaskHandler
     public function __construct(
         EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryService,
-        LoggerInterface $syncLogger,
+        LoggerInterface $ergonodeSyncLogger,
         LockFactory $lockFactory,
         ProductVisibilitySyncProcessor $productVisibilitySyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $syncLogger);
+        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
         $this->productVisibilitySyncProcessor = $productVisibilitySyncProcessor;
     }
