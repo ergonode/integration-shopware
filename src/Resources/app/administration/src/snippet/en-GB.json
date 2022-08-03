@@ -64,9 +64,10 @@
   },
   "sw-privileges": {
     "additional_permissions": {
-      "ergonode_synchronization": {
+      "ergonode": {
         "label": "Ergonode integration",
-        "triggerer": "Trigger synchronization"
+        "synchronisation_triggerer": "Trigger synchronization",
+        "history_viewer": "View import history"
       }
     }
   }

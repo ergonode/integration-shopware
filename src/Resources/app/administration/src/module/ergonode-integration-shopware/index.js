@@ -24,15 +24,17 @@ Shopware.Module.register('ergonode-integration-shopware', {
             name: 'ergonode-import-history',
             component: 'ergonode-import-history',
             path: 'imports',
-            // TODO: add privilege for import history viewing in routes
+            meta: {
+                privilege: 'ergonode.history_viewer',
+            },
         },
         synchronization: {
             name: 'ergonode-synchronization',
             component: 'ergonode-synchronization',
             path: 'synchronization',
             meta: {
-                privilege: 'ergonode_synchronization.triggerer',
-            }
+                privilege: 'ergonode.synchronisation_triggerer',
+            },
         },
     },
 
@@ -56,14 +58,14 @@ Shopware.Module.register('ergonode-integration-shopware', {
             path: 'ergonode.integration.shopware.synchronization',
             label: 'ErgonodeIntegrationShopware.tabs.synchronization',
             parent: 'ergonode-integration',
-            privilege: 'ergonode_synchronization.triggerer',
+            privilege: 'ergonode.synchronisation_triggerer',
         },
         {
             id: 'ergonode.imports',
             path: 'ergonode.integration.shopware.importHistory',
             label: 'ErgonodeIntegrationShopware.tabs.importHistory',
             parent: 'ergonode-integration',
-            // TODO: add privilege for import history viewing in navigation
+            privilege: 'ergonode.history_viewer',
         },
     ],
 })
