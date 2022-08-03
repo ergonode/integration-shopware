@@ -46,13 +46,17 @@ class TestCredentialsController extends AbstractController
             )
         );
 
+        $success = false;
+
         try {
             $query = $this->queryBuilder->buildActiveLanguages(1); // some random query
             $result = $client->query($query);
 
-            $success = 200 === $result->getResponseObject()->getStatusCode();
+            if (null !== $result) {
+                $success = 200 === $result->getResponseObject()->getStatusCode();
+            }
         } catch (Throwable $e) {
-            $success = false;
+            //
         }
 
         return new JsonResponse([
