@@ -64,9 +64,10 @@
   },
   "sw-privileges": {
     "additional_permissions": {
-      "ergonode_synchronization": {
+      "ergonode": {
         "label": "Integracja z Ergonode",
-        "triggerer": "Wyzwalanie synchronizacji"
+        "synchronisation_triggerer": "Wyzwalanie synchronizacji",
+        "history_viewer": "Przeglądanie historii importów"
       }
     }
   }

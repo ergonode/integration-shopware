@@ -42,19 +42,20 @@ Component.register('ergonode-import-history', {
         listingColumns () {
             return [
                 {
+                    property: 'name',
+                    label: this.$t('ErgonodeIntegrationShopware.importHistory.grid.name'),
+                },
+                {
                     property: 'status',
                     label: this.$t('ErgonodeIntegrationShopware.importHistory.grid.status'),
-                    width: 'auto',
                 },
                 {
                     property: 'startDate',
                     label: this.$t('ErgonodeIntegrationShopware.importHistory.grid.startedOn'),
-                    width: 'auto',
                 },
                 {
                     property: 'endDate',
                     label: this.$t('ErgonodeIntegrationShopware.importHistory.grid.endedOn'),
-                    width: 'auto',
                 },
             ];
         },
@@ -104,6 +105,16 @@ Component.register('ergonode-import-history', {
             this.isListingLoading = true;
             const criteria = new Criteria()
                 .setTotalCountMode(1)
+                .addSorting(
+                    {
+                        field: 'endDate',
+                        order: 'DESC',
+                    },
+                    {
+                        field: 'startDate',
+                        order: 'DESC',
+                    },
+                )
                 .setPage(this.listingPage)
                 .setLimit(this.listingLimit);
             try {
@@ -116,7 +127,6 @@ Component.register('ergonode-import-history', {
                     message,
                 });
             } finally {
-
                 this.isListingLoading = false;
             }
         },
