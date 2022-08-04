@@ -81,11 +81,12 @@ class ProductSyncProcessor
         }
 
         $stopwatch->start('process');
-        $this->productPersistor->persist($result->getProductData()['edges'], $context);
+        $writeResult = $this->productPersistor->persist($result->getProductData()['edges'], $context);
         $stopwatch->stop('process');
 
         $this->cursorManager->persist($endCursor, ProductStreamResultsProxy::MAIN_FIELD, $context);
 
+        $counter->incrProcessedEntityCount(count($writeResult));
         $counter->setHasNextPage($result->hasNextPage());
         $counter->setStopwatch($stopwatch);
         $this->performanceLogger->logPerformance(self::class, $stopwatch);

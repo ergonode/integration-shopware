@@ -10,6 +10,7 @@ use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Transformer\ProductTransformerChain;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -48,8 +49,9 @@ class ProductPersistor
 
     /**
      * @throws MissingRequiredProductMappingException
+     * @returns array Persisted primary keys
      */
-    public function persist(array $productListData, Context $context): void
+    public function persist(array $productListData, Context $context): array
     {
         $this->loadExistingProductCache($productListData, $context);
         $payloads = [];
@@ -75,10 +77,12 @@ class ProductPersistor
             }
         }
 
-        $this->productRepository->upsert(
+        $writeResult = $this->productRepository->upsert(
             $payloads,
             $context
         );
+
+        return $writeResult->getPrimaryKeys(ProductDefinition::ENTITY_NAME);
     }
 
     public function deleteProductIds(array $productIds, Context $context): void

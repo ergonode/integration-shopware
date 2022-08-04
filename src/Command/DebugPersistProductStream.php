@@ -87,7 +87,7 @@ class DebugPersistProductStream extends Command
         $io->success(\sprintf('Processed %d page(s) and %d entities', $processedPages - 1, $entityCount));
         $io->info(
             \sprintf(
-                "Process time:\t%.02fms\nPeak memory:\t\t%.02fMB",
+                "Process time:\t%.02fms\nPeak memory:\t%.02fMB",
                 $processTime,
                 $peakProcessMemory / 1024 / 1024
             )
