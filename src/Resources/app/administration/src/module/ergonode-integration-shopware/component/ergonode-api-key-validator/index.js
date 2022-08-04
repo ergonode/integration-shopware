@@ -59,7 +59,7 @@ Component.register('ergonode-api-key-validator', {
             this.isLoading = true;
             try {
                 const config = {
-                    baseUrl: this.pluginConfig['ErgonodeIntegrationShopware.config.ergonodeBaseUrl'],
+                    apiEndpoint: this.pluginConfig['ErgonodeIntegrationShopware.config.ergonodeApiEndpoint'],
                     apiKey: this.pluginConfig['ErgonodeIntegrationShopware.config.ergonodeApiKey'],
                 };
 

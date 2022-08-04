@@ -57,7 +57,7 @@ Component.register('ergonode-fields-mapping-multiselect', {
                 })
                 .catch(() => {
                     this.createNotificationError({
-                        message: this.$tc('StrixErgonode.mappings.messages.ergonodeAttributeFetchFailure'),
+                        message: this.$tc('ErgonodeIntegrationShopware.mappings.messages.ergonodeAttributeFetchFailure'),
                     });
                 })
                 .finally(() => this.isLoading = false);

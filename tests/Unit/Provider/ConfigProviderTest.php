@@ -72,7 +72,7 @@ class ConfigProviderTest extends TestCase
             $this->assertSame(
                 $expectedOutput[$index],
                 [
-                    $accessData->getBaseUrl(),
+                    $accessData->getApiEndpoint(),
                     $accessData->getSalesChannelId(),
                     $accessData->getApiKey(),
                 ]
@@ -106,7 +106,7 @@ class ConfigProviderTest extends TestCase
         $output = $this->configProvider->getErgonodeAccessData();
 
         $this->assertInstanceOf(ErgonodeAccessData::class, $output);
-        $this->assertEquals('some_base_url', $output->getBaseUrl());
+        $this->assertEquals('some_api_endpoint', $output->getApiEndpoint());
         $this->assertEquals('some_api_key', $output->getApiKey());
     }
 
@@ -139,7 +139,7 @@ class ConfigProviderTest extends TestCase
             ],
             [
                 [
-                    'some_base_url',
+                    'some_api_endpoint',
                     '',
                     'some_api_key',
                 ],
@@ -164,11 +164,11 @@ class ConfigProviderTest extends TestCase
         $this->systemConfigServiceMock
             ->method('getString')
             ->withConsecutive(
-                ['ErgonodeIntegrationShopware.config.ergonodeBaseUrl'],
+                ['ErgonodeIntegrationShopware.config.ergonodeApiEndpoint'],
                 ['ErgonodeIntegrationShopware.config.ergonodeApiKey'],
             )
             ->willReturnOnConsecutiveCalls(
-                'some_base_url',
+                'some_api_endpoint',
                 'some_api_key'
             );
     }

@@ -18,7 +18,8 @@ class DatabaseLifecycleManager
         'ergonode_attribute_mapping',
         'ergonode_category_mapping_extension',
         'ergonode_mapping_extension',
-        'ergonode_cursor'
+        'ergonode_cursor',
+        'ergonode_sync_history'
     ];
 
     private static array $extendedTableNames = [

@@ -41,10 +41,7 @@ class PropertyGroupTransformer
 
         $translations = [];
         if (!empty($node['label'])) {
-            $translations = array_merge_recursive($translations, $this->translationTransformer->transform($node['label'], 'name'));
-        }
-        if (!empty($node['hint'])) {
-            $translations = array_merge_recursive($translations, $this->translationTransformer->transform($node['hint'], 'description'));
+            $translations = $this->translationTransformer->transform($node['label'], 'name');
         }
 
         $propertyGroup = $dto->getSwPropertyGroup();

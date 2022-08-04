@@ -29,14 +29,14 @@ abstract class AbstractSyncTaskHandler extends ScheduledTaskHandler
         EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryService,
         LockFactory $lockFactory,
-        LoggerInterface $syncLogger
+        LoggerInterface $ergonodeSyncLogger
     ) {
         parent::__construct($scheduledTaskRepository);
 
         $this->context = new Context(new SystemSource());
         $this->syncHistoryService = $syncHistoryService;
         $this->lockFactory = $lockFactory;
-        $this->logger = $syncLogger;
+        $this->logger = $ergonodeSyncLogger;
     }
 
     public function run(): void
@@ -59,7 +59,7 @@ abstract class AbstractSyncTaskHandler extends ScheduledTaskHandler
     {
         $ref = new ReflectionClass($this);
 
-        return $ref->getShortName();
+        return str_replace('TaskHandler', '', $ref->getShortName());
     }
 
     protected function getLockName(): string

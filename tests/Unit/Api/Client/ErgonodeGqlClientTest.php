@@ -16,6 +16,8 @@ use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\Test\TestLogger;
 
 class ErgonodeGqlClientTest extends TestCase
 {
@@ -26,12 +28,16 @@ class ErgonodeGqlClientTest extends TestCase
 
     private ErgonodeGqlClient $gqlClient;
 
+    private LoggerInterface $testLogger;
+
     protected function setUp(): void
     {
         $this->gqlClientMock = $this->createMock(Client::class);
+        $this->testLogger = new TestLogger();
 
         $this->gqlClient = new ErgonodeGqlClient(
-            $this->gqlClientMock
+            $this->gqlClientMock,
+            $this->testLogger
         );
     }
 

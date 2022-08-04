@@ -6,22 +6,22 @@ namespace Ergonode\IntegrationShopware\Api;
 
 class ErgonodeAccessData
 {
-    private string $baseUrl;
+    private string $apiEndpoint;
 
     private string $apiKey;
 
     private ?string $salesChannelId;
 
-    public function __construct(string $baseUrl, string $apiKey, ?string $salesChannelId = null)
+    public function __construct(string $apiEndpoint, string $apiKey, ?string $salesChannelId = null)
     {
-        $this->baseUrl = $baseUrl;
+        $this->apiEndpoint = $apiEndpoint;
         $this->apiKey = $apiKey;
         $this->salesChannelId = $salesChannelId;
     }
 
-    public function getBaseUrl(): string
+    public function getApiEndpoint(): string
     {
-        return $this->baseUrl;
+        return $this->apiEndpoint;
     }
 
     public function getApiKey(): string

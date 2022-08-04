@@ -2,17 +2,7 @@
     <sw-page class="ergonode__synchronization-page">
         <template slot="content">
             <sw-card-view>
-                <sw-tabs>
-                    <sw-tabs-item
-                        :route="{ path: 'mapping' }"
-                        :active="false"
-                        :disabled="!acl.can('ergonode_attribute_mapping.viewer')"
-                    >{{ $t('ErgonodeIntegrationShopware.tabs.attributeMappings') }}</sw-tabs-item>
-                    <sw-tabs-item
-                        :route="{ path: 'synchronization' }"
-                        :active="true"
-                    >{{ $t('ErgonodeIntegrationShopware.tabs.synchronization') }}</sw-tabs-item>
-                </sw-tabs>
+                <ergonode-tabs></ergonode-tabs>
                 <sw-card v-if="acl.can('ergonode_attribute_mapping.viewer')"
                     :title="$t('ErgonodeIntegrationShopware.synchronization.synchronization')"
                 >

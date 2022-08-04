@@ -9,19 +9,16 @@ use GraphQL\Client;
 
 class HttpGqlClientFactory
 {
-    private const GRAPHQL_ENDPOINT = 'api/graphql/';
-
     private const TIMEOUT_SEC = 30;
 
     public function create(ErgonodeAccessData $accessData): Client
     {
         return new Client(
-            self::GRAPHQL_ENDPOINT,
+            $accessData->getApiEndpoint(),
             [
                 'X-API-KEY' => $accessData->getApiKey(),
             ],
             [
-                'base_uri' => $accessData->getBaseUrl(),
                 'timeout' => self::TIMEOUT_SEC,
             ]
         );

@@ -11,7 +11,34 @@
     },
     "tabs": {
       "attributeMappings": "Mapowania atrybutów",
+      "importHistory": "Historia importów",
       "synchronization": "Synchronizacja"
+    },
+    "importHistory": {
+      "importHistory": "Historia importów",
+      "grid": {
+        "name": "Nazwa",
+        "status": "Status",
+        "startedOn": "Rozpoczęto",
+        "updatedAt": "Zaktualizowano",
+        "endedOn": "Zakończono"
+      },
+      "status": {
+        "status": "Status",
+        "created": "Utworzono",
+        "processed": "Przetworzono",
+        "ended": "Zakończono"
+      },
+      "details": {
+        "importDetails": "Szczegóły importu",
+        "details": "Szczegóły",
+        "importDetails": "Szczegóły importu",
+        "processed": "Przetworzonych",
+        "errors": "Błędów",
+        "createdAt": "Utworzono",
+        "level": "Poziom",
+        "message": "Komunikat"
+      }
     },
     "mappings": {
       "attributeMappingGeneral": "Mapowanie atrybutów",
@@ -37,9 +64,10 @@
   },
   "sw-privileges": {
     "additional_permissions": {
-      "ergonode_synchronization": {
+      "ergonode": {
         "label": "Integracja z Ergonode",
-        "triggerer": "Wyzwalanie synchronizacji"
+        "synchronisation_triggerer": "Wyzwalanie synchronizacji",
+        "history_viewer": "Przeglądanie historii importów"
       }
     }
   }

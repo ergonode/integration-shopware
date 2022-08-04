@@ -19,10 +19,10 @@ class AttributeSyncTaskHandler extends AbstractSyncTaskHandler
         EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryLogger,
         LockFactory $lockFactory,
-        LoggerInterface $syncLogger,
+        LoggerInterface $ergonodeSyncLogger,
         AttributeSyncProcessor $attributeSyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryLogger, $lockFactory, $syncLogger);
+        parent::__construct($scheduledTaskRepository, $syncHistoryLogger, $lockFactory, $ergonodeSyncLogger);
 
         $this->attributeSyncProcessor = $attributeSyncProcessor;
     }

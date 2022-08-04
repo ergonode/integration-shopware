@@ -23,12 +23,12 @@ class CategoryTreeSyncTaskHandler extends AbstractSyncTaskHandler
     public function __construct(
         EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryService,
-        LoggerInterface $syncLogger,
+        LoggerInterface $ergonodeSyncLogger,
         LockFactory $lockFactory,
         ConfigProvider $configProvider,
         CategoryTreeSyncProcessor $categoryTreeSyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $syncLogger);
+        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
         $this->configProvider = $configProvider;
         $this->categoryTreeSyncProcessor = $categoryTreeSyncProcessor;
