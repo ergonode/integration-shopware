@@ -14,7 +14,6 @@ use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
-
 use function array_key_exists;
 use function array_merge_recursive;
 use function in_array;
@@ -84,6 +83,10 @@ class ProductTransformer implements ProductDataTransformerInterface
                 $result,
                 $this->getTransformedResult($mappingKeys, $translatedValues)
             );
+        }
+
+        if ($productData->isUpdate()) {
+            $result['id'] = $productData->getSwProduct()->getId();
         }
 
         $productData->setShopwareData(
