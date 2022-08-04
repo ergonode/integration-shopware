@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Command;
 
-use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
-use Ergonode\IntegrationShopware\Provider\ErgonodeCategoryProvider;
+use Ergonode\IntegrationShopware\Api\CategoryStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\CategoryTreeStreamResultsProxy;
+use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
+use Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTaskHandler;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -20,19 +22,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class DebugPersistCategories extends Command
 {
     protected static $defaultName = 'ergonode:debug:category-persist';
+    private CategorySyncTaskHandler $handler;
+    private ErgonodeCursorManager $cursorManager;
 
-    private ErgonodeCategoryProvider $categoryProvider;
-
-    private CategoryPersistor $categoryPersistor;
 
     public function __construct(
-        ErgonodeCategoryProvider $categoryProvider,
-        CategoryPersistor $categoryPersistor
+        CategorySyncTaskHandler $handler,
+        ErgonodeCursorManager $cursorManager
     ) {
         parent::__construct();
 
-        $this->categoryProvider = $categoryProvider;
-        $this->categoryPersistor = $categoryPersistor;
+        $this->handler = $handler;
+        $this->cursorManager = $cursorManager;
     }
 
     protected function configure()
@@ -40,10 +41,15 @@ class DebugPersistCategories extends Command
         parent::configure();
 
         $this->setHelp(
-            'This debug command fetches Ergonode category tree by code and saves it.'
+            'This debug command fetches Ergonode category tree.'
         );
 
-        $this->addArgument('code', InputArgument::REQUIRED, 'Root category code');
+        $this->addOption(
+            'force',
+            null,
+            InputOption::VALUE_NONE,
+            'Use this flag to clear saved cursors before running the handler'
+        );
     }
 
 
@@ -51,18 +57,20 @@ class DebugPersistCategories extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $categoryCollection = $this->categoryProvider->provideCategoryTree(
-            $input->getArgument('code')
-        );
+        $force = (bool)$input->getOption('force');
 
+        if ($force) {
+            $context = new Context(new SystemSource());
+            $this->cursorManager->deleteCursor(CategoryStreamResultsProxy::MAIN_FIELD, $context);
+            $this->cursorManager->deleteCursor(CategoryTreeStreamResultsProxy::MAIN_FIELD, $context);
+            $this->cursorManager->deleteCursor(CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR, $context);
 
-        if (empty($categoryCollection)) {
-            $io->error('Request failed');
-
-            return self::FAILURE;
+            $io->info('Cursors deleted');
         }
 
-        $this->categoryPersistor->persistCollection($categoryCollection, new Context(new SystemSource()));
+        $count = $this->handler->runSync();
+
+        $io->success(\sprintf('Processed %d entities', $count));
 
         return self::SUCCESS;
     }

@@ -8,90 +8,90 @@ use Ergonode\IntegrationShopware\Api\CategoryTreeStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
 use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
-use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
-use Ergonode\IntegrationShopware\Provider\CategoryProvider;
-use Ergonode\IntegrationShopware\Provider\ConfigProvider;
-use Ergonode\IntegrationShopware\Provider\LanguageProvider;
+use Ergonode\IntegrationShopware\Persistor\CategoryTreePersistor;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
-use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\System\Language\LanguageCollection;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
-
-use function array_map;
 use function count;
 
-class CategoryTreeSyncProcessor
+class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 {
-    public const DEFAULT_CATEGORY_COUNT = 10;
+    public const DEFAULT_TREE_COUNT = 1;
+    public const DEFAULT_LEAF_COUNT = 25;
 
     private ErgonodeGqlClientInterface $gqlClient;
     private CategoryQueryBuilder $categoryQueryBuilder;
-    private CategoryPersistor $categoryPersistor;
+    private CategoryTreePersistor $categoryPersistor;
     private ErgonodeCursorManager $cursorManager;
     private LoggerInterface $logger;
-    private ConfigProvider $configProvider;
-    private LanguageProvider $languageProvider;
-    private CategoryProvider $categoryProvider;
 
     public function __construct(
         ErgonodeGqlClientInterface $gqlClient,
         CategoryQueryBuilder $categoryQueryBuilder,
-        CategoryPersistor $categoryPersistor,
+        CategoryTreePersistor $categoryPersistor,
         ErgonodeCursorManager $cursorManager,
-        LoggerInterface $ergonodeSyncLogger,
-        ConfigProvider $configProvider,
-        LanguageProvider $languageProvider,
-        CategoryProvider $categoryProvider
+        LoggerInterface $ergonodeSyncLogger
     ) {
         $this->gqlClient = $gqlClient;
         $this->categoryQueryBuilder = $categoryQueryBuilder;
         $this->categoryPersistor = $categoryPersistor;
         $this->cursorManager = $cursorManager;
         $this->logger = $ergonodeSyncLogger;
-        $this->configProvider = $configProvider;
-        $this->languageProvider = $languageProvider;
-        $this->categoryProvider = $categoryProvider;
     }
 
-    /**
-     * @param int $categoryCount Number of categories to process (categories per page)
-     */
     public function processStream(
+        string $treeCode,
         Context $context,
-        int $categoryCount = self::DEFAULT_CATEGORY_COUNT
-    ): ?SyncCounterDTO {
+        ?int $categoryCount = null
+    ): SyncCounterDTO {
+        $categoryCount = $categoryCount ?? self::DEFAULT_LEAF_COUNT;
         $counter = new SyncCounterDTO();
+        $stopwatch = new Stopwatch();
 
-        $treeCode = $this->configProvider->getCategoryTreeCode();
         if (empty($treeCode)) {
             throw new RuntimeException('Could not find category tree code in plugin config.');
         }
 
-        $cursorEntity = $this->cursorManager->getCursorEntity(CategoryTreeStreamResultsProxy::MAIN_FIELD, $context);
-        $cursor = null === $cursorEntity ? null : $cursorEntity->getCursor();
+        $treeCursor = $this->cursorManager->getCursor(CategoryTreeStreamResultsProxy::MAIN_FIELD, $context);
+        $leafCursor = $this->cursorManager->getCursor(
+            CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
+            $context
+        );
 
-        $query = $this->categoryQueryBuilder->buildTreeStream($categoryCount, $cursor);
+        $stopwatch->start('query');
+        $query = $this->categoryQueryBuilder->buildTreeStream(
+            self::DEFAULT_TREE_COUNT,
+            $categoryCount,
+            $treeCursor,
+            $leafCursor
+        );
+
         /** @var CategoryTreeStreamResultsProxy|null $result */
         $result = $this->gqlClient->query($query, CategoryTreeStreamResultsProxy::class);
+        $stopwatch->stop('query');
 
         if (null === $result) {
             throw new RuntimeException('Request failed.');
         }
 
-        if (0 === count($result->getEdges())) {
+        $leafEdges = $result->getEdges()[0]['node']['categoryTreeLeafList']['edges'] ?? [];
+        $leafHasNextPage = $result->getEdges()[0]['node']['categoryTreeLeafList']['pageInfo']['hasNextPage'] ?? false;
+        $leafEndCursor = $result->getEdges()[0]['node']['categoryTreeLeafList']['pageInfo']['endCursor'] ?? null;
+
+        if (0 === count($result->getEdges()) && 0 === count($leafEdges)) {
             $this->logger->info('End of stream reached.');
-            return null;
+            $counter->setHasNextPage(false);
+
+            return $counter;
         }
 
-        $endCursor = $result->getEndCursor();
-        if (null === $endCursor) {
+        $treeEndCursor = $result->getEndCursor();
+        if (null === $treeEndCursor) {
             throw new RuntimeException('Could not retrieve end cursor from the response.');
         }
-
-        $activeLanguages = $this->languageProvider->getActiveLanguages($context);
 
         foreach ($result->getEdges() as $edge) {
             $node = $edge['node'] ?? null;
@@ -100,72 +100,56 @@ class CategoryTreeSyncProcessor
                 continue;
             }
 
-            $this->persistTreeRootStub($treeCode, $activeLanguages, $context);
+            $stopwatch->start('process');
 
             try {
-                foreach ($activeLanguages as $language) {
-                    $locale = IsoCodeConverter::shopwareToErgonodeIso($language->getLocale()->getCode());
+                $writeResult = $this->categoryPersistor->persistLeaves($leafEdges, $treeCode, $context);
+                $entityCount = \count($writeResult);
+                $counter->incrProcessedEntityCount($entityCount);
 
-                    foreach ($node['categoryTreeLeafList']['edges'] as $leafEdge) {
-                        $leafNode = $leafEdge['node'];
-                        $this->categoryPersistor->persistStub(
-                            $leafNode['category']['code'],
-                            $leafNode['parentCategory']['code'] ?? $treeCode,
-                            $locale,
-                            $context
-                        );
-                    }
-
-                    $this->logger->info('Processed category.', [
-                        'code' => $node['code'],
-                        'locale' => $locale
-                    ]);
-
-                    $counter->incrProcessedEntityCount();
-                }
-
-                $categoryCodes = array_map(
-                    fn($item) => $item['node']['category']['code'],
-                    $node['categoryTreeLeafList']['edges']
-                );
-                $categoryCodes[] = $treeCode;
-
-                $idsToRemove = $this->categoryProvider->getCategoryIdsNotInArray($categoryCodes, $context);
-
-                $this->logger->info('Removing following categories not found in Ergonode tree.', [
-                    'treeCode' => $treeCode,
-                    'categoryIds' => $idsToRemove
+                $this->logger->info('Persisted category leaves', [
+                    'count' => $entityCount
                 ]);
 
-                $this->categoryPersistor->deleteIds(
-                    $idsToRemove,
-                    $context
-                );
+                // TODO remove categories not found in Ergonode tree
+                // TODO handle categories order (afterCategoryId)
             } catch (Throwable $e) {
-                $this->logger->error('Error while persisting category.', [
+                $this->logger->error('Error while persisting category leaves.', [
                     'message' => $e->getMessage(),
                     'file' => $e->getFile() . ':' . $e->getLine(),
                     'code' => $node['code'],
                 ]);
+            } finally {
+                $stopwatch->stop('process');
             }
+
+            break;
         }
 
-        $this->cursorManager->persist($endCursor, CategoryTreeStreamResultsProxy::MAIN_FIELD, $context);
-
-        $counter->setHasNextPage($result->hasNextPage());
-
-        return $counter;
-    }
-
-    private function persistTreeRootStub($treeCode, LanguageCollection $activeLanguages, Context $context)
-    {
-        foreach ($activeLanguages as $language) {
-            $this->categoryPersistor->persistStub(
-                $treeCode,
-                null,
-                IsoCodeConverter::shopwareToErgonodeIso($language->getLocale()->getCode()),
+        if ($leafHasNextPage) {
+            $this->logger->info('Category leaves have next page', [
+                'leafCursor' => $leafEndCursor
+            ]);
+            $this->cursorManager->persist(
+                $leafEndCursor,
+                CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
                 $context
             );
+        } else {
+            $this->logger->info('Category leaves do not have next page', [
+                'treeCursor' => $treeEndCursor
+            ]);
+            $this->cursorManager->deleteCursor(
+                CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
+                $context
+            );
+            $this->cursorManager->persist($treeEndCursor, CategoryTreeStreamResultsProxy::MAIN_FIELD, $context);
+
         }
+
+        $counter->setHasNextPage($result->hasNextPage() || $leafHasNextPage);
+        $counter->setStopwatch($stopwatch);
+
+        return $counter;
     }
 }
