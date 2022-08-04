@@ -71,11 +71,6 @@ services:
     arguments:
       $repository: '@ergonode_cursor.repository'
 
-  # PROVIDER
-  Ergonode\IntegrationShopware\Provider\AttributeMappingProvider:
-    arguments:
-      $repository: '@ergonode_attribute_mapping.repository'
-
   # RESOLVER
   Ergonode\IntegrationShopware\Resolver\CustomFieldTransformerResolver:
     arguments:
