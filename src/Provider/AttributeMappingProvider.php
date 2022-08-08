@@ -17,6 +17,8 @@ use function md5;
 
 class AttributeMappingProvider
 {
+    public const ATTRIBUTE_MAPPING_CACHE_KEY = 'attribute_mapping';
+
     private EntityRepositoryInterface $repository;
 
     private CacheInterface $cache;
@@ -50,7 +52,7 @@ class AttributeMappingProvider
 
     private function getAttributeMap(Context $context): array
     {
-        $cacheKey = md5('attribute_mapping');
+        $cacheKey = md5(self::ATTRIBUTE_MAPPING_CACHE_KEY);
 
         try {
             return $this->cache->get($cacheKey, function () use ($context) {
