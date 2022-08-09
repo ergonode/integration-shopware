@@ -6,53 +6,68 @@ namespace Ergonode\IntegrationShopware\Provider;
 
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
+use Psr\Cache\InvalidArgumentException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Symfony\Contracts\Cache\CacheInterface;
+
+use function array_filter;
+use function md5;
 
 class AttributeMappingProvider
 {
+    public const ATTRIBUTE_MAPPING_CACHE_KEY = 'attribute_mapping';
+
     private EntityRepositoryInterface $repository;
 
-    private ?array $mappingCache = null;
+    private CacheInterface $cache;
 
     public function __construct(
-        EntityRepositoryInterface $repository
+        EntityRepositoryInterface $ergonodeAttributeMappingRepository,
+        CacheInterface $ergonodeAttributeMappingCache
     ) {
-        $this->repository = $repository;
+        $this->repository = $ergonodeAttributeMappingRepository;
+        $this->cache = $ergonodeAttributeMappingCache;
     }
 
     public function provideByShopwareKey(string $key, Context $context): ?ErgonodeAttributeMappingEntity
     {
-        if (null === $this->mappingCache) {
-            $this->loadMappingEntities($context);
-        }
+        $map = $this->getAttributeMap($context);
 
-        return $this->mappingCache[$key] ?? null;
+        return $map[$key] ?? null;
     }
 
     public function provideByErgonodeKey(string $key, Context $context): ErgonodeAttributeMappingCollection
     {
-        if (null === $this->mappingCache) {
-            $this->loadMappingEntities($context);
-        }
+        $map = $this->getAttributeMap($context);
 
         return new ErgonodeAttributeMappingCollection(
-            \array_filter(
-                $this->mappingCache,
+            array_filter(
+                $map,
                 fn(ErgonodeAttributeMappingEntity $entity) => $key === $entity->getErgonodeKey()
             )
         );
     }
 
-    private function loadMappingEntities(Context $context): void
+    private function getAttributeMap(Context $context): array
     {
-        $this->mappingCache = [];
-        $result = $this->repository->search(new Criteria(), $context);
+        $cacheKey = md5(self::ATTRIBUTE_MAPPING_CACHE_KEY);
 
-        /** @var ErgonodeAttributeMappingEntity $entity */
-        foreach ($result->getEntities() as $entity) {
-            $this->mappingCache[$entity->getShopwareKey()] = $entity;
+        try {
+            return $this->cache->get($cacheKey, function () use ($context) {
+                $map = [];
+
+                $result = $this->repository->search(new Criteria(), $context);
+                /** @var ErgonodeAttributeMappingEntity $entity */
+                foreach ($result->getEntities() as $entity) {
+                    $map[$entity->getShopwareKey()] = $entity;
+                }
+
+                return $map;
+            });
+        } catch (InvalidArgumentException $e) {
+            return [];
         }
     }
 }
