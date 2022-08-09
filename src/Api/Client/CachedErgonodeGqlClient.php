@@ -8,6 +8,10 @@ use GraphQL\Query;
 use GraphQL\Results;
 use Symfony\Contracts\Cache\CacheInterface;
 
+use function md5;
+use function sprintf;
+use function strval;
+
 class CachedErgonodeGqlClient implements ErgonodeGqlClientInterface
 {
     private ErgonodeGqlClient $ergonodeGqlClient;
@@ -16,15 +20,15 @@ class CachedErgonodeGqlClient implements ErgonodeGqlClientInterface
 
     public function __construct(
         ErgonodeGqlClient $ergonodeGqlClient,
-        CacheInterface $gqlRequestCache
+        CacheInterface $ergonodeGqlRequestCache
     ) {
         $this->ergonodeGqlClient = $ergonodeGqlClient;
-        $this->cache = $gqlRequestCache;
+        $this->cache = $ergonodeGqlRequestCache;
     }
 
     public function query(Query $query, ?string $proxyClass = null): ?Results
     {
-        $queryHash = \sprintf('%s_%s', \md5(\strval($query)), $proxyClass);
+        $queryHash = sprintf('%s_%s', md5(strval($query)), $proxyClass);
 
         return $this->cache->get($queryHash, fn() => $this->ergonodeGqlClient->query($query, $proxyClass));
     }

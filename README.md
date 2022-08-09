@@ -27,12 +27,18 @@ To build Store package execute:
 
 NOTE: The script uses absolute paths. It does not matter in which directory it is executed. 
 
-### GQL Request Cache
+### Cache
 
 In order to cache Ergonode GQL API requests you need to change the parameter `ergonode_integration.use_gql_cache` in
 `src/Resources/config/parameters.yml` to `true` and use `Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface` in your
 classes instead of concrete `Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClient` class. Cached client class is
-`Ergonode\IntegrationShopware\Api\Client\CachedErgonodeGqlClient`. More cache config options can be found in
+`Ergonode\IntegrationShopware\Api\Client\CachedErgonodeGqlClient`. 
+
+More cache config options can be found in
 `src/Resources/config/packages/cache.yml`.
 
-In order to clear request cache run `bin/console cache:pool:clear gql_request_cache`.
+In order to clear cache pool run `bin/console cache:pool:clear ergonode_gql_request_cache`.
+
+Available cache pools:
+- ergonode_gql_request_cache
+- ergonode_attribute_mapping_cache
