@@ -67,10 +67,6 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
         $result = null;
         try {
             foreach ($this->processors as $processor) {
-                if (++$currentPage >= self::MAX_PAGES_PER_RUN) {
-                    break;
-                }
-
                 $processorClass = \get_class($processor);
                 $this->logger->info('Starting category processor', [
                     'processor' => $processorClass
@@ -84,6 +80,10 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
                     }
 
                     $count += $result->getProcessedEntityCount();
+
+                    if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
+                        break 2;
+                    }
                 } while ($result->hasNextPage());
             }
         } catch (Throwable $e) {
