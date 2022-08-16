@@ -9,15 +9,21 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class SyncPerformanceLogger
 {
-    private LoggerInterface $syncLogger;
+    private LoggerInterface $logger;
+    private bool $enabled;
 
-    public function __construct(LoggerInterface $syncLogger)
+    public function __construct(LoggerInterface $ergonodeSyncLogger, bool $enabled)
     {
-        $this->syncLogger = $syncLogger;
+        $this->logger = $ergonodeSyncLogger;
+        $this->enabled = $enabled;
     }
 
     public function logPerformance(string $name, Stopwatch $stopwatch): void
     {
+        if (false === $this->enabled) {
+            return;
+        }
+
         $performanceInfo = [];
         foreach ($stopwatch->getSections()['__root__']->getEvents() as $event) {
             $performanceInfo[$event->getName() . '_time'] = \sprintf('%.02fms', $event->getDuration());
@@ -25,6 +31,6 @@ class SyncPerformanceLogger
         }
 
         $performanceInfo['name'] = $name;
-        $this->syncLogger->info('Performance report', $performanceInfo);
+        $this->logger->info('Performance report', $performanceInfo);
     }
 }
