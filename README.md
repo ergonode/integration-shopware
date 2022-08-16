@@ -83,12 +83,6 @@ ProductSyncProcessor might not properly handle variants that were "detached" sin
 When uninstalling plugin and selecting "Remove all app data permanently", all plugin tables and mappings will be
 removed. This means that all mappings will be lost and next synchronization will create duplicated entities.
 
-#### Category sync logic
-
-There are several ways to create Shopware category tree based on Ergonode's categories and category trees
-
-- By using front-end trigger in
-
 ### Testing
 
 In Shopware root run:
