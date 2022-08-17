@@ -4,17 +4,37 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Tests\Unit\Transformer;
 
+use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Tests\Fixture\GqlAttributeResponse;
 use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Framework\Context;
 
 class TranslationTransformerTest extends TestCase
 {
     private TranslationTransformer $transformer;
 
+    /**
+     * @var MockObject|Context
+     */
+    private Context $contextMock;
+
+    /**
+     * @var MockObject|LanguageProvider
+     */
+    private LanguageProvider $languageProviderMock;
+
     protected function setUp(): void
     {
-        $this->transformer = new TranslationTransformer();
+        $this->contextMock = $this->createMock(Context::class);
+        $this->languageProviderMock = $this->createMock(LanguageProvider::class);
+        $this->languageProviderMock->method('getDefaultLanguageLocale')
+            ->willReturn('en-GB');
+
+        $this->transformer = new TranslationTransformer(
+            $this->languageProviderMock
+        );
     }
 
     /**
@@ -25,6 +45,16 @@ class TranslationTransformerTest extends TestCase
         $output = $this->transformer->transform($ergonodeTranslationInput, $shopwareKeyInput);
 
         $this->assertSame($expectedOutput, $output);
+    }
+
+    /**
+     * @dataProvider defaultLocaleTestProvider
+     */
+    public function testTransformDefaultLocale($input, $expectedOutput): void
+    {
+        $result = $this->transformer->transformDefaultLocale($input, $this->contextMock);
+
+        $this->assertEquals($expectedOutput, $result);
     }
 
     public function ergonodeTranslationDataProvider(): array
@@ -92,6 +122,22 @@ class TranslationTransformerTest extends TestCase
                     ],
                 ],
             ],
+        ];
+    }
+
+    public function defaultLocaleTestProvider(): iterable
+    {
+        yield [
+            [
+                [
+                    'language' => 'en_GB',
+                    '__typename' => 'StringAttributeValue',
+                    'value_string' => ['value']
+                ]
+            ],
+            [
+                'value'
+            ]
         ];
     }
 }

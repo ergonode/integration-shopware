@@ -9,7 +9,6 @@ use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMapping
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Extension\PropertyGroup\PropertyGroupExtension;
 use Ergonode\IntegrationShopware\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
-use Ergonode\IntegrationShopware\Provider\PropertyGroupProvider;
 use Ergonode\IntegrationShopware\Tests\Fixture\GqlAttributeResponse;
 use Ergonode\IntegrationShopware\Transformer\PropertyGroupTransformer;
 use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
@@ -27,23 +26,16 @@ class AttributeNodeTransformerTest extends TestCase
     private PropertyGroupTransformer $transformer;
 
     /**
-     * @var MockObject|PropertyGroupProvider
-     */
-    private PropertyGroupProvider $propertyGroupProviderMock;
-
-    /**
      * @var MockObject|TranslationTransformer
      */
     private TranslationTransformer $translationTransformerMock;
 
     protected function setUp(): void
     {
-        $this->propertyGroupProviderMock = $this->createMock(PropertyGroupProvider::class);
         $this->translationTransformerMock = $this->createMock(TranslationTransformer::class);
         $this->contextMock = $this->createMock(Context::class);
 
         $this->transformer = new PropertyGroupTransformer(
-            $this->propertyGroupProviderMock,
             $this->translationTransformerMock
         );
     }
@@ -53,8 +45,7 @@ class AttributeNodeTransformerTest extends TestCase
      */
     public function testTransformNodeMethod(array $nodeInput, ?PropertyGroupEntity $providerReturnValue, array $expectedOutput)
     {
-        $this->mockTranslationTransformation(2 + count($nodeInput['options']));
-        $this->mockPropertyGroupProvider($providerReturnValue);
+        $this->mockTranslationTransformation(1 + count($nodeInput['options']));
 
         $output = $this->transformer->transformAttributeNode(
             new PropertyGroupTransformationDTO($nodeInput),
@@ -156,11 +147,9 @@ class AttributeNodeTransformerTest extends TestCase
                     'translations' => [
                         'pl-PL' => [
                             'name' => 'name_pl',
-                            'description' => 'description_pl',
                         ],
                         'en-US' => [
                             'name' => 'name_en',
-                            'description' => 'description_en',
                         ],
                     ],
                     'extensions' => [
@@ -264,11 +253,9 @@ class AttributeNodeTransformerTest extends TestCase
                     'translations' => [
                         'pl-PL' => [
                             'name' => 'name_pl',
-                            'description' => 'description_pl',
                         ],
                         'en-US' => [
                             'name' => 'name_en',
-                            'description' => 'description_en',
                         ],
                     ],
                     'extensions' => [
@@ -375,11 +362,9 @@ class AttributeNodeTransformerTest extends TestCase
                     'translations' => [
                         'pl-PL' => [
                             'name' => 'name_pl',
-                            'description' => 'description_pl',
                         ],
                         'en-US' => [
                             'name' => 'name_en',
-                            'description' => 'description_en',
                         ],
                     ],
                     'extensions' => [
@@ -520,11 +505,9 @@ class AttributeNodeTransformerTest extends TestCase
                     'translations' => [
                         'pl-PL' => [
                             'name' => 'name_pl',
-                            'description' => 'description_pl',
                         ],
                         'en-US' => [
                             'name' => 'name_en',
-                            'description' => 'description_en',
                         ],
                     ],
                     'extensions' => [
@@ -657,11 +640,9 @@ class AttributeNodeTransformerTest extends TestCase
                     'translations' => [
                         'pl-PL' => [
                             'name' => 'name_pl',
-                            'description' => 'description_pl',
                         ],
                         'en-US' => [
                             'name' => 'name_en',
-                            'description' => 'description_en',
                         ],
                     ],
                     'extensions' => [
@@ -682,13 +663,6 @@ class AttributeNodeTransformerTest extends TestCase
             ->expects($this->exactly($callCount))
             ->method('transform')
             ->willReturnCallback(fn(array $ergonodeTranslation, string $shopwareKey) => $this->getTranslation($shopwareKey));
-    }
-
-    private function mockPropertyGroupProvider(?PropertyGroupEntity $returnValue): void
-    {
-        $this->propertyGroupProviderMock
-            ->method('getPropertyGroupByMapping')
-            ->willReturn($returnValue);
     }
 
     private function getTranslation(string $key): array

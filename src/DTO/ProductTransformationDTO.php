@@ -12,7 +12,7 @@ class ProductTransformationDTO
 
     private array $shopwareData;
 
-    private ?ProductEntity $swProduct;
+    private ?ProductEntity $swProduct = null;
 
     private array $entitiesToDelete = [];
 
