@@ -1,2 +1,3 @@
 parameters:
-  ergonode_integration.use_gql_cache: false
+ ergonode_integration.use_gql_cache: false
+ ergonode_integration.use_performance_logger: true

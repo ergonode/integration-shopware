@@ -1,12 +1,82 @@
 # Shopware Ergonode Integration
 
+## Description
+
+This plugin synchronizes data from Ergonode to Shopware. It takes advantage of Ergonode's GraphQL API and utilizes
+Ergonode's streams.
+
+## Key features
+
+### Category sync
+
+This plugin synchronizes Ergonode's categories and single category tree into Shopware. First, it looks into
+categoryTreeStream to see if the main tree has changed since last sync. If it did, the plugin then iterates through
+all category leaves using the cursor. Categories not found in Shopware are created with code as its name. Translations
+are not persisted at this point. Categories already existing in Shopware have their parents updated.
+
+After it's done, or when no changes were detected, the categoryStream is fetched and category translations are
+persisted.
+
+> Missing features:
+> - Categories removed from the tree in Ergonode are not removed from Shopware
+> - Category order within the tree is not synchronized into Shopware
+
+### Product sync
+
+Products are synchronized using productStream. Main fields (fields that are found directly in Shopware's ProductEntity)
+can be configured in Settings > Ergonode integration > Attribute mappings. One Shopware field can be mapped to one
+Ergonode field and one Ergonode field can be mapped to many Shopware fields. These mappings are not required; the plugin
+will use Ergonode's code as product name if no such mapping is provided.
+
+Ergonode attributes of type `select` and `multiselect` will be added as properties in Shopware after attribute sync
+(see below). Attributes of other type can be added as custom fields by selecting them in plugin's config page under
+"Ergonode attributes as custom fields".
+
+Stock, tax and price are not synchronized. They have a default value set during the sync.
+
+Deleted products are also deleted in Shopware using productDeletedStream.
+
+### Attribute sync
+
+In order for attributes of type `select` or `multiselect` to appear in Shopware as properties, first the attribute sync
+must be executed.
+
+### Product cross-selling
+
+Product cross-selling can be set up by creating product relations in Ergonode, then in plugin config selecting those
+fields under "Ergonode attributes as cross selling".
+
+### Product visibility
+
+Product visibility can be set up using Ergonode's segments functionality. In Shopware plugin configuration segments'
+API keys can be set per sales channel and product visibility per sales channel will be updated accordingly.
+
+### Languages
+
+Ergonode languages are synchronized into Shopware.
+
+### Executing sync and scheduling
+
+The synchronization process is added as a bunch of scheduled tasks which are run periodically. The process can be
+triggered manually in Settings > Ergonode integration > Synchronization. Tasks use a lock system so that only one task
+of given type is ran at once. These tasks utilize Ergonode's cursors where applicable, meaning that they only process
+changes that occurred since last sync.
+
+### Sync history
+
+Synchronization history can be viewed under Settings > Ergonode integration > Import history.
+
+## Configuration
+
+The minimal configuration required involves setting up plugin's configuration in Shopware. The required settings are:
+
+- Ergonode GraphQL API endpoint (global setting)
+- Ergonode API key (can be set up per sales channel)
+- Code of the category tree to synchronize
+
 ## Development
 
 ### Dev notes
-
-`ProductSyncProcessor` and `CategorySyncProcessor` both have a setting of products/categories fetched per page when
-syncing using Ergonode streams (10). Scheduled task runners have a limit on how many pages per run are processed (25) to
-prevent infinite loop when something goes wrong.
 
 ProductSyncProcessor might not properly handle variants that were "detached" since last sync.
 
@@ -25,12 +95,13 @@ To build Store package execute:
 
 `bash <PLUGIN_DIR>/build/build-zip.sh`
 
-NOTE: The script uses absolute paths. It does not matter in which directory it is executed. 
+NOTE: The script uses absolute paths. It does not matter in which directory it is executed.
 
 ### Cache
 
-In order to cache Ergonode GQL API requests you need to change the parameter `ergonode_integration.use_gql_cache` in
-`src/Resources/config/parameters.yml` to `true` and use `Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface` in your
+In order to cache Ergonode GQL API requests you need to change the parameter `ergonode_integration.use_gql_cache`
+in `src/Resources/config/parameters.yml` to `true` and
+use `Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface` in your
 classes instead of concrete `Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClient` class. Cached client class is
 `Ergonode\IntegrationShopware\Api\Client\CachedErgonodeGqlClient`. 
 

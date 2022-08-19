@@ -34,6 +34,18 @@ class ErgonodeCursorManager
         ], $context);
     }
 
+    public function deleteCursor(string $query, Context $context): void
+    {
+        $cursorEntity = $this->getCursorEntity($query, $context);
+        if (null !== $cursorEntity) {
+            $this->repository->delete([
+                [
+                    'id' => $cursorEntity->getId()
+                ]
+            ], $context);
+        }
+    }
+
     public function getCursorEntity(string $query, Context $context): ?ErgonodeCursorEntity
     {
         $criteria = new Criteria();
@@ -46,5 +58,11 @@ class ErgonodeCursorManager
         }
 
         return null;
+    }
+
+    public function getCursor(string $query, Context $context): ?string
+    {
+        $cursorEntity = $this->getCursorEntity($query, $context);
+        return null === $cursorEntity ? null : $cursorEntity->getCursor();
     }
 }

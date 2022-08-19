@@ -9,24 +9,28 @@ use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
 class ProductSyncTaskHandler extends AbstractSyncTaskHandler
 {
-    private const MAX_PAGES_PER_RUN = 25;
+    private const MAX_PAGES_PER_RUN = 4;
 
     private ProductSyncProcessor $productSyncProcessor;
+    private MessageBusInterface $messageBus;
 
     public function __construct(
         EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryService,
         LockFactory $lockFactory,
         LoggerInterface $ergonodeSyncLogger,
-        ProductSyncProcessor $productSyncProcessor
+        ProductSyncProcessor $productSyncProcessor,
+        MessageBusInterface $messageBus
     ) {
         parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
         $this->productSyncProcessor = $productSyncProcessor;
+        $this->messageBus = $messageBus;
     }
 
     public static function getHandledMessages(): iterable
@@ -38,6 +42,7 @@ class ProductSyncTaskHandler extends AbstractSyncTaskHandler
     {
         $currentPage = 0;
         $count = 0;
+        $result = null;
 
         try {
             do {
@@ -45,12 +50,16 @@ class ProductSyncTaskHandler extends AbstractSyncTaskHandler
 
                 $count += $result->getProcessedEntityCount();
 
-                if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
+                if (self::MAX_PAGES_PER_RUN !== null && ++$currentPage >= self::MAX_PAGES_PER_RUN) {
                     break;
                 }
             } while ($result->hasNextPage());
         } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
+        }
+
+        if (null !== $result && $result->hasNextPage()) {
+            $this->messageBus->dispatch(new ProductSyncTask());
         }
 
         return $count;

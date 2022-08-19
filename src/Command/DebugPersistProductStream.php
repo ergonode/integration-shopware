@@ -54,14 +54,28 @@ class DebugPersistProductStream extends Command
         $io = new SymfonyStyle($input, $output);
         $io->progressStart();
 
-        $processedPages = 0;
+        $processedPages = 1;
+        $entityCount = 0;
+        $processTime = 0;
+        $peakProcessMemory = 0;
         try {
-            while ($this->productSyncProcessor->processStream($context)->hasNextPage()) {
+            do {
                 $io->progressAdvance();
-                if ($processedPages++ >= $limit && $limit !== null) {
+                $result = $this->productSyncProcessor->processStream($context);
+
+                $entityCount += $result->getProcessedEntityCount();
+                if ($result->hasStopwatch()) {
+                    $processEvent = $result->getStopwatch()->getSections()['__root__']->getEvent('process');
+                    if (null !== $processEvent) {
+                        $processTime += $processEvent->getDuration();
+                        $peakProcessMemory = \max($peakProcessMemory, $processEvent->getMemory());
+                    }
+                }
+
+                if ($limit !== null && $processedPages++ >= $limit) {
                     break;
                 }
-            }
+            } while ($result->hasNextPage());
 
             $io->progressFinish();
         } catch (\Throwable $e) {
@@ -70,7 +84,14 @@ class DebugPersistProductStream extends Command
             return Command::FAILURE;
         }
 
-        $io->success(\sprintf('Processed %d page(s)', $processedPages));
+        $io->success(\sprintf('Processed %d page(s) and %d entities', $processedPages - 1, $entityCount));
+        $io->info(
+            \sprintf(
+                "Process time:\t%.02fms\nPeak memory:\t%.02fMB",
+                $processTime,
+                $peakProcessMemory / 1024 / 1024
+            )
+        );
 
         return Command::SUCCESS;
     }

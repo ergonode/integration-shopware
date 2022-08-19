@@ -8,6 +8,7 @@ use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
 use Ergonode\IntegrationShopware\Entity\ErgonodeCursor\ErgonodeCursorEntity;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Manager\OrphanEntitiesManager;
+use Ergonode\IntegrationShopware\Persistor\CustomFieldPersistor;
 use Ergonode\IntegrationShopware\Persistor\PropertyGroupPersistor;
 use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
 use Ergonode\IntegrationShopware\Tests\Fixture\GqlAttributeResponse;
@@ -39,6 +40,11 @@ class OrphanEntitiesManagerTest extends TestCase
     private PropertyGroupPersistor $propertyGroupPersistorMock;
 
     /**
+     * @var MockObject|CustomFieldPersistor
+     */
+    private CustomFieldPersistor $customFieldPersistorMock;
+
+    /**
      * @var MockObject|Context
      */
     private Context $contextMock;
@@ -48,13 +54,15 @@ class OrphanEntitiesManagerTest extends TestCase
         $this->ergonodeCursorManagerMock = $this->createMock(ErgonodeCursorManager::class);
         $this->ergonodeAttributeProviderMock = $this->createMock(ErgonodeAttributeProvider::class);
         $this->propertyGroupPersistorMock = $this->createMock(PropertyGroupPersistor::class);
+        $this->customFieldPersistorMock = $this->createMock(CustomFieldPersistor::class);
 
         $this->contextMock = $this->createMock(Context::class);
 
         $this->manager = new OrphanEntitiesManager(
             $this->ergonodeCursorManagerMock,
             $this->ergonodeAttributeProviderMock,
-            $this->propertyGroupPersistorMock
+            $this->propertyGroupPersistorMock,
+            $this->customFieldPersistorMock
         );
     }
 
@@ -72,6 +80,7 @@ class OrphanEntitiesManagerTest extends TestCase
             'last_ergonode_cursor',
             $results
         );
+        $this->mockCustomFieldPersistor($results);
         $this->mockPropertyGroupPersistor($results, $mockDeletedPropertyGroups);
         $this->mockErgonodeCursorPersistor($cursorToPersist, AttributeDeletedStreamResultsProxy::MAIN_FIELD);
 
@@ -157,6 +166,15 @@ class OrphanEntitiesManagerTest extends TestCase
             ->method('provideDeletedAttributes')
             ->with($endCursor)
             ->willReturn(DataConverter::arrayAsGenerator($returnValues));
+    }
+
+    private function mockCustomFieldPersistor(array $returnValues = []): void
+    {
+        $this->customFieldPersistorMock
+            ->expects(
+                $this->exactly(\count($returnValues))
+            )
+            ->method('remove');
     }
 
     private function mockPropertyGroupPersistor(array $results, bool $mockDeletedPropertyGroups = true)

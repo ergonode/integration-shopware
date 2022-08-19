@@ -90,9 +90,6 @@ services:
   Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
-  Ergonode\IntegrationShopware\Service\ScheduledTask\CategoryTreeSyncTask:
-    tags: [ 'shopware.scheduled.task' ]
-
   Ergonode\IntegrationShopware\Service\ScheduledTask\AttributeSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
@@ -104,14 +101,6 @@ services:
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTask:
     tags: [ 'shopware.scheduled.task' ]
-
-  # This task is disabled because CategoryTreeSyncTask and CategorySyncTask together are building the full tree.
-  # Can be removed completely if both tasks are working correctly. The task handler could be left for debug purposes.
-  # (See SWERG-44, SWERG-49)
-  #  Ergonode\IntegrationShopware\Service\ScheduledTask\BuildFullCategoryTreeTask:
-  #    tags: [ 'shopware.scheduled.task' ]
-  #    arguments:
-  #      $lockFactory: '@ergonode_integration.lock_factory'
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
@@ -127,11 +116,9 @@ services:
     tags: [ 'messenger.message_handler' ]
     arguments:
       $lockFactory: '@ergonode_integration.lock_factory'
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\CategoryTreeSyncTaskHandler:
-    tags: [ 'messenger.message_handler' ]
-    arguments:
-      $lockFactory: '@ergonode_integration.lock_factory'
+      $processors:
+        - '@Ergonode\IntegrationShopware\Processor\CategoryTreeSyncProcessor'
+        - '@Ergonode\IntegrationShopware\Processor\CategorySyncProcessor'
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\AttributeSyncTaskHandler:
     tags: [ 'messenger.message_handler' ]
@@ -139,11 +126,6 @@ services:
       $lockFactory: '@ergonode_integration.lock_factory'
 
   Ergonode\IntegrationShopware\Service\ScheduledTask\LanguageSyncTaskHandler:
-    tags: [ 'messenger.message_handler' ]
-    arguments:
-      $lockFactory: '@ergonode_integration.lock_factory'
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\BuildFullCategoryTreeTaskHandler:
     tags: [ 'messenger.message_handler' ]
     arguments:
       $lockFactory: '@ergonode_integration.lock_factory'
@@ -185,3 +167,8 @@ services:
 
   Ergonode\IntegrationShopware\Subscriber\DeleteCategoryExtensionSubscriber:
     tags: [ 'kernel.event_subscriber' ]
+
+  # UTIL
+  Ergonode\IntegrationShopware\Util\SyncPerformanceLogger:
+    arguments:
+      $enabled: '%ergonode_integration.use_performance_logger%'

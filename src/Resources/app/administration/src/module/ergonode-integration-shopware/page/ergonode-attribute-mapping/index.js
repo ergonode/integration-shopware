@@ -46,14 +46,14 @@ Component.register('ergonode-attribute-mapping', {
         },
 
         shopwareAttributesSelectOptions () {
-            return this.shopwareAttributes?.map((attributeName, index) => ({
+            return this.shopwareAttributes?.map(attributeName => ({
                 label: attributeName,
                 value: attributeName,
             }));
         },
 
         ergonodeAttributesSelectOptions () {
-            return this.ergonodeAttributes?.map((attributeName, index) => ({
+            return this.ergonodeAttributes?.map(attributeName => ({
                 label: attributeName,
                 value: attributeName,
             }));
@@ -64,15 +64,17 @@ Component.register('ergonode-attribute-mapping', {
         },
 
         mappingAlreadyExists () {
-            return this.mappings?.some(mapping =>
-                mapping.shopwareKey == this.createShopwareAttribute &&
-                mapping.ergonodeKey == this.createErgonodeAttribute
+            return this.mappings.some(mapping =>
+                mapping.shopwareKey.toLowerCase() === this.createShopwareAttribute?.toLowerCase() &&
+                mapping.ergonodeKey.toLowerCase() === this.createErgonodeAttribute?.toLowerCase()
             );
         },
 
         mappingAttributeOccupied () {
             return this.createShopwareAttribute &&
-                this.mappings?.some(mapping => mapping.shopwareKey == this.createShopwareAttribute);
+                this.mappings.some(mapping =>
+                    mapping.shopwareKey.toLowerCase() === this.createShopwareAttribute?.toLowerCase()
+                );
         },
     },
 
@@ -84,9 +86,7 @@ Component.register('ergonode-attribute-mapping', {
 
         async fetchMappings () {
             this.isMappingLoading = true;
-            const criteria = new Criteria()
-                .setLimit(null);
-            this.mappings = await this.repository?.search(criteria, Context.Api);
+            this.mappings = await this.repository.search(new Criteria(), Context.Api);
             this.isMappingLoading = false;
         },
 
@@ -96,7 +96,7 @@ Component.register('ergonode-attribute-mapping', {
                 if (this.mappingAttributeOccupied) {
                     throw new Error(this.$t('ErgonodeIntegrationShopware.mappings.messages.shopwareAttributesMustBeUnique'));
                 }
-                let createdMapping = this.repository?.create(Context.Api);
+                let createdMapping = this.repository.create(Context.Api);
                 createdMapping.ergonodeKey = this.createErgonodeAttribute;
                 createdMapping.shopwareKey = this.createShopwareAttribute;
                 await this.repository.save(createdMapping, Context.Api);
@@ -123,13 +123,13 @@ Component.register('ergonode-attribute-mapping', {
         this.isLoading = true;
 
         try {
-            let result;
+            this.ergonodeAttributeService.getShopwareAttributes().then(result => {
+                this.shopwareAttributes = result.data.data
+            });
 
-            const {data: {data: shopwareAttributes}} = await this.ergonodeAttributeService.getShopwareAttributes();
-            this.shopwareAttributes = shopwareAttributes;
-
-            const {data: {data: ergonodeAttributes}} = await this.ergonodeAttributeService.getErgonodeAttributes();
-            this.ergonodeAttributes = ergonodeAttributes;
+            this.ergonodeAttributeService.getErgonodeAttributes().then(result => {
+                this.ergonodeAttributes = result.data.data
+            });
 
             await this.fetchMappings();
         } catch (e) {

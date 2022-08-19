@@ -9,18 +9,20 @@ use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingExceptio
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Transformer\ProductTransformerChain;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityRepositoryNotFoundException;
 use function array_filter;
-use function array_merge_recursive;
 use function array_values;
 use function is_array;
 
 class ProductPersistor
 {
+    private array $existingProductCache = [];
+
     private EntityRepositoryInterface $productRepository;
 
     private ProductProvider $productProvider;
@@ -29,31 +31,58 @@ class ProductPersistor
 
     private DefinitionInstanceRegistry $definitionInstanceRegistry;
 
+    private LoggerInterface $logger;
+
     public function __construct(
         EntityRepositoryInterface $productRepository,
         ProductProvider $productProvider,
         ProductTransformerChain $productTransformerChain,
-        DefinitionInstanceRegistry $definitionInstanceRegistry
+        DefinitionInstanceRegistry $definitionInstanceRegistry,
+        LoggerInterface $syncLogger
     ) {
         $this->productRepository = $productRepository;
         $this->productProvider = $productProvider;
         $this->productTransformerChain = $productTransformerChain;
         $this->definitionInstanceRegistry = $definitionInstanceRegistry;
+        $this->logger = $syncLogger;
     }
 
     /**
-     * @return string Shopware product ID
      * @throws MissingRequiredProductMappingException
+     * @returns array Persisted primary keys
      */
-    public function persist(array $productData, Context $context): string
+    public function persist(array $productListData, Context $context): array
     {
-        $productId = $this->persistProduct($productData, null, $context);
+        $this->loadExistingProductCache($productListData, $context);
+        $payloads = [];
+        foreach ($productListData as $productData) {
+            try {
+                $mainProductPayload = $this->getProductPayload($productData['node'], false, $context);
 
-        foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
-            $this->persistProduct($variantData['node'], $productId, $context);
+                foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
+                    $mainProductPayload['children'] = $this->getProductPayload($variantData, true, $context);
+                }
+
+                $payloads[] = $mainProductPayload;
+
+                $this->logger->info('Processed product.', [
+                    'sku' => $mainProductPayload['productNumber']
+                ]);
+            } catch (\Throwable $e) {
+                $this->logger->error('Error while transforming product.', [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile() . ':' . $e->getLine(),
+                    'sku' => $node['sku'] ?? null,
+                ]);
+            }
         }
 
-        return $productId;
+        $writeResult = $this->productRepository->upsert(
+            $payloads,
+            $context
+        );
+
+        return $writeResult->getPrimaryKeys(ProductDefinition::ENTITY_NAME);
     }
 
     public function deleteProductIds(array $productIds, Context $context): void
@@ -67,46 +96,22 @@ class ProductPersistor
     /**
      * @throws MissingRequiredProductMappingException
      */
-    protected function persistProduct(array $productData, ?string $parentId, Context $context): string
+    private function getProductPayload(array $productData, bool $isVariant, Context $context): array
     {
         $sku = $productData['sku'];
-        $existingProduct = $this->productProvider->getProductBySku($sku, $context, [
-            'media',
-            'properties',
-            'crossSellings.assignedProducts',
-            'crossSellings.' . AbstractErgonodeMappingExtension::EXTENSION_NAME,
-        ]);
+        $existingProduct = $this->existingProductCache[$sku] ?? null;
 
         $dto = new ProductTransformationDTO($productData);
-        $dto->setIsVariant($parentId !== null);
+        $dto->setIsVariant($isVariant);
         $dto->setSwProduct($existingProduct);
 
         $transformedData = $this->productTransformerChain->transform(
             $dto,
             $context
         );
-
-        $swProductData = array_merge_recursive(
-            $transformedData->getShopwareData(),
-            [
-                'id' => $dto->isUpdate() ? $existingProduct->getId() : null,
-                'parentId' => $parentId,
-                'productNumber' => $sku
-            ]
-        );
-
-        $swProductData = array_filter($swProductData);
-
-        $writtenProducts = $this->productRepository->upsert(
-            [$swProductData],
-            $context
-        );
-
         $this->deleteEntities($dto, $context);
 
-        $ids = $writtenProducts->getPrimaryKeys(ProductDefinition::ENTITY_NAME);
-
-        return reset($ids);
+        return array_filter($transformedData->getShopwareData());
     }
 
     private function deleteEntities(ProductTransformationDTO $dto, Context $context): void
@@ -123,6 +128,28 @@ class ProductPersistor
             } catch (EntityRepositoryNotFoundException $e) {
                 continue;
             }
+        }
+    }
+
+    private function loadExistingProductCache(array $productListData, Context $context)
+    {
+        $skus = [];
+        foreach ($productListData as $productData) {
+            $skus[] = $productData['node']['sku'];
+            foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
+                $skus[] = $variantData['node']['sku'];
+            }
+        }
+        $this->existingProductCache = [];
+        $entities = $this->productProvider->getProductsBySkuList($skus, $context, [
+            'media',
+            'properties',
+            'crossSellings.assignedProducts',
+            'crossSellings.' . AbstractErgonodeMappingExtension::EXTENSION_NAME,
+        ]);
+
+        foreach ($entities as $productEntity) {
+            $this->existingProductCache[$productEntity->getProductNumber()] = $productEntity;
         }
     }
 }
