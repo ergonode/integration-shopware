@@ -76,10 +76,11 @@ class OrphanEntitiesManagerTest extends TestCase
         array $expectedOutput
     ) {
         $this->mockErgonodeCursorProvider(AttributeDeletedStreamResultsProxy::MAIN_FIELD, 'last_ergonode_cursor');
-        $this->mockErgonodeProviders(
+        $this->mockErgonodeAttributeProvider(
             'last_ergonode_cursor',
             $results
         );
+        $this->mockCustomFieldPersistor($results);
         $this->mockPropertyGroupPersistor($results, $mockDeletedPropertyGroups);
         $this->mockErgonodeCursorPersistor($cursorToPersist, AttributeDeletedStreamResultsProxy::MAIN_FIELD);
 
@@ -158,19 +159,22 @@ class OrphanEntitiesManagerTest extends TestCase
             );
     }
 
-    private function mockErgonodeProviders(?string $endCursor = null, array $returnValues = [])
+    private function mockErgonodeAttributeProvider(?string $endCursor = null, array $returnValues = [])
+    {
+        $this->ergonodeAttributeProviderMock
+            ->expects($this->once())
+            ->method('provideDeletedAttributes')
+            ->with($endCursor)
+            ->willReturn(DataConverter::arrayAsGenerator($returnValues));
+    }
+
+    private function mockCustomFieldPersistor(array $returnValues = []): void
     {
         $this->customFieldPersistorMock
             ->expects(
                 $this->exactly(\count($returnValues))
             )
             ->method('remove');
-
-        $this->ergonodeAttributeProviderMock
-            ->expects($this->once())
-            ->method('provideDeletedAttributes')
-            ->with($endCursor)
-            ->willReturn(DataConverter::arrayAsGenerator($returnValues));
     }
 
     private function mockPropertyGroupPersistor(array $results, bool $mockDeletedPropertyGroups = true)
