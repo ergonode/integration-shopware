@@ -26,7 +26,7 @@ class CategoryProvider
 
     public function getCategoryByMapping(
         string $code,
-        string $locale,
+        ?string $locale,
         Context $context,
         array $associations = []
     ): ?CategoryEntity {
@@ -60,5 +60,17 @@ class CategoryProvider
         );
 
         return $this->categoryRepository->searchIds($criteria, $context)->getIds();
+    }
+
+    public function getCategoriesWithAnyCode(
+        array $codes,
+        Context $context,
+        array $associations = []
+    ): CategoryCollection {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsAnyFilter(ErgonodeCategoryMappingExtension::EXTENSION_NAME . '.code', $codes));
+        $criteria->addAssociations($associations);
+
+        return $this->categoryRepository->search($criteria, $context)->getEntities();
     }
 }

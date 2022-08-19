@@ -37,7 +37,6 @@ class SyncTriggerController extends AbstractController
      */
     public function triggerSync(): JsonResponse
     {
-        $this->messageBus->dispatch(new CategoryTreeSyncTask());
         $this->messageBus->dispatch(new CategorySyncTask());
         $this->messageBus->dispatch(new ProductSyncTask());
         $this->messageBus->dispatch(new ProductVisibilitySyncTask());

@@ -88,14 +88,24 @@ class CategoryQueryBuilder
             ]);
     }
 
-    public function buildTreeStream(int $count, ?string $cursor): Query
-    {
-        $listArguments = ['first' => $count];
-        if ($cursor !== null) {
-            $listArguments['after'] = $cursor;
+    public function buildTreeStream(
+        int $treeCount,
+        int $categoryLeafCount,
+        ?string $treeCursor,
+        ?string $categoryLeafCursor
+    ): Query {
+        $treeArguments = ['first' => $treeCount];
+        if ($treeCursor !== null) {
+            $treeArguments['after'] = $treeCursor;
         }
+
+        $categoryLeafArguments = ['first' => $categoryLeafCount];
+        if ($categoryLeafCursor !== null) {
+            $categoryLeafArguments['after'] = $categoryLeafCursor;
+        }
+
         return (new Query('categoryTreeStream'))
-            ->setArguments($listArguments)
+            ->setArguments($treeArguments)
             ->setSelectionSet([
                 'totalCount',
                 (new Query('pageInfo'))
@@ -110,6 +120,7 @@ class CategoryQueryBuilder
                             ->setSelectionSet([
                                 'code',
                                 (new Query('categoryTreeLeafList'))
+                                    ->setArguments($categoryLeafArguments)
                                     ->setSelectionSet([
                                         (new Query('pageInfo'))
                                             ->setSelectionSet([
