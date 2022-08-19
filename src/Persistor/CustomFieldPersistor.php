@@ -87,11 +87,8 @@ class CustomFieldPersistor
         ], $context);
     }
 
-    public function remove(AttributeDeletedStreamResultsProxy $attributes, Context $context): array
+    public function removeByCodes(array $codes, Context $context): array
     {
-        $codes = $attributes->map(static fn(array $node) => $node['node'] ?? null);
-        $codes = array_filter($codes);
-
         $ids = $this->customFieldProvider->getIdsByCodes($codes, $context);
 
         if (empty($ids)) {
@@ -100,8 +97,6 @@ class CustomFieldPersistor
 
         $deleted = $this->customFieldRepository->delete(array_map(static fn($id) => ['id' => $id], $ids), $context);
 
-        return [
-            CustomFieldDefinition::ENTITY_NAME => $deleted->getPrimaryKeys(CustomFieldDefinition::ENTITY_NAME)
-        ];
+        return $deleted->getPrimaryKeys(CustomFieldDefinition::ENTITY_NAME);
     }
 }
