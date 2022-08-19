@@ -13,6 +13,7 @@ use Shopware\Core\Content\Product\ProductCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class AttributeMappingProviderTest extends TestCase
 {
@@ -20,6 +21,11 @@ class AttributeMappingProviderTest extends TestCase
      * @var MockObject|EntityRepositoryInterface
      */
     private EntityRepositoryInterface $mappingRepositoryMock;
+
+    /**
+     * @var MockObject|CacheInterface
+     */
+    private CacheInterface $cacheMock;
 
     private AttributeMappingProvider $provider;
 
@@ -31,11 +37,13 @@ class AttributeMappingProviderTest extends TestCase
     protected function setUp(): void
     {
         $this->mappingRepositoryMock = $this->createMock(EntityRepositoryInterface::class);
-        
         $this->contextMock = $this->createMock(Context::class);
+        $this->cacheMock = $this->createMock(CacheInterface::class);
+        $this->mockCacheResult();
 
         $this->provider = new AttributeMappingProvider(
-            $this->mappingRepositoryMock
+            $this->mappingRepositoryMock,
+            $this->cacheMock
         );
     }
 
@@ -76,6 +84,14 @@ class AttributeMappingProviderTest extends TestCase
                 $this->createConfiguredMock(EntitySearchResult::class, [
                     'getEntities' => $result,
                 ])
+            );
+    }
+
+    private function mockCacheResult(): void
+    {
+        $this->cacheMock->method('get')
+            ->willReturnCallback(
+                fn(string $cacheKey, callable $callback) => $callback()
             );
     }
 }
