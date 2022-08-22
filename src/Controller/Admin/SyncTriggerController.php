@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Controller\Admin;
 
+use Ergonode\IntegrationShopware\Service\ScheduledTask\AttributeSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTask;
-use Ergonode\IntegrationShopware\Service\ScheduledTask\CategoryTreeSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTask;
+use Ergonode\IntegrationShopware\Service\ScheduledTask\LanguageSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\ProductVisibilitySyncTask;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -37,6 +38,8 @@ class SyncTriggerController extends AbstractController
      */
     public function triggerSync(): JsonResponse
     {
+        $this->messageBus->dispatch(new LanguageSyncTask());
+        $this->messageBus->dispatch(new AttributeSyncTask());
         $this->messageBus->dispatch(new CategorySyncTask());
         $this->messageBus->dispatch(new ProductSyncTask());
         $this->messageBus->dispatch(new ProductVisibilitySyncTask());
