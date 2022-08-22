@@ -56,11 +56,15 @@ class ProductPersistor
         $this->loadExistingProductCache($productListData, $context);
         $payloads = [];
         foreach ($productListData as $productData) {
+            // how do we know we fetch only variableproducts? 
+            if ($productData['node']['__typename'] !== 'VariableProduct') {
+                continue;
+            }
             try {
                 $mainProductPayload = $this->getProductPayload($productData['node'], false, $context);
 
-                foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
-                    $mainProductPayload['children'] = $this->getProductPayload($variantData, true, $context);
+                foreach ($productData['node']['variantList']['edges'] ?? [] as $variantData) {
+                    $mainProductPayload['children'][] = $this->getProductPayload($variantData['node'], true, $context);
                 }
 
                 $payloads[] = $mainProductPayload;
@@ -136,10 +140,11 @@ class ProductPersistor
         $skus = [];
         foreach ($productListData as $productData) {
             $skus[] = $productData['node']['sku'];
-            foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
+            foreach ($productData['node']['variantList']['edges'] ?? [] as $variantData) {
                 $skus[] = $variantData['node']['sku'];
             }
         }
+
         $this->existingProductCache = [];
         $entities = $this->productProvider->getProductsBySkuList($skus, $context, [
             'media',
