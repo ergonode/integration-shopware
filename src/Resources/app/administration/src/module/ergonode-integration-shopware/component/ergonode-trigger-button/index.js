@@ -23,6 +23,11 @@ Component.register('ergonode-trigger-button', {
             type: String,
             required: true,
         },
+        payload: {
+            type: Object,
+            required: false,
+            default: {}
+        }
     },
 
     data: () => ({
@@ -39,7 +44,7 @@ Component.register('ergonode-trigger-button', {
         async trigger () {
             this.isLoadingInternal = true;
             try {
-                let result = await this.ergonodeSynchronizationService.triggerSynchronization(this.endpoint);
+                let result = await this.ergonodeSynchronizationService.triggerSynchronization(this.endpoint, this.payload);
                 if (!result?.status === 200) {
                     throw new Error(result.statusText);
                 }

@@ -5,8 +5,8 @@ export default class ErgonodeSynchronizationService extends ApiService {
         super(httpClient, loginService, apiEndpoint);
     }
 
-    async triggerSynchronization (endpoint) {
-        return await this.client.post(`_action/ergonode/${endpoint}`, null,{
+    async triggerSynchronization (endpoint, payload = {}) {
+        return await this.client.post(`_action/ergonode/${endpoint}`, payload, {
             headers: this.getBasicHeaders(),
         });
     }
