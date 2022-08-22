@@ -46,16 +46,16 @@ Component.register('ergonode-attribute-mapping', {
         },
 
         shopwareAttributesSelectOptions () {
-            return this.shopwareAttributes?.map(attributeName => ({
-                label: attributeName,
-                value: attributeName,
+            return this.shopwareAttributes?.map(attribute => ({
+                label: `${attribute?.code}${attribute?.type ? ` (${attribute.type})` : ''}`,
+                value: attribute?.code,
             }));
         },
 
         ergonodeAttributesSelectOptions () {
-            return this.ergonodeAttributes?.map(attributeName => ({
-                label: attributeName,
-                value: attributeName,
+            return this.ergonodeAttributes?.map(attribute => ({
+                label: `${attribute?.code}${attribute?.type ? ` (${attribute.type})` : ''}`,
+                value: attribute?.code,
             }));
         },
 
