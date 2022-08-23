@@ -58,6 +58,7 @@
       "synchronization": "Synchronizacja",
       "synchronize": "Synchronizuj najnowsze zmiany",
       "synchronizeForce": "Synchronizuj wszystko",
+      "clearCursors": "Wyczyść kursory",
       "messages": {
         "executed": "Pomyślnie wywołano wyzwalacz"
       }

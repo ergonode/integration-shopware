@@ -26,8 +26,8 @@ Component.register('ergonode-trigger-button', {
         payload: {
             type: Object,
             required: false,
-            default: {}
-        }
+            default: () => ({}),
+        },
     },
 
     data: () => ({
