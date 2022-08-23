@@ -22,9 +22,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class DebugPersistCategories extends Command
 {
     protected static $defaultName = 'ergonode:debug:category-persist';
-    private CategorySyncTaskHandler $handler;
-    private ErgonodeCursorManager $cursorManager;
 
+    private CategorySyncTaskHandler $handler;
+
+    private ErgonodeCursorManager $cursorManager;
 
     public function __construct(
         CategorySyncTaskHandler $handler,
@@ -57,13 +58,17 @@ class DebugPersistCategories extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $force = (bool)$input->getOption('force');
-
-        if ($force) {
+        if ($input->getOption('force')) {
             $context = new Context(new SystemSource());
-            $this->cursorManager->deleteCursor(CategoryStreamResultsProxy::MAIN_FIELD, $context);
-            $this->cursorManager->deleteCursor(CategoryTreeStreamResultsProxy::MAIN_FIELD, $context);
-            $this->cursorManager->deleteCursor(CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR, $context);
+
+            $this->cursorManager->deleteCursors(
+                [
+                    CategoryStreamResultsProxy::MAIN_FIELD,
+                    CategoryTreeStreamResultsProxy::MAIN_FIELD,
+                    CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
+                ],
+                $context
+            );
 
             $io->info('Cursors deleted');
         }

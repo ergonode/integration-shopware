@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Controller\Admin;
 
+use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\CategoryTreeSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\ProductVisibilitySyncTask;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -22,9 +25,14 @@ class SyncTriggerController extends AbstractController
 {
     private MessageBusInterface $messageBus;
 
-    public function __construct(MessageBusInterface $messageBus)
-    {
+    private ErgonodeCursorManager $cursorManager;
+
+    public function __construct(
+        MessageBusInterface $messageBus,
+        ErgonodeCursorManager $cursorManager
+    ) {
         $this->messageBus = $messageBus;
+        $this->cursorManager = $cursorManager;
     }
 
     /**
@@ -33,10 +41,19 @@ class SyncTriggerController extends AbstractController
      *     name="api.admin.ergonode.trigger-sync",
      *     methods={"POST"}
      * )
+     *
+     * @param RequestDataBag $dataBag
+     * @param Context $context
      * @return JsonResponse
      */
-    public function triggerSync(): JsonResponse
+    public function triggerSync(RequestDataBag $dataBag, Context $context): JsonResponse
     {
+        $force = $dataBag->getBoolean('force');
+
+        if ($force) {
+            $this->cursorManager->deleteCursors([], $context);
+        }
+
         $this->messageBus->dispatch(new CategorySyncTask());
         $this->messageBus->dispatch(new ProductSyncTask());
         $this->messageBus->dispatch(new ProductVisibilitySyncTask());

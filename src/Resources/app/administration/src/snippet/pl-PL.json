@@ -56,7 +56,8 @@
     },
     "synchronization": {
       "synchronization": "Synchronizacja",
-      "synchronize": "Synchronizuj",
+      "synchronize": "Synchronizuj najnowsze zmiany",
+      "synchronizeForce": "Synchronizuj wszystko",
       "messages": {
         "executed": "Pomyślnie wywołano wyzwalacz"
       }
