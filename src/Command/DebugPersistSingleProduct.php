@@ -76,7 +76,7 @@ class DebugPersistSingleProduct extends Command
         }
 
         $this->productPersistor->persist(
-            [['node' => $result->getProductData()]],
+            $result->getProductData(),
             new Context(new SystemSource())
         );
 
