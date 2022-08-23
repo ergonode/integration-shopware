@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Command;
 
+use Ergonode\IntegrationShopware\Api\ProductStreamResultsProxy;
+use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Processor\ProductSyncProcessor;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
@@ -22,12 +24,16 @@ class DebugPersistProductStream extends Command
 
     private ProductSyncProcessor $productSyncProcessor;
 
+    private ErgonodeCursorManager $cursorManager;
+
     public function __construct(
-        ProductSyncProcessor $productSyncProcessor
+        ProductSyncProcessor $productSyncProcessor,
+        ErgonodeCursorManager $cursorManager
     ) {
         parent::__construct();
 
         $this->productSyncProcessor = $productSyncProcessor;
+        $this->cursorManager = $cursorManager;
     }
 
     protected function configure()
@@ -44,6 +50,13 @@ class DebugPersistProductStream extends Command
             InputOption::VALUE_OPTIONAL,
             'Limits how many pages of products are fetched from the stream'
         );
+
+        $this->addOption(
+            'force',
+            null,
+            InputOption::VALUE_NONE,
+            'Use this flag to clear saved cursors before running the handler'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -53,6 +66,14 @@ class DebugPersistProductStream extends Command
 
         $io = new SymfonyStyle($input, $output);
         $io->progressStart();
+
+        if ($input->getOption('force')) {
+            $context = new Context(new SystemSource());
+
+            $this->cursorManager->deleteCursor(ProductStreamResultsProxy::MAIN_FIELD, $context);
+
+            $io->info('Cursors deleted');
+        }
 
         $processedPages = 1;
         $entityCount = 0;

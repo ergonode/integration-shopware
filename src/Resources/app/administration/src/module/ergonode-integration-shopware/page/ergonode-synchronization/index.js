@@ -14,6 +14,13 @@ Component.register('ergonode-synchronization', {
                     endpoint: 'trigger-sync',
                     label: this.$t('ErgonodeIntegrationShopware.synchronization.synchronize'),
                 },
+                {
+                    endpoint: 'trigger-sync',
+                    payload: {
+                        force: true
+                    },
+                    label: this.$t('ErgonodeIntegrationShopware.synchronization.synchronizeForce'),
+                }
             ],
         };
     },

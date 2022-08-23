@@ -40,7 +40,7 @@ class AttributeMappingController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $attributes = $this->attributeMapper->getAllErgonodeAttributes($types);
+        $attributes = $this->attributeMapper->getAllErgonodeAttributesWithTypes($types);
 
         return new JsonResponse([
             'data' => $attributes,
@@ -52,7 +52,7 @@ class AttributeMappingController extends AbstractController
      */
     public function shopwareAttributes(): JsonResponse
     {
-        $attributes = $this->attributeMapper->getMappableShopwareAttributes();
+        $attributes = $this->attributeMapper->getMappableShopwareAttributesWithTypes();
 
         return new JsonResponse([
             'data' => $attributes,

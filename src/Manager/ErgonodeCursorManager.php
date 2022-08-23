@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Manager;
 
+use Ergonode\IntegrationShopware\Entity\ErgonodeCursor\ErgonodeCursorCollection;
 use Ergonode\IntegrationShopware\Entity\ErgonodeCursor\ErgonodeCursorEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 
 class ErgonodeCursorManager
 {
@@ -21,48 +22,70 @@ class ErgonodeCursorManager
         $this->repository = $repository;
     }
 
-    public function persist(string $cursor, string $query, Context $context): EntityWrittenContainerEvent
+    public function persist(string $cursor, string $queryName, Context $context): EntityWrittenContainerEvent
     {
-        $lastCursor = $this->getCursorEntity($query, $context);
+        $lastCursor = $this->getCursorEntity($queryName, $context);
 
         return $this->repository->upsert([
             [
                 'id' => $lastCursor ? $lastCursor->getId() : null,
                 'cursor' => $cursor,
-                'query' => $query,
+                'query' => $queryName,
             ],
         ], $context);
     }
 
-    public function deleteCursor(string $query, Context $context): void
+    public function deleteCursor(string $queryName, Context $context): void
     {
-        $cursorEntity = $this->getCursorEntity($query, $context);
-        if (null !== $cursorEntity) {
-            $this->repository->delete([
-                [
-                    'id' => $cursorEntity->getId()
-                ]
-            ], $context);
-        }
+        $this->deleteCursors([$queryName], $context);
     }
 
-    public function getCursorEntity(string $query, Context $context): ?ErgonodeCursorEntity
+    /**
+     * @param string[] $queryNames if empty, it will delete all
+     */
+    public function deleteCursors(array $queryNames, Context $context): void
+    {
+        $cursorEntities = $this->getCursorEntities($queryNames, $context);
+
+        if (0 === $cursorEntities->count()) {
+            return;
+        }
+
+        $this->repository->delete(
+            array_values(
+                $cursorEntities->map(
+                    fn(ErgonodeCursorEntity $entity) => ['id' => $entity->getId()]
+                )
+            ),
+            $context
+        );
+    }
+
+    public function getCursorEntity(string $queryName, Context $context): ?ErgonodeCursorEntity
+    {
+        return $this->getCursorEntities([$queryName], $context)->first();
+    }
+
+    /**
+     * @param string[] $queryNames if empty, it will get all
+     */
+    public function getCursorEntities(array $queryNames, Context $context): ErgonodeCursorCollection
     {
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('query', $query));
 
-        $cursor = $this->repository->search($criteria, $context)->first();
-
-        if ($cursor instanceof ErgonodeCursorEntity) {
-            return $cursor;
+        if (!empty($queryNames)) {
+            $criteria->addFilter(new EqualsAnyFilter('query', $queryNames));
         }
 
-        return null;
+        $result = $this->repository->search($criteria, $context)->getEntities();
+
+        return new ErgonodeCursorCollection($result);
     }
 
-    public function getCursor(string $query, Context $context): ?string
+    public function getCursor(string $queryName, Context $context): ?string
     {
-        $cursorEntity = $this->getCursorEntity($query, $context);
+        $cursorEntity = $this->getCursorEntity($queryName, $context);
+
         return null === $cursorEntity ? null : $cursorEntity->getCursor();
     }
 }

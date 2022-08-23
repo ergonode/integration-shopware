@@ -12,6 +12,7 @@
                             variant="ghost"
                             size="large"
                             :endpoint="trigger.endpoint"
+                            :payload="trigger.payload"
                             :disabled="!acl.can('ergonode_attribute_mapping.viewer')"
                         >
                             {{ trigger.label }}
