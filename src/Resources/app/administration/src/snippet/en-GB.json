@@ -56,7 +56,8 @@
     },
     "synchronization": {
       "synchronization": "Synchronization",
-      "synchronize": "Synchronize",
+      "synchronize": "Synchronize latest changes",
+      "synchronizeForce": "Synchronize all",
       "messages": {
         "executed": "Trigger executed successfully"
       }
