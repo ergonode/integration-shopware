@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Controller\Admin;
 
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
+use Ergonode\IntegrationShopware\Service\ScheduledTask\AttributeSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTask;
-use Ergonode\IntegrationShopware\Service\ScheduledTask\CategoryTreeSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTask;
+use Ergonode\IntegrationShopware\Service\ScheduledTask\LanguageSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\ProductVisibilitySyncTask;
 use Shopware\Core\Framework\Context;
@@ -54,6 +55,8 @@ class SyncTriggerController extends AbstractController
             $this->cursorManager->deleteCursors([], $context);
         }
 
+        $this->messageBus->dispatch(new LanguageSyncTask());
+        $this->messageBus->dispatch(new AttributeSyncTask());
         $this->messageBus->dispatch(new CategorySyncTask());
         $this->messageBus->dispatch(new ProductSyncTask());
         $this->messageBus->dispatch(new ProductVisibilitySyncTask());
