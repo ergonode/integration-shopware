@@ -55,22 +55,19 @@ class ProductPersistor
     {
         $this->loadExistingProductCache($productListData, $context);
         $payloads = [];
-        $existingVariants = [];
         foreach ($productListData as $productData) {
+            // how do we know we fetch only variableproducts? 
+            if ($productData['node']['__typename'] !== 'VariableProduct') {
+                continue;
+            }
             try {
                 $mainProductPayload = $this->getProductPayload($productData['node'], false, $context);
-                if ($this->isProductProcessedAsVariant($mainProductPayload, $existingVariants)) {
-                    continue;
-                }
 
                 foreach ($productData['node']['variantList']['edges'] ?? [] as $variantData) {
-                    $childrenPayload = $this->getProductPayload($variantData['node'], true, $context);
-                    $existingVariants[] = $childrenPayload['productNumber'];
-                    $payloads = $this->removeVariantsProcessedAsMain($childrenPayload, $payloads);
-                    $mainProductPayload['children'][] = $childrenPayload;
+                    $mainProductPayload['children'][] = $this->getProductPayload($variantData['node'], true, $context);
                 }
 
-                $payloads[$mainProductPayload['productNumber']] = $mainProductPayload;
+                $payloads[] = $mainProductPayload;
 
                 $this->logger->info('Processed product.', [
                     'sku' => $mainProductPayload['productNumber']
@@ -85,7 +82,7 @@ class ProductPersistor
         }
 
         $writeResult = $this->productRepository->upsert(
-            array_values($payloads),
+            $payloads,
             $context
         );
 
@@ -159,23 +156,5 @@ class ProductPersistor
         foreach ($entities as $productEntity) {
             $this->existingProductCache[$productEntity->getProductNumber()] = $productEntity;
         }
-    }
-
-    private function isProductProcessedAsVariant(array $payload, array $existingVariants): bool
-    {
-        if (isset($payload['productNumber']) && isset($existingVariants[$payload['productNumber']])) {
-            return true;
-        }
-
-        return false;
-    }
-
-    private function removeVariantsProcessedAsMain(array $childrenPayload, array $payloads): array
-    {
-        if (isset($childrenPayload['productNumber'], $payloads[$childrenPayload['productNumber']])) {
-            unset($payloads[$childrenPayload['productNumber']]);
-        }
-
-        return $payloads;
     }
 }
