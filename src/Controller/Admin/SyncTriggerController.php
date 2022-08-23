@@ -6,7 +6,6 @@ namespace Ergonode\IntegrationShopware\Controller\Admin;
 
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTask;
-use Ergonode\IntegrationShopware\Service\ScheduledTask\CategoryTreeSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTask;
 use Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTask;
