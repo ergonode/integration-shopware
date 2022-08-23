@@ -38,7 +38,7 @@ Component.register('ergonode-fields-mapping-multiselect', {
                     this.value
                     :
                     [this.value]
-                ).filter(value => this.ergoAttributes.includes(value));
+                ).filter(value => this.ergoAttributes.some(attribute => attribute?.code === value));
         },
 
         options () {
