@@ -43,7 +43,10 @@ Component.register('ergonode-fields-mapping-multiselect', {
 
         options () {
             return this.ergoAttributes.map(attribute => {
-                return {value: attribute, label: attribute};
+                return {
+                    value: attribute?.code,
+                    label: `${attribute?.code}${attribute?.type ? ` (${attribute.type})` : ''}`,
+                };
             });
         },
     },
