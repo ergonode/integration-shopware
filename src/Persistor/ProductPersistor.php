@@ -55,15 +55,22 @@ class ProductPersistor
     {
         $this->loadExistingProductCache($productListData, $context);
         $payloads = [];
+        $existingVariants = [];
         foreach ($productListData as $productData) {
             try {
                 $mainProductPayload = $this->getProductPayload($productData['node'], false, $context);
-
-                foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
-                    $mainProductPayload['children'] = $this->getProductPayload($variantData, true, $context);
+                if ($this->isProductProcessedAsVariant($mainProductPayload, $existingVariants)) {
+                    continue;
                 }
 
-                $payloads[] = $mainProductPayload;
+                foreach ($productData['node']['variantList']['edges'] ?? [] as $variantData) {
+                    $childrenPayload = $this->getProductPayload($variantData['node'], true, $context);
+                    $existingVariants[] = $childrenPayload['productNumber'];
+                    $payloads = $this->removeVariantsProcessedAsMain($childrenPayload, $payloads);
+                    $mainProductPayload['children'][] = $childrenPayload;
+                }
+
+                $payloads[$mainProductPayload['productNumber']] = $mainProductPayload;
 
                 $this->logger->info('Processed product.', [
                     'sku' => $mainProductPayload['productNumber']
@@ -78,7 +85,7 @@ class ProductPersistor
         }
 
         $writeResult = $this->productRepository->upsert(
-            $payloads,
+            array_values($payloads),
             $context
         );
 
@@ -136,10 +143,11 @@ class ProductPersistor
         $skus = [];
         foreach ($productListData as $productData) {
             $skus[] = $productData['node']['sku'];
-            foreach ($productData['variantList']['edges'] ?? [] as $variantData) {
+            foreach ($productData['node']['variantList']['edges'] ?? [] as $variantData) {
                 $skus[] = $variantData['node']['sku'];
             }
         }
+
         $this->existingProductCache = [];
         $entities = $this->productProvider->getProductsBySkuList($skus, $context, [
             'media',
@@ -151,5 +159,23 @@ class ProductPersistor
         foreach ($entities as $productEntity) {
             $this->existingProductCache[$productEntity->getProductNumber()] = $productEntity;
         }
+    }
+
+    private function isProductProcessedAsVariant(array $payload, array $existingVariants): bool
+    {
+        if (isset($payload['productNumber']) && isset($existingVariants[$payload['productNumber']])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function removeVariantsProcessedAsMain(array $childrenPayload, array $payloads): array
+    {
+        if (isset($childrenPayload['productNumber'], $payloads[$childrenPayload['productNumber']])) {
+            unset($payloads[$childrenPayload['productNumber']]);
+        }
+
+        return $payloads;
     }
 }
