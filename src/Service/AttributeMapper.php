@@ -54,10 +54,31 @@ class AttributeMapper
      */
     public function getMappableShopwareAttributes(): array
     {
-        return Constants::SW_PRODUCT_MAPPABLE_FIELDS;
+        return \array_keys(Constants::SW_PRODUCT_MAPPABLE_FIELDS);
+    }
+
+    public function getMappableShopwareAttributesWithTypes(): array
+    {
+        $attributes = [];
+        foreach (Constants::SW_PRODUCT_MAPPABLE_FIELDS as $code => $type) {
+            $attributes[] = [
+                'code' => $code,
+                'type' => $type
+            ];
+        }
+
+        return $attributes;
     }
 
     public function getAllErgonodeAttributes(array $types = []): array
+    {
+        return \array_map(
+            fn($data) => $data['code'],
+            $this->getAllErgonodeAttributesWithTypes($types)
+        );
+    }
+
+    public function getAllErgonodeAttributesWithTypes(array $types = []): array
     {
         $attributeCodes = [];
 
@@ -69,10 +90,30 @@ class AttributeMapper
             }
 
             foreach ($attributes->getEdges() as $attribute) {
-                $attributeCodes[] = $attribute['node']['code'] ?? '';
+                $node = $attribute['node'] ?? null;
+                $code = $node['code'] ?? null;
+                if (null === $node || null === $code) {
+                    continue;
+                }
+
+                $attributeCodes[] = [
+                    'code' => $code,
+                    'type' => $this->resolveAttributeType($node)
+                ];
             }
         }
 
         return $attributeCodes;
+    }
+
+    private function resolveAttributeType(array $node): string
+    {
+        foreach ($node as $key => $value) {
+            if (0 === \strpos($key, 'type_')) {
+                return \substr($key, 5);
+            }
+        }
+
+        return 'unknown';
     }
 }

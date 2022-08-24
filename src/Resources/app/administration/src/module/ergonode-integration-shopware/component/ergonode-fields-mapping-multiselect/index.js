@@ -38,12 +38,15 @@ Component.register('ergonode-fields-mapping-multiselect', {
                     this.value
                     :
                     [this.value]
-                ).filter(value => this.ergoAttributes.includes(value));
+                ).filter(value => this.ergoAttributes.some(attribute => attribute?.code === value));
         },
 
         options () {
             return this.ergoAttributes.map(attribute => {
-                return {value: attribute, label: attribute};
+                return {
+                    value: attribute?.code,
+                    label: `${attribute?.code}${attribute?.type ? ` (${attribute.type})` : ''}`,
+                };
             });
         },
     },
