@@ -13,7 +13,9 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class ConfigProvider
 {
-    private const CONFIG_NAMESPACE = 'ErgonodeIntegrationShopware.config.';
+    public const CONFIG_NAMESPACE = 'ErgonodeIntegrationShopware.config.';
+
+    public const API_ENDPOINT_CONFIG = self::CONFIG_NAMESPACE . 'ergonodeApiEndpoint';
 
     private SystemConfigService $configService;
 
@@ -43,10 +45,15 @@ class ConfigProvider
         return $accessData;
     }
 
+    public function getErgonodeApiEndpoint(): string
+    {
+        return $this->configService->getString(self::API_ENDPOINT_CONFIG); // always use global value
+    }
+
     public function getErgonodeAccessData(?string $salesChannelId = null): ErgonodeAccessData
     {
         return new ErgonodeAccessData(
-            $this->configService->getString(self::CONFIG_NAMESPACE . 'ergonodeApiEndpoint'), // always use global value
+            $this->getErgonodeApiEndpoint(),
             $this->configService->getString(self::CONFIG_NAMESPACE . 'ergonodeApiKey', $salesChannelId),
             $salesChannelId
         );
