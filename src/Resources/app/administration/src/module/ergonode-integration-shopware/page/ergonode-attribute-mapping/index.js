@@ -84,6 +84,11 @@ Component.register('ergonode-attribute-mapping', {
     },
 
     methods: {
+        attributeType (attributeSet = 'shopware', attributeName) {
+            return this[`${attributeSet}Attributes`]?.find(attribute =>
+                attribute?.code?.toLowerCase() === attributeName?.toLowerCase())?.type || '?';
+        },
+
         clearForm () {
             this.createShopwareAttribute = null;
             this.createErgonodeAttribute = null;

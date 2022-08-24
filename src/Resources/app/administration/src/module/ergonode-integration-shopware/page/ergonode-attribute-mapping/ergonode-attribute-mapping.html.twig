@@ -51,6 +51,12 @@
                                 :is-loading="isMappingLoading"
                                 @delete-item-finish="fetchMappings()"
                             >
+                                <template #column-shopwareKey="{ item }">
+                                    {{ item.shopwareKey }} ({{ attributeType('shopware', item.shopwareKey) }})
+                                </template>
+                                <template #column-ergonodeKey="{ item }">
+                                    {{ item.ergonodeKey }} ({{ attributeType('ergonode', item.ergonodeKey) }})
+                                </template>
                             </sw-entity-listing>
                         </template>
                     </sw-card>
