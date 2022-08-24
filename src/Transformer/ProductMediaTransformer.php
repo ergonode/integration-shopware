@@ -52,7 +52,7 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
                 continue;
             }
 
-            $payload = $this->buildProductMediaPayload($mediaId, $productData, $context);
+            $payload = $this->buildProductMediaPayload($mediaId, $index, $productData, $context);
             if (empty($payload)) {
                 unset($swData[self::SW_PRODUCT_FIELD_MEDIA][$index]);
                 continue;
@@ -82,7 +82,7 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
         return $productData;
     }
 
-    private function buildProductMediaPayload(string $mediaId, ProductTransformationDTO $productData, Context $context): array
+    private function buildProductMediaPayload(string $mediaId, int $position, ProductTransformationDTO $productData, Context $context): array
     {
         $productMedia = null;
         if (null !== $productData->getSwProduct()) {
@@ -96,6 +96,7 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
         return [
             'id' => $productMedia ? $productMedia->getId() : Uuid::randomHex(), // need to generate uuid here so media won't be duplicated if used as cover
             'mediaId' => $mediaId,
+            'position' => $position
         ];
     }
 
