@@ -20,6 +20,10 @@ Component.register('ergonode-synchronization', {
                         force: true
                     },
                     label: this.$t('ErgonodeIntegrationShopware.synchronization.synchronizeForce'),
+                },
+                {
+                    endpoint: 'clear-cursors',
+                    label: this.$t('ErgonodeIntegrationShopware.synchronization.clearCursors'),
                 }
             ],
         };

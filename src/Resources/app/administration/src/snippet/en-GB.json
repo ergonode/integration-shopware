@@ -58,6 +58,7 @@
       "synchronization": "Synchronization",
       "synchronize": "Synchronize latest changes",
       "synchronizeForce": "Synchronize all",
+      "clearCursors": "Clear cursors",
       "messages": {
         "executed": "Trigger executed successfully"
       }
