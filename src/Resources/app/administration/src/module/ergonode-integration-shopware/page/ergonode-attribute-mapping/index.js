@@ -45,6 +45,11 @@ Component.register('ergonode-attribute-mapping', {
             ];
         },
 
+        criteria () {
+            return new Criteria()
+                .addSorting(Criteria.sort('createdAt', 'DESC'));
+        },
+
         shopwareAttributesSelectOptions () {
             return this.shopwareAttributes?.map(attribute => ({
                 label: `${attribute?.code}${attribute?.type ? ` (${attribute.type})` : ''}`,
@@ -86,7 +91,7 @@ Component.register('ergonode-attribute-mapping', {
 
         async fetchMappings () {
             this.isMappingLoading = true;
-            this.mappings = await this.repository.search(new Criteria(), Context.Api);
+            this.mappings = await this.repository.search(this.criteria, Context.Api);
             this.isMappingLoading = false;
         },
 
