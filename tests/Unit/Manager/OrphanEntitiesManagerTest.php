@@ -15,8 +15,6 @@ use Ergonode\IntegrationShopware\Tests\Fixture\GqlAttributeResponse;
 use Ergonode\IntegrationShopware\Tests\Util\DataConverter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionDefinition;
-use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 
@@ -72,7 +70,7 @@ class OrphanEntitiesManagerTest extends TestCase
     public function testCleanPropertyGroupsMethod(
         array $results,
         string $cursorToPersist,
-        bool $mockDeletedPropertyGroups,
+        bool $mockDeleted,
         array $expectedOutput
     ) {
         $this->mockErgonodeCursorProvider(AttributeDeletedStreamResultsProxy::MAIN_FIELD, 'last_ergonode_cursor');
@@ -80,8 +78,8 @@ class OrphanEntitiesManagerTest extends TestCase
             'last_ergonode_cursor',
             $results
         );
-        $this->mockCustomFieldPersistor($results);
-        $this->mockPropertyGroupPersistor($results, $mockDeletedPropertyGroups);
+        $this->mockCustomFieldPersistor($results, $mockDeleted);
+        $this->mockPropertyGroupPersistor($results, $mockDeleted);
         $this->mockErgonodeCursorPersistor($cursorToPersist, AttributeDeletedStreamResultsProxy::MAIN_FIELD);
 
         $output = $this->manager->cleanAttributes($this->contextMock);
@@ -99,14 +97,12 @@ class OrphanEntitiesManagerTest extends TestCase
                         'hasNextPage' => false,
                         'getEndCursor' => 'new_ergonode_cursor',
                         'hasEndCursor' => true,
+                        'map' => ['some_id_0'],
                     ]),
                 ],
                 'new_ergonode_cursor',
                 true,
-                [
-                    PropertyGroupDefinition::ENTITY_NAME => ['some_id_0'],
-                    PropertyGroupOptionDefinition::ENTITY_NAME => ['some_id_0'],
-                ],
+                ['some_id_0', 'some_id_0'],
             ],
             '2 pages' => [
                 [
@@ -115,6 +111,7 @@ class OrphanEntitiesManagerTest extends TestCase
                         'hasNextPage' => true,
                         'getEndCursor' => 'new_ergonode_cursor',
                         'hasEndCursor' => true,
+                        'map' => ['some_id_0', 'some_id_1'],
                     ]),
                     $this->createConfiguredMock(AttributeDeletedStreamResultsProxy::class, [
                         'getEdges' => GqlAttributeResponse::attributeDeletedStreamResponse()['data']['attributeDeletedStream']['edges'],
@@ -125,10 +122,7 @@ class OrphanEntitiesManagerTest extends TestCase
                 ],
                 'new_ergonode_cursor2',
                 true,
-                [
-                    PropertyGroupDefinition::ENTITY_NAME => ['some_id_0', 'some_id_1'],
-                    PropertyGroupOptionDefinition::ENTITY_NAME => ['some_id_0', 'some_id_1'],
-                ],
+                ['some_id_0', 'some_id_1', 'some_id_0', 'some_id_1'],
             ],
             'no deleted property groups' => [
                 [
@@ -137,6 +131,7 @@ class OrphanEntitiesManagerTest extends TestCase
                         'hasNextPage' => false,
                         'getEndCursor' => 'new_ergonode_cursor',
                         'hasEndCursor' => true,
+                        'map' => [],
                     ]),
                 ],
                 'new_ergonode_cursor',
@@ -154,7 +149,7 @@ class OrphanEntitiesManagerTest extends TestCase
             ->with($argument, $this->contextMock)
             ->willReturn(
                 $this->createConfiguredMock(ErgonodeCursorEntity::class, [
-                    'getCursor' => $returnValue
+                    'getCursor' => $returnValue,
                 ])
             );
     }
@@ -168,31 +163,36 @@ class OrphanEntitiesManagerTest extends TestCase
             ->willReturn(DataConverter::arrayAsGenerator($returnValues));
     }
 
-    private function mockCustomFieldPersistor(array $returnValues = []): void
-    {
-        $this->customFieldPersistorMock
-            ->expects(
-                $this->exactly(\count($returnValues))
-            )
-            ->method('remove');
-    }
-
-    private function mockPropertyGroupPersistor(array $results, bool $mockDeletedPropertyGroups = true)
+    private function mockCustomFieldPersistor(array $results, bool $mockDeleted): void
     {
         $returns = [];
 
-        foreach ($results as $key => $value) {
-            $returns[] = $mockDeletedPropertyGroups ? [
-                PropertyGroupDefinition::ENTITY_NAME => ["some_id_$key"],
-                PropertyGroupOptionDefinition::ENTITY_NAME => ["some_id_$key"],
-            ] : [];
+        if ($mockDeleted) {
+            foreach ($results as $key => $value) {
+                $returns[] = "some_id_$key";
+            }
+        }
+
+        $this->customFieldPersistorMock
+            ->expects($this->once())
+            ->method('removeByCodes')
+            ->willReturn($returns);;
+    }
+
+    private function mockPropertyGroupPersistor(array $results, bool $mockDeleted)
+    {
+        $returns = [];
+
+        if ($mockDeleted) {
+            foreach ($results as $key => $value) {
+                $returns[] = "some_id_$key";
+            }
         }
 
         $this->propertyGroupPersistorMock
-            ->expects($this->exactly(count($results)))
-            ->method('remove')
-            ->withConsecutive(...array_map(fn($result) => [$result, $this->contextMock], $results))
-            ->willReturnOnConsecutiveCalls(...$returns);
+            ->expects($this->once())
+            ->method('removeByCodes')
+            ->willReturn($returns);
     }
 
     private function mockErgonodeCursorPersistor(string $cursor, string $query)

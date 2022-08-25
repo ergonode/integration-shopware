@@ -12,9 +12,12 @@ use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Persistor\ProductPersistor;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\QueryBuilder\ProductQueryBuilder;
+use Ergonode\IntegrationShopware\Util\SyncPerformanceLogger;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\Stopwatch\Stopwatch;
+
 use function count;
 
 class DeletedProductSyncProcessor
@@ -33,13 +36,16 @@ class DeletedProductSyncProcessor
 
     private ProductProvider $productProvider;
 
+    private SyncPerformanceLogger $performanceLogger;
+
     public function __construct(
         ErgonodeGqlClientInterface $gqlClient,
         ProductQueryBuilder $productQueryBuilder,
         ProductPersistor $productPersistor,
         ProductProvider $productProvider,
         ErgonodeCursorManager $cursorManager,
-        LoggerInterface $ergonodeSyncLogger
+        LoggerInterface $ergonodeSyncLogger,
+        SyncPerformanceLogger $performanceLogger
     ) {
         $this->gqlClient = $gqlClient;
         $this->productQueryBuilder = $productQueryBuilder;
@@ -47,6 +53,7 @@ class DeletedProductSyncProcessor
         $this->cursorManager = $cursorManager;
         $this->logger = $ergonodeSyncLogger;
         $this->productProvider = $productProvider;
+        $this->performanceLogger = $performanceLogger;
     }
 
     /**
@@ -55,13 +62,16 @@ class DeletedProductSyncProcessor
     public function processStream(Context $context, int $productCount = self::DEFAULT_PRODUCT_COUNT): SyncCounterDTO
     {
         $counter = new SyncCounterDTO();
+        $stopwatch = new Stopwatch();
 
         $cursorEntity = $this->cursorManager->getCursorEntity(ProductDeletedStreamResultsProxy::MAIN_FIELD, $context);
         $cursor = null === $cursorEntity ? null : $cursorEntity->getCursor();
 
+        $stopwatch->start('query');
         $query = $this->productQueryBuilder->buildDeleted($productCount, $cursor);
         /** @var ProductStreamResultsProxy|null $result */
         $result = $this->gqlClient->query($query, ProductDeletedStreamResultsProxy::class);
+        $stopwatch->stop('query');
 
         if (null === $result) {
             throw new RuntimeException('Request failed.');
@@ -79,6 +89,7 @@ class DeletedProductSyncProcessor
             throw new RuntimeException('Could not retrieve end cursor from the response.');
         }
 
+        $stopwatch->start('process');
         $deletedProductCodes = \array_map(
             fn($item) => $item['node'] ?? null,
             $edges
@@ -86,8 +97,9 @@ class DeletedProductSyncProcessor
 
         $idsToDelete = $this->productProvider->getProductIdsBySkus($deletedProductCodes, $context);
         $this->productPersistor->deleteProductIds($idsToDelete, $context);
-
         $processedEntityCount = \count($idsToDelete);
+        $stopwatch->stop('process');
+
         $this->logger->info('Processed deleted products', [
             'deletedProductCount' => $processedEntityCount,
             'deletedProductCodes' => $deletedProductCodes,
@@ -98,6 +110,8 @@ class DeletedProductSyncProcessor
 
         $counter->setHasNextPage($result->hasNextPage());
         $counter->incrProcessedEntityCount($processedEntityCount);
+        $counter->setStopwatch($stopwatch);
+        $this->performanceLogger->logPerformance(self::class, $stopwatch);
 
         return $counter;
     }

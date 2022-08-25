@@ -9,7 +9,6 @@ use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
 use Ergonode\IntegrationShopware\DTO\PropertyGroupTransformationDTO;
 use Ergonode\IntegrationShopware\Provider\PropertyGroupProvider;
 use Ergonode\IntegrationShopware\Transformer\PropertyGroupTransformer;
-use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionDefinition;
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -79,22 +78,16 @@ class PropertyGroupPersistor
         return $upserted->getPrimaryKeys(PropertyGroupDefinition::ENTITY_NAME);
     }
 
-    public function remove(AttributeDeletedStreamResultsProxy $attributes, Context $context): array
+    public function removeByCodes(array $codes, Context $context): array
     {
-        $codes = $attributes->map(fn(array $node) => $node['node'] ?? null);
-        $codes = array_filter($codes);
-
         $ids = $this->propertyGroupProvider->getIdsByCodes($codes, $context);
 
         if (empty($ids)) {
             return [];
         }
 
-        $deleted = $this->propertyGroupRepository->delete(array_map(fn($id) => ['id' => $id], $ids), $context);
+        $deleted = $this->propertyGroupRepository->delete(array_map(static fn($id) => ['id' => $id], $ids), $context);
 
-        return [
-            PropertyGroupDefinition::ENTITY_NAME => $deleted->getPrimaryKeys(PropertyGroupDefinition::ENTITY_NAME),
-            PropertyGroupOptionDefinition::ENTITY_NAME => $deleted->getPrimaryKeys(PropertyGroupOptionDefinition::ENTITY_NAME),
-        ];
+        return $deleted->getPrimaryKeys(PropertyGroupDefinition::ENTITY_NAME);
     }
 }
