@@ -22,7 +22,7 @@ class Constants
         'height' => 'numeric',
         'width' => 'numeric',
         'length' => 'numeric',
-        'customSearchKeywords' => 'text',
+        'customSearchKeywords' => 'multiselect',
         'description' => 'text',
         'metaTitle' => 'text',
         'metaDescription' => 'text',
