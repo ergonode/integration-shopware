@@ -12,7 +12,6 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Symfony\Component\Lock\LockFactory;
-
 use function sprintf;
 
 abstract class AbstractSyncTaskHandler extends ScheduledTaskHandler
@@ -33,7 +32,7 @@ abstract class AbstractSyncTaskHandler extends ScheduledTaskHandler
     ) {
         parent::__construct($scheduledTaskRepository);
 
-        $this->context = new Context(new SystemSource());
+        $this->context = $this->createContext();
         $this->syncHistoryService = $syncHistoryService;
         $this->lockFactory = $lockFactory;
         $this->logger = $ergonodeSyncLogger;
@@ -65,6 +64,11 @@ abstract class AbstractSyncTaskHandler extends ScheduledTaskHandler
     protected function getLockName(): string
     {
         return sprintf('%s.%s.%s', 'ErgonodeIntegration', $this->getTaskName(), 'lock');
+    }
+
+    protected function createContext(): Context
+    {
+        return new Context(new SystemSource());
     }
 
     abstract protected function runSync(): int;

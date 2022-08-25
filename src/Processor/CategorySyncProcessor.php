@@ -82,6 +82,7 @@ class CategorySyncProcessor implements CategoryProcessorInterface
             $primaryKeys = $this->categoryPersistor->persist($result->getEdges(), $context);
             $entityCount = \count($primaryKeys);
             $counter->incrProcessedEntityCount($entityCount);
+            $counter->setPrimaryKeys($primaryKeys);
 
             $this->logger->info('Persisted category translations', [
                 'count' => $entityCount
