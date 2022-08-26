@@ -103,9 +103,11 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             $stopwatch->start('process');
 
             try {
-                $writeResult = $this->categoryPersistor->persistLeaves($leafEdges, $treeCode, $context);
-                $entityCount = \count($writeResult);
+                $primaryKeys = $this->categoryPersistor->persistLeaves($leafEdges, $treeCode, $context);
+                $entityCount = \count($primaryKeys);
+
                 $counter->incrProcessedEntityCount($entityCount);
+                $counter->setPrimaryKeys($primaryKeys);
 
                 $this->logger->info('Persisted category leaves', [
                     'count' => $entityCount
