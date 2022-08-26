@@ -16,11 +16,11 @@ class AttributeTypeValidator
     public function validate(array $ergonodeAttribute, ErgonodeAttributeMappingEntity $mapping, bool $throwException): bool
     {
         $swKey = $mapping->getShopwareKey();
-        $expectedType = Constants::SW_PRODUCT_MAPPABLE_FIELDS[$swKey];
+        $validTypes = Constants::SW_PRODUCT_MAPPABLE_FIELDS[$swKey];
 
         if (empty($ergonodeAttribute)) {
             if ($throwException) {
-                throw new InvalidAttributeTypeException($mapping, $expectedType);
+                throw new InvalidAttributeTypeException($mapping, $validTypes);
             }
 
             return false;
@@ -28,10 +28,10 @@ class AttributeTypeValidator
 
         $actualType = AttributeTypesEnum::getShortNodeType($ergonodeAttribute);
 
-        $valid = $expectedType === $actualType;
+        $valid = in_array($actualType, $validTypes);
 
         if ($throwException && false === $valid) {
-            throw new InvalidAttributeTypeException($mapping, $expectedType, $actualType);
+            throw new InvalidAttributeTypeException($mapping, $validTypes, $actualType);
         }
 
         return $valid;
