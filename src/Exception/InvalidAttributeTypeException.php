@@ -11,14 +11,14 @@ class InvalidAttributeTypeException extends Exception
 {
     private ErgonodeAttributeMappingEntity $mapping;
 
-    private string $expectedType;
+    private array $validTypes;
 
     private string $actualType;
 
-    public function __construct(ErgonodeAttributeMappingEntity $mapping, string $expectedType, string $actualType = '')
+    public function __construct(ErgonodeAttributeMappingEntity $mapping, array $validTypes, string $actualType = '')
     {
         $this->mapping = $mapping;
-        $this->expectedType = $expectedType;
+        $this->validTypes = $validTypes;
         $this->actualType = $actualType;
 
         parent::__construct('Invalid Attribute type, skipping. Please check Attribute mapping.');
@@ -29,9 +29,14 @@ class InvalidAttributeTypeException extends Exception
         return $this->mapping;
     }
 
-    public function getExpectedType(): string
+    public function getValidTypes(): array
     {
-        return $this->expectedType;
+        return $this->validTypes;
+    }
+
+    public function getValidTypesStr(): string
+    {
+        return implode('/', $this->validTypes);
     }
 
     public function getActualType(): string

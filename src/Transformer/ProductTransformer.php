@@ -171,17 +171,17 @@ class ProductTransformer implements ProductDataTransformerInterface
                 // TODO SWERG-84: remove inlined context from message after adding context display in admin
                 $this->logger->warning(
                     sprintf(
-                        '%s [sku: %s; actualType: %s, expectedType: %s, ergonodeKey: %s; shopwareKey: %s]',
+                        '%s [sku: %s; actualType: %s, validTypes: %s, ergonodeKey: %s; shopwareKey: %s]',
                         $e->getMessage(),
                         $logContext['sku'] ?? '',
                         $e->getActualType(),
-                        $e->getExpectedType(),
+                        $e->getValidTypesStr(),
                         $e->getMapping()->getErgonodeKey(),
                         $e->getMapping()->getShopwareKey(),
                     ),
                     array_merge($logContext, [
                         'actualType' => $e->getActualType(),
-                        'expectedType' => $e->getExpectedType(),
+                        'validTypes' => $e->getValidTypes(),
                         'ergonodeKey' => $e->getMapping()->getErgonodeKey(),
                         'shopwareKey' => $e->getMapping()->getShopwareKey(),
                     ])

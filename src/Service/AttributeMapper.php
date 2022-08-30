@@ -60,10 +60,10 @@ class AttributeMapper
     public function getMappableShopwareAttributesWithTypes(): array
     {
         $attributes = [];
-        foreach (Constants::SW_PRODUCT_MAPPABLE_FIELDS as $code => $type) {
+        foreach (Constants::SW_PRODUCT_MAPPABLE_FIELDS as $code => $types) {
             $attributes[] = [
                 'code' => $code,
-                'type' => $type
+                'type' => implode('/', $types)
             ];
         }
 
