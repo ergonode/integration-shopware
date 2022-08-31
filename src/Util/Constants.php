@@ -8,6 +8,7 @@ class Constants
 {
     public const ATTRIBUTE_SCOPE_GLOBAL = 'GLOBAL';
     public const ATTRIBUTE_SCOPE_LOCAL = 'LOCAL';
+    public const DEFAULT_TRANSLATION_KEY = 'sw-product-stream.filter.values.';
 
     public const PRODUCT_CUSTOM_FIELD_SET_NAME = 'ergonode_integration_custom_fields';
 
@@ -38,5 +39,15 @@ class Constants
         'shippingFree' => ['bool'],
         'restockTime' => ['numeric'],
         'markAsTopseller' => ['bool'],
+    ];
+
+    // put translations keys here if key is different than self::DEFAULT_TRANSLATION_KEY
+    public const SW_PRODUCT_TRANSLATION_KEYS = [
+        'media' => 'sw-product.list.columnMedia',
+        'customSearchKeywords' => 'sw-settings-search.generalTab.configFields.customSearchKeywords',
+        'metaTitle' => 'sw-product.seoForm.labelMetaTitle',
+        'metaDescription' => 'sw-product.seoForm.labelMetaDescription',
+        'keywords' => 'sw-product.seoForm.labelKeywords',
+        'purchaseSteps' => 'sw-product.settingsForm.labelPurchaseSteps',
     ];
 }
