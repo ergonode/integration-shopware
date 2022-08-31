@@ -63,7 +63,8 @@ class AttributeMapper
         foreach (Constants::SW_PRODUCT_MAPPABLE_FIELDS as $code => $types) {
             $attributes[] = [
                 'code' => $code,
-                'type' => implode('/', $types)
+                'type' => implode('/', $types),
+                'translationKey' => Constants::SW_PRODUCT_TRANSLATION_KEYS[$code] ?? Constants::DEFAULT_TRANSLATION_KEY.$code
             ];
         }
 
