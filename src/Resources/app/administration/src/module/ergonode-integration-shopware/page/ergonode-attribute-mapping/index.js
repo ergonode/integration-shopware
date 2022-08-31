@@ -52,7 +52,7 @@ Component.register('ergonode-attribute-mapping', {
 
         shopwareAttributesSelectOptions () {
             return this.shopwareAttributes?.map(attribute => ({
-                label: `${attribute?.code}${attribute?.type ? ` (${attribute.type})` : ''}`,
+                label: `${this.$tc(attribute?.translationKey)} (${attribute?.type ? ` (${attribute.type})` : ''}`,
                 value: attribute?.code,
             }));
         },
