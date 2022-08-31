@@ -9,7 +9,10 @@ use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Ergonode\IntegrationShopware\Util\SyncPerformanceLogger;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Content\Category\DataAbstractionLayer\CategoryIndexingMessage;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexerRegistry;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
@@ -52,6 +55,14 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
         return [CategorySyncTask::class];
     }
 
+    protected function createContext(): Context
+    {
+        $context = parent::createContext();
+        $context->addState(EntityIndexerRegistry::DISABLE_INDEXING);
+
+        return $context;
+    }
+
     public function runSync(): int
     {
         $currentPage = 0;
@@ -65,6 +76,7 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
         }
 
         $result = null;
+        $primaryKeys = [];
         try {
             foreach ($this->processors as $processor) {
                 $processorClass = \get_class($processor);
@@ -80,6 +92,7 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
                     }
 
                     $count += $result->getProcessedEntityCount();
+                    $primaryKeys = \array_merge($primaryKeys, $result->getPrimaryKeys());
 
                     if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
                         break 2;
@@ -88,6 +101,13 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
             }
         } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
+        }
+
+        if (false === empty($primaryKeys)) {
+            $this->logger->info('Dispatching category indexing message');
+            $indexingMessage = new CategoryIndexingMessage($primaryKeys);
+            $indexingMessage->setIndexer('category.indexer');
+            $this->messageBus->dispatch($indexingMessage);
         }
 
         if (null !== $result && $result->hasNextPage()) {

@@ -29,4 +29,9 @@ class AttributeTypesEnum extends AbstractEnum
 
         return reset($type) ?: self::TEXT;
     }
+
+    public static function getShortNodeType(array $attribute): string
+    {
+        return str_replace('type_', '', self::getNodeType($attribute));
+    }
 }

@@ -12,6 +12,8 @@ class SyncCounterDTO
 
     private int $processedEntityCount = 0;
 
+    private array $primaryKeys = [];
+
     private ?Stopwatch $stopwatch = null;
 
     public function hasNextPage(): bool
@@ -32,6 +34,16 @@ class SyncCounterDTO
     public function incrProcessedEntityCount(int $incrCount = 1): void
     {
         $this->processedEntityCount += $incrCount;
+    }
+
+    public function getPrimaryKeys(): array
+    {
+        return $this->primaryKeys;
+    }
+
+    public function setPrimaryKeys(array $primaryKeys): void
+    {
+        $this->primaryKeys = $primaryKeys;
     }
 
     public function getStopwatch(): ?Stopwatch

@@ -81,14 +81,16 @@ class ProductSyncProcessor
         }
 
         $stopwatch->start('process');
-        $writeResult = $this->productPersistor->persist($result->getProductData()['edges'], $context);
+        $primaryKeys = $this->productPersistor->persist($result->getProductData()['edges'], $context);
         $stopwatch->stop('process');
 
         $this->cursorManager->persist($endCursor, ProductStreamResultsProxy::MAIN_FIELD, $context);
 
-        $counter->incrProcessedEntityCount(count($writeResult));
+        $counter->incrProcessedEntityCount(count($primaryKeys));
+        $counter->setPrimaryKeys($primaryKeys);
         $counter->setHasNextPage($result->hasNextPage());
         $counter->setStopwatch($stopwatch);
+
         $this->performanceLogger->logPerformance(self::class, $stopwatch);
 
         return $counter;

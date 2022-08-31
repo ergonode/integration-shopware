@@ -10,6 +10,8 @@ use Ergonode\IntegrationShopware\Persistor\PropertyGroupPersistor;
 use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
 use Shopware\Core\Framework\Context;
 
+use function array_filter;
+
 class OrphanEntitiesManager
 {
     private ErgonodeCursorManager $ergonodeCursorManager;
@@ -34,19 +36,22 @@ class OrphanEntitiesManager
 
     public function cleanAttributes(Context $context): array
     {
-        $entities = [];
+        $codes = [];
 
         $lastCursor = $this->ergonodeCursorManager->getCursorEntity(AttributeDeletedStreamResultsProxy::MAIN_FIELD, $context);
         $lastCursor = null !== $lastCursor ? $lastCursor->getCursor() : null;
         $generator = $this->ergonodeAttributeProvider->provideDeletedAttributes($lastCursor);
 
         foreach ($generator as $deletedAttributes) {
-            $entities = array_merge_recursive(
-                $entities,
-                $this->propertyGroupPersistor->remove($deletedAttributes, $context),
-                $this->customFieldPersistor->remove($deletedAttributes, $context)
-            );
+            $codes[] = $this->getCodes($deletedAttributes);
         }
+
+        $codes = array_merge(...$codes);
+
+        $entities = [
+            ...$this->propertyGroupPersistor->removeByCodes($codes, $context),
+            ...$this->customFieldPersistor->removeByCodes($codes, $context),
+        ];
 
         if (isset($deletedAttributes) && $deletedAttributes->hasEndCursor()) {
             $this->ergonodeCursorManager->persist(
@@ -57,5 +62,12 @@ class OrphanEntitiesManager
         }
 
         return $entities;
+    }
+
+    private function getCodes(AttributeDeletedStreamResultsProxy $attributes): array
+    {
+        $codes = $attributes->map(static fn(array $node) => $node['node'] ?? null);
+
+        return array_filter($codes);
     }
 }
