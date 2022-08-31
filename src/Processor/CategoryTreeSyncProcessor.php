@@ -146,7 +146,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
                 $context
             );
             $this->cursorManager->persist($treeEndCursor, CategoryTreeStreamResultsProxy::MAIN_FIELD, $context);
-
         }
 
         $counter->setHasNextPage($result->hasNextPage() || $leafHasNextPage);

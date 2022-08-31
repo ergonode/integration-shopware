@@ -51,6 +51,9 @@ services:
   Ergonode\IntegrationShopware\Entity\ErgonodeSyncHistory\ErgonodeSyncHistoryDefinition:
     tags: [ 'shopware.entity.definition' ]
 
+  Ergonode\IntegrationShopware\Entity\CategoryLastChildMapping\CategoryLastChildMappingDefinition:
+    tags: [ 'shopware.entity.definition' ]
+
   # EXTENSION
   Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension:
     tags: [ 'shopware.entity.extension' ]
