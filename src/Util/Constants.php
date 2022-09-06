@@ -49,5 +49,6 @@ class Constants
         'metaDescription' => 'sw-product.seoForm.labelMetaDescription',
         'keywords' => 'sw-product.seoForm.labelKeywords',
         'purchaseSteps' => 'sw-product.settingsForm.labelPurchaseSteps',
+        'manufacturerNumber' => 'sw-product.settingsForm.labelManufacturerNumber'
     ];
 }
