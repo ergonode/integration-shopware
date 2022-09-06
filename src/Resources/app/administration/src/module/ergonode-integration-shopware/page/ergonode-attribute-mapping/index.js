@@ -88,7 +88,17 @@ Component.register('ergonode-attribute-mapping', {
             return this[`${attributeSet}Attributes`]?.find(attribute =>
                 attribute?.code?.toLowerCase() === attributeName?.toLowerCase())?.type || '?';
         },
-
+    
+        attributeTranslation (shopwareKey) {
+            const foundAttributes = this.shopwareAttributes.filter(attribute => attribute?.code === shopwareKey);
+            
+            if (!foundAttributes?.length) {
+                return shopwareKey;
+            }
+            
+            return this.$t(foundAttributes[0].translationKey);
+        },
+        
         clearForm () {
             this.createShopwareAttribute = null;
             this.createErgonodeAttribute = null;
