@@ -9,7 +9,7 @@ use GraphQL\Client;
 
 class HttpGqlClientFactory
 {
-    private const TIMEOUT_SEC = 30;
+    private const TIMEOUT_SEC = 60;
 
     public function create(ErgonodeAccessData $accessData): Client
     {

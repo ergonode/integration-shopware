@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
+use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\Processor\CategoryProcessorInterface;
 use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
@@ -29,6 +30,8 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
 
     private SyncPerformanceLogger $performanceLogger;
 
+    private CategoryOrderHelper $categoryOrderHelper;
+
     /**
      * @param CategoryProcessorInterface[] $processors
      */
@@ -40,7 +43,8 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
         ConfigProvider $configProvider,
         iterable $processors,
         MessageBusInterface $messageBus,
-        SyncPerformanceLogger $performanceLogger
+        SyncPerformanceLogger $performanceLogger,
+        CategoryOrderHelper $categoryOrderHelper
     ) {
         parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
@@ -48,6 +52,7 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
         $this->processors = $processors;
         $this->messageBus = $messageBus;
         $this->performanceLogger = $performanceLogger;
+        $this->categoryOrderHelper = $categoryOrderHelper;
     }
 
     public static function getHandledMessages(): iterable
@@ -103,6 +108,7 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
             $this->logger->error($e->getMessage());
         }
 
+        $primaryKeys = \array_unique($primaryKeys);
         if (false === empty($primaryKeys)) {
             $this->logger->info('Dispatching category indexing message');
             $indexingMessage = new CategoryIndexingMessage($primaryKeys);
@@ -113,6 +119,9 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
         if (null !== $result && $result->hasNextPage()) {
             $this->logger->info('Dispatching next CategorySyncMessage because still has next page');
             $this->messageBus->dispatch(new CategorySyncTask());
+        } else {
+            $this->logger->info('Category sync finished. Clearing Category Order Helper saved mappings');
+            $this->categoryOrderHelper->clearSaved();
         }
 
         return $count;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Persistor;
 
 use Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension;
+use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\Persistor\Helper\ExistingCategoriesHelper;
 use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Context;
@@ -15,13 +16,16 @@ class CategoryTreePersistor
 {
     private EntityRepositoryInterface $categoryRepository;
     private ExistingCategoriesHelper $categoriesHelper;
+    private CategoryOrderHelper $categoryOrderHelper;
 
     public function __construct(
         EntityRepositoryInterface $categoryRepository,
-        ExistingCategoriesHelper $categoriesHelper
+        ExistingCategoriesHelper $existingCategoriesHelper,
+        CategoryOrderHelper $categoryOrderHelper
     ) {
         $this->categoryRepository = $categoryRepository;
-        $this->categoriesHelper = $categoriesHelper;
+        $this->categoriesHelper = $existingCategoriesHelper;
+        $this->categoryOrderHelper = $categoryOrderHelper;
     }
 
     /**
@@ -30,13 +34,25 @@ class CategoryTreePersistor
     public function persistLeaves(array $leaves, string $treeCode, Context $context): array
     {
         $codes = \array_map(fn($node) => $node['node']['category']['code'], $leaves);
-        $parentCodes = \array_map(fn($node) => $node['node']['parentCategory']['code'] ?? null, $leaves);
+        $parentCodes = \array_filter(\array_map(fn($node) => $node['node']['parentCategory']['code'] ?? null, $leaves));
+        $parentCodes[] = $treeCode;
 
         $codes = \array_merge($codes, $parentCodes);
         $codes = \array_unique(\array_filter($codes));
-        $codes[] = $treeCode;
 
         $this->categoriesHelper->load($codes, $context);
+
+        $parentIds = \array_filter(
+            \array_map(
+                fn($code) => $this->categoriesHelper->get($code),
+                $parentCodes
+            )
+        );
+
+        $this->categoryOrderHelper->load(
+            $parentIds,
+            $context
+        );
 
         $payloads = [];
         if (false === $this->categoriesHelper->has($treeCode)) {
@@ -53,6 +69,8 @@ class CategoryTreePersistor
         }
 
         $writeResult = $this->categoryRepository->upsert($payloads, $context);
+
+        $this->categoryOrderHelper->save($context);
 
         return $writeResult->getPrimaryKeys(CategoryDefinition::ENTITY_NAME);
     }
@@ -78,9 +96,16 @@ class CategoryTreePersistor
             $createCategory = true;
         }
 
+        $afterCategoryId = null;
+        if (null !== $parentId) {
+            $afterCategoryId = $this->categoryOrderHelper->getLastCategoryIdForParent($parentId);
+            $this->categoryOrderHelper->set($parentId, $id);
+        }
+
         $result = [
             'id' => $id,
             'parentId' => $parentId,
+            'afterCategoryId' => $afterCategoryId
         ];
 
         if ($createCategory) {
