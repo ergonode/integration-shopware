@@ -118,7 +118,10 @@ class ProductPersistor
         );
         $this->deleteEntities($dto, $context);
 
-        return array_filter($transformedData->getShopwareData());
+        return array_filter(
+            $transformedData->getShopwareData(),
+            fn($value) => !empty($value) || 0 === $value
+        );
     }
 
     private function deleteEntities(ProductTransformationDTO $dto, Context $context): void
