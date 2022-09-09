@@ -24,7 +24,7 @@ class Constants
         'width' => ['numeric'],
         'length' => ['numeric'],
         'customSearchKeywords' => ['multiselect'],
-        'description' => ['text', 'textarea', 'select'],
+        'description' => ['text', 'textarea'],
         'metaTitle' => ['text', 'textarea', 'select'],
         'metaDescription' => ['text', 'textarea', 'select'],
         'keywords' => ['text', 'textarea', 'select'],
@@ -49,5 +49,6 @@ class Constants
         'metaDescription' => 'sw-product.seoForm.labelMetaDescription',
         'keywords' => 'sw-product.seoForm.labelKeywords',
         'purchaseSteps' => 'sw-product.settingsForm.labelPurchaseSteps',
+        'manufacturerNumber' => 'sw-product.settingsForm.labelManufacturerNumber'
     ];
 }

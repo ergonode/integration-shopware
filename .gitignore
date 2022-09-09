@@ -6,3 +6,4 @@ build/*
 !build/composer-dist
 !build/build-zip.sh
 vendor/
+.idea
