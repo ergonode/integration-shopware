@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
+use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\Processor\CategoryProcessorInterface;
 use Ergonode\IntegrationShopware\Provider\ConfigProvider;
@@ -32,6 +33,8 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
 
     private CategoryOrderHelper $categoryOrderHelper;
 
+    private CategoryPersistor $categoryPersistor;
+
     /**
      * @param CategoryProcessorInterface[] $processors
      */
@@ -44,7 +47,8 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
         iterable $processors,
         MessageBusInterface $messageBus,
         SyncPerformanceLogger $performanceLogger,
-        CategoryOrderHelper $categoryOrderHelper
+        CategoryOrderHelper $categoryOrderHelper,
+        CategoryPersistor $categoryPersistor
     ) {
         parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
@@ -53,6 +57,7 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
         $this->messageBus = $messageBus;
         $this->performanceLogger = $performanceLogger;
         $this->categoryOrderHelper = $categoryOrderHelper;
+        $this->categoryPersistor = $categoryPersistor;
     }
 
     public static function getHandledMessages(): iterable
@@ -122,6 +127,18 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
         } else {
             $this->logger->info('Category sync finished. Clearing Category Order Helper saved mappings');
             $this->categoryOrderHelper->clearSaved();
+
+            $lastSync = $this->configProvider->getLastCategorySyncTimestamp();
+            $removedCategoryCount = $this->categoryPersistor->removeCategoriesUpdatedAtBeforeTimestamp($lastSync);
+
+            $this->logger->info('Removed orphaned Ergonode categories', [
+                'count' => $removedCategoryCount
+            ]);
+
+            $formattedTime = $this->configProvider->setLastCategorySyncTimestamp(\time());
+            $this->logger->info('Saved lastCategorySyncTime', [
+                'time' => $formattedTime
+            ]);
         }
 
         return $count;

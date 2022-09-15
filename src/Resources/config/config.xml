@@ -52,5 +52,11 @@
             <label>Code of the category tree to synchronize</label>
             <label lang="de-DE">Code of the category tree to synchronize</label>
         </input-field>
+        <input-field type="text">
+            <name>lastCategorySyncTime</name>
+            <label>Last category synchronization completion time</label>
+            <label lang="de-DE">Last category synchronization completion time</label>
+            <disabled>true</disabled>
+        </input-field>
     </card>
 </config>
