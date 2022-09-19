@@ -10,6 +10,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetEntity;
 use Shopware\Core\System\CustomField\CustomFieldEntity;
 
@@ -33,6 +35,15 @@ class CustomFieldProvider
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('name', $name));
+        $criteria->addAssociation('customFieldSet');
+
+        return $this->customFieldRepository->search($criteria, $context)->first();
+    }
+
+    public function getErgonodeCustomFieldByName(string $name, Context $context): ?CustomFieldEntity
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('name', $name));
         $criteria->addFilter(new EqualsFilter('customFieldSet.name', Constants::PRODUCT_CUSTOM_FIELD_SET_NAME));
         $criteria->addAssociation('customFieldSet');
 
@@ -42,7 +53,7 @@ class CustomFieldProvider
     public function getErgonodeCustomFieldSetId(Context $context): ?string
     {
         if (null === $this->customFieldSetId) {
-            $set = $this->getCustomFieldSet($context);
+            $set = $this->getErgonodeCustomFieldSet($context);
 
             if (null !== $set) {
                 $this->customFieldSetId = $set->getId();
@@ -52,7 +63,7 @@ class CustomFieldProvider
         return $this->customFieldSetId;
     }
 
-    public function getCustomFieldSet(Context $context): ?CustomFieldSetEntity
+    public function getErgonodeCustomFieldSet(Context $context): ?CustomFieldSetEntity
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('name', Constants::PRODUCT_CUSTOM_FIELD_SET_NAME));

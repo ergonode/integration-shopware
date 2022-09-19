@@ -7,6 +7,7 @@ namespace Ergonode\IntegrationShopware\Transformer;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use Ergonode\IntegrationShopware\Resolver\ProductCustomFieldTransformerResolver;
+use Ergonode\IntegrationShopware\Util\CustomFieldUtil;
 use Shopware\Core\Framework\Context;
 
 use function array_filter;
@@ -37,20 +38,26 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
 
         $customFields = [];
         foreach ($attributes as $ergoCustomField) {
-            $node = $ergoCustomField['node'];
+            $node = $ergoCustomField['node'] ?? null;
+            $code = $node['attribute']['code'] ?? null;
+
+            if (empty($node) || empty($code)) {
+                continue;
+            }
 
             $typedTransformer = $this->transformerResolver->resolve($node);
             if (null === $typedTransformer) {
                 continue;
             }
 
-            $transformedValue = $typedTransformer->transformNode($node, $context);
-
-            $customFields = array_merge_recursive(
-                $customFields,
-                $transformedValue
+            $customFields[] = $typedTransformer->transformNode(
+                $node,
+                CustomFieldUtil::buildCustomFieldName($code),
+                $context
             );
         }
+
+        $customFields = array_merge_recursive(...$customFields);
 
         $swData['translations'] = array_merge_recursive(
             $swData['translations'] ?? [],

@@ -6,7 +6,6 @@ namespace Ergonode\IntegrationShopware\Transformer\ProductCustomField;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
-use Ergonode\IntegrationShopware\Util\CustomFieldUtil;
 use Shopware\Core\Framework\Context;
 
 use function in_array;
@@ -37,13 +36,11 @@ class SimpleProductCustomFieldTransformer implements ProductCustomFieldTransform
         ]);
     }
 
-    public function transformNode(array $node, Context $context): array
+    public function transformNode(array $node, string $customFieldName, Context $context): array
     {
-        $code = $node['attribute']['code'];
-
         return $this->translationTransformer->transform(
             $node['valueTranslations'],
-            sprintf('customFields.%s', CustomFieldUtil::buildCustomFieldName($code))
+            sprintf('customFields.%s', $customFieldName)
         );
     }
 }

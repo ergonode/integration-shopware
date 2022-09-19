@@ -22,7 +22,7 @@ class RelationCustomFieldTransformer implements CustomFieldTransformerInterface
             'config' => [
                 'entity' => ProductDefinition::ENTITY_NAME,
                 'componentName' => 'sw-entity-multi-id-select',
-                'customFieldType' => 'entity',
+                'customFieldType' => CustomFieldTypes::ENTITY,
             ],
         ];
     }

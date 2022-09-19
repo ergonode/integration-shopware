@@ -35,8 +35,15 @@ services:
     arguments:
       $repository: '@ergonode_attribute_mapping.repository'
 
+  Ergonode\IntegrationShopware\Command\CreateCustomFieldMappingCommand:
+    arguments:
+      $repository: '@ergonode_custom_field_mapping.repository'
+
   # ENTITY DEFINITION
   Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition:
+    tags: [ 'shopware.entity.definition' ]
+
+  Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeCustomFieldMappingDefinition:
     tags: [ 'shopware.entity.definition' ]
 
   Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionDefinition:
@@ -73,6 +80,17 @@ services:
   Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager:
     arguments:
       $repository: '@ergonode_cursor.repository'
+
+  # PROVIDER
+  ergonode.integration_shopware.provider.attribute_mapping_provider:
+    class: Ergonode\IntegrationShopware\Provider\AttributeMappingProvider
+    arguments:
+      $repository: '@ergonode_attribute_mapping.repository'
+
+  ergonode.integration_shopware.provider.custom_field_mapping_provider:
+    class: Ergonode\IntegrationShopware\Provider\AttributeMappingProvider
+    arguments:
+      $repository: '@ergonode_custom_field_mapping.repository'
 
   # RESOLVER
   Ergonode\IntegrationShopware\Resolver\CustomFieldTransformerResolver:
@@ -150,6 +168,16 @@ services:
       $kernelEnv: '%kernel.environment%'
       $repository: '@ergonode_sync_history.repository'
 
+  ergonode.integration_shopware.service.attribute_mapper:
+    class: Ergonode\IntegrationShopware\Service\AttributeMapper
+    arguments:
+      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
+
+  ergonode.integration_shopware.service.custom_field_mapper:
+    class: Ergonode\IntegrationShopware\Service\AttributeMapper
+    arguments:
+      $attributeMappingProvider: '@ergonode.integration_shopware.provider.custom_field_mapping_provider'
+
   # TRANSFORMER
   Ergonode\IntegrationShopware\Transformer\ProductTransformerChain:
     arguments:
@@ -161,8 +189,17 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductDefaultValuesTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductMediaTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductCustomFieldTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductExistingCustomFieldTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductPropertiesTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductCrossSellingTransformer'
+
+  Ergonode\IntegrationShopware\Transformer\ProductTransformer:
+    arguments:
+      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
+
+  Ergonode\IntegrationShopware\Transformer\ProductExistingCustomFieldTransformer:
+    arguments:
+      $customFieldMappingProvider: '@ergonode.integration_shopware.provider.custom_field_mapping_provider'
 
   # SUBSCRIBER
   Ergonode\IntegrationShopware\Subscriber\DeleteExtensionSubscriber:

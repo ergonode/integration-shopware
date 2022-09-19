@@ -6,7 +6,6 @@ namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
-use Ergonode\IntegrationShopware\Exception\InvalidAttributeTypeException;
 use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingException;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
@@ -14,7 +13,6 @@ use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
 use Ergonode\IntegrationShopware\Util\AttributeTypeValidator;
 use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
 
@@ -45,18 +43,14 @@ class ProductTransformer implements ProductDataTransformerInterface
 
     private AttributeTypeValidator $attributeTypeValidator;
 
-    private LoggerInterface $logger;
-
     public function __construct(
         AttributeMappingProvider $attributeMappingProvider,
         LanguageProvider $languageProvider,
-        AttributeTypeValidator $attributeTypeValidator,
-        LoggerInterface $ergonodeSyncLogger
+        AttributeTypeValidator $attributeTypeValidator
     ) {
         $this->attributeMappingProvider = $attributeMappingProvider;
         $this->languageProvider = $languageProvider;
         $this->attributeTypeValidator = $attributeTypeValidator;
-        $this->logger = $ergonodeSyncLogger;
     }
 
     /**
@@ -79,7 +73,12 @@ class ProductTransformer implements ProductDataTransformerInterface
             $code = $edge['node']['attribute']['code'];
             $mappingKeys = $this->attributeMappingProvider->provideByErgonodeKey($code, $context);
 
-            $this->filterWrongMappings($edge['node']['attribute'], $mappingKeys, ['sku' => $ergonodeData['sku']]);
+            $this->attributeTypeValidator->filterWrongAttributes(
+                $edge['node']['attribute'] ?? [],
+                $mappingKeys,
+                $context,
+                ['sku' => $ergonodeData['sku']]
+            );
 
             if (0 === $mappingKeys->count()) {
                 continue;
@@ -147,46 +146,5 @@ class ProductTransformer implements ProductDataTransformerInterface
         }
 
         return $result;
-    }
-
-    private function filterWrongMappings(
-        array $attribute,
-        ErgonodeAttributeMappingCollection $mappingKeys,
-        array $logContext = []
-    ): void {
-        if (empty($attribute)) {
-            return;
-        }
-
-        foreach ($mappingKeys as $key => $mappingKey) {
-            try {
-                $this->attributeTypeValidator->validate(
-                    $attribute,
-                    $mappingKey,
-                    true
-                );
-            } catch (InvalidAttributeTypeException $e) {
-                $mappingKeys->remove($key);
-
-                // TODO SWERG-84: remove inlined context from message after adding context display in admin
-                $this->logger->warning(
-                    sprintf(
-                        '%s [sku: %s; actualType: %s, validTypes: %s, ergonodeKey: %s; shopwareKey: %s]',
-                        $e->getMessage(),
-                        $logContext['sku'] ?? '',
-                        $e->getActualType(),
-                        $e->getValidTypesStr(),
-                        $e->getMapping()->getErgonodeKey(),
-                        $e->getMapping()->getShopwareKey(),
-                    ),
-                    array_merge($logContext, [
-                        'actualType' => $e->getActualType(),
-                        'validTypes' => $e->getValidTypes(),
-                        'ergonodeKey' => $e->getMapping()->getErgonodeKey(),
-                        'shopwareKey' => $e->getMapping()->getShopwareKey(),
-                    ])
-                );
-            }
-        }
     }
 }

@@ -9,19 +9,23 @@ use Exception;
 
 class InvalidAttributeTypeException extends Exception
 {
-    private ErgonodeAttributeMappingEntity $mapping;
+    protected ErgonodeAttributeMappingEntity $mapping;
 
-    private array $validTypes;
+    protected array $validTypes;
 
-    private string $actualType;
+    protected string $actualType;
 
-    public function __construct(ErgonodeAttributeMappingEntity $mapping, array $validTypes, string $actualType = '')
-    {
+    public function __construct(
+        ErgonodeAttributeMappingEntity $mapping,
+        array $validTypes,
+        string $actualType = '',
+        string $message = 'Invalid Attribute type, skipping. Please check Attribute mapping.'
+    ) {
         $this->mapping = $mapping;
         $this->validTypes = $validTypes;
         $this->actualType = $actualType;
 
-        parent::__construct('Invalid Attribute type, skipping. Please check Attribute mapping.');
+        parent::__construct($message);
     }
 
     public function getMapping(): ErgonodeAttributeMappingEntity

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Controller\Admin;
 
-use Ergonode\IntegrationShopware\Service\AttributeMapper;
+use Ergonode\IntegrationShopware\Provider\MappableFieldsProvider;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,14 +15,14 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route(defaults={"_routeScope"={"api"}})
  */
-class AttributeMappingController extends AbstractController
+class MappingController extends AbstractController
 {
-    private AttributeMapper $attributeMapper;
+    private MappableFieldsProvider $mappableFieldsProvider;
 
     public function __construct(
-        AttributeMapper $attributeMapper
+        MappableFieldsProvider $mappableFieldsProvider
     ) {
-        $this->attributeMapper = $attributeMapper;
+        $this->mappableFieldsProvider = $mappableFieldsProvider;
     }
 
     /**
@@ -40,7 +41,7 @@ class AttributeMappingController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $attributes = $this->attributeMapper->getAllErgonodeAttributesWithTypes($types);
+        $attributes = $this->mappableFieldsProvider->getErgonodeAttributesWithTypes($types);
 
         return new JsonResponse([
             'data' => $attributes,
@@ -52,7 +53,19 @@ class AttributeMappingController extends AbstractController
      */
     public function shopwareAttributes(): JsonResponse
     {
-        $attributes = $this->attributeMapper->getMappableShopwareAttributesWithTypes();
+        $attributes = $this->mappableFieldsProvider->getShopwareAttributesWithTypes();
+
+        return new JsonResponse([
+            'data' => $attributes,
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/api/ergonode/shopware-custom-fields", name="api.ergonode.shopwareCustomFields", methods={"GET"})
+     */
+    public function shopwareCustomFields(Context $context): JsonResponse
+    {
+        $attributes = $this->mappableFieldsProvider->getShopwareCustomFieldsWithTypes($context);
 
         return new JsonResponse([
             'data' => $attributes,

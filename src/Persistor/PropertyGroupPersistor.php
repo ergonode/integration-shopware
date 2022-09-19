@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Persistor;
 
-use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
 use Ergonode\IntegrationShopware\DTO\PropertyGroupTransformationDTO;
 use Ergonode\IntegrationShopware\Provider\PropertyGroupProvider;
@@ -13,7 +12,6 @@ use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
-use function array_filter;
 use function array_map;
 use function array_merge;
 

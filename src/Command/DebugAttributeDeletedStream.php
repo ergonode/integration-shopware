@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Command;
 
 use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
-use Ergonode\IntegrationShopware\Api\ProductDeletedStreamResultsProxy;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Manager\OrphanEntitiesManager;
 use Shopware\Core\Framework\Api\Context\SystemSource;
