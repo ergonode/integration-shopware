@@ -11,15 +11,19 @@
     },
     "tabs": {
       "attributeMappings": "Attribute mappings",
+      "customFieldMappings": "Custom field mappings",
       "importHistory": "Import history",
       "synchronization": "Synchronization"
     },
     "mappings": {
       "attributeMappingGeneral": "Attribute mapping",
+      "customFieldMappingGeneral": "Custom field mapping",
       "attributeMappings": "Attribute mappings",
+      "customFieldMappings": "Custom field mappings",
       "shopwareAttribute": "Shopware attribute",
+      "shopwareCustomField": "Shopware custom field",
       "ergonodeAttribute": "Ergonode attribute",
-      "addAttributeMapping": "Add mapping",
+      "addMapping": "Add mapping",
       "messages": {
         "mappingCreationSuccessful": "An attribute mapping has been successfully created.",
         "mappingCreationFailure": "Could not create an attribute mapping.",

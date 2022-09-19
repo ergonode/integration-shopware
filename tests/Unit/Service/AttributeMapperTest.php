@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Tests\Unit\Service;
 
-use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Ergonode\IntegrationShopware\Provider\Mapping\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
 use Ergonode\IntegrationShopware\Service\AttributeMapper;
 use Ergonode\IntegrationShopware\Tests\Fixture\ErgonodeAttributeMappingFixture;

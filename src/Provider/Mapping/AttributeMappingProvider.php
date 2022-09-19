@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Provider;
+namespace Ergonode\IntegrationShopware\Provider\Mapping;
 
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
@@ -17,7 +17,7 @@ use function md5;
 
 class AttributeMappingProvider
 {
-    public const ATTRIBUTE_MAPPING_CACHE_KEY = 'attribute_mapping';
+    private const MAPPING_CACHE_KEY = 'attribute_mapping';
 
     private EntityRepositoryInterface $repository;
 
@@ -52,7 +52,7 @@ class AttributeMappingProvider
 
     private function getAttributeMap(Context $context): array
     {
-        $cacheKey = md5(self::ATTRIBUTE_MAPPING_CACHE_KEY);
+        $cacheKey = md5(self::MAPPING_CACHE_KEY);
 
         try {
             return $this->cache->get($cacheKey, function () use ($context) {

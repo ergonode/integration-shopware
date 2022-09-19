@@ -12,9 +12,15 @@ Component.register('ergonode-tabs', {
             tabs: [
                 {
                     routeObject: {
-                        path: 'mapping',
+                        path: 'attribute-mapping',
                     },
                     label: this.$t('ErgonodeIntegrationShopware.tabs.attributeMappings'),
+                },
+                {
+                    routeObject: {
+                        path: 'custom-field-mapping',
+                    },
+                    label: this.$t('ErgonodeIntegrationShopware.tabs.customFieldMappings'),
                 },
                 {
                     routeObject: {

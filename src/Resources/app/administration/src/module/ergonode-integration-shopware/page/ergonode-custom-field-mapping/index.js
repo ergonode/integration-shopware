@@ -1,9 +1,9 @@
-import template from './ergonode-attribute-mapping.html.twig';
-import './ergonode-attribute-mapping.scss';
+import template from './ergonode-custom-field-mapping.html.twig';
+import './ergonode-custom-field-mapping.scss';
 
 const { Component, Context, Data: { Criteria }, Mixin } = Shopware;
 
-Component.register('ergonode-attribute-mapping', {
+Component.register('ergonode-custom-field-mapping', {
     inject: ['acl', 'repositoryFactory', 'ergonodeAttributeService'],
 
     mixins: [
@@ -27,7 +27,7 @@ Component.register('ergonode-attribute-mapping', {
 
     computed: {
         repository () {
-            return this.repositoryFactory.create('ergonode_attribute_mapping');
+            return this.repositoryFactory.create('ergonode_custom_field_mapping');
         },
 
         columns () {
@@ -136,18 +136,19 @@ Component.register('ergonode-attribute-mapping', {
                 this.isCreateLoading = false;
             }
         },
+
     },
 
     async created () {
         this.isLoading = true;
 
         try {
-            this.ergonodeAttributeService.getShopwareAttributes().then(result => {
-                this.shopwareAttributes = result.data.data
+            this.ergonodeAttributeService.getShopwareCustomFields().then(result => {
+                this.shopwareAttributes = result.data.data;
             });
 
             this.ergonodeAttributeService.getErgonodeAttributes().then(result => {
-                this.ergonodeAttributes = result.data.data
+                this.ergonodeAttributes = result.data.data;
             });
 
             await this.fetchMappings();

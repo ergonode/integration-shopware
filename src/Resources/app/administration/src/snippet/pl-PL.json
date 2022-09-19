@@ -45,7 +45,7 @@
       "attributeMappings": "Mapowania atrybutów",
       "shopwareAttribute": "Atrybut Shopware",
       "ergonodeAttribute": "Atrybut Ergonode",
-      "addAttributeMapping": "Dodaj mapowanie atrybutu",
+      "addMapping": "Dodaj mapowanie",
       "messages": {
         "mappingCreationSuccessful": "Pomyślnie utworzono mapowanie atrybutów.",
         "mappingCreationFailure": "Nie udało się utworzyć mapowania.",

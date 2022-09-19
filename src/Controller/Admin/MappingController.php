@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route(defaults={"_routeScope"={"api"}})
  */
-class AttributeMappingController extends AbstractController
+class MappingController extends AbstractController
 {
     private AttributeMapper $attributeMapper;
 
@@ -52,7 +52,20 @@ class AttributeMappingController extends AbstractController
      */
     public function shopwareAttributes(): JsonResponse
     {
+        // todo separate mappers
         $attributes = $this->attributeMapper->getMappableShopwareAttributesWithTypes();
+
+        return new JsonResponse([
+            'data' => $attributes,
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/api/ergonode/shopware-custom-fields", name="api.ergonode.shopwareCustomFields", methods={"GET"})
+     */
+    public function shopwareCustomFields(): JsonResponse
+    {
+        $attributes = $this->attributeMapper->getMappableShopwareCustomFieldsWithTypes();
 
         return new JsonResponse([
             'data' => $attributes,

@@ -39,6 +39,9 @@ services:
   Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition:
     tags: [ 'shopware.entity.definition' ]
 
+  Ergonode\IntegrationShopware\Entity\ErgonodeCustomFieldMapping\ErgonodeCustomFieldMappingDefinition:
+    tags: [ 'shopware.entity.definition' ]
+
   Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionDefinition:
     tags: [ 'shopware.entity.definition' ]
 

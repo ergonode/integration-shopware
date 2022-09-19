@@ -1,5 +1,5 @@
 {% block ergonode_attribute_mapping_page %}
-    <sw-page class="ergonode__attribute-mapping-page">
+    <sw-page class="ergonode__custom-field-mapping-page">
         <template slot="content">
             <sw-card-view>
                 <ergonode-tabs></ergonode-tabs>
@@ -9,7 +9,7 @@
                         :title="$t('ErgonodeIntegrationShopware.mappings.addMapping')"
                     >
                         <sw-single-select
-                            :label="$t('ErgonodeIntegrationShopware.mappings.shopwareAttribute')"
+                            :label="$t('ErgonodeIntegrationShopware.mappings.shopwareCustomField')"
                             :options="shopwareAttributesSelectOptions"
                             v-model="createShopwareAttribute"
                         >
@@ -35,12 +35,12 @@
                         </sw-label>
                     </sw-card>
                     <sw-card v-if="acl.can('ergonode_attribute_mapping.viewer')"
-                        class="ergonode__attribute-mapping-grid-card"
+                        class="ergonode__custom-field-mapping-grid-card"
                         :title="$t('ErgonodeIntegrationShopware.mappings.attributeMappings')"
                     >
                         <template #default>
                             <sw-entity-listing
-                                class="ergonode__attribute-mapping-grid"
+                                class="ergonode__custom-field-mapping-grid"
                                 :columns="columns"
                                 :items="mappings"
                                 :repository="repository"

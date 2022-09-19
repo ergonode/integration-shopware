@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Service;
 
-use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Ergonode\IntegrationShopware\Provider\Mapping\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
 use Ergonode\IntegrationShopware\Util\Constants;
 use Shopware\Core\Framework\Context;
@@ -67,6 +67,19 @@ class AttributeMapper
                 'translationKey' => Constants::SW_PRODUCT_TRANSLATION_KEYS[$code] ?? Constants::DEFAULT_TRANSLATION_KEY.$code
             ];
         }
+
+        return $attributes;
+    }
+
+    public function getMappableShopwareCustomFieldsWithTypes(): array
+    {
+        $attributes = [
+            [
+                'code' => 'codee',
+                'type' => 'typee',
+                'translationKey' => 'translationKeyy'
+            ]
+        ];
 
         return $attributes;
     }

@@ -8,7 +8,7 @@ use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
 use Ergonode\IntegrationShopware\Exception\InvalidAttributeTypeException;
 use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingException;
-use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Ergonode\IntegrationShopware\Provider\Mapping\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
 use Ergonode\IntegrationShopware\Util\AttributeTypeValidator;

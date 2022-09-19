@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Tests\Unit\Provider;
 
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
-use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Ergonode\IntegrationShopware\Provider\Mapping\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Tests\Fixture\ErgonodeAttributeMappingFixture;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
