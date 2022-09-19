@@ -116,11 +116,12 @@ class CategoryPersistor
     {
         $result = $this->connection->executeStatement(
             \sprintf(
-                'DELETE FROM %s WHERE updated_at < :timestamp AND ergonode_category_mapping_extension_id IS NOT NULL;',
+                'DELETE FROM %s WHERE GREATEST(created_at, COALESCE(updated_at, 0)) < :timestamp
+                 AND ergonode_category_mapping_extension_id IS NOT NULL;',
                 CategoryDefinition::ENTITY_NAME
             ),
             [
-                'timestamp' => $timestamp
+                'timestamp' => (new \DateTime('@' . $timestamp))->format('Y-m-d H:i:s')
             ]
         );
 

@@ -132,10 +132,13 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
             $removedCategoryCount = $this->categoryPersistor->removeCategoriesUpdatedAtBeforeTimestamp($lastSync);
 
             $this->logger->info('Removed orphaned Ergonode categories', [
-                'count' => $removedCategoryCount
+                'count' => $removedCategoryCount,
+                'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM)
             ]);
 
-            $formattedTime = $this->configProvider->setLastCategorySyncTimestamp(\time());
+            $formattedTime = $this->configProvider->setLastCategorySyncTimestamp(
+                (new \DateTime('+1 second'))->getTimestamp()
+            );
             $this->logger->info('Saved lastCategorySyncTime', [
                 'time' => $formattedTime
             ]);
