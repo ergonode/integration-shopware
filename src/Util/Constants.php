@@ -15,6 +15,9 @@ class Constants
     public const SW_PRODUCT_MAPPABLE_FIELDS = [
         'active' => ['bool'],
         'name' => ['text', 'textarea', 'select'],
+        'price.net' => ['numeric', 'price'],
+        'price.gross' => ['numeric', 'price'],
+        'tax.rate' => ['numeric'],
         'stock' => ['numeric'],
         'media' => ['gallery'],
         'ean' => ['text', 'textarea', 'select'],
