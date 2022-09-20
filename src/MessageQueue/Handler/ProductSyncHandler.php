@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
+namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 
+use Ergonode\IntegrationShopware\MessageQueue\Message\ProductSync;
 use Ergonode\IntegrationShopware\Processor\ProductSyncProcessor;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Product\DataAbstractionLayer\ProductIndexingMessage;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexerRegistry;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
-class ProductSyncTaskHandler extends AbstractSyncTaskHandler
+class ProductSyncHandler extends AbstractSyncHandler
 {
     private const MAX_PAGES_PER_RUN = 4;
 
@@ -23,14 +23,13 @@ class ProductSyncTaskHandler extends AbstractSyncTaskHandler
     private MessageBusInterface $messageBus;
 
     public function __construct(
-        EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryService,
         LockFactory $lockFactory,
         LoggerInterface $ergonodeSyncLogger,
         ProductSyncProcessor $productSyncProcessor,
         MessageBusInterface $messageBus
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $ergonodeSyncLogger);
+        parent::__construct($syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
         $this->productSyncProcessor = $productSyncProcessor;
         $this->messageBus = $messageBus;
@@ -38,7 +37,7 @@ class ProductSyncTaskHandler extends AbstractSyncTaskHandler
 
     public static function getHandledMessages(): iterable
     {
-        return [ProductSyncTask::class];
+        return [ProductSync::class];
     }
 
     protected function createContext(): Context
@@ -79,7 +78,7 @@ class ProductSyncTaskHandler extends AbstractSyncTaskHandler
         }
 
         if (null !== $result && $result->hasNextPage()) {
-            $this->messageBus->dispatch(new ProductSyncTask());
+            $this->messageBus->dispatch(new ProductSync());
         }
 
         return $count;
