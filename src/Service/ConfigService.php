@@ -117,4 +117,31 @@ class ConfigService
     {
         $this->configService->set(self::CONFIG_NAMESPACE.'fullSyncDate', $date->format('d-m-Y H:i:s'));
     }
+
+    public function getLastCategorySyncTimestamp(): int
+    {
+        $lastCheckedStr = $this->configService->getString(
+            self::CONFIG_NAMESPACE . 'lastCategorySyncTime'
+        );
+
+        if (empty($lastCheckedStr)) {
+            return 0;
+        }
+
+        return (new \DateTime($lastCheckedStr))->getTimestamp();
+    }
+
+    /**
+     * @return string Human-readable time
+     */
+    public function setLastCategorySyncTimestamp(int $timestamp): string
+    {
+        $formatted = (new \DateTime('@' . $timestamp))->format(\DateTimeInterface::ATOM);
+        $this->configService->set(
+            self::CONFIG_NAMESPACE . 'lastCategorySyncTime',
+            $formatted
+        );
+
+        return $formatted;
+    }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 
 use Ergonode\IntegrationShopware\MessageQueue\Message\CategorySync;
+use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\Processor\CategoryProcessorInterface;
 use Ergonode\IntegrationShopware\Service\ConfigService;
@@ -32,6 +33,8 @@ class CategorySyncHandler extends AbstractSyncHandler
 
     private CategoryOrderHelper $categoryOrderHelper;
 
+    private CategoryPersistor $categoryPersistor;
+
     /**
      * @param SyncHistoryLogger $syncHistoryService
      * @param LoggerInterface $ergonodeSyncLogger
@@ -41,6 +44,7 @@ class CategorySyncHandler extends AbstractSyncHandler
      * @param MessageBusInterface $messageBus
      * @param SyncPerformanceLogger $performanceLogger
      * @param CategoryOrderHelper $categoryOrderHelper
+     * @param CategoryPersistor $categoryPersistor
      */
     public function __construct(
         SyncHistoryLogger $syncHistoryService,
@@ -50,7 +54,8 @@ class CategorySyncHandler extends AbstractSyncHandler
         iterable $processors,
         MessageBusInterface $messageBus,
         SyncPerformanceLogger $performanceLogger,
-        CategoryOrderHelper $categoryOrderHelper
+        CategoryOrderHelper $categoryOrderHelper,
+        CategoryPersistor $categoryPersistor
     ) {
         parent::__construct($syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
@@ -59,6 +64,7 @@ class CategorySyncHandler extends AbstractSyncHandler
         $this->messageBus = $messageBus;
         $this->performanceLogger = $performanceLogger;
         $this->categoryOrderHelper = $categoryOrderHelper;
+        $this->categoryPersistor = $categoryPersistor;
     }
 
     public static function getHandledMessages(): iterable
@@ -128,6 +134,21 @@ class CategorySyncHandler extends AbstractSyncHandler
         } else {
             $this->logger->info('Category sync finished. Clearing Category Order Helper saved mappings');
             $this->categoryOrderHelper->clearSaved();
+
+            $lastSync = $this->configProvider->getLastCategorySyncTimestamp();
+            $removedCategoryCount = $this->categoryPersistor->removeCategoriesUpdatedAtBeforeTimestamp($lastSync);
+
+            $this->logger->info('Removed orphaned Ergonode categories', [
+                'count' => $removedCategoryCount,
+                'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM)
+            ]);
+
+            $formattedTime = $this->configProvider->setLastCategorySyncTimestamp(
+                (new \DateTime('+1 second'))->getTimestamp()
+            );
+            $this->logger->info('Saved lastCategorySyncTime', [
+                'time' => $formattedTime
+            ]);
         }
 
         return $count;

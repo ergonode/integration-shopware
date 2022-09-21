@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Persistor;
 
+use Doctrine\DBAL\Connection;
 use Ergonode\IntegrationShopware\Persistor\Helper\ExistingCategoriesHelper;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
@@ -19,16 +20,20 @@ class CategoryPersistor
 
     private LanguageProvider $languageProvider;
 
+    private Connection $connection;
+
     private string $defaultLocale;
 
     public function __construct(
         EntityRepositoryInterface $categoryRepository,
         LanguageProvider $languageProvider,
-        ExistingCategoriesHelper $categoriesHelper
+        ExistingCategoriesHelper $categoriesHelper,
+        Connection $connection
     ) {
         $this->categoryRepository = $categoryRepository;
         $this->categoriesHelper = $categoriesHelper;
         $this->languageProvider = $languageProvider;
+        $this->connection = $connection;
     }
 
     /**
@@ -102,5 +107,28 @@ class CategoryPersistor
             'name' => $categoryName,
             'translations' => $translations,
         ];
+    }
+
+    /**
+     * @return int Number of deleted categories
+     */
+    public function removeCategoriesUpdatedAtBeforeTimestamp(int $timestamp): int
+    {
+        $result = $this->connection->executeStatement(
+            \sprintf(
+                'DELETE FROM %s WHERE GREATEST(created_at, COALESCE(updated_at, 0)) < :timestamp
+                 AND ergonode_category_mapping_extension_id IS NOT NULL;',
+                CategoryDefinition::ENTITY_NAME
+            ),
+            [
+                'timestamp' => (new \DateTime('@' . $timestamp))->format('Y-m-d H:i:s')
+            ]
+        );
+
+        if (is_int($result)) {
+            return $result;
+        }
+
+        return 0;
     }
 }
