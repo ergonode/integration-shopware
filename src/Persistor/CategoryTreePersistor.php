@@ -55,9 +55,9 @@ class CategoryTreePersistor
         );
 
         $payloads = [];
-        if (false === $this->categoriesHelper->has($treeCode)) {
-            $payloads[] = $this->createCategoryLeafPayload($treeCode, $treeCode);
-        }
+
+        // Create/update tree root entity
+        $payloads[] = $this->createCategoryLeafPayload($treeCode, $treeCode);
 
         foreach ($leaves as $leaf) {
             $node = $leaf['node'];
@@ -83,7 +83,12 @@ class CategoryTreePersistor
         $existingCategoryId = $this->categoriesHelper->get($code);
 
         if (null === $parentCode) {
-            $parentId = $this->categoriesHelper->get($treeCode);
+            if ($code === $treeCode) {
+                // this is tree root category
+                $parentId = null;
+            } else {
+                $parentId = $this->categoriesHelper->get($treeCode);
+            }
         } else {
             $parentId = $this->categoriesHelper->get($parentCode);
         }
