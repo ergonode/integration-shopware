@@ -9,8 +9,8 @@ use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Persistor\CustomFieldPersistor;
 use Ergonode\IntegrationShopware\Persistor\PropertyGroupPersistor;
-use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Shopware\Core\Framework\Context;
 
 use function count;
@@ -23,18 +23,18 @@ class AttributeSyncProcessor
 
     private CustomFieldPersistor $customFieldManager;
 
-    private ConfigProvider $configProvider;
+    private ConfigService $configService;
 
     public function __construct(
         ErgonodeAttributeProvider $ergonodeAttributeProvider,
         PropertyGroupPersistor $propertyGroupPersistor,
         CustomFieldPersistor $customFieldManager,
-        ConfigProvider $configProvider
+        ConfigService $configService
     ) {
         $this->ergonodeAttributeProvider = $ergonodeAttributeProvider;
         $this->propertyGroupPersistor = $propertyGroupPersistor;
         $this->customFieldManager = $customFieldManager;
-        $this->configProvider = $configProvider;
+        $this->configService = $configService;
     }
 
     public function process(Context $context): SyncCounterDTO
@@ -71,7 +71,7 @@ class AttributeSyncProcessor
     private function persistCustomFields(AttributeStreamResultsProxy $attributes, Context $context): int
     {
         $customFields = $attributes->filterByCodes(
-            $this->configProvider->getErgonodeCustomFieldKeys()
+            $this->configService->getErgonodeCustomFieldKeys()
         );
 
         if ($customFields instanceof AttributeStreamResultsProxy) {

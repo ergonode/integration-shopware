@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
-use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use Ergonode\IntegrationShopware\Resolver\ProductCustomFieldTransformerResolver;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Shopware\Core\Framework\Context;
 
 use function array_filter;
@@ -15,15 +15,15 @@ use function in_array;
 
 class ProductCustomFieldTransformer implements ProductDataTransformerInterface
 {
-    private ConfigProvider $configProvider;
+    private ConfigService $configService;
 
     private ProductCustomFieldTransformerResolver $transformerResolver;
 
     public function __construct(
-        ConfigProvider $configProvider,
+        ConfigService $configService,
         ProductCustomFieldTransformerResolver $transformerResolver
     ) {
-        $this->configProvider = $configProvider;
+        $this->configService = $configService;
         $this->transformerResolver = $transformerResolver;
     }
 
@@ -31,7 +31,7 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
     {
         $swData = $productData->getShopwareData();
 
-        $codes = $this->configProvider->getErgonodeCustomFieldKeys();
+        $codes = $this->configService->getErgonodeCustomFieldKeys();
 
         $attributes = $this->getAttributesByCodes($productData->getErgonodeData(), $codes);
 

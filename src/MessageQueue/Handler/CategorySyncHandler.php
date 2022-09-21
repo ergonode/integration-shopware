@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
+namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 
+use Ergonode\IntegrationShopware\MessageQueue\Message\CategorySync;
 use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\Processor\CategoryProcessorInterface;
-use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Ergonode\IntegrationShopware\Util\SyncPerformanceLogger;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Category\DataAbstractionLayer\CategoryIndexingMessage;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexerRegistry;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
-class CategorySyncTaskHandler extends AbstractSyncTaskHandler
+class CategorySyncHandler extends AbstractSyncHandler
 {
     private const MAX_PAGES_PER_RUN = 10;
 
-    private ConfigProvider $configProvider;
+    private ConfigService $configService;
 
     private iterable $processors;
 
@@ -36,23 +36,30 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
     private CategoryPersistor $categoryPersistor;
 
     /**
+     * @param SyncHistoryLogger $syncHistoryService
+     * @param LoggerInterface $ergonodeSyncLogger
+     * @param LockFactory $lockFactory
+     * @param ConfigService $configService
      * @param CategoryProcessorInterface[] $processors
+     * @param MessageBusInterface $messageBus
+     * @param SyncPerformanceLogger $performanceLogger
+     * @param CategoryOrderHelper $categoryOrderHelper
+     * @param CategoryPersistor $categoryPersistor
      */
     public function __construct(
-        EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryService,
         LoggerInterface $ergonodeSyncLogger,
         LockFactory $lockFactory,
-        ConfigProvider $configProvider,
+        ConfigService $configService,
         iterable $processors,
         MessageBusInterface $messageBus,
         SyncPerformanceLogger $performanceLogger,
         CategoryOrderHelper $categoryOrderHelper,
         CategoryPersistor $categoryPersistor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $ergonodeSyncLogger);
+        parent::__construct($syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
-        $this->configProvider = $configProvider;
+        $this->configService = $configService;
         $this->processors = $processors;
         $this->messageBus = $messageBus;
         $this->performanceLogger = $performanceLogger;
@@ -62,7 +69,7 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
 
     public static function getHandledMessages(): iterable
     {
-        return [CategorySyncTask::class];
+        return [CategorySync::class];
     }
 
     protected function createContext(): Context
@@ -78,7 +85,7 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
         $currentPage = 0;
         $count = 0;
 
-        $categoryTreeCode = $this->configProvider->getCategoryTreeCode();
+        $categoryTreeCode = $this->configService->getCategoryTreeCode();
         if (empty($categoryTreeCode)) {
             $this->logger->error('Could not find category tree code in plugin config.');
 
@@ -123,7 +130,7 @@ class CategorySyncTaskHandler extends AbstractSyncTaskHandler
 
         if (null !== $result && $result->hasNextPage()) {
             $this->logger->info('Dispatching next CategorySyncMessage because still has next page');
-            $this->messageBus->dispatch(new CategorySyncTask());
+            $this->messageBus->dispatch(new CategorySync());
         } else {
             $this->logger->info('Category sync finished. Clearing Category Order Helper saved mappings');
             $this->categoryOrderHelper->clearSaved();

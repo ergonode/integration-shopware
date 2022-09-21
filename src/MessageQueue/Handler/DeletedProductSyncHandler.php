@@ -2,36 +2,35 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
+namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 
+use Ergonode\IntegrationShopware\MessageQueue\Message\DeletedProductSync;
 use Ergonode\IntegrationShopware\Processor\DeletedProductSyncProcessor;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Symfony\Component\Lock\LockFactory;
 use Throwable;
 
-class DeletedProductSyncTaskHandler extends AbstractSyncTaskHandler
+class DeletedProductSyncHandler extends AbstractSyncHandler
 {
     private const MAX_PAGES_PER_RUN = 25;
 
     private DeletedProductSyncProcessor $deletedProductSyncProcessor;
 
     public function __construct(
-        EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryService,
         LockFactory $lockFactory,
         LoggerInterface $ergonodeSyncLogger,
         DeletedProductSyncProcessor $deletedProductSyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $ergonodeSyncLogger);
+        parent::__construct($syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
         $this->deletedProductSyncProcessor = $deletedProductSyncProcessor;
     }
 
     public static function getHandledMessages(): iterable
     {
-        return [DeletedProductSyncTask::class];
+        return [DeletedProductSync::class];
     }
 
     public function runSync(): int

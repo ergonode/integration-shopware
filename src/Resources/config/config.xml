@@ -59,4 +59,38 @@
             <disabled>true</disabled>
         </input-field>
     </card>
+    <card>
+        <title>Scheduler</title>
+        <title lang="de-DE">Scheduler</title>
+        <input-field type="bool">
+            <name>schedulerEnabled</name>
+            <label>Enable scheduler</label>
+            <label lang="de-DE">Enable scheduler</label>
+        </input-field>
+        <input-field type="datetime">
+            <name>schedulerStartDatetime</name>
+            <label>Start date and time</label>
+            <label lang="de-DE">Start date and time</label>
+        </input-field>
+        <input-field type="int">
+            <name>schedulerRecurrenceHour</name>
+            <label>Recurrence hour</label>
+            <label lang="de-DE">Recurrence hour</label>
+            <max>24</max>
+            <min>0</min>
+            <defaultValue>0</defaultValue>
+            <helpText>How often the scheduler should run? Hour interval</helpText>
+            <helpText lang="de-DE">How often the scheduler should run? Hourly interval</helpText>
+        </input-field>
+        <input-field type="int">
+            <name>schedulerRecurrenceMinute</name>
+            <label>Recurrence minute</label>
+            <label lang="de-DE">Recurrence minute</label>
+            <max>59</max>
+            <min>0</min>
+            <defaultValue>0</defaultValue>
+            <helpText>How often the scheduler should run? Minute interval</helpText>
+            <helpText lang="de-DE">How often the scheduler should run? Minute interval</helpText>
+        </input-field>
+    </card>
 </config>

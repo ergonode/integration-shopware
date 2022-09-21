@@ -8,10 +8,10 @@ use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Extension\ProductCrossSelling\ProductCrossSellingExtension;
 use Ergonode\IntegrationShopware\Manager\ExtensionManager;
-use Ergonode\IntegrationShopware\Provider\ConfigProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Provider\ProductCrossSellingProvider;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSelling\ProductCrossSellingDefinition;
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSelling\ProductCrossSellingEntity;
@@ -23,7 +23,7 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 {
     private const SW_PRODUCT_FIELD_CROSS_SELLING = 'crossSellings';
 
-    private ConfigProvider $configProvider;
+    private ConfigService $configService;
 
     private ProductProvider $productProvider;
 
@@ -36,14 +36,14 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
     private LanguageProvider $languageProvider;
 
     public function __construct(
-        ConfigProvider $configProvider,
+        ConfigService $configService,
         ProductProvider $productProvider,
         TranslationTransformer $translationTransformer,
         ProductCrossSellingProvider $productCrossSellingProvider,
         ExtensionManager $extensionManager,
         LanguageProvider $languageProvider
     ) {
-        $this->configProvider = $configProvider;
+        $this->configService = $configService;
         $this->productProvider = $productProvider;
         $this->translationTransformer = $translationTransformer;
         $this->productCrossSellingProvider = $productCrossSellingProvider;
@@ -59,7 +59,7 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 
         $swData = $productData->getShopwareData();
 
-        $codes = $this->configProvider->getErgonodeCrossSellingKeys();
+        $codes = $this->configService->getErgonodeCrossSellingKeys();
 
         $attributes = array_values($this->getAttributesByCodes($productData->getErgonodeData(), $codes));
 
