@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Tests\Unit\Transformer;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Provider;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Transformer\ProductPriceTransformer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 
@@ -28,21 +27,18 @@ class ProductPriceTransformerTest extends TestCase
         $this->productPriceTransformer = new ProductPriceTransformer();
     }
 
-    public function testTransformingNewProduct(): void
+    /**
+     * @dataProvider getProductData
+     */
+    public function testTransformingData(array $data): void
     {
-        $dto = new ProductTransformationDTO([]);
-        $dto->setSwProduct(null);
-
-        $result = $this->productPriceTransformer->transform(
-            $dto,
-            $this->contextMock
-        );
+        $result = $this->productPriceTransformer->transform(new ProductTransformationDTO([], $data), $this->contextMock);
 
         $this->assertEquals([
             'price' => [
                 [
-                    'net' => 0,
-                    'gross' => 0,
+                    'net' => 100,
+                    'gross' => 123,
                     'linked' => false,
                     'currencyId' => Defaults::CURRENCY
                 ]
@@ -50,16 +46,17 @@ class ProductPriceTransformerTest extends TestCase
         ], $result->getShopwareData());
     }
 
-    public function testTransformingUpdatedProduct(): void
+    public function getProductData(): array
     {
-        $dto = new ProductTransformationDTO([]);
-        $dto->setSwProduct($this->createMock(ProductEntity::class));
-
-        $result = $this->productPriceTransformer->transform(
-            $dto,
-            $this->contextMock
-        );
-
-        $this->assertArrayNotHasKey('price', $result->getShopwareData());
+        return [
+            [
+                [
+                    'price' => [
+                        'net' => 100,
+                        'gross' => 123,
+                    ]
+                ]
+            ]
+        ];
     }
 }
