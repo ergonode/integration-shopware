@@ -56,9 +56,6 @@ class CategoryTreePersistor
 
         $payloads = [];
 
-        // Create/update tree root entity
-        $payloads[] = $this->createCategoryLeafPayload($treeCode, $treeCode);
-
         foreach ($leaves as $leaf) {
             $node = $leaf['node'];
             $payloads[] = $this->createCategoryLeafPayload(

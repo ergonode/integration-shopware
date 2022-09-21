@@ -135,7 +135,7 @@ class CategorySyncHandler extends AbstractSyncHandler
             $this->logger->info('Category sync finished. Clearing Category Order Helper saved mappings');
             $this->categoryOrderHelper->clearSaved();
 
-            $lastSync = $this->configProvider->getLastCategorySyncTimestamp();
+            $lastSync = $this->configService->getLastCategorySyncTimestamp();
             $removedCategoryCount = $this->categoryPersistor->removeCategoriesUpdatedAtBeforeTimestamp($lastSync);
 
             $this->logger->info('Removed orphaned Ergonode categories', [
@@ -143,7 +143,7 @@ class CategorySyncHandler extends AbstractSyncHandler
                 'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM)
             ]);
 
-            $formattedTime = $this->configProvider->setLastCategorySyncTimestamp(
+            $formattedTime = $this->configService->setLastCategorySyncTimestamp(
                 (new \DateTime('+1 second'))->getTimestamp()
             );
             $this->logger->info('Saved lastCategorySyncTime', [
