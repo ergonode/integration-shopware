@@ -22,6 +22,7 @@ class Constants
         'media' => ['gallery'],
         'ean' => ['text', 'textarea', 'select'],
         'manufacturerNumber' => ['text', 'textarea', 'select'],
+        'manufacturer' => ['select'],
         'weight' => ['numeric'],
         'height' => ['numeric'],
         'width' => ['numeric'],
