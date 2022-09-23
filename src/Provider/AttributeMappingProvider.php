@@ -11,7 +11,6 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Contracts\Cache\CacheInterface;
-
 use function array_filter;
 use function md5;
 
@@ -69,5 +68,10 @@ class AttributeMappingProvider
         } catch (InvalidArgumentException $e) {
             return [];
         }
+    }
+
+    public function invalidateCache(): void
+    {
+        $this->cache->delete(md5(self::ATTRIBUTE_MAPPING_CACHE_KEY));
     }
 }
