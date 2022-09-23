@@ -17,7 +17,6 @@
     },
     "mappings": {
       "attributeMappingGeneral": "Attribute mapping",
-      "customFieldMappingGeneral": "Custom field mapping",
       "attributeMappings": "Attribute mappings",
       "customFieldMappings": "Custom field mappings",
       "shopwareAttribute": "Shopware attribute",
