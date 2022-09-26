@@ -102,64 +102,8 @@ services:
       - !tagged_iterator { tag: 'ergonode_integration.product_custom_field_transformer' }
 
   # SCHEDULED TASK
-  Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTask:
+  Ergonode\IntegrationShopware\Service\ScheduledTask\FullSyncTask:
     tags: [ 'shopware.scheduled.task' ]
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\ProductVisibilitySyncTask:
-    tags: [ 'shopware.scheduled.task' ]
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTask:
-    tags: [ 'shopware.scheduled.task' ]
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\AttributeSyncTask:
-    tags: [ 'shopware.scheduled.task' ]
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\LanguageSyncTask:
-    tags: [ 'shopware.scheduled.task' ]
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTask:
-    tags: [ 'shopware.scheduled.task' ]
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTask:
-    tags: [ 'shopware.scheduled.task' ]
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTaskHandler:
-    tags: [ 'messenger.message_handler' ]
-    arguments:
-      $lockFactory: '@ergonode_integration.lock_factory'
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\ProductVisibilitySyncTaskHandler:
-    tags: [ 'messenger.message_handler' ]
-    arguments:
-      $lockFactory: '@ergonode_integration.lock_factory'
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTaskHandler:
-    tags: [ 'messenger.message_handler' ]
-    arguments:
-      $lockFactory: '@ergonode_integration.lock_factory'
-      $processors:
-        - '@Ergonode\IntegrationShopware\Processor\CategoryTreeSyncProcessor'
-        - '@Ergonode\IntegrationShopware\Processor\CategorySyncProcessor'
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\AttributeSyncTaskHandler:
-    tags: [ 'messenger.message_handler' ]
-    arguments:
-      $lockFactory: '@ergonode_integration.lock_factory'
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\LanguageSyncTaskHandler:
-    tags: [ 'messenger.message_handler' ]
-    arguments:
-      $lockFactory: '@ergonode_integration.lock_factory'
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTaskHandler:
-    tags: [ 'messenger.message_handler' ]
-    arguments:
-      $lockFactory: '@ergonode_integration.lock_factory'
-
-  Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTaskHandler:
-    tags: [ 'messenger.message_handler' ]
-    arguments:
-      $lockFactory: '@ergonode_integration.lock_factory'
 
   # SERVICE
   Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger:
@@ -215,3 +159,16 @@ services:
   Ergonode\IntegrationShopware\Util\SyncPerformanceLogger:
     arguments:
       $enabled: '%ergonode_integration.use_performance_logger%'
+
+  # HANDLER
+
+  Ergonode\IntegrationShopware\MessageQueue\Handler\:
+    resource: '../../MessageQueue/Handler/'
+    arguments:
+      $lockFactory: '@ergonode_integration.lock_factory'
+
+  Ergonode\IntegrationShopware\MessageQueue\Handler\CategorySyncHandler:
+      arguments:
+        $processors:
+          - '@Ergonode\IntegrationShopware\Processor\CategoryTreeSyncProcessor'
+          - '@Ergonode\IntegrationShopware\Processor\CategorySyncProcessor'

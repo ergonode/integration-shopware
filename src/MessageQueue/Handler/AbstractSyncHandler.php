@@ -2,19 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
+namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
+use Shopware\Core\Framework\MessageQueue\Handler\AbstractMessageHandler;
 use Symfony\Component\Lock\LockFactory;
 use function sprintf;
 
-abstract class AbstractSyncTaskHandler extends ScheduledTaskHandler
+abstract class AbstractSyncHandler extends AbstractMessageHandler
 {
     protected Context $context;
 
@@ -25,20 +24,17 @@ abstract class AbstractSyncTaskHandler extends ScheduledTaskHandler
     protected LoggerInterface $logger;
 
     public function __construct(
-        EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryService,
         LockFactory $lockFactory,
         LoggerInterface $ergonodeSyncLogger
     ) {
-        parent::__construct($scheduledTaskRepository);
-
         $this->context = $this->createContext();
         $this->syncHistoryService = $syncHistoryService;
         $this->lockFactory = $lockFactory;
         $this->logger = $ergonodeSyncLogger;
     }
 
-    public function run(): void
+    public function handle($message): void
     {
         $lock = $this->lockFactory->createLock($this->getLockName());
         if (false === $lock->acquire()) {
@@ -58,7 +54,7 @@ abstract class AbstractSyncTaskHandler extends ScheduledTaskHandler
     {
         $ref = new ReflectionClass($this);
 
-        return str_replace('TaskHandler', '', $ref->getShortName());
+        return str_replace('Handler', '', $ref->getShortName());
     }
 
     protected function getLockName(): string
