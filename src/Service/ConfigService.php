@@ -79,9 +79,11 @@ class ConfigService
         return [];
     }
 
-    public function getCategoryTreeCode(): string
+    public function getCategoryTreeCodes(): array
     {
-        return $this->configService->getString(self::CONFIG_NAMESPACE . 'categoryTreeCode');
+        $treeCodes = $this->configService->getString(self::CONFIG_NAMESPACE . 'categoryTreeCode');
+
+        return explode(',', $treeCodes);
     }
 
     public function isSchedulerEnabled(): bool
