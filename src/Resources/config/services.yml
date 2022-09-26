@@ -112,16 +112,6 @@ services:
       $kernelEnv: '%kernel.environment%'
       $repository: '@ergonode_sync_history.repository'
 
-  ergonode.integration_shopware.service.attribute_mapper:
-    class: Ergonode\IntegrationShopware\Service\AttributeMapper
-    arguments:
-      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
-
-  ergonode.integration_shopware.service.custom_field_mapper:
-    class: Ergonode\IntegrationShopware\Service\AttributeMapper
-    arguments:
-      $attributeMappingProvider: '@ergonode.integration_shopware.provider.custom_field_mapping_provider'
-
   # TRANSFORMER
   Ergonode\IntegrationShopware\Transformer\ProductTransformerChain:
     arguments:
