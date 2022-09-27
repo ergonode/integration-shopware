@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Provider;
+namespace Ergonode\IntegrationShopware\Provider\Mapping;
 
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
