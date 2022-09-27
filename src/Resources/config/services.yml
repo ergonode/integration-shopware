@@ -43,7 +43,7 @@ services:
   Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition:
     tags: [ 'shopware.entity.definition' ]
 
-  Ergonode\IntegrationShopware\Entity\ErgonodeCustomFieldMapping\ErgonodeCustomFieldMappingDefinition:
+  Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeCustomFieldMappingDefinition:
     tags: [ 'shopware.entity.definition' ]
 
   Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionDefinition:
