@@ -123,6 +123,9 @@ services:
   Ergonode\IntegrationShopware\Subscriber\ClearCursorsSubscriber:
     tags: [ 'kernel.event_subscriber' ]
 
+  Ergonode\IntegrationShopware\Subscriber\ErgonodeMappingCacheSubscriber:
+    tags: [ 'kernel.event_subscriber' ]
+
   # UTIL
   Ergonode\IntegrationShopware\Util\SyncPerformanceLogger:
     arguments:
