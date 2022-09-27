@@ -112,9 +112,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
                 $this->logger->info('Persisted category leaves', [
                     'count' => $entityCount
                 ]);
-
-                // TODO remove categories not found in Ergonode tree
-                // TODO handle categories order (afterCategoryId)
             } catch (Throwable $e) {
                 $this->logger->error('Error while persisting category leaves.', [
                     'message' => $e->getMessage(),

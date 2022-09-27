@@ -39,14 +39,21 @@ class LanguageProvider
         return $languageEntity->getLocale()->getCode();
     }
 
-    public function getActiveLanguages(Context $context): LanguageCollection
+    public function getLocaleCodeByContext(Context $context): ?string
     {
-        $criteria = new Criteria();
+        $criteria = new Criteria([$context->getLanguageId()]);
         $criteria->addAssociation('locale');
 
-        /** @var LanguageCollection $result */
-        $result = $this->languageRepository->search($criteria, $context)->getEntities();
+        $language = $this->languageRepository->search($criteria, $context)->first();
 
-        return $result;
+        if ($language instanceof LanguageEntity) {
+            $locale = $language->getLocale();
+
+            if (null !== $locale) {
+                return $locale->getCode();
+            }
+        }
+
+        return null;
     }
 }

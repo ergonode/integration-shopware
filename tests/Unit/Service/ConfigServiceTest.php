@@ -2,24 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Tests\Unit\Provider;
+namespace Ergonode\IntegrationShopware\Tests\Unit\Service;
 
 use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
-use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Generator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
-use Shopware\Core\Framework\Uuid\Uuid;
-use Shopware\Core\System\SystemConfig\SystemConfigCollection;
-use Shopware\Core\System\SystemConfig\SystemConfigEntity;
+use Shopware\Core\System\SalesChannel\SalesChannelCollection;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
-class ConfigProviderTest extends TestCase
+class ConfigServiceTest extends TestCase
 {
-    private ConfigProvider $configProvider;
+    private ConfigService $configService;
 
     /**
      * @var MockObject|SystemConfigService
@@ -29,7 +28,7 @@ class ConfigProviderTest extends TestCase
     /**
      * @var MockObject|EntityRepositoryInterface
      */
-    private $systemConfigRepositoryMock;
+    private $salesChannelRepositoryMock;
 
     /**
      * @var MockObject|Context
@@ -39,13 +38,13 @@ class ConfigProviderTest extends TestCase
     protected function setUp(): void
     {
         $this->systemConfigServiceMock = $this->createMock(SystemConfigService::class);
-        $this->systemConfigRepositoryMock = $this->createMock(EntityRepositoryInterface::class);
+        $this->salesChannelRepositoryMock = $this->createMock(EntityRepositoryInterface::class);
 
         $this->contextMock = $this->createMock(Context::class);
 
-        $this->configProvider = new ConfigProvider(
+        $this->configService = new ConfigService(
             $this->systemConfigServiceMock,
-            $this->systemConfigRepositoryMock
+            $this->salesChannelRepositoryMock
         );
     }
 
@@ -56,14 +55,14 @@ class ConfigProviderTest extends TestCase
     {
         $this->mockSystemConfigServiceReturnsAccessData();
 
-        $this->systemConfigRepositoryMock
+        $this->salesChannelRepositoryMock
             ->expects($this->once())
             ->method('search')
             ->willReturn($this->createConfiguredMock(EntitySearchResult::class, [
-                'getEntities' => new SystemConfigCollection($mockReturn),
+                'getEntities' => new SalesChannelCollection($mockReturn),
             ]));
 
-        $output = $this->configProvider->getSalesChannelErgonodeAccessData($this->contextMock);
+        $output = $this->configService->getSalesChannelErgonodeAccessData($this->contextMock);
 
         $this->assertNotEmpty($output);
 
@@ -87,14 +86,14 @@ class ConfigProviderTest extends TestCase
     {
         $this->mockSystemConfigServiceReturnsAccessData();
 
-        $this->systemConfigRepositoryMock
+        $this->salesChannelRepositoryMock
             ->expects($this->once())
             ->method('search')
             ->willReturn($this->createConfiguredMock(EntitySearchResult::class, [
-                'getEntities' => new SystemConfigCollection([]),
+                'getEntities' => new SalesChannelCollection([]),
             ]));
 
-        $output = $this->configProvider->getSalesChannelErgonodeAccessData($this->contextMock);
+        $output = $this->configService->getSalesChannelErgonodeAccessData($this->contextMock);
 
         $this->assertSame([], $output);
     }
@@ -103,7 +102,7 @@ class ConfigProviderTest extends TestCase
     {
         $this->mockSystemConfigServiceReturnsAccessData();
 
-        $output = $this->configProvider->getErgonodeAccessData();
+        $output = $this->configService->getErgonodeAccessData();
 
         $this->assertInstanceOf(ErgonodeAccessData::class, $output);
         $this->assertEquals('some_api_endpoint', $output->getApiEndpoint());
@@ -120,7 +119,7 @@ class ConfigProviderTest extends TestCase
             ->with('ErgonodeIntegrationShopware.config.customFieldKeys')
             ->willReturn($mockReturn);
 
-        $output = $this->configProvider->getErgonodeCustomFieldKeys();
+        $output = $this->configService->getErgonodeCustomFieldKeys();
 
         $this->assertSame($expectedOutput, $output);
     }
@@ -135,28 +134,18 @@ class ConfigProviderTest extends TestCase
     {
         yield [
             [
-                $this->mockSystemConfigEntity('sales_channel_1', 'api_key_1'),
+                $this->createConfiguredMock(SalesChannelEntity::class, [
+                    'getId' => 'some_channel_id',
+                ]),
             ],
             [
                 [
                     'some_api_endpoint',
-                    '',
+                    'some_channel_id',
                     'some_api_key',
                 ],
             ],
         ];
-    }
-
-    /**
-     * @return SystemConfigEntity|MockObject
-     */
-    private function mockSystemConfigEntity(?string $salesChannelId, string $configurationValue): SystemConfigEntity
-    {
-        return $this->createConfiguredMock(SystemConfigEntity::class, [
-            'getUniqueIdentifier' => Uuid::randomHex(),
-            'getSalesChannelId' => $salesChannelId,
-            'getConfigurationValue' => $configurationValue,
-        ]);
     }
 
     private function mockSystemConfigServiceReturnsAccessData(): void

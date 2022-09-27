@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Command;
 
-use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition;
+use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeCustomFieldMappingDefinition;
 use Ergonode\IntegrationShopware\Provider\MappableFieldsProvider;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
@@ -14,9 +14,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class CreateAttributeMappingCommand extends Command
+class CreateCustomFieldMappingCommand extends Command
 {
-    protected static $defaultName = 'ergonode:attributes:create-mapping';
+    protected static $defaultName = 'ergonode:custom-fields:create-mapping';
 
     private Context $context;
 
@@ -53,7 +53,7 @@ class CreateAttributeMappingCommand extends Command
         $ergonodeKey = $input->getArgument('ergonodeKey');
 
         if (empty($shopwareKey)) {
-            $io->error(['No Shopware key provided.', 'Available keys: ' . implode(', ', $this->mappableFieldsProvider->getShopwareAttributes())]);
+            $io->error(['No Shopware key provided.', 'Available keys: ' . implode(', ', $this->mappableFieldsProvider->getShopwareCustomFields($this->context))]);
 
             return self::FAILURE;
         }
@@ -76,8 +76,8 @@ class CreateAttributeMappingCommand extends Command
             return self::FAILURE;
         }
 
-        $io->success('Product attribute mapping created.');
-        $io->success($written->getPrimaryKeys(ErgonodeAttributeMappingDefinition::ENTITY_NAME));
+        $io->success('Product custom field mapping created.');
+        $io->success($written->getPrimaryKeys(ErgonodeCustomFieldMappingDefinition::ENTITY_NAME));
 
         return self::SUCCESS;
     }

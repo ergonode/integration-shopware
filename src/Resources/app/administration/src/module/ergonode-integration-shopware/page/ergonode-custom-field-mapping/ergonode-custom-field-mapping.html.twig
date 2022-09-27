@@ -52,7 +52,7 @@
                                 @delete-item-finish="fetchMappings()"
                             >
                                 <template #column-shopwareKey="{ item }">
-                                   {{ attributeTranslation(item.shopwareKey) }} ({{ attributeType('shopware', item.shopwareKey) }})
+                                    {{ item.shopwareKey }} - {{ attributeTranslation(item.shopwareKey) }} ({{ attributeType('shopware', item.shopwareKey) }})
                                 </template>
                                 <template #column-ergonodeKey="{ item }">
                                     {{ item.ergonodeKey }} ({{ attributeType('ergonode', item.ergonodeKey) }})

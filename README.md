@@ -32,8 +32,6 @@ Ergonode attributes of type `select` and `multiselect` will be added as properti
 (see below). Attributes of other type can be added as custom fields by selecting them in plugin's config page under
 "Ergonode attributes as custom fields".
 
-Stock, tax and price are not synchronized. They have a default value set during the sync.
-
 Deleted products are also deleted in Shopware using productDeletedStream.
 
 ### Attribute sync

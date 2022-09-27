@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Persistor;
 
-use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
 use Ergonode\IntegrationShopware\Provider\CustomFieldProvider;
 use Ergonode\IntegrationShopware\Transformer\CustomFieldTransformer;
@@ -64,9 +63,22 @@ class CustomFieldPersistor
         return $written->getPrimaryKeys(CustomFieldDefinition::ENTITY_NAME);
     }
 
+    public function removeByCodes(array $codes, Context $context): array
+    {
+        $ids = $this->customFieldProvider->getIdsByCodes($codes, $context);
+
+        if (empty($ids)) {
+            return [];
+        }
+
+        $deleted = $this->customFieldRepository->delete(array_map(static fn($id) => ['id' => $id], $ids), $context);
+
+        return $deleted->getPrimaryKeys(CustomFieldDefinition::ENTITY_NAME);
+    }
+
     private function persistCustomFieldSet(Context $context): void
     {
-        if (null !== $this->customFieldProvider->getCustomFieldSet($context)) {
+        if (null !== $this->customFieldProvider->getErgonodeCustomFieldSet($context)) {
             return;
         }
 
@@ -85,18 +97,5 @@ class CustomFieldPersistor
                 ],
             ],
         ], $context);
-    }
-
-    public function removeByCodes(array $codes, Context $context): array
-    {
-        $ids = $this->customFieldProvider->getIdsByCodes($codes, $context);
-
-        if (empty($ids)) {
-            return [];
-        }
-
-        $deleted = $this->customFieldRepository->delete(array_map(static fn($id) => ['id' => $id], $ids), $context);
-
-        return $deleted->getPrimaryKeys(CustomFieldDefinition::ENTITY_NAME);
     }
 }

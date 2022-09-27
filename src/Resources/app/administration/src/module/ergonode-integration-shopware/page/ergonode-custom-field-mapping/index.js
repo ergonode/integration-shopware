@@ -52,7 +52,7 @@ Component.register('ergonode-custom-field-mapping', {
 
         shopwareAttributesSelectOptions () {
             return this.shopwareAttributes?.map(attribute => ({
-                label: `${this.$tc(attribute?.translationKey)} ${attribute?.type ? ` (${attribute.type})` : ''}`,
+                label: `${attribute?.code} - ${this.$tc(attribute?.translationKey)} ${attribute?.type ? ` (${attribute.type})` : ''}`,
                 value: attribute?.code,
             }));
         },

@@ -32,7 +32,7 @@ class CustomFieldTransformer
     {
         $code = $node['code'];
 
-        $customField = $this->customFieldProvider->getCustomFieldByName(
+        $customField = $this->customFieldProvider->getErgonodeCustomFieldByName(
             CustomFieldUtil::buildCustomFieldName($code),
             $context
         );

@@ -17,8 +17,6 @@ use Shopware\Core\Content\Property\PropertyGroupEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 
-use function array_merge_recursive;
-
 class PropertyGroupTransformer
 {
     private TranslationTransformer $translationTransformer;
