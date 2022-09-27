@@ -5,25 +5,25 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Api\Client;
 
 use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
-use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Generator;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 
 class ErgonodeGqlClientFactory
 {
-    private ConfigProvider $configProvider;
+    private ConfigService $configService;
 
     private HttpGqlClientFactory $httpClientFactory;
 
     private LoggerInterface $apiLogger;
 
     public function __construct(
-        ConfigProvider $configProvider,
+        ConfigService $configService,
         HttpGqlClientFactory $httpClientFactory,
         LoggerInterface $ergonodeApiLogger
     ) {
-        $this->configProvider = $configProvider;
+        $this->configService = $configService;
         $this->httpClientFactory = $httpClientFactory;
         $this->apiLogger = $ergonodeApiLogger;
     }
@@ -31,13 +31,13 @@ class ErgonodeGqlClientFactory
     public function createFromPluginConfig(): ErgonodeGqlClient
     {
         return $this->create(
-            $this->configProvider->getErgonodeAccessData()
+            $this->configService->getErgonodeAccessData()
         );
     }
 
     public function createForEverySalesChannel(Context $context): Generator
     {
-        $accessDataArray = $this->configProvider->getSalesChannelErgonodeAccessData($context);
+        $accessDataArray = $this->configService->getSalesChannelErgonodeAccessData($context);
 
         foreach ($accessDataArray as $accessData) {
             yield $this->create($accessData);

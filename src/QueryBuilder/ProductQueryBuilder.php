@@ -458,7 +458,7 @@ class ProductQueryBuilder
                         (new Query('label'))
                             ->setSelectionSet([
                                 'language',
-                                'value'
+                                'value',
                             ]),
                     ]),
                 (new InlineFragment('TextareaAttribute'))

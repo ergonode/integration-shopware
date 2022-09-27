@@ -10,6 +10,7 @@ use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttribu
 use Ergonode\IntegrationShopware\Provider\Mapping\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Transformer\ProductTransformer;
+use Ergonode\IntegrationShopware\Util\AttributeTypeValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
@@ -33,43 +34,27 @@ class ProductTransformerTest extends TestCase
      */
     private $contextMock;
 
+    /**
+     * @var AttributeTypeValidator|MockObject
+     */
+    private $attributeTypeValidator;
+
     protected function setUp(): void
     {
         $this->attributeMappingProvider = $this->createMock(AttributeMappingProvider::class);
         $this->contextMock = $this->createMock(Context::class);
+        $this->attributeTypeValidator = $this->createMock(AttributeTypeValidator::class);
         $this->mockAttributeMappingProvider();
+        $this->mockAttributeTypeValidator();
 
         $languageProvider = $this->createMock(LanguageProvider::class);
         $languageProvider->method('getDefaultLanguageLocale')->willReturn('en-GB');
 
         $this->productTransformer = new ProductTransformer(
             $this->attributeMappingProvider,
-            $languageProvider
+            $languageProvider,
+            $this->attributeTypeValidator
         );
-    }
-
-    private function mockAttributeMappingProvider(): void
-    {
-        $returnValueMap = [];
-        foreach (self::MOCK_MAPPING as $swKey => $ergoKey) {
-            $mappingEntity = $this->createMock(ErgonodeAttributeMappingEntity::class);
-            $mappingEntity->method('getShopwareKey')->willReturn($swKey);
-            $mappingEntity->method('getErgonodeKey')->willReturn($ergoKey);
-
-            $mappingCollection = new ErgonodeAttributeMappingCollection([
-                $mappingEntity
-            ]);
-
-            $returnValueMap[] = [
-                $ergoKey,
-                $this->contextMock,
-                $mappingCollection
-            ];
-        }
-
-        $this->attributeMappingProvider
-            ->method('provideByErgonodeKey')
-            ->willReturnMap($returnValueMap);
     }
 
     /**
@@ -86,11 +71,11 @@ class ProductTransformerTest extends TestCase
             'name' => 'Test product EN',
             'translations' => [
                 'pl-PL' => [
-                    'name' => 'Test product PL'
+                    'name' => 'Test product PL',
                 ],
                 'en-GB' => [
-                    'name' => 'Test product EN'
-                ]
+                    'name' => 'Test product EN',
+                ],
             ],
             'stock' => 999,
         ], $result->getShopwareData());
@@ -160,8 +145,39 @@ class ProductTransformerTest extends TestCase
                             ],
                         ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
+    }
+
+    private function mockAttributeMappingProvider(): void
+    {
+        $returnValueMap = [];
+        foreach (self::MOCK_MAPPING as $swKey => $ergoKey) {
+            $mappingEntity = $this->createMock(ErgonodeAttributeMappingEntity::class);
+            $mappingEntity->method('getShopwareKey')->willReturn($swKey);
+            $mappingEntity->method('getErgonodeKey')->willReturn($ergoKey);
+
+            $mappingCollection = new ErgonodeAttributeMappingCollection([
+                $mappingEntity,
+            ]);
+
+            $returnValueMap[] = [
+                $ergoKey,
+                $this->contextMock,
+                $mappingCollection,
+            ];
+        }
+
+        $this->attributeMappingProvider
+            ->method('provideByErgonodeKey')
+            ->willReturnMap($returnValueMap);
+    }
+
+    private function mockAttributeTypeValidator(): void
+    {
+        $this->attributeTypeValidator
+            ->expects($this->exactly(count(self::MOCK_MAPPING)))
+            ->method('filterWrongAttributes');
     }
 }

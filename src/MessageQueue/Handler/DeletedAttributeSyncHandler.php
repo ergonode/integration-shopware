@@ -2,34 +2,33 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
+namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 
+use Ergonode\IntegrationShopware\MessageQueue\Message\DeletedAttributeSync;
 use Ergonode\IntegrationShopware\Processor\DeletedAttributesSyncProcessor;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Symfony\Component\Lock\LockFactory;
 use Throwable;
 
-class DeletedAttributeSyncTaskHandler extends AbstractSyncTaskHandler
+class DeletedAttributeSyncHandler extends AbstractSyncHandler
 {
     private DeletedAttributesSyncProcessor $deletedAttributesSyncProcessor;
 
     public function __construct(
-        EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryLogger,
         LockFactory $lockFactory,
         LoggerInterface $ergonodeSyncLogger,
         DeletedAttributesSyncProcessor $deletedAttributesSyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryLogger, $lockFactory, $ergonodeSyncLogger);
+        parent::__construct($syncHistoryLogger, $lockFactory, $ergonodeSyncLogger);
 
         $this->deletedAttributesSyncProcessor = $deletedAttributesSyncProcessor;
     }
 
     public static function getHandledMessages(): iterable
     {
-        return [DeletedAttributeSyncTask::class];
+        return [DeletedAttributeSync::class];
     }
 
     public function runSync(): int
