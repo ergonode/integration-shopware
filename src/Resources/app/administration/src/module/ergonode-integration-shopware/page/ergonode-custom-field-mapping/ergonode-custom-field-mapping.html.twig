@@ -1,4 +1,4 @@
-{% block ergonode_attribute_mapping_page %}
+{% block ergonode_custom_field_mapping_page %}
     <sw-page class="ergonode__custom-field-mapping-page">
         <template slot="content">
             <sw-card-view>
@@ -52,7 +52,7 @@
                                 @delete-item-finish="fetchMappings()"
                             >
                                 <template #column-shopwareKey="{ item }">
-                                   {{ translation(item.shopwareKey) }} ({{ type('shopwareCustomFields', item.shopwareKey) }})
+                                    {{ translation(item.shopwareKey) }} ({{ type('shopwareCustomFields', item.shopwareKey) }})
                                 </template>
                                 <template #column-ergonodeKey="{ item }">
                                     {{ item.ergonodeKey }} ({{ type('ergonodeAttributes', item.ergonodeKey) }})
