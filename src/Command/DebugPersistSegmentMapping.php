@@ -47,7 +47,7 @@ class DebugPersistSegmentMapping extends Command
 
         $count = $this->productVisibilitySyncProcessor->processStream($this->context);
 
-        if (0 === $count) {
+        if (0 === $count->getProcessedEntityCount()) {
             $io->info('No actions performed.');
 
             return self::SUCCESS;

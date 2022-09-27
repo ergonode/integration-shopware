@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Subscriber;
 
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
-use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SystemConfig\Event\BeforeSystemConfigChangedEvent;
@@ -15,12 +15,12 @@ class ClearCursorsSubscriber implements EventSubscriberInterface
 {
     private ErgonodeCursorManager $cursorManager;
 
-    private ConfigProvider $configProvider;
+    private ConfigService $configService;
 
-    public function __construct(ErgonodeCursorManager $cursorManager, ConfigProvider $configProvider)
+    public function __construct(ErgonodeCursorManager $cursorManager, ConfigService $configService)
     {
         $this->cursorManager = $cursorManager;
-        $this->configProvider = $configProvider;
+        $this->configService = $configService;
     }
 
     public static function getSubscribedEvents(): array
@@ -33,8 +33,8 @@ class ClearCursorsSubscriber implements EventSubscriberInterface
     public function onBeforeSystemConfigChanged(BeforeSystemConfigChangedEvent $event): void
     {
         if (
-            ConfigProvider::API_ENDPOINT_CONFIG !== $event->getKey() ||
-            $this->configProvider->getErgonodeApiEndpoint() === $event->getValue()
+            configService::API_ENDPOINT_CONFIG !== $event->getKey() ||
+            $this->configService->getErgonodeApiEndpoint() === $event->getValue()
         ) {
             return;
         }

@@ -19,7 +19,7 @@ class PriceCustomFieldTransformer implements CustomFieldTransformerInterface
         return [
             'type' => CustomFieldTypes::PRICE,
             'config' => [
-                'customFieldType' => 'price',
+                'customFieldType' => CustomFieldTypes::PRICE,
             ],
         ];
     }

@@ -6,15 +6,15 @@ namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTask;
 
-class ProductVisibilitySyncTask extends ScheduledTask
+class FullSyncTask extends ScheduledTask
 {
     public static function getTaskName(): string
     {
-        return 'ergonode.product_visibility_sync_task';
+        return 'ergonode.full_sync_task';
     }
 
     public static function getDefaultInterval(): int
     {
-        return 1800; // 30m
+        return 60; // 1m
     }
 }

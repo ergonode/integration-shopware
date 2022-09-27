@@ -2,34 +2,33 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
+namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 
+use Ergonode\IntegrationShopware\MessageQueue\Message\ProductVisibilitySync;
 use Ergonode\IntegrationShopware\Processor\ProductVisibilitySyncProcessor;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Symfony\Component\Lock\LockFactory;
 use Throwable;
 
-class ProductVisibilitySyncTaskHandler extends AbstractSyncTaskHandler
+class ProductVisibilitySyncHandler extends AbstractSyncHandler
 {
     private ProductVisibilitySyncProcessor $productVisibilitySyncProcessor;
 
     public function __construct(
-        EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryService,
         LoggerInterface $ergonodeSyncLogger,
         LockFactory $lockFactory,
         ProductVisibilitySyncProcessor $productVisibilitySyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryService, $lockFactory, $ergonodeSyncLogger);
+        parent::__construct($syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
         $this->productVisibilitySyncProcessor = $productVisibilitySyncProcessor;
     }
 
     public static function getHandledMessages(): iterable
     {
-        return [ProductVisibilitySyncTask::class];
+        return [ProductVisibilitySync::class];
     }
 
     public function runSync(): int

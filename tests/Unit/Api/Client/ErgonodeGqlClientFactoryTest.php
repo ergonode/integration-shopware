@@ -8,7 +8,7 @@ use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClient;
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory;
 use Ergonode\IntegrationShopware\Api\Client\HttpGqlClientFactory;
 use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
-use Ergonode\IntegrationShopware\Provider\ConfigProvider;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -17,9 +17,9 @@ use Psr\Log\Test\TestLogger;
 class ErgonodeGqlClientFactoryTest extends TestCase
 {
     /**
-     * @var MockObject|ConfigProvider
+     * @var MockObject|ConfigService
      */
-    private $configProviderMock;
+    private $configServiceMock;
 
     /**
      * @var MockObject|HttpGqlClientFactory
@@ -38,12 +38,12 @@ class ErgonodeGqlClientFactoryTest extends TestCase
     protected function setUp(): void
     {
         $this->accessDataMock = $this->createMock(ErgonodeAccessData::class);
-        $this->configProviderMock = $this->getConfigProviderMock();
+        $this->configServiceMock = $this->getConfigServiceMock();
         $this->httpGqlClientFactoryMock = $this->createMock(HttpGqlClientFactory::class);
         $this->testLogger = new TestLogger();
 
         $this->gqlClientFactory = new ErgonodeGqlClientFactory(
-            $this->configProviderMock,
+            $this->configServiceMock,
             $this->httpGqlClientFactoryMock,
             $this->testLogger
         );
@@ -74,11 +74,11 @@ class ErgonodeGqlClientFactoryTest extends TestCase
     }
 
     /**
-     * @return MockObject|ConfigProvider
+     * @return MockObject|ConfigService
      */
-    private function getConfigProviderMock(): MockObject
+    private function getConfigServiceMock(): MockObject
     {
-        return $this->createConfiguredMock(ConfigProvider::class, [
+        return $this->createConfiguredMock(ConfigService::class, [
             'getErgonodeAccessData' => $this->accessDataMock,
         ]);
     }

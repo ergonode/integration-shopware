@@ -7,7 +7,7 @@ namespace Ergonode\IntegrationShopware\Command;
 use Ergonode\IntegrationShopware\Api\CategoryStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\CategoryTreeStreamResultsProxy;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
-use Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTaskHandler;
+use Ergonode\IntegrationShopware\MessageQueue\Handler\CategorySyncHandler;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\Console\Command\Command;
@@ -23,12 +23,12 @@ class DebugPersistCategories extends Command
 {
     protected static $defaultName = 'ergonode:debug:category-persist';
 
-    private CategorySyncTaskHandler $handler;
+    private CategorySyncHandler $handler;
 
     private ErgonodeCursorManager $cursorManager;
 
     public function __construct(
-        CategorySyncTaskHandler $handler,
+        CategorySyncHandler $handler,
         ErgonodeCursorManager $cursorManager
     ) {
         parent::__construct();

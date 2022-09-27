@@ -6,7 +6,6 @@ namespace Ergonode\IntegrationShopware\Transformer\ProductCustomField;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
-use Ergonode\IntegrationShopware\Util\CustomFieldUtil;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -33,10 +32,8 @@ class PriceProductCustomFieldTransformer implements ProductCustomFieldTransforme
         return AttributeTypesEnum::PRICE === AttributeTypesEnum::getNodeType($node['attribute']);
     }
 
-    public function transformNode(array $node, Context $context): array
+    public function transformNode(array $node, string $customFieldName, Context $context): array
     {
-        $code = $node['attribute']['code'];
-
         $translated = $this->translationTransformer->transform(
             $node['valueTranslations']
         );
@@ -46,7 +43,7 @@ class PriceProductCustomFieldTransformer implements ProductCustomFieldTransforme
         foreach ($translated as &$value) {
             $value = [
                 'customFields' => [
-                    CustomFieldUtil::buildCustomFieldName($code) => [
+                    $customFieldName => [
                         [
                             'net' => $value,
                             'gross' => $value,
@@ -74,7 +71,7 @@ class PriceProductCustomFieldTransformer implements ProductCustomFieldTransforme
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('isoCode', $code));
 
-        /** @var CurrencyEntity|null $currency **/
+        /** @var CurrencyEntity|null $currency * */
         $currency = $this->currencyRepository->search($criteria, $context)->first();
 
         if (null !== $currency) {

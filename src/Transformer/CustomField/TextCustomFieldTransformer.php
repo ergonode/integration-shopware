@@ -21,7 +21,7 @@ class TextCustomFieldTransformer implements CustomFieldTransformerInterface
             'config' => [
                 'type' => 'text',
                 'componentName' => 'sw-field',
-                'customFieldType' => 'text',
+                'customFieldType' => CustomFieldTypes::TEXT,
             ],
         ];
     }

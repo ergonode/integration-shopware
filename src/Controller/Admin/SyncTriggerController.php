@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Controller\Admin;
 
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
-use Ergonode\IntegrationShopware\Service\ScheduledTask\AttributeSyncTask;
-use Ergonode\IntegrationShopware\Service\ScheduledTask\CategorySyncTask;
-use Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedAttributeSyncTask;
-use Ergonode\IntegrationShopware\Service\ScheduledTask\DeletedProductSyncTask;
-use Ergonode\IntegrationShopware\Service\ScheduledTask\LanguageSyncTask;
-use Ergonode\IntegrationShopware\Service\ScheduledTask\ProductSyncTask;
-use Ergonode\IntegrationShopware\Service\ScheduledTask\ProductVisibilitySyncTask;
+use Ergonode\IntegrationShopware\MessageQueue\Message\AttributeSync;
+use Ergonode\IntegrationShopware\MessageQueue\Message\CategorySync;
+use Ergonode\IntegrationShopware\MessageQueue\Message\DeletedAttributeSync;
+use Ergonode\IntegrationShopware\MessageQueue\Message\DeletedProductSync;
+use Ergonode\IntegrationShopware\MessageQueue\Message\LanguageSync;
+use Ergonode\IntegrationShopware\MessageQueue\Message\ProductSync;
+use Ergonode\IntegrationShopware\MessageQueue\Message\ProductVisibilitySync;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -55,13 +55,13 @@ class SyncTriggerController extends AbstractController
             $this->cursorManager->deleteCursors([], $context);
         }
 
-        $this->messageBus->dispatch(new LanguageSyncTask());
-        $this->messageBus->dispatch(new AttributeSyncTask());
-        $this->messageBus->dispatch(new CategorySyncTask());
-        $this->messageBus->dispatch(new ProductSyncTask());
-        $this->messageBus->dispatch(new ProductVisibilitySyncTask());
-        $this->messageBus->dispatch(new DeletedProductSyncTask());
-        $this->messageBus->dispatch(new DeletedAttributeSyncTask());
+        $this->messageBus->dispatch(new LanguageSync());
+        $this->messageBus->dispatch(new AttributeSync());
+        $this->messageBus->dispatch(new CategorySync());
+        $this->messageBus->dispatch(new ProductSync());
+        $this->messageBus->dispatch(new ProductVisibilitySync());
+        $this->messageBus->dispatch(new DeletedProductSync());
+        $this->messageBus->dispatch(new DeletedAttributeSync());
 
         return new JsonResponse([
             'success' => true,

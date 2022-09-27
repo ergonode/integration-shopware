@@ -2,34 +2,33 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
+namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 
+use Ergonode\IntegrationShopware\MessageQueue\Message\AttributeSync;
 use Ergonode\IntegrationShopware\Processor\AttributeSyncProcessor;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Symfony\Component\Lock\LockFactory;
 use Throwable;
 
-class AttributeSyncTaskHandler extends AbstractSyncTaskHandler
+class AttributeSyncHandler extends AbstractSyncHandler
 {
     private AttributeSyncProcessor $attributeSyncProcessor;
 
     public function __construct(
-        EntityRepositoryInterface $scheduledTaskRepository,
         SyncHistoryLogger $syncHistoryLogger,
         LockFactory $lockFactory,
         LoggerInterface $ergonodeSyncLogger,
         AttributeSyncProcessor $attributeSyncProcessor
     ) {
-        parent::__construct($scheduledTaskRepository, $syncHistoryLogger, $lockFactory, $ergonodeSyncLogger);
+        parent::__construct($syncHistoryLogger, $lockFactory, $ergonodeSyncLogger);
 
         $this->attributeSyncProcessor = $attributeSyncProcessor;
     }
 
     public static function getHandledMessages(): iterable
     {
-        return [AttributeSyncTask::class];
+        return [AttributeSync::class];
     }
 
     public function runSync(): int

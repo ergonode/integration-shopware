@@ -10,5 +10,5 @@ interface ProductCustomFieldTransformerInterface
 {
     public function supports(array $node): bool;
 
-    public function transformNode(array $node, Context $context): array;
+    public function transformNode(array $node, string $customFieldName, Context $context): array;
 }
