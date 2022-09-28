@@ -1,17 +1,17 @@
-{% block ergonode_attribute_mapping_page %}
+{% block ergonode_custom_field_mapping_page %}
     <sw-page class="ergonode__custom-field-mapping-page">
         <template slot="content">
             <sw-card-view>
                 <ergonode-tabs></ergonode-tabs>
                 <sw-skeleton v-if="isLoading"></sw-skeleton>
                 <template v-else>
-                    <sw-card v-if="acl.can('ergonode_attribute_mapping.creator')"
+                    <sw-card v-if="acl.can('ergonode_custom_field_mapping.creator')"
                         :title="$t('ErgonodeIntegrationShopware.mappings.addMapping')"
                     >
                         <sw-single-select
                             :label="$t('ErgonodeIntegrationShopware.mappings.shopwareCustomField')"
-                            :options="shopwareAttributesSelectOptions"
-                            v-model="createShopwareAttribute"
+                            :options="shopwareCustomFieldsSelectOptions"
+                            v-model="createShopwareCustomField"
                         >
                         </sw-single-select>
                         <sw-single-select
@@ -34,9 +34,9 @@
                             {{ $t('ErgonodeIntegrationShopware.mappings.messages.mappingAlreadyExists') }}
                         </sw-label>
                     </sw-card>
-                    <sw-card v-if="acl.can('ergonode_attribute_mapping.viewer')"
+                    <sw-card v-if="acl.can('ergonode_custom_field_mapping.viewer')"
                         class="ergonode__custom-field-mapping-grid-card"
-                        :title="$t('ErgonodeIntegrationShopware.mappings.attributeMappings')"
+                        :title="$t('ErgonodeIntegrationShopware.mappings.customFieldMappings')"
                     >
                         <template #default>
                             <sw-entity-listing
@@ -45,17 +45,17 @@
                                 :items="mappings"
                                 :repository="repository"
                                 :fullPage="false"
-                                :allow-delete="acl.can('ergonode_attribute_mapping.deleter')"
+                                :allow-delete="acl.can('ergonode_custom_field_mapping.deleter')"
                                 :allow-edit="false"
                                 :allow-inline-edit="false"
                                 :is-loading="isMappingLoading"
                                 @delete-item-finish="fetchMappings()"
                             >
                                 <template #column-shopwareKey="{ item }">
-                                    {{ item.shopwareKey }} - {{ attributeTranslation(item.shopwareKey) }} ({{ attributeType('shopware', item.shopwareKey) }})
+                                    {{ translation(item.shopwareKey) }} ({{ type('shopwareCustomFields', item.shopwareKey) }})
                                 </template>
                                 <template #column-ergonodeKey="{ item }">
-                                    {{ item.ergonodeKey }} ({{ attributeType('ergonode', item.ergonodeKey) }})
+                                    {{ item.ergonodeKey }} ({{ type('ergonodeAttributes', item.ergonodeKey) }})
                                 </template>
                             </sw-entity-listing>
                         </template>

@@ -151,7 +151,6 @@ services:
       $enabled: '%ergonode_integration.use_performance_logger%'
 
   # HANDLER
-
   Ergonode\IntegrationShopware\MessageQueue\Handler\:
     resource: '../../MessageQueue/Handler/'
     arguments:

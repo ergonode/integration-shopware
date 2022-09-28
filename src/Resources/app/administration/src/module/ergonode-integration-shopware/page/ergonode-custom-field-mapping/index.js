@@ -17,9 +17,9 @@ Component.register('ergonode-custom-field-mapping', {
             isLoading: false,
             isMappingLoading: false,
             isCreateLoading: false,
-            createShopwareAttribute: null,
+            createShopwareCustomField: null,
             createErgonodeAttribute: null,
-            shopwareAttributes: [],
+            shopwareCustomFields: [],
             ergonodeAttributes: [],
             mappings: [],
         };
@@ -50,10 +50,10 @@ Component.register('ergonode-custom-field-mapping', {
                 .addSorting(Criteria.sort('createdAt', 'DESC'));
         },
 
-        shopwareAttributesSelectOptions () {
-            return this.shopwareAttributes?.map(attribute => ({
-                label: `${attribute?.code} - ${this.$tc(attribute?.translationKey)} ${attribute?.type ? ` (${attribute.type})` : ''}`,
-                value: attribute?.code,
+        shopwareCustomFieldsSelectOptions () {
+            return this.shopwareCustomFields?.map(field => ({
+                label: `${field?.label}${field?.type ? ` (${field.type})` : ''}`,
+                value: field?.code,
             }));
         },
 
@@ -65,42 +65,36 @@ Component.register('ergonode-custom-field-mapping', {
         },
 
         buttonDisabled () {
-            return !(this.createShopwareAttribute && this.createErgonodeAttribute) || this.mappingAlreadyExists;
+            return !(this.createShopwareCustomField && this.createErgonodeAttribute) || this.mappingAlreadyExists;
         },
 
         mappingAlreadyExists () {
             return this.mappings.some(mapping =>
-                mapping.shopwareKey.toLowerCase() === this.createShopwareAttribute?.toLowerCase() &&
+                mapping.shopwareKey.toLowerCase() === this.createShopwareCustomField?.toLowerCase() &&
                 mapping.ergonodeKey.toLowerCase() === this.createErgonodeAttribute?.toLowerCase()
             );
         },
 
-        mappingAttributeOccupied () {
-            return this.createShopwareAttribute &&
+        mappingCustomFieldOccupied () {
+            return this.createShopwareCustomField &&
                 this.mappings.some(mapping =>
-                    mapping.shopwareKey.toLowerCase() === this.createShopwareAttribute?.toLowerCase()
+                    mapping.shopwareKey.toLowerCase() === this.createShopwareCustomField?.toLowerCase()
                 );
         },
     },
 
     methods: {
-        attributeType (attributeSet = 'shopware', attributeName) {
-            return this[`${attributeSet}Attributes`]?.find(attribute =>
-                attribute?.code?.toLowerCase() === attributeName?.toLowerCase())?.type || '?';
+        type (set = 'shopwareCustomFields', fieldName) {
+            return this[set]?.find(field =>
+                field?.code?.toLowerCase() === fieldName?.toLowerCase())?.type || '?';
         },
-    
-        attributeTranslation (shopwareKey) {
-            const foundAttributes = this.shopwareAttributes.filter(attribute => attribute?.code === shopwareKey);
-            
-            if (!foundAttributes?.length) {
-                return shopwareKey;
-            }
-            
-            return this.$t(foundAttributes[0].translationKey);
+
+        translation (shopwareKey) {
+            return this.shopwareCustomFields.find(field => field?.code === shopwareKey)?.label || shopwareKey;
         },
-        
+
         clearForm () {
-            this.createShopwareAttribute = null;
+            this.createShopwareCustomField = null;
             this.createErgonodeAttribute = null;
         },
 
@@ -113,12 +107,12 @@ Component.register('ergonode-custom-field-mapping', {
         async addMapping () {
             this.isCreateLoading = true;
             try {
-                if (this.mappingAttributeOccupied) {
+                if (this.mappingCustomFieldOccupied) {
                     throw new Error(this.$t('ErgonodeIntegrationShopware.mappings.messages.shopwareAttributesMustBeUnique'));
                 }
                 let createdMapping = this.repository.create(Context.Api);
+                createdMapping.shopwareKey = this.createShopwareCustomField;
                 createdMapping.ergonodeKey = this.createErgonodeAttribute;
-                createdMapping.shopwareKey = this.createShopwareAttribute;
                 await this.repository.save(createdMapping, Context.Api);
 
                 this.clearForm();
@@ -144,7 +138,7 @@ Component.register('ergonode-custom-field-mapping', {
 
         try {
             this.ergonodeAttributeService.getShopwareCustomFields().then(result => {
-                this.shopwareAttributes = result.data.data;
+                this.shopwareCustomFields = result.data.data;
             });
 
             this.ergonodeAttributeService.getErgonodeAttributes().then(result => {
