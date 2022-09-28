@@ -65,6 +65,18 @@ services:
   Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension:
     tags: [ 'shopware.entity.extension' ]
 
+  # HANDLER
+  Ergonode\IntegrationShopware\MessageQueue\Handler\:
+    resource: '../../MessageQueue/Handler/'
+    arguments:
+      $lockFactory: '@ergonode_integration.lock_factory'
+
+  Ergonode\IntegrationShopware\MessageQueue\Handler\CategorySyncHandler:
+    arguments:
+      $processors:
+        - '@Ergonode\IntegrationShopware\Processor\CategoryTreeSyncProcessor'
+        - '@Ergonode\IntegrationShopware\Processor\CategorySyncProcessor'
+
   # LOCK
   ergonode_integration.flock_store:
     class: Symfony\Component\Lock\Store\FlockStore
@@ -112,6 +124,22 @@ services:
       $kernelEnv: '%kernel.environment%'
       $repository: '@ergonode_sync_history.repository'
 
+  # SUBSCRIBER
+  Ergonode\IntegrationShopware\Subscriber\DeleteExtensionSubscriber:
+    tags: [ 'kernel.event_subscriber' ]
+
+  Ergonode\IntegrationShopware\Subscriber\DeleteCategoryExtensionSubscriber:
+    tags: [ 'kernel.event_subscriber' ]
+
+  Ergonode\IntegrationShopware\Subscriber\ClearCursorsSubscriber:
+    tags: [ 'kernel.event_subscriber' ]
+
+  Ergonode\IntegrationShopware\Subscriber\ErgonodeMappingCacheSubscriber:
+    tags: [ 'kernel.event_subscriber' ]
+    arguments:
+      $attributeMappingProvider: 'ergonode.integration_shopware.provider.attribute_mapping_provider'
+      $customFieldMappingProvider: 'ergonode.integration_shopware.provider.custom_field_mapping_provider'
+
   # TRANSFORMER
   Ergonode\IntegrationShopware\Transformer\ProductTransformerChain:
     arguments:
@@ -140,33 +168,7 @@ services:
     arguments:
       $customFieldMappingProvider: '@ergonode.integration_shopware.provider.custom_field_mapping_provider'
 
-  # SUBSCRIBER
-  Ergonode\IntegrationShopware\Subscriber\DeleteExtensionSubscriber:
-    tags: [ 'kernel.event_subscriber' ]
-
-  Ergonode\IntegrationShopware\Subscriber\DeleteCategoryExtensionSubscriber:
-    tags: [ 'kernel.event_subscriber' ]
-
-  Ergonode\IntegrationShopware\Subscriber\ClearCursorsSubscriber:
-    tags: [ 'kernel.event_subscriber' ]
-
-  Ergonode\IntegrationShopware\Subscriber\ErgonodeMappingCacheSubscriber:
-    tags: [ 'kernel.event_subscriber' ]
-
   # UTIL
   Ergonode\IntegrationShopware\Util\SyncPerformanceLogger:
     arguments:
       $enabled: '%ergonode_integration.use_performance_logger%'
-
-  # HANDLER
-  Ergonode\IntegrationShopware\MessageQueue\Handler\:
-    resource: '../../MessageQueue/Handler/'
-    arguments:
-      $lockFactory: '@ergonode_integration.lock_factory'
-
-  Ergonode\IntegrationShopware\MessageQueue\Handler\CategorySyncHandler:
-      arguments:
-        $processors:
-          - '@Ergonode\IntegrationShopware\Processor\CategoryTreeSyncProcessor'
-          - '@Ergonode\IntegrationShopware\Processor\CategorySyncProcessor'
-
