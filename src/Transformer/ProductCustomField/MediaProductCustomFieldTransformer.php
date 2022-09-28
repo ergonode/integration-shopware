@@ -7,7 +7,6 @@ namespace Ergonode\IntegrationShopware\Transformer\ProductCustomField;
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Manager\FileManager;
 use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
-use Ergonode\IntegrationShopware\Util\CustomFieldUtil;
 use Shopware\Core\Framework\Context;
 
 use function in_array;
@@ -37,10 +36,8 @@ class MediaProductCustomFieldTransformer implements ProductCustomFieldTransforme
         ]);
     }
 
-    public function transformNode(array $node, Context $context): array
+    public function transformNode(array $node, string $customFieldName, Context $context): array
     {
-        $code = $node['attribute']['code'];
-
         $translated = $this->translationTransformer->transform(
             $node['valueTranslations']
         );
@@ -55,7 +52,7 @@ class MediaProductCustomFieldTransformer implements ProductCustomFieldTransforme
 
             $value = [
                 'customFields' => [
-                    CustomFieldUtil::buildCustomFieldName($code) => $mediaId,
+                    $customFieldName => $mediaId,
                 ],
             ];
         }

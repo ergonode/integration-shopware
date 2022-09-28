@@ -11,6 +11,12 @@ export default class ErgonodeAttributeService extends ApiService {
         });
     }
 
+    async getShopwareCustomFields () {
+        return await this.client.get('ergonode/shopware-custom-fields', {
+            headers: this.getBasicHeaders(),
+        });
+    }
+
     async getErgonodeAttributes (types = []) {
         return await this.client.get('ergonode/ergonode-attributes', {
             headers: this.getBasicHeaders(),

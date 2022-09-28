@@ -1,9 +1,9 @@
-import template from './ergonode-attribute-mapping.html.twig';
-import './ergonode-attribute-mapping.scss';
+import template from './ergonode-custom-field-mapping.html.twig';
+import './ergonode-custom-field-mapping.scss';
 
 const { Component, Context, Data: { Criteria }, Mixin } = Shopware;
 
-Component.register('ergonode-attribute-mapping', {
+Component.register('ergonode-custom-field-mapping', {
     inject: ['acl', 'repositoryFactory', 'ergonodeAttributeService'],
 
     mixins: [
@@ -17,9 +17,9 @@ Component.register('ergonode-attribute-mapping', {
             isLoading: false,
             isMappingLoading: false,
             isCreateLoading: false,
-            createShopwareAttribute: null,
+            createShopwareCustomField: null,
             createErgonodeAttribute: null,
-            shopwareAttributes: [],
+            shopwareCustomFields: [],
             ergonodeAttributes: [],
             mappings: [],
         };
@@ -27,7 +27,7 @@ Component.register('ergonode-attribute-mapping', {
 
     computed: {
         repository () {
-            return this.repositoryFactory.create('ergonode_attribute_mapping');
+            return this.repositoryFactory.create('ergonode_custom_field_mapping');
         },
 
         columns () {
@@ -50,10 +50,10 @@ Component.register('ergonode-attribute-mapping', {
                 .addSorting(Criteria.sort('createdAt', 'DESC'));
         },
 
-        shopwareAttributesSelectOptions () {
-            return this.shopwareAttributes?.map(attribute => ({
-                label: `${this.$tc(attribute?.translationKey)}${attribute?.type ? ` (${attribute.type})` : ''}`,
-                value: attribute?.code,
+        shopwareCustomFieldsSelectOptions () {
+            return this.shopwareCustomFields?.map(field => ({
+                label: `${field?.label}${field?.type ? ` (${field.type})` : ''}`,
+                value: field?.code,
             }));
         },
 
@@ -65,42 +65,36 @@ Component.register('ergonode-attribute-mapping', {
         },
 
         buttonDisabled () {
-            return !(this.createShopwareAttribute && this.createErgonodeAttribute) || this.mappingAlreadyExists;
+            return !(this.createShopwareCustomField && this.createErgonodeAttribute) || this.mappingAlreadyExists;
         },
 
         mappingAlreadyExists () {
             return this.mappings.some(mapping =>
-                mapping.shopwareKey.toLowerCase() === this.createShopwareAttribute?.toLowerCase() &&
+                mapping.shopwareKey.toLowerCase() === this.createShopwareCustomField?.toLowerCase() &&
                 mapping.ergonodeKey.toLowerCase() === this.createErgonodeAttribute?.toLowerCase()
             );
         },
 
-        mappingAttributeOccupied () {
-            return this.createShopwareAttribute &&
+        mappingCustomFieldOccupied () {
+            return this.createShopwareCustomField &&
                 this.mappings.some(mapping =>
-                    mapping.shopwareKey.toLowerCase() === this.createShopwareAttribute?.toLowerCase()
+                    mapping.shopwareKey.toLowerCase() === this.createShopwareCustomField?.toLowerCase()
                 );
         },
     },
 
     methods: {
-        attributeType (attributeSet = 'shopware', attributeName) {
-            return this[`${attributeSet}Attributes`]?.find(attribute =>
-                attribute?.code?.toLowerCase() === attributeName?.toLowerCase())?.type || '?';
+        type (set = 'shopwareCustomFields', fieldName) {
+            return this[set]?.find(field =>
+                field?.code?.toLowerCase() === fieldName?.toLowerCase())?.type || '?';
         },
-    
-        attributeTranslation (shopwareKey) {
-            const foundAttributes = this.shopwareAttributes.filter(attribute => attribute?.code === shopwareKey);
-            
-            if (!foundAttributes?.length) {
-                return shopwareKey;
-            }
-            
-            return this.$t(foundAttributes[0].translationKey);
+
+        translation (shopwareKey) {
+            return this.shopwareCustomFields.find(field => field?.code === shopwareKey)?.label || shopwareKey;
         },
-        
+
         clearForm () {
-            this.createShopwareAttribute = null;
+            this.createShopwareCustomField = null;
             this.createErgonodeAttribute = null;
         },
 
@@ -113,12 +107,12 @@ Component.register('ergonode-attribute-mapping', {
         async addMapping () {
             this.isCreateLoading = true;
             try {
-                if (this.mappingAttributeOccupied) {
+                if (this.mappingCustomFieldOccupied) {
                     throw new Error(this.$t('ErgonodeIntegrationShopware.mappings.messages.shopwareAttributesMustBeUnique'));
                 }
                 let createdMapping = this.repository.create(Context.Api);
+                createdMapping.shopwareKey = this.createShopwareCustomField;
                 createdMapping.ergonodeKey = this.createErgonodeAttribute;
-                createdMapping.shopwareKey = this.createShopwareAttribute;
                 await this.repository.save(createdMapping, Context.Api);
 
                 this.clearForm();
@@ -136,18 +130,19 @@ Component.register('ergonode-attribute-mapping', {
                 this.isCreateLoading = false;
             }
         },
+
     },
 
     async created () {
         this.isLoading = true;
 
         try {
-            this.ergonodeAttributeService.getShopwareAttributes().then(result => {
-                this.shopwareAttributes = result.data.data
+            this.ergonodeAttributeService.getShopwareCustomFields().then(result => {
+                this.shopwareCustomFields = result.data.data;
             });
 
             this.ergonodeAttributeService.getErgonodeAttributes().then(result => {
-                this.ergonodeAttributes = result.data.data
+                this.ergonodeAttributes = result.data.data;
             });
 
             await this.fetchMappings();

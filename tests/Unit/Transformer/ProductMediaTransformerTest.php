@@ -159,11 +159,13 @@ class ProductMediaTransformerTest extends TestCase
                         [
                             'id' => 'product_media/media/image_1.jpg',
                             'mediaId' => 'media/image_1.jpg',
+                            'position' => 0,
                         ],
                     ],
                     'cover' => [
                         'id' => 'product_media/media/image_1.jpg',
                         'mediaId' => 'media/image_1.jpg',
+                        'position' => 0,
                     ],
                 ],
             ],
@@ -191,15 +193,18 @@ class ProductMediaTransformerTest extends TestCase
                         [
                             'id' => 'product_media/media/image_1.jpg',
                             'mediaId' => 'media/image_1.jpg',
+                            'position' => 0,
                         ],
                         [
                             'id' => 'product_media/media/image_2.jpg',
                             'mediaId' => 'media/image_2.jpg',
+                            'position' => 1,
                         ],
                     ],
                     'cover' => [
                         'id' => 'product_media/media/image_1.jpg',
                         'mediaId' => 'media/image_1.jpg',
+                        'position' => 0,
                     ],
                 ],
             ],
@@ -227,15 +232,18 @@ class ProductMediaTransformerTest extends TestCase
                         [
                             'id' => 'product_media/media/image_2.jpg',
                             'mediaId' => 'media/image_2.jpg',
+                            'position' => 0,
                         ],
                         [
                             'id' => 'product_media/media/image_1.jpg',
                             'mediaId' => 'media/image_1.jpg',
+                            'position' => 1,
                         ],
                     ],
                     'cover' => [
                         'id' => 'product_media/media/image_2.jpg',
                         'mediaId' => 'media/image_2.jpg',
+                        'position' => 0,
                     ],
                 ],
             ],
