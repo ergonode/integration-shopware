@@ -137,8 +137,8 @@ services:
   Ergonode\IntegrationShopware\Subscriber\ErgonodeMappingCacheSubscriber:
     tags: [ 'kernel.event_subscriber' ]
     arguments:
-      $attributeMappingProvider: 'ergonode.integration_shopware.provider.attribute_mapping_provider'
-      $customFieldMappingProvider: 'ergonode.integration_shopware.provider.custom_field_mapping_provider'
+      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
+      $customFieldMappingProvider: '@ergonode.integration_shopware.provider.custom_field_mapping_provider'
 
   # TRANSFORMER
   Ergonode\IntegrationShopware\Transformer\ProductTransformerChain:
