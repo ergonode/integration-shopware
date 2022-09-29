@@ -140,6 +140,10 @@ services:
       $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
       $customFieldMappingProvider: '@ergonode.integration_shopware.provider.custom_field_mapping_provider'
 
+  Ergonode\IntegrationShopware\Subscriber\UpdatePluginSubscriber:
+    arguments:
+      $registry: '@Shopware\Core\Framework\MessageQueue\ScheduledTask\Registry\TaskRegistry'
+    tags: [ 'kernel.event_subscriber' ]
   # TRANSFORMER
   Ergonode\IntegrationShopware\Transformer\ProductTransformerChain:
     arguments:
