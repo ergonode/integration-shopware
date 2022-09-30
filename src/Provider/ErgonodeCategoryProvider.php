@@ -4,57 +4,47 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Provider;
 
-use Ergonode\IntegrationShopware\Api\CategoryTreeResultsProxy;
+use Ergonode\IntegrationShopware\Api\CategoryTreeStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
-use Ergonode\IntegrationShopware\Struct\ErgonodeCategoryCollection;
-use Ergonode\IntegrationShopware\Transformer\CategoryResponseTransformer;
+use Generator;
 use RuntimeException;
 
 class ErgonodeCategoryProvider
 {
-    private const CATEGORIES_PER_PAGE = 1000;
+    private const TREES_PER_PAGE = 200;
 
     private CategoryQueryBuilder $categoryQueryBuilder;
 
     private ErgonodeGqlClientInterface $ergonodeGqlClient;
 
-    private CategoryResponseTransformer $categoryResponseTransformer;
-
     public function __construct(
         CategoryQueryBuilder $categoryQueryBuilder,
-        ErgonodeGqlClientInterface $ergonodeGqlClient,
-        CategoryResponseTransformer $categoryResponseTransformer
+        ErgonodeGqlClientInterface $ergonodeGqlClient
     ) {
         $this->categoryQueryBuilder = $categoryQueryBuilder;
         $this->ergonodeGqlClient = $ergonodeGqlClient;
-        $this->categoryResponseTransformer = $categoryResponseTransformer;
     }
 
-    /**
-     * @throws RuntimeException
-     */
-    public function provideCategoryTree(string $treeCode): ErgonodeCategoryCollection
+    public function provideCategoryTreeCodes(): Generator
     {
         $cursor = null;
-        $categories = new ErgonodeCategoryCollection();
 
         do {
-            $query = $this->categoryQueryBuilder->buildTree($treeCode, self::CATEGORIES_PER_PAGE, $cursor);
-            $results = $this->ergonodeGqlClient->query($query, CategoryTreeResultsProxy::class);
+            $query = $this->categoryQueryBuilder->buildTreeStreamWithOnlyCodes(self::TREES_PER_PAGE, $cursor);
+            $results = $this->ergonodeGqlClient->query($query, CategoryTreeStreamResultsProxy::class);
 
-            if (!$results instanceof CategoryTreeResultsProxy) {
+            if (!$results instanceof CategoryTreeStreamResultsProxy) {
                 continue;
             }
 
             if ($results->isMainDataEmpty()) {
-                throw new RuntimeException(sprintf('Tree with code %1 does not exist in Ergonode.', $treeCode));
+                throw new RuntimeException('Could not fetch category trees from Ergonode (empty response).');
             }
 
-            $categories = $categories->merge($this->categoryResponseTransformer->transformResponse($results->getMainData()));
+            yield $results;
+
             $cursor = $results->getEndCursor();
         } while (null !== $cursor && $results->hasNextPage());
-
-        return $categories;
     }
 }

@@ -56,7 +56,7 @@ class CategorySyncProcessor implements CategoryProcessorInterface
         $cursor = null === $cursorEntity ? null : $cursorEntity->getCursor();
 
         $stopwatch->start('query');
-        $query = $this->categoryQueryBuilder->build($treeCode, $categoryCount, $cursor);
+        $query = $this->categoryQueryBuilder->build($categoryCount, $cursor);
         /** @var CategoryStreamResultsProxy|null $result */
         $result = $this->gqlClient->query($query, CategoryStreamResultsProxy::class);
         $stopwatch->stop('query');

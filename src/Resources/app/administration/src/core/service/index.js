@@ -1,4 +1,4 @@
-import ErgonodeAttributeService from "./ergonode-attribute-service";
+import ErgonodeMappingService from "./ergonode-mapping-service";
 import ErgonodeSynchronizationService from "./ergonode-synchronization-service";
 import ErgonodeConfigurationService from "./ergonode-configuration-service";
 import ErgonodeImportHistoryService from "./ergonode-history-import-service";
@@ -6,8 +6,8 @@ import ErgonodeImportHistoryService from "./ergonode-history-import-service";
 const { Application, Service } = Shopware;
 const initContainer = Application.getContainer('init');
 
-Service().register('ergonodeAttributeService', (container) => {
-    return new ErgonodeAttributeService(
+Service().register('ergonodeMappingService', (container) => {
+    return new ErgonodeMappingService(
       initContainer.httpClient,
         container.loginService,
     );
