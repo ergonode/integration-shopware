@@ -102,7 +102,7 @@ class ProductTransformerTest extends TestCase
                                             [
                                                 'code' => 'name',
                                             ],
-                                        'valueTranslations' =>
+                                        'translations' =>
                                             [
                                                 [
                                                     'inherited' => false,
@@ -126,7 +126,7 @@ class ProductTransformerTest extends TestCase
                                             [
                                                 'code' => 'stock',
                                             ],
-                                        'valueTranslations' =>
+                                        'translations' =>
                                             [
                                                 [
                                                     'inherited' => false,

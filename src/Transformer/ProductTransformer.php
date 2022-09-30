@@ -15,7 +15,6 @@ use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
-
 use function array_key_exists;
 use function array_merge_recursive;
 use function in_array;
@@ -84,7 +83,7 @@ class ProductTransformer implements ProductDataTransformerInterface
                 continue;
             }
 
-            $translatedValues = $this->getTranslatedValues($edge['node']['valueTranslations']);
+            $translatedValues = $this->getTranslatedValues($edge['node']['translations']);
 
             if (false === array_key_exists($this->defaultLocale, $translatedValues)) {
                 throw new RuntimeException(
@@ -114,7 +113,20 @@ class ProductTransformer implements ProductDataTransformerInterface
         $translatedValues = [];
         foreach ($valueTranslations as $valueTranslation) {
             $valueKey = ErgonodeApiValueKeyResolverUtil::resolve($valueTranslation['__typename']);
-            $translatedValues[$valueTranslation['language']] = $valueTranslation[$valueKey];
+            switch($valueKey) {
+                case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_ARRAY:
+                    $translatedValues[$valueTranslation['language']] = $valueTranslation[$valueKey]['code'];
+                    break;
+                case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_MULTI_ARRAY:
+                    $translatedValues[$valueTranslation['language']] = array_column(
+                        $valueTranslation[$valueKey],
+                        'code'
+                    );
+                    break;
+                default:
+                    $translatedValues[$valueTranslation['language']] = $valueTranslation[$valueKey];
+                    break;
+            }
         }
 
         return $translatedValues;

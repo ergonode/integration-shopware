@@ -81,26 +81,28 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
 
         foreach ($selectAttributes as $attribute) {
             $node = $attribute['node'];
-            if (empty($node) || empty($node['valueTranslations'])) {
+            if (empty($node) || empty($node['translations'])) {
                 continue;
             }
 
-            $translated = $this->translationTransformer->transform($node['valueTranslations']);
+            $translated = $this->translationTransformer->transform($node['translations']);
 
             $value = reset($translated); // assuming that the attribute is GLOBAL
             if (!$value) {
                 continue;
             }
 
-            if (!is_array($value)) {
+            /** If array is associative for a select option, convert it to multidimensional array as for multiselect */
+            if (isset($value['code'])) {
                 $value = [$value];
             }
 
-            foreach ($value as &$optionCode) {
-                $optionCode = CodeBuilderUtil::build($node['attribute']['code'], $optionCode);
+            $optionCodes = [];
+            foreach ($value as $option) {
+                $optionCodes[] = CodeBuilderUtil::build($node['attribute']['code'], $option['code']);
             }
 
-            $transformed = array_merge($transformed, $value);
+            $transformed = array_merge($transformed, $optionCodes);
         }
 
         return $transformed;

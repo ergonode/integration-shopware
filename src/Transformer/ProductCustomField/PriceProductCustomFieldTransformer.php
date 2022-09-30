@@ -35,7 +35,7 @@ class PriceProductCustomFieldTransformer implements ProductCustomFieldTransforme
     public function transformNode(array $node, string $customFieldName, Context $context): array
     {
         $translated = $this->translationTransformer->transform(
-            $node['valueTranslations']
+            $node['translations']
         );
 
         $currencyId = $this->getCurrencyIdByCode($node['attribute']['currency'] ?? '', $context);
