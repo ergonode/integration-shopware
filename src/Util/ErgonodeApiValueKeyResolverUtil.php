@@ -6,20 +6,30 @@ namespace Ergonode\IntegrationShopware\Util;
 
 class ErgonodeApiValueKeyResolverUtil
 {
+    public const TYPE_VALUE_ARRAY = 'value_array';
+    public const TYPE_VALUE_MULTI_ARRAY = 'value_multi_array';
+
     public static function resolve(string $typename): string
     {
         switch ($typename) {
-            case 'StringAttributeValue':
+            case 'TextAttributeValueTranslation':
+            case 'TextareaAttributeValueTranslation':
+            case 'DateAttributeValueTranslation':
+            case 'UnitAttributeValueTranslation':
                 return 'value_string';
-            case 'NumericAttributeValue':
+            case 'NumericAttributeValueTranslation':
+            case 'PriceAttributeValueTranslation':
                 return 'value_numeric';
-            case 'StringArrayAttributeValue':
-                return 'value_array';
-            case 'MultimediaAttributeValue':
+            case 'SelectAttributeValueTranslation':
+                return self::TYPE_VALUE_ARRAY;
+            case 'MultiSelectAttributeValueTranslation':
+                return self::TYPE_VALUE_MULTI_ARRAY;
+            case 'FileAttributeValueTranslation':
+            case 'ImageAttributeValueTranslation':
                 return 'value_multimedia';
-            case 'MultimediaArrayAttributeValue':
+            case 'GalleryAttributeValueTranslation':
                 return 'value_multimedia_array';
-            case 'ProductArrayAttributeValue':
+            case 'ProductRelationAttributeValueTranslation':
                 return 'value_product_array';
             default:
                 throw new \RuntimeException(\sprintf('Unknown value typename: %s', $typename));

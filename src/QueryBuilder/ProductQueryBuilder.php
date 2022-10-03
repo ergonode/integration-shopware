@@ -61,35 +61,52 @@ class ProductQueryBuilder
                                                                                 (new Query('node'))
                                                                                     ->setSelectionSet([
                                                                                         $this->getAttributeFragment(),
-                                                                                        (new Query('valueTranslations'))
+                                                                                        (new Query('translations'))
                                                                                             ->setSelectionSet([
                                                                                                 'language',
                                                                                                 '__typename',
-                                                                                                (new InlineFragment('StringAttributeValue'))
+                                                                                                (new InlineFragment('TextAttributeValueTranslation'))
                                                                                                     ->setSelectionSet([
                                                                                                         (new Query('value'))->setAlias('value_string'),
                                                                                                     ]),
-                                                                                                (new InlineFragment('NumericAttributeValue'))
+                                                                                                (new InlineFragment('TextareaAttributeValueTranslation'))
+                                                                                                    ->setSelectionSet([
+                                                                                                        (new Query('value'))->setAlias('value_string'),
+                                                                                                    ]),
+                                                                                                (new InlineFragment('DateAttributeValueTranslation'))
+                                                                                                    ->setSelectionSet([
+                                                                                                        (new Query('value'))->setAlias('value_string'),
+                                                                                                    ]),
+                                                                                                (new InlineFragment('UnitAttributeValueTranslation'))
                                                                                                     ->setSelectionSet([
                                                                                                         (new Query('value'))->setAlias('value_numeric'),
                                                                                                     ]),
-                                                                                                (new InlineFragment('StringArrayAttributeValue'))
+                                                                                                (new InlineFragment('PriceAttributeValueTranslation'))
                                                                                                     ->setSelectionSet([
-                                                                                                        (new Query('value'))->setAlias('value_array'),
+                                                                                                        (new Query('value'))->setAlias('value_numeric'),
                                                                                                     ]),
-                                                                                                (new InlineFragment('MultimediaAttributeValue'))
+                                                                                                (new InlineFragment('NumericAttributeValueTranslation'))
+                                                                                                    ->setSelectionSet([
+                                                                                                        (new Query('value'))->setAlias('value_numeric'),
+                                                                                                    ]),
+                                                                                                (new InlineFragment('MultiSelectAttributeValueTranslation'))
                                                                                                     ->setSelectionSet([
                                                                                                         (new Query('value'))
-                                                                                                            ->setAlias('value_multimedia')
+                                                                                                            ->setAlias('value_multi_array')
                                                                                                             ->setSelectionSet([
-                                                                                                                'name',
-                                                                                                                'extension',
-                                                                                                                'mime',
-                                                                                                                'size',
-                                                                                                                'url',
+                                                                                                                'code',
                                                                                                             ]),
                                                                                                     ]),
-                                                                                                (new InlineFragment('MultimediaArrayAttributeValue'))
+                                                                                                (new InlineFragment('SelectAttributeValueTranslation'))
+                                                                                                    ->setSelectionSet([
+                                                                                                        (new Query('value'))
+                                                                                                            ->setAlias('value_array')
+                                                                                                            ->setSelectionSet([
+                                                                                                                'code',
+                                                                                                            ]),
+                                                                                                    ]),
+
+                                                                                                (new InlineFragment('FileAttributeValueTranslation'))
                                                                                                     ->setSelectionSet([
                                                                                                         (new Query('value'))
                                                                                                             ->setAlias('value_multimedia_array')
@@ -101,7 +118,31 @@ class ProductQueryBuilder
                                                                                                                 'url',
                                                                                                             ]),
                                                                                                     ]),
-                                                                                                (new InlineFragment('ProductArrayAttributeValue'))
+                                                                                                (new InlineFragment('ImageAttributeValueTranslation'))
+                                                                                                    ->setSelectionSet([
+                                                                                                        (new Query('value'))
+                                                                                                            ->setAlias('value_multimedia')
+                                                                                                            ->setSelectionSet([
+                                                                                                                'name',
+                                                                                                                'extension',
+                                                                                                                'mime',
+                                                                                                                'size',
+                                                                                                                'url',
+                                                                                                            ]),
+                                                                                                    ]),
+                                                                                                (new InlineFragment('GalleryAttributeValueTranslation'))
+                                                                                                    ->setSelectionSet([
+                                                                                                        (new Query('value'))
+                                                                                                            ->setAlias('value_multimedia_array')
+                                                                                                            ->setSelectionSet([
+                                                                                                                'name',
+                                                                                                                'extension',
+                                                                                                                'mime',
+                                                                                                                'size',
+                                                                                                                'url',
+                                                                                                            ]),
+                                                                                                    ]),
+                                                                                                (new InlineFragment('ProductRelationAttributeValueTranslation'))
                                                                                                     ->setSelectionSet([
                                                                                                         (new Query('value'))
                                                                                                             ->setAlias('value_product_array')
@@ -136,35 +177,52 @@ class ProductQueryBuilder
                                                 (new Query('node'))
                                                     ->setSelectionSet([
                                                         $this->getAttributeFragment(),
-                                                        (new Query('valueTranslations'))
+                                                        (new Query('translations'))
                                                             ->setSelectionSet([
                                                                 'language',
                                                                 '__typename',
-                                                                (new InlineFragment('StringAttributeValue'))
+                                                                (new InlineFragment('TextAttributeValueTranslation'))
                                                                     ->setSelectionSet([
                                                                         (new Query('value'))->setAlias('value_string'),
                                                                     ]),
-                                                                (new InlineFragment('NumericAttributeValue'))
+                                                                (new InlineFragment('TextareaAttributeValueTranslation'))
+                                                                    ->setSelectionSet([
+                                                                        (new Query('value'))->setAlias('value_string'),
+                                                                    ]),
+                                                                (new InlineFragment('DateAttributeValueTranslation'))
+                                                                    ->setSelectionSet([
+                                                                        (new Query('value'))->setAlias('value_string'),
+                                                                    ]),
+                                                                (new InlineFragment('UnitAttributeValueTranslation'))
                                                                     ->setSelectionSet([
                                                                         (new Query('value'))->setAlias('value_numeric'),
                                                                     ]),
-                                                                (new InlineFragment('StringArrayAttributeValue'))
+                                                                (new InlineFragment('PriceAttributeValueTranslation'))
                                                                     ->setSelectionSet([
-                                                                        (new Query('value'))->setAlias('value_array'),
+                                                                        (new Query('value'))->setAlias('value_numeric'),
                                                                     ]),
-                                                                (new InlineFragment('MultimediaAttributeValue'))
+                                                                (new InlineFragment('NumericAttributeValueTranslation'))
+                                                                    ->setSelectionSet([
+                                                                        (new Query('value'))->setAlias('value_numeric'),
+                                                                    ]),
+                                                                (new InlineFragment('MultiSelectAttributeValueTranslation'))
                                                                     ->setSelectionSet([
                                                                         (new Query('value'))
-                                                                            ->setAlias('value_multimedia')
+                                                                            ->setAlias('value_multi_array')
                                                                             ->setSelectionSet([
-                                                                                'name',
-                                                                                'extension',
-                                                                                'mime',
-                                                                                'size',
-                                                                                'url',
+                                                                                'code',
                                                                             ]),
                                                                     ]),
-                                                                (new InlineFragment('MultimediaArrayAttributeValue'))
+                                                                (new InlineFragment('SelectAttributeValueTranslation'))
+                                                                    ->setSelectionSet([
+                                                                        (new Query('value'))
+                                                                            ->setAlias('value_array')
+                                                                            ->setSelectionSet([
+                                                                                'code',
+                                                                            ]),
+                                                                    ]),
+
+                                                                (new InlineFragment('FileAttributeValueTranslation'))
                                                                     ->setSelectionSet([
                                                                         (new Query('value'))
                                                                             ->setAlias('value_multimedia_array')
@@ -176,7 +234,31 @@ class ProductQueryBuilder
                                                                                 'url',
                                                                             ]),
                                                                     ]),
-                                                                (new InlineFragment('ProductArrayAttributeValue'))
+                                                                (new InlineFragment('ImageAttributeValueTranslation'))
+                                                                    ->setSelectionSet([
+                                                                        (new Query('value'))
+                                                                            ->setAlias('value_multimedia')
+                                                                            ->setSelectionSet([
+                                                                                'name',
+                                                                                'extension',
+                                                                                'mime',
+                                                                                'size',
+                                                                                'url',
+                                                                            ]),
+                                                                    ]),
+                                                                (new InlineFragment('GalleryAttributeValueTranslation'))
+                                                                    ->setSelectionSet([
+                                                                        (new Query('value'))
+                                                                            ->setAlias('value_multimedia_array')
+                                                                            ->setSelectionSet([
+                                                                                'name',
+                                                                                'extension',
+                                                                                'mime',
+                                                                                'size',
+                                                                                'url',
+                                                                            ]),
+                                                                    ]),
+                                                                (new InlineFragment('ProductRelationAttributeValueTranslation'))
                                                                     ->setSelectionSet([
                                                                         (new Query('value'))
                                                                             ->setAlias('value_product_array')
@@ -252,35 +334,52 @@ class ProductQueryBuilder
                                                                 (new Query('node'))
                                                                     ->setSelectionSet([
                                                                         $this->getAttributeFragment(),
-                                                                        (new Query('valueTranslations'))
+                                                                        (new Query('translations'))
                                                                             ->setSelectionSet([
                                                                                 'language',
                                                                                 '__typename',
-                                                                                (new InlineFragment('StringAttributeValue'))
+                                                                                (new InlineFragment('TextAttributeValueTranslation'))
                                                                                     ->setSelectionSet([
                                                                                         (new Query('value'))->setAlias('value_string'),
                                                                                     ]),
-                                                                                (new InlineFragment('NumericAttributeValue'))
+                                                                                (new InlineFragment('TextareaAttributeValueTranslation'))
+                                                                                    ->setSelectionSet([
+                                                                                        (new Query('value'))->setAlias('value_string'),
+                                                                                    ]),
+                                                                                (new InlineFragment('DateAttributeValueTranslation'))
+                                                                                    ->setSelectionSet([
+                                                                                        (new Query('value'))->setAlias('value_string'),
+                                                                                    ]),
+                                                                                (new InlineFragment('UnitAttributeValueTranslation'))
                                                                                     ->setSelectionSet([
                                                                                         (new Query('value'))->setAlias('value_numeric'),
                                                                                     ]),
-                                                                                (new InlineFragment('StringArrayAttributeValue'))
+                                                                                (new InlineFragment('PriceAttributeValueTranslation'))
                                                                                     ->setSelectionSet([
-                                                                                        (new Query('value'))->setAlias('value_array'),
+                                                                                        (new Query('value'))->setAlias('value_numeric'),
                                                                                     ]),
-                                                                                (new InlineFragment('MultimediaAttributeValue'))
+                                                                                (new InlineFragment('NumericAttributeValueTranslation'))
+                                                                                    ->setSelectionSet([
+                                                                                        (new Query('value'))->setAlias('value_numeric'),
+                                                                                    ]),
+                                                                                (new InlineFragment('MultiSelectAttributeValueTranslation'))
                                                                                     ->setSelectionSet([
                                                                                         (new Query('value'))
-                                                                                            ->setAlias('value_multimedia')
+                                                                                            ->setAlias('value_multi_array')
                                                                                             ->setSelectionSet([
-                                                                                                'name',
-                                                                                                'extension',
-                                                                                                'mime',
-                                                                                                'size',
-                                                                                                'url',
+                                                                                                'code',
                                                                                             ]),
                                                                                     ]),
-                                                                                (new InlineFragment('MultimediaArrayAttributeValue'))
+                                                                                (new InlineFragment('SelectAttributeValueTranslation'))
+                                                                                    ->setSelectionSet([
+                                                                                        (new Query('value'))
+                                                                                            ->setAlias('value_array')
+                                                                                            ->setSelectionSet([
+                                                                                                'code',
+                                                                                            ]),
+                                                                                    ]),
+
+                                                                                (new InlineFragment('FileAttributeValueTranslation'))
                                                                                     ->setSelectionSet([
                                                                                         (new Query('value'))
                                                                                             ->setAlias('value_multimedia_array')
@@ -292,7 +391,31 @@ class ProductQueryBuilder
                                                                                                 'url',
                                                                                             ]),
                                                                                     ]),
-                                                                                (new InlineFragment('ProductArrayAttributeValue'))
+                                                                                (new InlineFragment('ImageAttributeValueTranslation'))
+                                                                                    ->setSelectionSet([
+                                                                                        (new Query('value'))
+                                                                                            ->setAlias('value_multimedia')
+                                                                                            ->setSelectionSet([
+                                                                                                'name',
+                                                                                                'extension',
+                                                                                                'mime',
+                                                                                                'size',
+                                                                                                'url',
+                                                                                            ]),
+                                                                                    ]),
+                                                                                (new InlineFragment('GalleryAttributeValueTranslation'))
+                                                                                    ->setSelectionSet([
+                                                                                        (new Query('value'))
+                                                                                            ->setAlias('value_multimedia_array')
+                                                                                            ->setSelectionSet([
+                                                                                                'name',
+                                                                                                'extension',
+                                                                                                'mime',
+                                                                                                'size',
+                                                                                                'url',
+                                                                                            ]),
+                                                                                    ]),
+                                                                                (new InlineFragment('ProductRelationAttributeValueTranslation'))
                                                                                     ->setSelectionSet([
                                                                                         (new Query('value'))
                                                                                             ->setAlias('value_product_array')
@@ -327,35 +450,52 @@ class ProductQueryBuilder
                                 (new Query('node'))
                                     ->setSelectionSet([
                                         $this->getAttributeFragment(),
-                                        (new Query('valueTranslations'))
+                                        (new Query('translations'))
                                             ->setSelectionSet([
                                                 'language',
                                                 '__typename',
-                                                (new InlineFragment('StringAttributeValue'))
+                                                (new InlineFragment('TextAttributeValueTranslation'))
                                                     ->setSelectionSet([
                                                         (new Query('value'))->setAlias('value_string'),
                                                     ]),
-                                                (new InlineFragment('NumericAttributeValue'))
+                                                (new InlineFragment('TextareaAttributeValueTranslation'))
+                                                    ->setSelectionSet([
+                                                        (new Query('value'))->setAlias('value_string'),
+                                                    ]),
+                                                (new InlineFragment('DateAttributeValueTranslation'))
+                                                    ->setSelectionSet([
+                                                        (new Query('value'))->setAlias('value_string'),
+                                                    ]),
+                                                (new InlineFragment('UnitAttributeValueTranslation'))
                                                     ->setSelectionSet([
                                                         (new Query('value'))->setAlias('value_numeric'),
                                                     ]),
-                                                (new InlineFragment('StringArrayAttributeValue'))
+                                                (new InlineFragment('PriceAttributeValueTranslation'))
                                                     ->setSelectionSet([
-                                                        (new Query('value'))->setAlias('value_array'),
+                                                        (new Query('value'))->setAlias('value_numeric'),
                                                     ]),
-                                                (new InlineFragment('MultimediaAttributeValue'))
+                                                (new InlineFragment('NumericAttributeValueTranslation'))
+                                                    ->setSelectionSet([
+                                                        (new Query('value'))->setAlias('value_numeric'),
+                                                    ]),
+                                                (new InlineFragment('MultiSelectAttributeValueTranslation'))
                                                     ->setSelectionSet([
                                                         (new Query('value'))
-                                                            ->setAlias('value_multimedia')
+                                                            ->setAlias('value_multi_array')
                                                             ->setSelectionSet([
-                                                                'name',
-                                                                'extension',
-                                                                'mime',
-                                                                'size',
-                                                                'url',
+                                                                'code',
                                                             ]),
                                                     ]),
-                                                (new InlineFragment('MultimediaArrayAttributeValue'))
+                                                (new InlineFragment('SelectAttributeValueTranslation'))
+                                                    ->setSelectionSet([
+                                                        (new Query('value'))
+                                                            ->setAlias('value_array')
+                                                            ->setSelectionSet([
+                                                                'code',
+                                                            ]),
+                                                    ]),
+
+                                                (new InlineFragment('FileAttributeValueTranslation'))
                                                     ->setSelectionSet([
                                                         (new Query('value'))
                                                             ->setAlias('value_multimedia_array')
@@ -367,7 +507,31 @@ class ProductQueryBuilder
                                                                 'url',
                                                             ]),
                                                     ]),
-                                                (new InlineFragment('ProductArrayAttributeValue'))
+                                                (new InlineFragment('ImageAttributeValueTranslation'))
+                                                    ->setSelectionSet([
+                                                        (new Query('value'))
+                                                            ->setAlias('value_multimedia')
+                                                            ->setSelectionSet([
+                                                                'name',
+                                                                'extension',
+                                                                'mime',
+                                                                'size',
+                                                                'url',
+                                                            ]),
+                                                    ]),
+                                                (new InlineFragment('GalleryAttributeValueTranslation'))
+                                                    ->setSelectionSet([
+                                                        (new Query('value'))
+                                                            ->setAlias('value_multimedia_array')
+                                                            ->setSelectionSet([
+                                                                'name',
+                                                                'extension',
+                                                                'mime',
+                                                                'size',
+                                                                'url',
+                                                            ]),
+                                                    ]),
+                                                (new InlineFragment('ProductRelationAttributeValueTranslation'))
                                                     ->setSelectionSet([
                                                         (new Query('value'))
                                                             ->setAlias('value_product_array')
