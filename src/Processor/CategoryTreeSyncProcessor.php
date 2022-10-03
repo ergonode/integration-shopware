@@ -8,8 +8,10 @@ use Ergonode\IntegrationShopware\Api\CategoryTreeStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
 use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
+use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\Persistor\CategoryTreePersistor;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
@@ -24,22 +26,28 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
     private ErgonodeGqlClientInterface $gqlClient;
     private CategoryQueryBuilder $categoryQueryBuilder;
-    private CategoryTreePersistor $categoryPersistor;
+    private CategoryTreePersistor $categoryTreePersistor;
     private ErgonodeCursorManager $cursorManager;
     private LoggerInterface $logger;
+    private ConfigService $configService;
+    private CategoryPersistor $categoryPersistor;
 
     public function __construct(
         ErgonodeGqlClientInterface $gqlClient,
         CategoryQueryBuilder $categoryQueryBuilder,
-        CategoryTreePersistor $categoryPersistor,
+        CategoryTreePersistor $categoryTreePersistor,
         ErgonodeCursorManager $cursorManager,
-        LoggerInterface $ergonodeSyncLogger
+        LoggerInterface $ergonodeSyncLogger,
+        ConfigService $configService,
+        CategoryPersistor $categoryPersistor
     ) {
         $this->gqlClient = $gqlClient;
         $this->categoryQueryBuilder = $categoryQueryBuilder;
-        $this->categoryPersistor = $categoryPersistor;
+        $this->categoryTreePersistor = $categoryTreePersistor;
         $this->cursorManager = $cursorManager;
         $this->logger = $ergonodeSyncLogger;
+        $this->configService = $configService;
+        $this->categoryPersistor = $categoryPersistor;
     }
 
     public function processStream(
@@ -103,7 +111,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             $stopwatch->start('process');
 
             try {
-                $primaryKeys = $this->categoryPersistor->persistLeaves($leafEdges, $treeCode, $context);
+                $primaryKeys = $this->categoryTreePersistor->persistLeaves($leafEdges, $treeCode, $context);
                 $entityCount = \count($primaryKeys);
 
                 $counter->incrProcessedEntityCount($entityCount);
@@ -148,6 +156,28 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $counter->setHasNextPage($result->hasNextPage() || $leafHasNextPage);
         $counter->setStopwatch($stopwatch);
 
+        if (false === $counter->hasNextPage()) {
+            $this->removeOrphanedCategories();
+        }
+
         return $counter;
+    }
+
+    private function removeOrphanedCategories(): void
+    {
+        $lastSync = $this->configService->getLastCategorySyncTimestamp();
+        $removedCategoryCount = $this->categoryPersistor->removeCategoriesUpdatedAtBeforeTimestamp($lastSync);
+
+        $this->logger->info('Removed orphaned Ergonode categories', [
+            'count' => $removedCategoryCount,
+            'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM)
+        ]);
+
+        $formattedTime = $this->configService->setLastCategorySyncTimestamp(
+            (new \DateTime('+1 second'))->getTimestamp()
+        );
+        $this->logger->info('Saved lastCategorySyncTime', [
+            'time' => $formattedTime
+        ]);
     }
 }
