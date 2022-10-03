@@ -4,7 +4,7 @@ import './ergonode-attribute-mapping.scss';
 const { Component, Context, Data: { Criteria }, Mixin } = Shopware;
 
 Component.register('ergonode-attribute-mapping', {
-    inject: ['acl', 'repositoryFactory', 'ergonodeAttributeService'],
+    inject: ['acl', 'repositoryFactory', 'ergonodeMappingService'],
 
     mixins: [
         Mixin.getByName('notification'),
@@ -52,7 +52,7 @@ Component.register('ergonode-attribute-mapping', {
 
         shopwareAttributesSelectOptions () {
             return this.shopwareAttributes?.map(attribute => ({
-                label: `${this.$tc(attribute?.translationKey)}${attribute?.type ? ` (${attribute.type})` : ''}`,
+                label: `${this.$t(attribute?.translationKey)}${attribute?.type ? ` (${attribute.type})` : ''}`,
                 value: attribute?.code,
             }));
         },
@@ -142,11 +142,11 @@ Component.register('ergonode-attribute-mapping', {
         this.isLoading = true;
 
         try {
-            this.ergonodeAttributeService.getShopwareAttributes().then(result => {
+            this.ergonodeMappingService.getShopwareAttributes().then(result => {
                 this.shopwareAttributes = result.data.data
             });
 
-            this.ergonodeAttributeService.getErgonodeAttributes().then(result => {
+            this.ergonodeMappingService.getErgonodeAttributes().then(result => {
                 this.ergonodeAttributes = result.data.data
             });
 

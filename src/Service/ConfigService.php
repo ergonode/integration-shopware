@@ -61,63 +61,51 @@ class ConfigService
 
     public function getErgonodeCustomFieldKeys(): array
     {
-        $keys = $this->configService->get(self::CONFIG_NAMESPACE . 'customFieldKeys');
-        if (is_array($keys)) {
-            return $keys;
-        }
-
-        return [];
+        return $this->getArray(self::CONFIG_NAMESPACE . 'customFieldKeys');
     }
 
     public function getErgonodeCrossSellingKeys(): array
     {
-        $keys = $this->configService->get(self::CONFIG_NAMESPACE . 'crossSellingKeys');
-        if (is_array($keys)) {
-            return $keys;
-        }
-
-        return [];
+        return $this->getArray(self::CONFIG_NAMESPACE . 'crossSellingKeys');
     }
 
     public function getCategoryTreeCodes(): array
     {
-        $treeCodes = $this->configService->getString(self::CONFIG_NAMESPACE . 'categoryTreeCode');
-
-        return explode(',', $treeCodes);
+        return $this->getArray(self::CONFIG_NAMESPACE . 'categoryTreeCodes');
     }
 
     public function isSchedulerEnabled(): bool
     {
-        return $this->configService->getBool(self::CONFIG_NAMESPACE.'schedulerEnabled');
+        return $this->configService->getBool(self::CONFIG_NAMESPACE . 'schedulerEnabled');
     }
 
     public function getSchedulerStartDatetime(): ?\DateTime
     {
-        $value = $this->configService->getString(self::CONFIG_NAMESPACE.'schedulerStartDatetime');
+        $value = $this->configService->getString(self::CONFIG_NAMESPACE . 'schedulerStartDatetime');
 
         return empty($value) ? null : new \DateTime($value);
     }
 
     public function getSchedulerRecurrenceHour(): string
     {
-        return $this->configService->getString(self::CONFIG_NAMESPACE.'schedulerRecurrenceHour');
+        return $this->configService->getString(self::CONFIG_NAMESPACE . 'schedulerRecurrenceHour');
     }
 
     public function getSchedulerRecurrenceMinute(): string
     {
-        return $this->configService->getString(self::CONFIG_NAMESPACE.'schedulerRecurrenceMinute');
+        return $this->configService->getString(self::CONFIG_NAMESPACE . 'schedulerRecurrenceMinute');
     }
 
     public function getLastFullSyncDatetime(): ?\DateTime
     {
-        $value = $this->configService->getString(self::CONFIG_NAMESPACE.'fullSyncDate');
+        $value = $this->configService->getString(self::CONFIG_NAMESPACE . 'fullSyncDate');
 
         return empty($value) ? null : new \DateTime($value);
     }
 
     public function setLastFullSyncDatetime(\DateTime $date): void
     {
-        $this->configService->set(self::CONFIG_NAMESPACE.'fullSyncDate', $date->format('d-m-Y H:i:s'));
+        $this->configService->set(self::CONFIG_NAMESPACE . 'fullSyncDate', $date->format('d-m-Y H:i:s'));
     }
 
     public function getLastCategorySyncTimestamp(): int
@@ -145,5 +133,15 @@ class ConfigService
         );
 
         return $formatted;
+    }
+
+    private function getArray(string $key): array
+    {
+        $value = $this->configService->get($key);
+        if (is_array($value)) {
+            return $value;
+        }
+
+        return [];
     }
 }

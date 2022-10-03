@@ -49,6 +49,18 @@ class MappingController extends AbstractController
     }
 
     /**
+     * @Route("/api/ergonode/ergonode-category-trees", name="api.ergonode.ergonodeCategoryTrees", methods={"GET"})
+     */
+    public function ergonodeCategoryTrees(): JsonResponse
+    {
+        $codes = $this->mappableFieldsProvider->getErgonodeCategoryTreeCodes();
+
+        return new JsonResponse([
+            'data' => $codes,
+        ], Response::HTTP_OK);
+    }
+
+    /**
      * @Route("/api/ergonode/shopware-attributes", name="api.ergonode.shopwareAttributes", methods={"GET"})
      */
     public function shopwareAttributes(): JsonResponse

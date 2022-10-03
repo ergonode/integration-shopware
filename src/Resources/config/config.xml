@@ -27,7 +27,7 @@
         <title>Fields mapping</title>
         <title lang="de-DE">Fields mapping</title>
 
-        <component name="ergonode-fields-mapping-multiselect">
+        <component name="ergonode-attribute-multiselect">
             <name>customFieldKeys</name>
             <label>Ergonode attributes as custom fields</label>
             <label lang="de-DE">Ergonode attributes as custom fields</label>
@@ -35,7 +35,7 @@
             <helpText lang="de-DE">Every selected attribute will be fetched as product custom field</helpText>
         </component>
 
-        <component name="ergonode-fields-mapping-multiselect">
+        <component name="ergonode-attribute-multiselect">
             <name>crossSellingKeys</name>
             <attributesType>type_relation</attributesType>
             <label>Ergonode attributes as cross selling</label>
@@ -47,12 +47,12 @@
     <card>
         <title>Category Sync</title>
         <title lang="de-DE">Category Sync</title>
+        <component name="ergonode-category-tree-multiselect">
+            <name>categoryTreeCodes</name>
+            <label>Category trees to synchronize</label>
+            <label lang="de-DE">Category trees to synchronize</label>
+        </component>
         <input-field>
-            <name>categoryTreeCode</name>
-            <label>Code of the category tree to synchronize</label>
-            <label lang="de-DE">Code of the category tree to synchronize</label>
-        </input-field>
-        <input-field type="text">
             <name>lastCategorySyncTime</name>
             <label>Last category synchronization completion time</label>
             <label lang="de-DE">Last category synchronization completion time</label>

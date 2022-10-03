@@ -4,7 +4,7 @@ import './ergonode-custom-field-mapping.scss';
 const { Component, Context, Data: { Criteria }, Mixin } = Shopware;
 
 Component.register('ergonode-custom-field-mapping', {
-    inject: ['acl', 'repositoryFactory', 'ergonodeAttributeService'],
+    inject: ['acl', 'repositoryFactory', 'ergonodeMappingService'],
 
     mixins: [
         Mixin.getByName('notification'),
@@ -137,11 +137,11 @@ Component.register('ergonode-custom-field-mapping', {
         this.isLoading = true;
 
         try {
-            this.ergonodeAttributeService.getShopwareCustomFields().then(result => {
+            this.ergonodeMappingService.getShopwareCustomFields().then(result => {
                 this.shopwareCustomFields = result.data.data;
             });
 
-            this.ergonodeAttributeService.getErgonodeAttributes().then(result => {
+            this.ergonodeMappingService.getErgonodeAttributes().then(result => {
                 this.ergonodeAttributes = result.data.data;
             });
 
