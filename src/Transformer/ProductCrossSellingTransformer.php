@@ -73,7 +73,7 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
             }
 
             // cross-selling in Shopware cannot be translatable; getting default language OR first one
-            $value = $this->translationTransformer->transformDefaultLocale($node['valueTranslations'], $context);
+            $value = $this->translationTransformer->transformDefaultLocale($node['translations'], $context);
             $skus = array_column($value, 'sku');
 
             $productIds = array_values($this->productProvider->getProductIdsBySkus($skus, $context));

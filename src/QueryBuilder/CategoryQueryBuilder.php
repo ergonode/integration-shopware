@@ -57,12 +57,13 @@ class CategoryQueryBuilder
             ]);
     }
 
-    public function build(string $treeCode, int $count, ?string $cursor): Query
+    public function build(int $count, ?string $cursor): Query
     {
         $listArguments = ['first' => $count];
         if ($cursor !== null) {
             $listArguments['after'] = $cursor;
         }
+
         return (new Query('categoryStream'))
             ->setArguments($listArguments)
             ->setSelectionSet([
@@ -83,16 +84,16 @@ class CategoryQueryBuilder
                                         'value',
                                         'language',
                                     ]),
-                            ])
-                    ])
+                            ]),
+                    ]),
             ]);
     }
 
     public function buildTreeStream(
         int $treeCount,
         int $categoryLeafCount,
-        ?string $treeCursor,
-        ?string $categoryLeafCursor
+        ?string $treeCursor = null,
+        ?string $categoryLeafCursor = null
     ): Query {
         $treeArguments = ['first' => $treeCount];
         if ($treeCursor !== null) {
@@ -141,9 +142,38 @@ class CategoryQueryBuilder
                                                             ]),
                                                     ]),
                                             ]),
-                                    ])
-                            ])
-                    ])
+                                    ]),
+                            ]),
+                    ]),
+            ]);
+    }
+
+    public function buildTreeStreamWithOnlyCodes(
+        int $treeCount,
+        ?string $treeCursor = null
+    ): Query {
+        $treeArguments = ['first' => $treeCount];
+        if ($treeCursor !== null) {
+            $treeArguments['after'] = $treeCursor;
+        }
+
+        return (new Query('categoryTreeStream'))
+            ->setArguments($treeArguments)
+            ->setSelectionSet([
+                'totalCount',
+                (new Query('pageInfo'))
+                    ->setSelectionSet([
+                        'endCursor',
+                        'hasNextPage',
+                    ]),
+                (new Query('edges'))
+                    ->setSelectionSet([
+                        'cursor',
+                        (new Query('node'))
+                            ->setSelectionSet([
+                                'code',
+                            ]),
+                    ]),
             ]);
     }
 }

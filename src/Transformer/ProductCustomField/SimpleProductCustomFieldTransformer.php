@@ -39,7 +39,7 @@ class SimpleProductCustomFieldTransformer implements ProductCustomFieldTransform
     public function transformNode(array $node, string $customFieldName, Context $context): array
     {
         return $this->translationTransformer->transform(
-            $node['valueTranslations'],
+            $node['translations'],
             sprintf('customFields.%s', $customFieldName)
         );
     }

@@ -7,7 +7,7 @@ Shopware.Module.register('ergonode-integration-shopware', {
     name: 'ErgonodeIntegrationShopware',
     title: 'ErgonodeIntegrationShopware.mainMenuItemGeneral',
     description: 'Shopware Ergonode integration plugin',
-    version: '0.0.5',
+    version: '1.4.0',
     color: '#00bc87',
     icon: 'default-symbol-products',
 

@@ -33,7 +33,7 @@ class RelationProductCustomFieldTransformer implements ProductCustomFieldTransfo
     public function transformNode(array $node, string $customFieldName, Context $context): array
     {
         $translated = $this->translationTransformer->transform(
-            $node['valueTranslations']
+            $node['translations']
         );
 
         foreach ($translated as &$value) {

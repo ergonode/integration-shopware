@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Provider;
 
+use Ergonode\IntegrationShopware\Struct\ErgonodeCategory;
 use Ergonode\IntegrationShopware\Util\Constants;
 use Ergonode\IntegrationShopware\Util\CustomFieldUtil;
 use Shopware\Core\Content\Product\ProductDefinition;
@@ -28,14 +29,18 @@ class MappableFieldsProvider
 
     private LanguageProvider $languageProvider;
 
+    private ErgonodeCategoryProvider $ergonodeCategoryProvider;
+
     public function __construct(
         ErgonodeAttributeProvider $ergonodeAttributeProvider,
         EntityRepositoryInterface $customFieldRepository,
-        LanguageProvider $languageProvider
+        LanguageProvider $languageProvider,
+        ErgonodeCategoryProvider $ergonodeCategoryProvider
     ) {
         $this->ergonodeAttributeProvider = $ergonodeAttributeProvider;
         $this->customFieldRepository = $customFieldRepository;
         $this->languageProvider = $languageProvider;
+        $this->ergonodeCategoryProvider = $ergonodeCategoryProvider;
     }
 
     /**
@@ -137,6 +142,22 @@ class MappableFieldsProvider
         }
 
         return $attributeCodes;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getErgonodeCategoryTreeCodes(): array
+    {
+        $generator = $this->ergonodeCategoryProvider->provideCategoryTreeCodes();
+        $treeCodes = [];
+
+        foreach ($generator as $result) {
+            $codes = array_map(fn(array $category) => $category['node']['code'] ?? null, $result->getEdges());
+            $treeCodes[] = array_filter($codes);
+        }
+
+        return array_merge(...$treeCodes);
     }
 
     private function resolveErgonodeAttributeType(array $node): string
