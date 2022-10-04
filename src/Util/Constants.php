@@ -53,6 +53,9 @@ class Constants
         'metaDescription' => 'sw-product.seoForm.labelMetaDescription',
         'keywords' => 'sw-product.seoForm.labelKeywords',
         'purchaseSteps' => 'sw-product.settingsForm.labelPurchaseSteps',
-        'manufacturerNumber' => 'sw-product.settingsForm.labelManufacturerNumber'
+        'manufacturerNumber' => 'sw-product.settingsForm.labelManufacturerNumber',
+        'tax.rate' => 'sw-product.priceForm.labelTaxRate',
+        'price.net' => 'sw-product.priceForm.labelPurchasePriceNet',
+        'price.gross' => 'sw-product.priceForm.labelPurchasePriceGross'
     ];
 }
