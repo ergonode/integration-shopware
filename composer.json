@@ -25,7 +25,8 @@
         "ext-json": "*",
         "shopware/administration": "~6.4.11",
         "shopware/core": "~6.4.11",
-        "gmostafa/php-graphql-client": "^1.13"
+        "gmostafa/php-graphql-client": "^1.13",
+        "phpstan/phpstan": "^0.12"
     },
     "require-dev": {
         "phpunit/phpunit": "~9.5.17"
