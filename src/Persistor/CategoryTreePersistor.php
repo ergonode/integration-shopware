@@ -98,11 +98,8 @@ class CategoryTreePersistor
             $createCategory = true;
         }
 
-        $afterCategoryId = null;
-        if (null !== $parentId) {
-            $afterCategoryId = $this->categoryOrderHelper->getLastCategoryIdForParent($parentId);
-            $this->categoryOrderHelper->set($parentId, $id);
-        }
+        $afterCategoryId = $this->categoryOrderHelper->getLastCategoryIdForParent($parentId);
+        $this->categoryOrderHelper->set($parentId, $id);
 
         $result = [
             'id' => $id,

@@ -28,7 +28,7 @@ class CategoryLastChildMappingDefinition extends EntityDefinition
     {
         return new FieldCollection([
             (new IdField('id', 'id'))->addFlags(new PrimaryKey(), new Required()),
-            (new IdField('category_id', 'categoryId'))->addFlags(new Required()),
+            (new IdField('category_id', 'categoryId')),
             (new IdField('last_child_id', 'lastChildId'))->addFlags(new Required()),
         ]);
     }
