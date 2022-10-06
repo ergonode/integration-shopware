@@ -130,7 +130,7 @@ class CategorySyncHandler extends AbstractSyncHandler
 
         if (null !== $result && $result->hasNextPage()) {
             $this->logger->info('Dispatching next CategorySyncMessage because still has next page');
-            #$this->messageBus->dispatch(new CategorySync());
+            $this->messageBus->dispatch(new CategorySync());
         } else {
             $this->logger->info('Category sync finished. Clearing Category Order Helper saved mappings');
             $this->categoryOrderHelper->clearSaved();
