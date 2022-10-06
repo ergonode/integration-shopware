@@ -12,13 +12,11 @@ use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\Persistor\CategoryTreePersistor;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
 use Ergonode\IntegrationShopware\Service\ConfigService;
-use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
-
 use function count;
 
 class CategoryTreeSyncProcessor implements CategoryProcessorInterface
@@ -58,8 +56,11 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $this->categoryPersistor = $categoryPersistor;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function processStream(
-        string $treeCode,
+        array $treeCodes,
         Context $context,
         ?int $categoryCount = null
     ): SyncCounterDTO {
@@ -67,16 +68,12 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $counter = new SyncCounterDTO();
         $stopwatch = new Stopwatch();
 
-        if (empty($treeCode)) {
-            throw new RuntimeException('Could not find category tree code in plugin config.');
-        }
-
         $treeCursor = $this->cursorManager->getCursor(
-            CodeBuilderUtil::build($treeCode, CategoryTreeStreamResultsProxy::MAIN_FIELD),
+            CategoryTreeStreamResultsProxy::MAIN_FIELD,
             $context
         );
         $leafCursor = $this->cursorManager->getCursor(
-            CodeBuilderUtil::build($treeCode, CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR),
+            CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
             $context
         );
 
@@ -114,15 +111,21 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
         foreach ($result->getEdges() as $edge) {
             $node = $edge['node'] ?? null;
+            $currentTreeCode = $node['code'];
 
-            if ($treeCode !== $node['code']) {
+            if (false === \in_array($node['code'], $treeCodes)) {
                 continue;
             }
 
             $stopwatch->start('process');
 
             try {
-                $primaryKeys = $this->categoryTreePersistor->persistLeaves($leafEdges, $treeCode, $context);
+                $primaryKeys = $this->categoryTreePersistor->persistLeaves($leafEdges, $currentTreeCode, $context);
+
+                if (false === $leafHasNextPage) {
+                    $this->removeOrphanedCategories($currentTreeCode);
+                }
+
                 $entityCount = \count($primaryKeys);
 
                 $counter->incrProcessedEntityCount($entityCount);
@@ -150,7 +153,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             ]);
             $this->cursorManager->persist(
                 $leafEndCursor,
-                CodeBuilderUtil::build($treeCode, CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR),
+                CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
                 $context
             );
         } else {
@@ -158,12 +161,12 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
                 'treeCursor' => $treeEndCursor,
             ]);
             $this->cursorManager->deleteCursor(
-                CodeBuilderUtil::build($treeCode, CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR),
+                CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
                 $context
             );
             $this->cursorManager->persist(
                 $treeEndCursor,
-                CodeBuilderUtil::build($treeCode, CategoryTreeStreamResultsProxy::MAIN_FIELD),
+                CategoryTreeStreamResultsProxy::MAIN_FIELD,
                 $context
             );
         }
@@ -171,19 +174,19 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $counter->setHasNextPage($result->hasNextPage() || $leafHasNextPage);
         $counter->setStopwatch($stopwatch);
 
-        if (false === $counter->hasNextPage()) {
-            $this->removeOrphanedCategories();
-        }
-
         return $counter;
     }
 
-    private function removeOrphanedCategories(): void
+    private function removeOrphanedCategories(string $treeCode): void
     {
         $lastSync = $this->configService->getLastCategorySyncTimestamp();
-        $removedCategoryCount = $this->categoryPersistor->removeCategoriesUpdatedAtBeforeTimestamp($lastSync);
+        $removedCategoryCount = $this->categoryPersistor->removeCategoriesUpdatedAtBeforeTimestamp(
+            $lastSync,
+            $treeCode
+        );
 
         $this->logger->info('Removed orphaned Ergonode categories', [
+            'treeCode' => $treeCode,
             'count' => $removedCategoryCount,
             'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM),
         ]);

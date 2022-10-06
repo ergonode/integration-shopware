@@ -84,7 +84,7 @@ class CategorySyncHandler extends AbstractSyncHandler
 
         $categoryTreeCodes = $this->configService->getCategoryTreeCodes();
         if (empty($categoryTreeCodes)) {
-            $this->logger->error('Could not find category tree code in plugin config.');
+            $this->logger->error('Could not find category tree codes in plugin config.');
 
             return 0;
         }
@@ -92,31 +92,29 @@ class CategorySyncHandler extends AbstractSyncHandler
         $result = null;
         $primaryKeys = [];
         try {
-            foreach ($categoryTreeCodes as $categoryTreeCode) {
-                foreach ($this->processors as $processor) {
-                    $processorClass = \get_class($processor);
-                    $this->logger->info(
-                        'Starting category processor',
-                        [
-                            'processor' => $processorClass,
-                        ]
-                    );
+            foreach ($this->processors as $processor) {
+                $processorClass = \get_class($processor);
+                $this->logger->info(
+                    'Starting category processor',
+                    [
+                        'processor' => $processorClass,
+                    ]
+                );
 
-                    do {
-                        $result = $processor->processStream($categoryTreeCode, $this->context);
+                do {
+                    $result = $processor->processStream($categoryTreeCodes, $this->context);
 
-                        if ($result->hasStopwatch()) {
-                            $this->performanceLogger->logPerformance($processorClass, $result->getStopwatch());
-                        }
+                    if ($result->hasStopwatch()) {
+                        $this->performanceLogger->logPerformance($processorClass, $result->getStopwatch());
+                    }
 
-                        $count += $result->getProcessedEntityCount();
-                        $primaryKeys = \array_merge($primaryKeys, $result->getPrimaryKeys());
+                    $count += $result->getProcessedEntityCount();
+                    $primaryKeys = \array_merge($primaryKeys, $result->getPrimaryKeys());
 
-                        if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
-                            break 2;
-                        }
-                    } while ($result->hasNextPage());
-                }
+                    if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
+                        break 2;
+                    }
+                } while ($result->hasNextPage());
             }
         } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
@@ -132,7 +130,7 @@ class CategorySyncHandler extends AbstractSyncHandler
 
         if (null !== $result && $result->hasNextPage()) {
             $this->logger->info('Dispatching next CategorySyncMessage because still has next page');
-            $this->messageBus->dispatch(new CategorySync());
+            #$this->messageBus->dispatch(new CategorySync());
         } else {
             $this->logger->info('Category sync finished. Clearing Category Order Helper saved mappings');
             $this->categoryOrderHelper->clearSaved();

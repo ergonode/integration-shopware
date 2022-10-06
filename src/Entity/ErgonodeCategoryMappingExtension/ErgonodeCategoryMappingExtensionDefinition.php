@@ -30,7 +30,8 @@ class ErgonodeCategoryMappingExtensionDefinition extends EntityDefinition
         return new FieldCollection([
             (new IdField('id', 'id'))->addFlags(new PrimaryKey(), new Required()),
             (new StringField('code', 'code'))->addFlags(new Required()),
-            (new StringField('locale', 'locale'))->addFlags()
+            (new StringField('locale', 'locale')),
+            (new StringField('tree_code', 'treeCode'))->addFlags(new Required())
         ]);
     }
 }

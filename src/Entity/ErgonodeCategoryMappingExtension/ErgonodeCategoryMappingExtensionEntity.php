@@ -13,6 +13,8 @@ class ErgonodeCategoryMappingExtensionEntity extends Entity
 
     protected ?string $code;
 
+    protected ?string $treeCode;
+
     protected ?string $locale;
 
     public function getCode(): ?string
@@ -23,6 +25,16 @@ class ErgonodeCategoryMappingExtensionEntity extends Entity
     public function setCode(?string $code): void
     {
         $this->code = $code;
+    }
+
+    public function getTreeCode(): ?string
+    {
+        return $this->treeCode;
+    }
+
+    public function setTreeCode(?string $treeCode): void
+    {
+        $this->treeCode = $treeCode;
     }
 
     public function getLocale(): ?string

@@ -111,6 +111,7 @@ class CategoryTreePersistor
             $result['name'] = $code;
             $result[ErgonodeCategoryMappingExtension::EXTENSION_NAME] = [
                 'code' => $code,
+                'treeCode' => $treeCode,
                 'locale' => null
             ];
         }

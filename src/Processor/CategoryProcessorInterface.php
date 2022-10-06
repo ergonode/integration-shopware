@@ -9,8 +9,11 @@ use Shopware\Core\Framework\Context;
 
 interface CategoryProcessorInterface
 {
+    /**
+     * @param string[] $treeCodes
+     */
     public function processStream(
-        string $treeCode,
+        array $treeCodes,
         Context $context,
         ?int $categoryCount = null
     ): SyncCounterDTO;
