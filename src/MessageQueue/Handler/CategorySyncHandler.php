@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 
 use Ergonode\IntegrationShopware\MessageQueue\Message\CategorySync;
-use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\Processor\CategoryProcessorInterface;
 use Ergonode\IntegrationShopware\Service\ConfigService;
@@ -32,8 +31,6 @@ class CategorySyncHandler extends AbstractSyncHandler
     private SyncPerformanceLogger $performanceLogger;
 
     private CategoryOrderHelper $categoryOrderHelper;
-
-    private CategoryPersistor $categoryPersistor;
 
     /**
      * @param SyncHistoryLogger $syncHistoryService

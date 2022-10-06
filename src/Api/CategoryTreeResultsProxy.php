@@ -20,11 +20,11 @@ class CategoryTreeResultsProxy extends AbstractResultsProxy
 
     public function getEndCursor(): ?string
     {
-        return (string)$this->getLeafList()['pageInfo']['endCursor'] ?? null;
+        return $this->getLeafList()['pageInfo']['endCursor'] ?? null;
     }
 
     public function hasNextPage(): bool
     {
-        return (bool)$this->getLeafList()['pageInfo']['hasNextPage'] ?? false;
+        return (bool)($this->getLeafList()['pageInfo']['hasNextPage'] ?? false);
     }
 }

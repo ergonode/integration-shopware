@@ -31,7 +31,7 @@ class PropertyGroupTransformer
     {
         $node = $dto->getErgonodeData();
 
-        if (Constants::ATTRIBUTE_SCOPE_GLOBAL !== $node['scope'] ?? null) { // properties in Shopware are not translatable
+        if (Constants::ATTRIBUTE_SCOPE_GLOBAL !== ($node['scope'] ?? null)) { // properties in Shopware are not translatable
             return $dto;
         }
 

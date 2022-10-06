@@ -79,7 +79,7 @@ class ProductPersistor
                 $this->logger->error('Error while transforming product.', [
                     'message' => $e->getMessage(),
                     'file' => $e->getFile() . ':' . $e->getLine(),
-                    'sku' => $node['sku'] ?? null,
+                    'sku' => $productData['node']['sku'] ?? null,
                 ]);
             }
         }

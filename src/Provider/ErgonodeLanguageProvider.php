@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Provider;
 
+use Ergonode\IntegrationShopware\Api\AbstractStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
 use Ergonode\IntegrationShopware\Api\LanguageListStreamResultsProxy;
 use Ergonode\IntegrationShopware\QueryBuilder\LanguageQueryBuilder;
@@ -38,6 +39,6 @@ class ErgonodeLanguageProvider
             yield $results;
 
             $endCursor = $results->getEndCursor();
-        } while (null !== $results && $results->hasNextPage());
+        } while ($results instanceof AbstractStreamResultsProxy && $results->hasNextPage());
     }
 }

@@ -25,7 +25,7 @@ class AttributeTypesEnum extends AbstractEnum
             return self::TEXT;
         }
 
-        $type = array_intersect(self::cases(), array_keys($attribute ?? []));
+        $type = array_intersect(self::cases(), array_keys($attribute));
 
         return reset($type) ?: self::TEXT;
     }

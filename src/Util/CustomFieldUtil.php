@@ -23,8 +23,9 @@ class CustomFieldUtil
     {
         $config = $customField->getConfig() ?: [];
 
+        $customFieldType = $config['customFieldType'] ?? '';
         // special cases
-        if (CustomFieldTypes::MEDIA === $config['customFieldType'] ?? '') {
+        if (CustomFieldTypes::MEDIA === $customFieldType) {
             return [
                 AttributeTypesEnum::IMAGE,
                 AttributeTypesEnum::FILE,
@@ -33,8 +34,8 @@ class CustomFieldUtil
         }
 
         if (
-            (CustomFieldTypes::ENTITY === $config['customFieldType'] ?? '') &&
-            (ProductDefinition::ENTITY_NAME === $config['entity'] ?? '') &&
+            (CustomFieldTypes::ENTITY === $customFieldType) &&
+            (ProductDefinition::ENTITY_NAME === ($config['entity'] ?? '')) &&
             CustomFieldTypes::SELECT === $customField->getType()
         ) {
             return [
@@ -43,7 +44,7 @@ class CustomFieldUtil
         }
 
         if (
-            (CustomFieldTypes::ENTITY === $config['customFieldType'] ?? '') &&
+            (CustomFieldTypes::ENTITY === $customFieldType) &&
             CustomFieldTypes::SELECT === $customField->getType()
         ) {
             // not mappable
@@ -67,7 +68,7 @@ class CustomFieldUtil
                     AttributeTypesEnum::PRICE,
                 ];
             case CustomFieldTypes::SELECT:
-                $isMultiSelect = 'sw-multi-select' === $config['componentName'] ?? '';
+                $isMultiSelect = 'sw-multi-select' === ($config['componentName'] ?? '');
 
                 return $isMultiSelect ? [AttributeTypesEnum::MULTISELECT] : [AttributeTypesEnum::SELECT];
             case CustomFieldTypes::HTML:
