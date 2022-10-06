@@ -15,6 +15,8 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityRepositoryNotFoundException;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use function array_filter;
 use function array_values;
 use function is_array;
@@ -33,18 +35,22 @@ class ProductPersistor
 
     private LoggerInterface $logger;
 
+    private EntityRepositoryInterface $productCategoryRepository;
+
     public function __construct(
         EntityRepositoryInterface $productRepository,
         ProductProvider $productProvider,
         ProductTransformerChain $productTransformerChain,
         DefinitionInstanceRegistry $definitionInstanceRegistry,
-        LoggerInterface $syncLogger
+        LoggerInterface $syncLogger,
+        EntityRepositoryInterface $productCategoryRepository
     ) {
         $this->productRepository = $productRepository;
         $this->productProvider = $productProvider;
         $this->productTransformerChain = $productTransformerChain;
         $this->definitionInstanceRegistry = $definitionInstanceRegistry;
         $this->logger = $syncLogger;
+        $this->productCategoryRepository = $productCategoryRepository;
     }
 
     /**
@@ -84,6 +90,15 @@ class ProductPersistor
             }
         }
 
+        $productIds = [];
+        foreach ($payloads as $payload) {
+            if (\array_key_exists('id', $payload)) {
+                $productIds[] = $payload['id'];
+            }
+        }
+
+        $this->clearProductCategories($productIds, $context);
+
         $writeResult = $this->productRepository->upsert(
             array_values($payloads),
             $context
@@ -98,6 +113,20 @@ class ProductPersistor
             \array_map(static fn($id) => ['id' => $id], $productIds),
             $context
         );
+    }
+
+    /**
+     * @param string[] $productIds
+     */
+    public function clearProductCategories(array $productIds, Context $context): void
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsAnyFilter('productId', $productIds));
+        $ids = $this->productCategoryRepository->searchIds($criteria, $context)->getIds();
+
+        if (false === empty($ids)) {
+            $this->productCategoryRepository->delete($ids, $context);
+        }
     }
 
     /**
