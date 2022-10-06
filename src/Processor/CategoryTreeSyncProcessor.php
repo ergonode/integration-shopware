@@ -12,11 +12,13 @@ use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\Persistor\CategoryTreePersistor;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
 use Ergonode\IntegrationShopware\Service\ConfigService;
+use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
+
 use function count;
 
 class CategoryTreeSyncProcessor implements CategoryProcessorInterface
@@ -25,11 +27,17 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
     public const DEFAULT_LEAF_COUNT = 25;
 
     private ErgonodeGqlClientInterface $gqlClient;
+
     private CategoryQueryBuilder $categoryQueryBuilder;
+
     private CategoryTreePersistor $categoryTreePersistor;
+
     private ErgonodeCursorManager $cursorManager;
+
     private LoggerInterface $logger;
+
     private ConfigService $configService;
+
     private CategoryPersistor $categoryPersistor;
 
     public function __construct(
@@ -63,9 +71,12 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             throw new RuntimeException('Could not find category tree code in plugin config.');
         }
 
-        $treeCursor = $this->cursorManager->getCursor(CategoryTreeStreamResultsProxy::MAIN_FIELD, $context);
+        $treeCursor = $this->cursorManager->getCursor(
+            CodeBuilderUtil::build($treeCode, CategoryTreeStreamResultsProxy::MAIN_FIELD),
+            $context
+        );
         $leafCursor = $this->cursorManager->getCursor(
-            CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
+            CodeBuilderUtil::build($treeCode, CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR),
             $context
         );
 
@@ -118,7 +129,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
                 $counter->setPrimaryKeys($primaryKeys);
 
                 $this->logger->info('Persisted category leaves', [
-                    'count' => $entityCount
+                    'count' => $entityCount,
                 ]);
             } catch (Throwable $e) {
                 $this->logger->error('Error while persisting category leaves.', [
@@ -135,22 +146,26 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
         if ($leafHasNextPage) {
             $this->logger->info('Category leaves have next page', [
-                'leafCursor' => $leafEndCursor
+                'leafCursor' => $leafEndCursor,
             ]);
             $this->cursorManager->persist(
                 $leafEndCursor,
-                CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
+                CodeBuilderUtil::build($treeCode, CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR),
                 $context
             );
         } else {
             $this->logger->info('Category leaves do not have next page', [
-                'treeCursor' => $treeEndCursor
+                'treeCursor' => $treeEndCursor,
             ]);
             $this->cursorManager->deleteCursor(
-                CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
+                CodeBuilderUtil::build($treeCode, CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR),
                 $context
             );
-            $this->cursorManager->persist($treeEndCursor, CategoryTreeStreamResultsProxy::MAIN_FIELD, $context);
+            $this->cursorManager->persist(
+                $treeEndCursor,
+                CodeBuilderUtil::build($treeCode, CategoryTreeStreamResultsProxy::MAIN_FIELD),
+                $context
+            );
         }
 
         $counter->setHasNextPage($result->hasNextPage() || $leafHasNextPage);
@@ -170,14 +185,14 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
         $this->logger->info('Removed orphaned Ergonode categories', [
             'count' => $removedCategoryCount,
-            'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM)
+            'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM),
         ]);
 
         $formattedTime = $this->configService->setLastCategorySyncTimestamp(
             (new \DateTime('+1 second'))->getTimestamp()
         );
         $this->logger->info('Saved lastCategorySyncTime', [
-            'time' => $formattedTime
+            'time' => $formattedTime,
         ]);
     }
 }
