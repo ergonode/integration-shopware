@@ -10,10 +10,12 @@ use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
+use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\Stopwatch\Stopwatch;
+
 use function count;
 
 class CategorySyncProcessor implements CategoryProcessorInterface
@@ -21,9 +23,13 @@ class CategorySyncProcessor implements CategoryProcessorInterface
     public const DEFAULT_CATEGORY_COUNT = 10;
 
     private ErgonodeGqlClientInterface $gqlClient;
+
     private CategoryQueryBuilder $categoryQueryBuilder;
+
     private CategoryPersistor $categoryPersistor;
+
     private ErgonodeCursorManager $cursorManager;
+
     private LoggerInterface $logger;
 
     public function __construct(
@@ -52,7 +58,10 @@ class CategorySyncProcessor implements CategoryProcessorInterface
         $counter = new SyncCounterDTO();
         $stopwatch = new Stopwatch();
 
-        $cursorEntity = $this->cursorManager->getCursorEntity(CategoryStreamResultsProxy::MAIN_FIELD, $context);
+        $cursorEntity = $this->cursorManager->getCursorEntity(
+            CodeBuilderUtil::build($treeCode, CategoryStreamResultsProxy::MAIN_FIELD),
+            $context
+        );
         $cursor = null === $cursorEntity ? null : $cursorEntity->getCursor();
 
         $stopwatch->start('query');
@@ -85,7 +94,7 @@ class CategorySyncProcessor implements CategoryProcessorInterface
             $counter->setPrimaryKeys($primaryKeys);
 
             $this->logger->info('Persisted category translations', [
-                'count' => $entityCount
+                'count' => $entityCount,
             ]);
         } catch (\Throwable $e) {
             $this->logger->error('Error while persisting category translations.', [
@@ -96,7 +105,11 @@ class CategorySyncProcessor implements CategoryProcessorInterface
             $stopwatch->stop('process');
         }
 
-        $this->cursorManager->persist($endCursor, CategoryStreamResultsProxy::MAIN_FIELD, $context);
+        $this->cursorManager->persist(
+            $endCursor,
+            CodeBuilderUtil::build($treeCode, CategoryStreamResultsProxy::MAIN_FIELD),
+            $context
+        );
 
         $counter->setHasNextPage($result->hasNextPage());
         $counter->setStopwatch($stopwatch);
