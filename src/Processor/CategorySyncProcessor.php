@@ -10,12 +10,10 @@ use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
-use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\Stopwatch\Stopwatch;
-
 use function count;
 
 class CategorySyncProcessor implements CategoryProcessorInterface
@@ -47,10 +45,11 @@ class CategorySyncProcessor implements CategoryProcessorInterface
     }
 
     /**
+     * @inheritDoc
      * @param int|null $categoryCount Number of categories to process (categories per page)
      */
     public function processStream(
-        string $treeCode,
+        array $treeCodes,
         Context $context,
         ?int $categoryCount = null
     ): SyncCounterDTO {
@@ -59,7 +58,7 @@ class CategorySyncProcessor implements CategoryProcessorInterface
         $stopwatch = new Stopwatch();
 
         $cursorEntity = $this->cursorManager->getCursorEntity(
-            CodeBuilderUtil::build($treeCode, CategoryStreamResultsProxy::MAIN_FIELD),
+            CategoryStreamResultsProxy::MAIN_FIELD,
             $context
         );
         $cursor = null === $cursorEntity ? null : $cursorEntity->getCursor();
@@ -107,7 +106,7 @@ class CategorySyncProcessor implements CategoryProcessorInterface
 
         $this->cursorManager->persist(
             $endCursor,
-            CodeBuilderUtil::build($treeCode, CategoryStreamResultsProxy::MAIN_FIELD),
+            CategoryStreamResultsProxy::MAIN_FIELD,
             $context
         );
 
