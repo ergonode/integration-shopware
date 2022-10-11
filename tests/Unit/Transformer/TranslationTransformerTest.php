@@ -102,13 +102,13 @@ class TranslationTransformerTest extends TestCase
                     [
                         'inherited' => false,
                         'language' => 'pl_PL',
-                        '__typename' => 'NumericAttributeValue',
+                        '__typename' => 'NumericAttributeValueTranslation',
                         'value_numeric' => 666,
                     ],
                     [
                         'inherited' => false,
                         'language' => 'de_DE',
-                        '__typename' => 'NumericAttributeValue',
+                        '__typename' => 'NumericAttributeValueTranslation',
                         'value_numeric' => 1234,
                     ],
                 ],
@@ -131,7 +131,7 @@ class TranslationTransformerTest extends TestCase
             [
                 [
                     'language' => 'en_GB',
-                    '__typename' => 'StringAttributeValue',
+                    '__typename' => 'TextAttributeValueTranslation',
                     'value_string' => ['value']
                 ]
             ],

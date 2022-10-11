@@ -53,9 +53,8 @@ class IsoCodeConverterTest extends TestCase
             ['pl_PL', 'pl-PL'],
             ['en_US', 'en-US'],
             ['de_DE', 'de-DE'],
-            [['de_DE'], ['de-DE']],
-            [['de_DE', 'pl_PL'], ['de-DE', 'pl-PL']],
-            [['__', '_', ''], ['--', '-', '']],
+            ['__', '--'],
+            ['_', '-'],
         ];
     }
 
