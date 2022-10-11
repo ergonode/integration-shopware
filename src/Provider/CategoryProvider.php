@@ -44,7 +44,12 @@ class CategoryProvider
         $criteria->addFilter(new EqualsFilter(ErgonodeCategoryMappingExtension::EXTENSION_NAME . '.code', $code));
         $criteria->addAssociations($associations);
 
-        return $this->categoryRepository->search($criteria, $context)->getEntities();
+        $result = $this->categoryRepository->search($criteria, $context)->getEntities();
+        if (!$result instanceof CategoryCollection) {
+            throw new \RuntimeException('Invalid category collection');
+        }
+
+        return $result;
     }
 
     public function getCategoryIdsNotInArray(array $notIn, Context $context): array
@@ -71,6 +76,11 @@ class CategoryProvider
         $criteria->addFilter(new EqualsAnyFilter(ErgonodeCategoryMappingExtension::EXTENSION_NAME . '.code', $codes));
         $criteria->addAssociations($associations);
 
-        return $this->categoryRepository->search($criteria, $context)->getEntities();
+        $result = $this->categoryRepository->search($criteria, $context)->getEntities();
+        if (!$result instanceof CategoryCollection) {
+            throw new \RuntimeException('Invalid category collection');
+        }
+
+        return $result;
     }
 }

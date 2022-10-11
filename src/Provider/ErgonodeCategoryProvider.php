@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Provider;
 
+use Ergonode\IntegrationShopware\Api\AbstractStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\CategoryTreeStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
@@ -45,6 +46,6 @@ class ErgonodeCategoryProvider
             yield $results;
 
             $cursor = $results->getEndCursor();
-        } while (null !== $cursor && $results->hasNextPage());
+        } while (null !== $cursor && $results instanceof AbstractStreamResultsProxy && $results->hasNextPage());
     }
 }

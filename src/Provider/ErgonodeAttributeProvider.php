@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Provider;
 
+use Ergonode\IntegrationShopware\Api\AbstractStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
@@ -39,7 +40,7 @@ class ErgonodeAttributeProvider
             yield $results;
 
             $endCursor = $results->getEndCursor();
-        } while (null !== $results && $results->hasNextPage());
+        } while ($results instanceof AbstractStreamResultsProxy && $results->hasNextPage());
     }
 
     public function provideDeletedAttributes(?string $endCursor = null): Generator
@@ -55,6 +56,6 @@ class ErgonodeAttributeProvider
             yield $results;
 
             $endCursor = $results->getEndCursor();
-        } while (null !== $results && $results->hasNextPage());
+        } while ($results instanceof AbstractStreamResultsProxy && $results->hasNextPage());
     }
 }
