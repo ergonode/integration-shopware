@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Persistor;
 
+use Doctrine\DBAL\Connection;
+use Ergonode\IntegrationShopware\Entity\ErgonodeCategoryMappingExtension\ErgonodeCategoryMappingExtensionDefinition;
 use Ergonode\IntegrationShopware\Persistor\Helper\ExistingCategoriesHelper;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
@@ -19,16 +21,20 @@ class CategoryPersistor
 
     private LanguageProvider $languageProvider;
 
+    private Connection $connection;
+
     private string $defaultLocale;
 
     public function __construct(
         EntityRepositoryInterface $categoryRepository,
         LanguageProvider $languageProvider,
-        ExistingCategoriesHelper $categoriesHelper
+        ExistingCategoriesHelper $categoriesHelper,
+        Connection $connection
     ) {
         $this->categoryRepository = $categoryRepository;
         $this->categoriesHelper = $categoriesHelper;
         $this->languageProvider = $languageProvider;
+        $this->connection = $connection;
     }
 
     /**
@@ -102,5 +108,33 @@ class CategoryPersistor
             'name' => $categoryName,
             'translations' => $translations,
         ];
+    }
+
+    /**
+     * @return int Number of deleted categories
+     */
+    public function removeCategoriesUpdatedAtBeforeTimestamp(int $timestamp, string $treeCode): int
+    {
+        $result = $this->connection->executeStatement(
+            \sprintf(
+                'DELETE cat FROM %1$s cat
+                 JOIN %2$s ext ON cat.ergonode_category_mapping_extension_id = ext.id
+                 WHERE GREATEST(cat.created_at, COALESCE(cat.updated_at, 0)) < :timestamp
+                 AND ext.tree_code = :treeCode
+                 AND cat.ergonode_category_mapping_extension_id IS NOT NULL;',
+                CategoryDefinition::ENTITY_NAME,
+                ErgonodeCategoryMappingExtensionDefinition::ENTITY_NAME
+            ),
+            [
+                'timestamp' => (new \DateTime('@' . $timestamp))->format('Y-m-d H:i:s'),
+                'treeCode' => $treeCode
+            ]
+        );
+
+        if (is_int($result)) {
+            return $result;
+        }
+
+        return 0;
     }
 }

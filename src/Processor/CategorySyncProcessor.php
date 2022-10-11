@@ -21,9 +21,13 @@ class CategorySyncProcessor implements CategoryProcessorInterface
     public const DEFAULT_CATEGORY_COUNT = 10;
 
     private ErgonodeGqlClientInterface $gqlClient;
+
     private CategoryQueryBuilder $categoryQueryBuilder;
+
     private CategoryPersistor $categoryPersistor;
+
     private ErgonodeCursorManager $cursorManager;
+
     private LoggerInterface $logger;
 
     public function __construct(
@@ -41,10 +45,11 @@ class CategorySyncProcessor implements CategoryProcessorInterface
     }
 
     /**
+     * @inheritDoc
      * @param int|null $categoryCount Number of categories to process (categories per page)
      */
     public function processStream(
-        string $treeCode,
+        array $treeCodes,
         Context $context,
         ?int $categoryCount = null
     ): SyncCounterDTO {
@@ -52,11 +57,14 @@ class CategorySyncProcessor implements CategoryProcessorInterface
         $counter = new SyncCounterDTO();
         $stopwatch = new Stopwatch();
 
-        $cursorEntity = $this->cursorManager->getCursorEntity(CategoryStreamResultsProxy::MAIN_FIELD, $context);
+        $cursorEntity = $this->cursorManager->getCursorEntity(
+            CategoryStreamResultsProxy::MAIN_FIELD,
+            $context
+        );
         $cursor = null === $cursorEntity ? null : $cursorEntity->getCursor();
 
         $stopwatch->start('query');
-        $query = $this->categoryQueryBuilder->build($treeCode, $categoryCount, $cursor);
+        $query = $this->categoryQueryBuilder->build($categoryCount, $cursor);
         /** @var CategoryStreamResultsProxy|null $result */
         $result = $this->gqlClient->query($query, CategoryStreamResultsProxy::class);
         $stopwatch->stop('query');
@@ -85,7 +93,7 @@ class CategorySyncProcessor implements CategoryProcessorInterface
             $counter->setPrimaryKeys($primaryKeys);
 
             $this->logger->info('Persisted category translations', [
-                'count' => $entityCount
+                'count' => $entityCount,
             ]);
         } catch (\Throwable $e) {
             $this->logger->error('Error while persisting category translations.', [
@@ -96,7 +104,11 @@ class CategorySyncProcessor implements CategoryProcessorInterface
             $stopwatch->stop('process');
         }
 
-        $this->cursorManager->persist($endCursor, CategoryStreamResultsProxy::MAIN_FIELD, $context);
+        $this->cursorManager->persist(
+            $endCursor,
+            CategoryStreamResultsProxy::MAIN_FIELD,
+            $context
+        );
 
         $counter->setHasNextPage($result->hasNextPage());
         $counter->setStopwatch($stopwatch);

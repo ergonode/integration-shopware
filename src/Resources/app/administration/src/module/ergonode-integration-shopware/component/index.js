@@ -1,4 +1,6 @@
-import './ergonode-fields-mapping-multiselect'
+import './ergonode-api-entity-multiselect'
+import './ergonode-api-key-validator'
+import './ergonode-attribute-multiselect'
+import './ergonode-category-tree-multiselect'
 import './ergonode-tabs'
 import './ergonode-trigger-button'
-import './ergonode-api-key-validator'

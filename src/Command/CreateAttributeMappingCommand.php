@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Command;
 
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition;
-use Ergonode\IntegrationShopware\Service\AttributeMapper;
+use Ergonode\IntegrationShopware\Provider\MappableFieldsProvider;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -22,15 +22,15 @@ class CreateAttributeMappingCommand extends Command
 
     private EntityRepositoryInterface $repository;
 
-    private AttributeMapper $attributeMapper;
+    private MappableFieldsProvider $mappableFieldsProvider;
 
     public function __construct(
         EntityRepositoryInterface $repository,
-        AttributeMapper $attributeMapper
+        MappableFieldsProvider $mappableFieldsProvider
     ) {
         $this->context = new Context(new SystemSource());
         $this->repository = $repository;
-        $this->attributeMapper = $attributeMapper;
+        $this->mappableFieldsProvider = $mappableFieldsProvider;
 
         parent::__construct();
     }
@@ -53,12 +53,12 @@ class CreateAttributeMappingCommand extends Command
         $ergonodeKey = $input->getArgument('ergonodeKey');
 
         if (empty($shopwareKey)) {
-            $io->error(['No Shopware key provided.', 'Available keys: ' . implode(', ', $this->attributeMapper->getMappableShopwareAttributes())]);
+            $io->error(['No Shopware key provided.', 'Available keys: ' . implode(', ', $this->mappableFieldsProvider->getShopwareAttributes())]);
 
             return self::FAILURE;
         }
         if (empty($ergonodeKey)) {
-            $io->error(['No Ergonode key provided.', 'Available keys: ' . implode(', ', $this->attributeMapper->getAllErgonodeAttributes())]);
+            $io->error(['No Ergonode key provided.', 'Available keys: ' . implode(', ', $this->mappableFieldsProvider->getErgonodeAttributes())]);
 
             return self::FAILURE;
         }

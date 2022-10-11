@@ -15,10 +15,14 @@ class Constants
     public const SW_PRODUCT_MAPPABLE_FIELDS = [
         'active' => ['bool'],
         'name' => ['text', 'textarea', 'select'],
+        'price.net' => ['numeric', 'price'],
+        'price.gross' => ['numeric', 'price'],
+        'tax.rate' => ['numeric'],
         'stock' => ['numeric'],
         'media' => ['gallery'],
         'ean' => ['text', 'textarea', 'select'],
         'manufacturerNumber' => ['text', 'textarea', 'select'],
+        'manufacturer' => ['select'],
         'weight' => ['numeric'],
         'height' => ['numeric'],
         'width' => ['numeric'],
@@ -49,6 +53,9 @@ class Constants
         'metaDescription' => 'sw-product.seoForm.labelMetaDescription',
         'keywords' => 'sw-product.seoForm.labelKeywords',
         'purchaseSteps' => 'sw-product.settingsForm.labelPurchaseSteps',
-        'manufacturerNumber' => 'sw-product.settingsForm.labelManufacturerNumber'
+        'manufacturerNumber' => 'sw-product.settingsForm.labelManufacturerNumber',
+        'tax.rate' => 'sw-product.priceForm.labelTaxRate',
+        'price.net' => 'global.sw-price-field.labelPriceNet',
+        'price.gross' => 'global.sw-price-field.labelPriceGross'
     ];
 }

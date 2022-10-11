@@ -7,17 +7,25 @@ Shopware.Module.register('ergonode-integration-shopware', {
     name: 'ErgonodeIntegrationShopware',
     title: 'ErgonodeIntegrationShopware.mainMenuItemGeneral',
     description: 'Shopware Ergonode integration plugin',
-    version: '0.0.5',
+    version: '1.4.0',
     color: '#00bc87',
     icon: 'default-symbol-products',
 
     routes: {
         attributeMapping: {
-            name: 'ergonode-mapping',
+            name: 'ergonode-attribute-mapping',
             component: 'ergonode-attribute-mapping',
-            path: 'mapping',
+            path: 'attribute-mapping',
             meta: {
                 privilege: 'ergonode_attribute_mapping.viewer',
+            }
+        },
+        customFieldMapping: {
+            name: 'ergonode-custom-field-mapping',
+            component: 'ergonode-custom-field-mapping',
+            path: 'custom-field-mapping',
+            meta: {
+                privilege: 'ergonode_custom_field_mapping.viewer',
             }
         },
         importHistory: {
@@ -47,11 +55,18 @@ Shopware.Module.register('ergonode-integration-shopware', {
             privilege: 'ergonode_attribute_mapping.viewer',
         },
         {
-            id: 'ergonode.mapping',
+            id: 'ergonode.mapping.attribute',
             path: 'ergonode.integration.shopware.attributeMapping',
             label: 'ErgonodeIntegrationShopware.tabs.attributeMappings',
             parent: 'ergonode-integration',
             privilege: 'ergonode_attribute_mapping.viewer',
+        },
+        {
+            id: 'ergonode.mapping.custom-field',
+            path: 'ergonode.integration.shopware.customFieldMapping',
+            label: 'ErgonodeIntegrationShopware.tabs.customFieldMappings',
+            parent: 'ergonode-integration',
+            privilege: 'ergonode_custom_field_mapping.viewer',
         },
         {
             id: 'ergonode.synchronization',

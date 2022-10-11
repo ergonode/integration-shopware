@@ -26,7 +26,7 @@ class MediaCustomFieldTransformer implements CustomFieldTransformerInterface
             'type' => CustomFieldTypes::TEXT,
             'config' => [
                 'componentName' => 'sw-media-field',
-                'customFieldType' => 'media',
+                'customFieldType' => CustomFieldTypes::MEDIA,
             ],
         ];
     }

@@ -11,21 +11,24 @@
     },
     "tabs": {
       "attributeMappings": "Attribute mappings",
+      "customFieldMappings": "Custom field mappings",
       "importHistory": "Import history",
       "synchronization": "Synchronization"
     },
     "mappings": {
       "attributeMappingGeneral": "Attribute mapping",
       "attributeMappings": "Attribute mappings",
+      "customFieldMappings": "Custom field mappings",
       "shopwareAttribute": "Shopware attribute",
+      "shopwareCustomField": "Shopware custom field",
       "ergonodeAttribute": "Ergonode attribute",
-      "addAttributeMapping": "Add mapping",
+      "addMapping": "Add mapping",
       "messages": {
-        "mappingCreationSuccessful": "An attribute mapping has been successfully created.",
-        "mappingCreationFailure": "Could not create an attribute mapping.",
-        "mappingAlreadyExists": "A mapping of these attributes already exists.",
-        "shopwareAttributesMustBeUnique": "For every Shopware attribute there may only be one mapping that includes it.",
-        "ergonodeAttributeFetchFailure": "Failed to fetch Ergonode attributes. Please, check if Ergonode API Settings are correct."
+        "mappingCreationSuccessful": "A mapping has been successfully created.",
+        "mappingCreationFailure": "Could not create mapping.",
+        "mappingAlreadyExists": "A mapping of these parameters already exists.",
+        "shopwareAttributesMustBeUnique": "For every Shopware attribute/field there may only be one mapping that includes it.",
+        "ergonodeOptionsFetchFailure": "Failed to fetch Ergonode options for {label} field. Please, check if Ergonode API Settings are correct."
       }
     },
     "importHistory": {
@@ -46,7 +49,6 @@
       "details": {
         "importDetails": "Import details",
         "details": "Details",
-        "importDetails": "Import details",
         "processed": "Processed",
         "errors": "Errors",
         "createdAt": "Created at",

@@ -6,7 +6,7 @@
                 <sw-skeleton v-if="isLoading"></sw-skeleton>
                 <template v-else>
                     <sw-card v-if="acl.can('ergonode_attribute_mapping.creator')"
-                        :title="$t('ErgonodeIntegrationShopware.mappings.addAttributeMapping')"
+                        :title="$t('ErgonodeIntegrationShopware.mappings.addMapping')"
                     >
                         <sw-single-select
                             :label="$t('ErgonodeIntegrationShopware.mappings.shopwareAttribute')"
@@ -26,7 +26,7 @@
                             :disabled="buttonDisabled"
                             @click="addMapping"
                         >
-                            {{ $t('ErgonodeIntegrationShopware.mappings.addAttributeMapping') }}
+                            {{ $t('ErgonodeIntegrationShopware.mappings.addMapping') }}
                         </sw-button>
                         <sw-label v-if="mappingAlreadyExists"
                                   variant="danger"

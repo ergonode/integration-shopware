@@ -12,6 +12,8 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 
 class CategoryOrderHelper
 {
@@ -29,7 +31,7 @@ class CategoryOrderHelper
         $this->connection = $connection;
     }
 
-    public function getLastCategoryIdForParent(string $parentCategoryId): ?string
+    public function getLastCategoryIdForParent(?string $parentCategoryId): ?string
     {
         return $this->lastCategoryMapping[$parentCategoryId]['lastChildId'] ?? null;
     }
@@ -43,7 +45,14 @@ class CategoryOrderHelper
         }
 
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsAnyFilter('categoryId', $ids));
+        $criteria->addFilter(
+            new MultiFilter('OR',
+                [
+                    new EqualsAnyFilter('categoryId', $ids),
+                    new EqualsFilter('categoryId', null)
+                ]
+            )
+        );
 
         /** @var CategoryLastChildMappingCollection $collection */
         $collection = $this->repository->search($criteria, $context)->getEntities();
@@ -57,7 +66,7 @@ class CategoryOrderHelper
         }
     }
 
-    public function set(string $parentId, string $childId): void
+    public function set(?string $parentId, string $childId): void
     {
         $this->lastCategoryMapping[$parentId]['lastChildId'] = $childId;
     }

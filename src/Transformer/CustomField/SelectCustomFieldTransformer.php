@@ -35,7 +35,7 @@ class SelectCustomFieldTransformer implements CustomFieldTransformerInterface
     {
         $options = [];
 
-        foreach ($node['options'] as $option) {
+        foreach ($node['options'] ?? [] as $option) {
             $label = $this->translationTransformer->transform($option['label']);
 
             $options[] = [
@@ -51,7 +51,7 @@ class SelectCustomFieldTransformer implements CustomFieldTransformerInterface
             'config' => [
                 'options' => $options,
                 'componentName' => $isMultiSelect ? 'sw-multi-select' : 'sw-single-select',
-                'customFieldType' => 'select',
+                'customFieldType' => CustomFieldTypes::SELECT,
             ],
         ];
     }
