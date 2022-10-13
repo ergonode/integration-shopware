@@ -72,6 +72,12 @@
             <label>Start date and time</label>
             <label lang="de-DE">Start date and time</label>
         </input-field>
+
+        <component name="ergonode-timezone-select">
+            <name>schedulerTimezone</name>
+            <label>Scheduler timezone</label>
+            <label lang="de-DE">Scheduler timezone</label>
+        </component>
         <input-field type="int">
             <name>schedulerRecurrenceHour</name>
             <label>Recurrence hour</label>
