@@ -20,6 +20,9 @@ services:
     Ergonode\IntegrationShopware\Transformer\ProductCustomField\ProductCustomFieldTransformerInterface:
       tags: [ 'ergonode_integration.product_custom_field_transformer' ]
 
+    Ergonode\IntegrationShopware\Processor\CategoryProcessorInterface:
+      tags: [ 'ergonode_integration.category_processor' ]
+
   # WIRE WHOLE NAMESPACE
   Ergonode\IntegrationShopware\:
     resource: '../../'
@@ -73,9 +76,7 @@ services:
 
   Ergonode\IntegrationShopware\MessageQueue\Handler\CategorySyncHandler:
     arguments:
-      $processors:
-        - '@Ergonode\IntegrationShopware\Processor\CategoryTreeSyncProcessor'
-        - '@Ergonode\IntegrationShopware\Processor\CategorySyncProcessor'
+      $processors: !tagged_iterator 'ergonode_integration.category_processor'
 
   # LOCK
   ergonode_integration.flock_store:

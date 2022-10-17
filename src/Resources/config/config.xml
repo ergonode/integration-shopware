@@ -52,12 +52,6 @@
             <label>Category trees to synchronize</label>
             <label lang="de-DE">Category trees to synchronize</label>
         </component>
-        <input-field>
-            <name>lastCategorySyncTime</name>
-            <label>Last category synchronization completion time</label>
-            <label lang="de-DE">Last category synchronization completion time</label>
-            <disabled>true</disabled>
-        </input-field>
     </card>
     <card>
         <title>Scheduler</title>

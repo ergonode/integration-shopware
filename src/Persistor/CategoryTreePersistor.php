@@ -79,18 +79,9 @@ class CategoryTreePersistor
     ): array {
         $existingCategoryId = $this->categoriesHelper->get($code);
 
-        if (null === $parentCode) {
-            if ($code === $treeCode) {
-                // this is tree root category
-                $parentId = null;
-            } else {
-                $parentId = $this->categoriesHelper->get($treeCode);
-            }
-        } else {
-            $parentId = $this->categoriesHelper->get($parentCode);
-        }
+        $parentId = $parentCode ? $this->categoriesHelper->get($parentCode) : null;
 
-        $id = null === $existingCategoryId ? null : $existingCategoryId;
+        $id = $existingCategoryId;
         $createCategory = false;
         if (null === $id) {
             $id = Uuid::randomHex();

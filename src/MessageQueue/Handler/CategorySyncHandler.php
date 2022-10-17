@@ -7,6 +7,7 @@ namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 use Ergonode\IntegrationShopware\MessageQueue\Message\CategorySync;
 use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\Processor\CategoryProcessorInterface;
+use Ergonode\IntegrationShopware\Processor\CategoryTreeSyncProcessor;
 use Ergonode\IntegrationShopware\Service\ConfigService;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Ergonode\IntegrationShopware\Util\SyncPerformanceLogger;
@@ -76,7 +77,6 @@ class CategorySyncHandler extends AbstractSyncHandler
 
     public function runSync(): int
     {
-        $currentPage = 0;
         $count = 0;
 
         $categoryTreeCodes = $this->configService->getCategoryTreeCodes();
@@ -90,28 +90,10 @@ class CategorySyncHandler extends AbstractSyncHandler
         $primaryKeys = [];
         try {
             foreach ($this->processors as $processor) {
-                $processorClass = \get_class($processor);
-                $this->logger->info(
-                    'Starting category processor',
-                    [
-                        'processor' => $processorClass,
-                    ]
-                );
+                $processedKeys = $this->runProcessor($categoryTreeCodes, $processor);
 
-                do {
-                    $result = $processor->processStream($categoryTreeCodes, $this->context);
-
-                    if ($result->hasStopwatch()) {
-                        $this->performanceLogger->logPerformance($processorClass, $result->getStopwatch());
-                    }
-
-                    $count += $result->getProcessedEntityCount();
-                    $primaryKeys = \array_merge($primaryKeys, $result->getPrimaryKeys());
-
-                    if ($currentPage++ >= self::MAX_PAGES_PER_RUN) {
-                        break 2;
-                    }
-                } while ($result->hasNextPage());
+                $primaryKeys = \array_merge($primaryKeys, $processedKeys);
+                $count += count($primaryKeys);
             }
         } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
@@ -134,5 +116,41 @@ class CategorySyncHandler extends AbstractSyncHandler
         }
 
         return $count;
+    }
+
+    private function runProcessor(array $categoryTreeCodes, CategoryProcessorInterface $processor): array
+    {
+        $currentPage = 0;
+        $processorClass = \get_class($processor);
+        $this->logger->info(
+            'Starting category processor',
+            [
+                'processor' => $processorClass,
+            ]
+        );
+
+        $existingEntities = [];
+        $primaryKeys = [];
+        do {
+            $result = $processor->processStream($categoryTreeCodes, $this->context);
+
+            if ($result->hasStopwatch()) {
+                $this->performanceLogger->logPerformance($processorClass, $result->getStopwatch());
+            }
+
+            $primaryKeys = \array_merge($primaryKeys, $result->getPrimaryKeys());
+
+            foreach ($result->getAdditionalData()['keys'] ?? [] as $treeCode => $ids) {
+                $existingEntities[$treeCode] = array_merge($existingEntities[$treeCode] ?? [], $ids);
+            }
+
+            $currentPage++;
+        } while ($result->hasNextPage() && $currentPage >= self::MAX_PAGES_PER_RUN);
+
+        if ($processor instanceof CategoryTreeSyncProcessor) {
+            $processor->removeOrphanedCategories($existingEntities);
+        }
+
+        return $primaryKeys;
     }
 }
