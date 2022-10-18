@@ -7,6 +7,7 @@ namespace Ergonode\IntegrationShopware\Controller\Admin;
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory;
 use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
 use Ergonode\IntegrationShopware\QueryBuilder\LanguageQueryBuilder;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,12 +23,16 @@ class TestCredentialsController extends AbstractController
 
     private LanguageQueryBuilder $queryBuilder;
 
+    private LoggerInterface $ergonodeApiLogger;
+
     public function __construct(
         ErgonodeGqlClientFactory $clientFactory,
-        LanguageQueryBuilder $languageQueryBuilder
+        LanguageQueryBuilder $languageQueryBuilder,
+        LoggerInterface $ergonodeApiLogger
     ) {
         $this->clientFactory = $clientFactory;
         $this->queryBuilder = $languageQueryBuilder;
+        $this->ergonodeApiLogger = $ergonodeApiLogger;
     }
 
     /**
@@ -56,7 +61,7 @@ class TestCredentialsController extends AbstractController
                 $success = 200 === $result->getResponseObject()->getStatusCode();
             }
         } catch (Throwable $e) {
-            //
+            $this->ergonodeApiLogger->error('Invalid API credentials');
         }
 
         return new JsonResponse([
