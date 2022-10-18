@@ -61,11 +61,12 @@ class FullSyncTaskHandler extends ScheduledTaskHandler
         }
 
         $startDate = $this->configService->getSchedulerStartDatetime();
-        if (!$startDate) {
+        $startTimezone = $this->configService->getSchedulerStartTimezone();
+        if (!$startDate || !$startTimezone) {
             return false;
         }
 
-        $currentDate = new \DateTime();
+        $currentDate = new \DateTime('now', new \DateTimeZone($startTimezone));
 
         $lastRun = $this->configService->getLastFullSyncDatetime();
         if (!$lastRun) {

@@ -83,4 +83,16 @@ class MappingController extends AbstractController
             'data' => $attributes,
         ], Response::HTTP_OK);
     }
+
+    /**
+     * @Route("/api/ergonode/timezones", name="api.ergonode.timezones", methods={"GET"})
+     */
+    public function timezones(): JsonResponse
+    {
+        $timezones = timezone_identifiers_list();
+
+        return new JsonResponse([
+            'data' => $timezones,
+        ], Response::HTTP_OK);
+    }
 }

@@ -99,8 +99,9 @@ class ConfigService
     public function getLastFullSyncDatetime(): ?\DateTime
     {
         $value = $this->configService->getString(self::CONFIG_NAMESPACE . 'fullSyncDate');
+        $timezone = $this->getSchedulerStartTimezone();
 
-        return empty($value) ? null : new \DateTime($value);
+        return empty($value) ? null : new \DateTime($value, new \DateTimeZone($timezone));
     }
 
     public function setLastFullSyncDatetime(\DateTime $date): void
@@ -143,5 +144,10 @@ class ConfigService
         }
 
         return [];
+    }
+
+    public function getSchedulerStartTimezone(): string
+    {
+        return $this->configService->getString(self::CONFIG_NAMESPACE . 'schedulerTimezone');
     }
 }
