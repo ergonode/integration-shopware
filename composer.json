@@ -25,12 +25,12 @@
         "ext-json": "*",
         "shopware/administration": "~6.4.11",
         "shopware/core": "~6.4.11",
-        "gmostafa/php-graphql-client": "^1.13",
-        "phpstan/phpstan": "^1.8.8"
+        "gmostafa/php-graphql-client": "^1.13"
     },
     "require-dev": {
         "phpunit/phpunit": "~9.5.17",
-        "phpmd/phpmd": "^2.13"
+        "phpmd/phpmd": "^2.13",
+        "phpstan/phpstan": "^1.8.8"
     },
     "autoload": {
         "psr-4": {
