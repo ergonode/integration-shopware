@@ -107,13 +107,13 @@ class ProductTransformerTest extends TestCase
                                                 [
                                                     'inherited' => false,
                                                     'language' => 'pl_PL',
-                                                    '__typename' => 'StringAttributeValue',
+                                                    '__typename' => 'TextAttributeValueTranslation',
                                                     'value_string' => 'Test product PL',
                                                 ],
                                                 [
                                                     'inherited' => false,
                                                     'language' => 'en_GB',
-                                                    '__typename' => 'StringAttributeValue',
+                                                    '__typename' => 'TextAttributeValueTranslation',
                                                     'value_string' => 'Test product EN',
                                                 ],
                                             ],
@@ -131,13 +131,13 @@ class ProductTransformerTest extends TestCase
                                                 [
                                                     'inherited' => false,
                                                     'language' => 'pl_PL',
-                                                    '__typename' => 'NumericAttributeValue',
+                                                    '__typename' => 'NumericAttributeValueTranslation',
                                                     'value_numeric' => 999,
                                                 ],
                                                 [
                                                     'inherited' => false,
                                                     'language' => 'en_GB',
-                                                    '__typename' => 'NumericAttributeValue',
+                                                    '__typename' => 'NumericAttributeValueTranslation',
                                                     'value_numeric' => 999,
                                                 ],
                                             ],

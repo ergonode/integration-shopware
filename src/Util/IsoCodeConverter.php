@@ -23,18 +23,8 @@ class IsoCodeConverter
         return str_replace('_', '-', $iso);
     }
 
-    /**
-     * @param array|string $iso
-     * @return array|string
-     */
-    public static function shopwareToErgonodeIso($iso)
+    public static function shopwareToErgonodeIso(string $iso)
     {
-        if (!is_array($iso) && !is_string($iso)) {
-            throw new InvalidArgumentException(
-                sprintf('Expected argument 1 to be array or string. Got: %s', get_debug_type($iso))
-            );
-        }
-
         return str_replace('-', '_', $iso);
     }
 }

@@ -29,10 +29,8 @@ class LanguageProvider
         $criteria = new Criteria([Defaults::LANGUAGE_SYSTEM]);
         $criteria->addAssociation('locale');
 
-        /** @var LanguageEntity $languageEntity */
         $languageEntity = $this->languageRepository->search($criteria, $context)->first();
-
-        if (null === $languageEntity) {
+        if (!$languageEntity instanceof LanguageEntity) {
             throw new RuntimeException('Could not load default system language entity');
         }
 

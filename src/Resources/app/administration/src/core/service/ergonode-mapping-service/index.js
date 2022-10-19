@@ -31,4 +31,10 @@ export default class ErgonodeMappingService extends ApiService {
             headers: this.getBasicHeaders()
         });
     }
+    
+    async getTimezones() {
+        return await this.client.get('ergonode/timezones', {
+            headers: this.getBasicHeaders()
+        });
+    }
 }

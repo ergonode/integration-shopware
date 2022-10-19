@@ -109,7 +109,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
     }
 
     /**
-     * @return string[]
+     * @return array[string, array[string, string]]
      */
     private function getOptionsMapping(array $options, Context $context): array
     {
