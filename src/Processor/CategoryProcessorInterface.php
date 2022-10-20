@@ -14,7 +14,8 @@ interface CategoryProcessorInterface
      */
     public function processStream(
         array $treeCodes,
-        Context $context,
-        ?int $categoryCount = null
+        Context $context
     ): SyncCounterDTO;
+
+    public static function getDefaultPriority(): int;
 }
