@@ -110,6 +110,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
                 $this->logger->info('Persisted category leaves', [
                     'count' => count($primaryKeys),
+                    'treeCode' => $currentTreeCode
                 ]);
             } catch (Throwable $e) {
                 $this->logger->error('Error while persisting category leaves.', [
