@@ -15,9 +15,9 @@ pipeline {
                 }
         }
     }
-    post {
-        cleanup {
-            cleanWs deleteDirs: true
-        }
-    }
+    // post {
+    //     cleanup {
+    //         cleanWs deleteDirs: true
+    //     }
+    // }
 }
