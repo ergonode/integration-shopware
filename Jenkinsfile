@@ -5,9 +5,9 @@ pipeline {
     
     stages {
         stage('Build shopware and start test') {
-                // when {
-                //     expression { BRANCH_NAME ==~ /(PR.*)/ }
-                // }
+                when {
+                    expression { BRANCH_NAME ==~ /(PR.*)/ }
+                }
                 steps { 
                     sh script: "docker-compose up -d", label: 'Start shopware'
                     sh script: "docker-compose exec -T -u www-data shopware ./run-test.sh", label: 'Start tests'
@@ -15,9 +15,9 @@ pipeline {
                 }
         }
     }
-    // post {
-    //     cleanup {
-    //         cleanWs deleteDirs: true
-    //     }
-    // }
+    post {
+        cleanup {
+            cleanWs deleteDirs: true
+        }
+    }
 }
