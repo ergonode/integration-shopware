@@ -113,22 +113,23 @@ class CategoryPersistor
     /**
      * @return int Number of deleted categories
      */
-    public function removeCategoriesUpdatedAtBeforeTimestamp(int $timestamp, string $treeCode): int
+    public function removeOtherCategoriesFromTree(array $processedIds, string $treeCode): int
     {
         $result = $this->connection->executeStatement(
             \sprintf(
                 'DELETE cat FROM %1$s cat
-                 JOIN %2$s ext ON cat.ergonode_category_mapping_extension_id = ext.id
-                 WHERE GREATEST(cat.created_at, COALESCE(cat.updated_at, 0)) < :timestamp
+                 INNER JOIN %2$s ext ON cat.ergonode_category_mapping_extension_id = ext.id
+                 WHERE HEX(cat.id) NOT IN (:processedIds)
                  AND ext.tree_code = :treeCode
                  AND cat.ergonode_category_mapping_extension_id IS NOT NULL;',
                 CategoryDefinition::ENTITY_NAME,
                 ErgonodeCategoryMappingExtensionDefinition::ENTITY_NAME
             ),
             [
-                'timestamp' => (new \DateTime('@' . $timestamp))->format('Y-m-d H:i:s'),
+                'processedIds' => $processedIds,
                 'treeCode' => $treeCode
-            ]
+            ],
+            ['validKeys' => Connection::PARAM_STR_ARRAY]
         );
 
         if (is_int($result)) {

@@ -14,6 +14,8 @@ class SyncCounterDTO
 
     private array $primaryKeys = [];
 
+    private array $additionalData = [];
+
     private ?Stopwatch $stopwatch = null;
 
     public function hasNextPage(): bool
@@ -59,5 +61,15 @@ class SyncCounterDTO
     public function hasStopwatch(): bool
     {
         return null !== $this->stopwatch;
+    }
+
+    public function getAdditionalData(): array
+    {
+        return $this->additionalData;
+    }
+
+    public function setAdditionalData(array $additionalData): void
+    {
+        $this->additionalData = $additionalData;
     }
 }

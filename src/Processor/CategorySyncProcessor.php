@@ -46,14 +46,11 @@ class CategorySyncProcessor implements CategoryProcessorInterface
 
     /**
      * @inheritDoc
-     * @param int|null $categoryCount Number of categories to process (categories per page)
      */
     public function processStream(
         array $treeCodes,
-        Context $context,
-        ?int $categoryCount = null
+        Context $context
     ): SyncCounterDTO {
-        $categoryCount = $categoryCount ?? self::DEFAULT_CATEGORY_COUNT;
         $counter = new SyncCounterDTO();
         $stopwatch = new Stopwatch();
 
@@ -64,7 +61,7 @@ class CategorySyncProcessor implements CategoryProcessorInterface
         $cursor = null === $cursorEntity ? null : $cursorEntity->getCursor();
 
         $stopwatch->start('query');
-        $query = $this->categoryQueryBuilder->build($categoryCount, $cursor);
+        $query = $this->categoryQueryBuilder->build(self::DEFAULT_CATEGORY_COUNT, $cursor);
         /** @var CategoryStreamResultsProxy|null $result */
         $result = $this->gqlClient->query($query, CategoryStreamResultsProxy::class);
         $stopwatch->stop('query');
@@ -114,5 +111,10 @@ class CategorySyncProcessor implements CategoryProcessorInterface
         $counter->setStopwatch($stopwatch);
 
         return $counter;
+    }
+
+    public static function getDefaultPriority(): int
+    {
+        return 10;
     }
 }

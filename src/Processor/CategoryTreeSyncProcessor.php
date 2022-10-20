@@ -11,7 +11,6 @@ use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\Persistor\CategoryTreePersistor;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
-use Ergonode\IntegrationShopware\Service\ConfigService;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
@@ -34,8 +33,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
     private LoggerInterface $logger;
 
-    private ConfigService $configService;
-
     private CategoryPersistor $categoryPersistor;
 
     public function __construct(
@@ -44,7 +41,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         CategoryTreePersistor $categoryTreePersistor,
         ErgonodeCursorManager $cursorManager,
         LoggerInterface $ergonodeSyncLogger,
-        ConfigService $configService,
         CategoryPersistor $categoryPersistor
     ) {
         $this->gqlClient = $gqlClient;
@@ -52,7 +48,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $this->categoryTreePersistor = $categoryTreePersistor;
         $this->cursorManager = $cursorManager;
         $this->logger = $ergonodeSyncLogger;
-        $this->configService = $configService;
         $this->categoryPersistor = $categoryPersistor;
     }
 
@@ -61,10 +56,8 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
      */
     public function processStream(
         array $treeCodes,
-        Context $context,
-        ?int $categoryCount = null
+        Context $context
     ): SyncCounterDTO {
-        $categoryCount = $categoryCount ?? self::DEFAULT_LEAF_COUNT;
         $counter = new SyncCounterDTO();
         $stopwatch = new Stopwatch();
 
@@ -80,7 +73,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $stopwatch->start('query');
         $query = $this->categoryQueryBuilder->buildTreeStream(
             self::DEFAULT_TREE_COUNT,
-            $categoryCount,
+            self::DEFAULT_LEAF_COUNT,
             $treeCursor,
             $leafCursor
         );
@@ -113,7 +106,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             $node = $edge['node'] ?? null;
             $currentTreeCode = $node['code'];
 
-            if (false === \in_array($node['code'], $treeCodes)) {
+            if (false === \in_array($currentTreeCode, $treeCodes)) {
                 continue;
             }
 
@@ -122,21 +115,13 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             try {
                 $primaryKeys = $this->categoryTreePersistor->persistLeaves($leafEdges, $currentTreeCode, $context);
 
-                if (false === $leafHasNextPage) {
-                    $this->removeOrphanedCategories($currentTreeCode);
-
-                    // TODO:
-                    // Temporary fix for SWERG-169. The issue is that removeOrphanedCategories adds 1 second to the
-                    // last sync time and when the sync is ran for the first time some trees can be processed under
-                    // 1 second resulting in them being completely removed because they have updated_at time before
-                    // the new lastSyncTime
-                    sleep(2);
-                }
-
                 $entityCount = \count($primaryKeys);
 
                 $counter->incrProcessedEntityCount($entityCount);
                 $counter->setPrimaryKeys($primaryKeys);
+                $existingKeys = $counter->getAdditionalData()['keys'][$currentTreeCode] ?? [];
+                $existingKeys = array_merge($existingKeys, $primaryKeys);
+                $counter->setAdditionalData(['keys' => [$currentTreeCode => $existingKeys]]);
 
                 $this->logger->info('Persisted category leaves', [
                     'count' => $entityCount,
@@ -184,25 +169,24 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         return $counter;
     }
 
-    private function removeOrphanedCategories(string $treeCode): void
+    public function removeOrphanedCategories(array $idsPerTree): void
     {
-        $lastSync = $this->configService->getLastCategorySyncTimestamp();
-        $removedCategoryCount = $this->categoryPersistor->removeCategoriesUpdatedAtBeforeTimestamp(
-            $lastSync,
-            $treeCode
-        );
+        foreach ($idsPerTree as $treeCode => $ids) {
+            $removedCategoryCount = $this->categoryPersistor->removeOtherCategoriesFromTree(
+                $ids,
+                $treeCode
+            );
 
-        $this->logger->info('Removed orphaned Ergonode categories', [
-            'treeCode' => $treeCode,
-            'count' => $removedCategoryCount,
-            'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM),
-        ]);
+            $this->logger->info('Removed orphaned Ergonode categories', [
+                'treeCode' => $treeCode,
+                'count' => $removedCategoryCount,
+                'time' => (new \DateTime('now'))->format(DATE_ATOM),
+            ]);
+        }
+    }
 
-        $formattedTime = $this->configService->setLastCategorySyncTimestamp(
-            (new \DateTime('+1 second'))->getTimestamp()
-        );
-        $this->logger->info('Saved lastCategorySyncTime', [
-            'time' => $formattedTime,
-        ]);
+    public static function getDefaultPriority(): int
+    {
+        return 5;
     }
 }
