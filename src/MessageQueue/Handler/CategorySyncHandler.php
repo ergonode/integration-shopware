@@ -138,7 +138,7 @@ class CategorySyncHandler extends AbstractSyncHandler
                 $this->performanceLogger->logPerformance($processorClass, $result->getStopwatch());
             }
 
-            $primaryKeys = \array_merge($primaryKeys, $result->getPrimaryKeys());
+            $primaryKeys[] = $result->getPrimaryKeys();
 
             foreach ($result->getAdditionalData()['keys'] ?? [] as $treeCode => $ids) {
                 $existingEntities[$treeCode] = array_merge($existingEntities[$treeCode] ?? [], $ids);
@@ -146,6 +146,8 @@ class CategorySyncHandler extends AbstractSyncHandler
 
             $currentPage++;
         } while ($result->hasNextPage() && $currentPage >= self::MAX_PAGES_PER_RUN);
+
+        $primaryKeys = array_merge(...$primaryKeys);
 
         if ($processor instanceof CategoryTreeSyncProcessor) {
             $processor->removeOrphanedCategories($existingEntities);
