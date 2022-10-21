@@ -139,6 +139,7 @@ class CategorySyncHandler extends AbstractSyncHandler
             }
 
             $primaryKeys[] = $result->getPrimaryKeys();
+            rand(1,10);
 
             foreach ($result->getAdditionalData()['keys'] ?? [] as $treeCode => $ids) {
                 $existingEntities[$treeCode] = array_merge($existingEntities[$treeCode] ?? [], $ids);
