@@ -51,7 +51,9 @@ class FullSyncTaskHandler extends ScheduledTaskHandler
         $this->messageBus->dispatch(new DeletedProductSync());
         $this->messageBus->dispatch(new DeletedAttributeSync());
 
-        $this->configService->setLastFullSyncDatetime(new \DateTime('now', $this->configService->getSchedulerStartTimezone()));
+        $this->configService->setLastFullSyncDatetime(
+            new \DateTime('now', new \DateTimeZone($this->configService->getSchedulerStartTimezone()))
+        );
     }
 
     private function shouldRun(): bool
