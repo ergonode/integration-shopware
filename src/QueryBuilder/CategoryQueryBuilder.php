@@ -90,23 +90,15 @@ class CategoryQueryBuilder
     }
 
     public function buildTreeStream(
-        int $treeCount,
         int $categoryLeafCount,
-        ?string $treeCursor = null,
         ?string $categoryLeafCursor = null
     ): Query {
-        $treeArguments = ['first' => $treeCount];
-        if ($treeCursor !== null) {
-            $treeArguments['after'] = $treeCursor;
-        }
-
         $categoryLeafArguments = ['first' => $categoryLeafCount];
         if ($categoryLeafCursor !== null) {
             $categoryLeafArguments['after'] = $categoryLeafCursor;
         }
 
         return (new Query('categoryTreeStream'))
-            ->setArguments($treeArguments)
             ->setSelectionSet([
                 'totalCount',
                 (new Query('pageInfo'))

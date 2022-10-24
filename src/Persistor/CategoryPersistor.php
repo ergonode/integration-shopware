@@ -12,6 +12,7 @@ use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
 
 class CategoryPersistor
 {
@@ -113,23 +114,24 @@ class CategoryPersistor
     /**
      * @return int Number of deleted categories
      */
-    public function removeOtherCategoriesFromTree(array $processedIds, string $treeCode): int
+    public function removeOtherCategoriesFromTree(array $processedIds): int
     {
         $result = $this->connection->executeStatement(
             \sprintf(
                 'DELETE cat FROM %1$s cat
                  INNER JOIN %2$s ext ON cat.ergonode_category_mapping_extension_id = ext.id
+                 LEFT JOIN %3$s sc ON cat.id = sc.navigation_category_id
                  WHERE HEX(cat.id) NOT IN (:processedIds)
-                 AND ext.tree_code = :treeCode
-                 AND cat.ergonode_category_mapping_extension_id IS NOT NULL;',
+                 AND cat.ergonode_category_mapping_extension_id IS NOT NULL
+                 AND sc.id IS NULL;',
                 CategoryDefinition::ENTITY_NAME,
-                ErgonodeCategoryMappingExtensionDefinition::ENTITY_NAME
+                ErgonodeCategoryMappingExtensionDefinition::ENTITY_NAME,
+                SalesChannelDefinition::ENTITY_NAME,
             ),
             [
-                'processedIds' => $processedIds,
-                'treeCode' => $treeCode
+                'processedIds' => $processedIds
             ],
-            ['validKeys' => Connection::PARAM_STR_ARRAY]
+            ['processedIds' => Connection::PARAM_STR_ARRAY]
         );
 
         if (is_int($result)) {
