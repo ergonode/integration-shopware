@@ -20,7 +20,6 @@ use function count;
 
 class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 {
-    public const DEFAULT_TREE_COUNT = 1;
     public const DEFAULT_LEAF_COUNT = 25;
 
     private ErgonodeGqlClientInterface $gqlClient;
@@ -61,10 +60,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $counter = new SyncCounterDTO();
         $stopwatch = new Stopwatch();
 
-        $treeCursor = $this->cursorManager->getCursor(
-            CategoryTreeStreamResultsProxy::MAIN_FIELD,
-            $context
-        );
         $leafCursor = $this->cursorManager->getCursor(
             CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
             $context
@@ -72,9 +67,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
         $stopwatch->start('query');
         $query = $this->categoryQueryBuilder->buildTreeStream(
-            self::DEFAULT_TREE_COUNT,
             self::DEFAULT_LEAF_COUNT,
-            $treeCursor,
             $leafCursor
         );
 
@@ -86,22 +79,14 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             throw new RuntimeException('Request failed.');
         }
 
-        $leafEdges = $result->getEdges()[0]['node']['categoryTreeLeafList']['edges'] ?? [];
-        $leafHasNextPage = $result->getEdges()[0]['node']['categoryTreeLeafList']['pageInfo']['hasNextPage'] ?? false;
-        $leafEndCursor = $result->getEdges()[0]['node']['categoryTreeLeafList']['pageInfo']['endCursor'] ?? null;
-
-        if (0 === count($result->getEdges()) && 0 === count($leafEdges)) {
-            $this->logger->info('End of stream reached.');
-            $counter->setHasNextPage(false);
-
-            return $counter;
-        }
-
         $treeEndCursor = $result->getEndCursor();
         if (null === $treeEndCursor) {
             throw new RuntimeException('Could not retrieve end cursor from the response.');
         }
 
+        $leafHasNextPage = false;
+        $leafEndCursor = null;
+        $processedKeys = [];
         foreach ($result->getEdges() as $edge) {
             $node = $edge['node'] ?? null;
             $currentTreeCode = $node['code'];
@@ -113,18 +98,18 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             $stopwatch->start('process');
 
             try {
+                $leafEdges = $edge['node']['categoryTreeLeafList']['edges'] ?? [];
                 $primaryKeys = $this->categoryTreePersistor->persistLeaves($leafEdges, $currentTreeCode, $context);
 
-                $entityCount = \count($primaryKeys);
+                $processedKeys[] = $primaryKeys;
 
-                $counter->incrProcessedEntityCount($entityCount);
-                $counter->setPrimaryKeys($primaryKeys);
-                $existingKeys = $counter->getAdditionalData()['keys'][$currentTreeCode] ?? [];
-                $existingKeys = array_merge($existingKeys, $primaryKeys);
-                $counter->setAdditionalData(['keys' => [$currentTreeCode => $existingKeys]]);
+                if (!$leafHasNextPage) {
+                    $leafHasNextPage = ['node']['categoryTreeLeafList']['pageInfo']['hasNextPage'] ?? false;
+                    $leafEndCursor = $edge['node']['categoryTreeLeafList']['pageInfo']['endCursor'] ?? null;
+                }
 
                 $this->logger->info('Persisted category leaves', [
-                    'count' => $entityCount,
+                    'count' => count($primaryKeys),
                 ]);
             } catch (Throwable $e) {
                 $this->logger->error('Error while persisting category leaves.', [
@@ -135,10 +120,13 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             } finally {
                 $stopwatch->stop('process');
             }
-
-            break;
         }
 
+        $processedKeys = array_merge(...$processedKeys);
+        $entityCount = \count($processedKeys);
+
+        $counter->incrProcessedEntityCount($entityCount);
+        $counter->setPrimaryKeys($processedKeys);
         if ($leafHasNextPage) {
             $this->logger->info('Category leaves have next page', [
                 'leafCursor' => $leafEndCursor,
@@ -149,16 +137,8 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
                 $context
             );
         } else {
-            $this->logger->info('Category leaves do not have next page', [
-                'treeCursor' => $treeEndCursor,
-            ]);
             $this->cursorManager->deleteCursor(
                 CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
-                $context
-            );
-            $this->cursorManager->persist(
-                $treeEndCursor,
-                CategoryTreeStreamResultsProxy::MAIN_FIELD,
                 $context
             );
         }
@@ -169,20 +149,16 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         return $counter;
     }
 
-    public function removeOrphanedCategories(array $idsPerTree): void
+    public function removeOrphanedCategories(array $keys): void
     {
-        foreach ($idsPerTree as $treeCode => $ids) {
-            $removedCategoryCount = $this->categoryPersistor->removeOtherCategoriesFromTree(
-                $ids,
-                $treeCode
-            );
+        $removedCategoryCount = $this->categoryPersistor->removeOtherCategoriesFromTree(
+            $keys
+        );
 
-            $this->logger->info('Removed orphaned Ergonode categories', [
-                'treeCode' => $treeCode,
-                'count' => $removedCategoryCount,
-                'time' => (new \DateTime('now'))->format(DATE_ATOM),
-            ]);
-        }
+        $this->logger->info('Removed orphaned Ergonode categories', [
+            'count' => $removedCategoryCount,
+            'time' => (new \DateTime('now'))->format(DATE_ATOM),
+        ]);
     }
 
     public static function getDefaultPriority(): int
