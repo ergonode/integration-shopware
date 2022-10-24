@@ -9,6 +9,7 @@ use Ergonode\IntegrationShopware\Entity\ErgonodeCategoryMappingExtension\Ergonod
 use Ergonode\IntegrationShopware\Persistor\Helper\ExistingCategoriesHelper;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -26,16 +27,20 @@ class CategoryPersistor
 
     private string $defaultLocale;
 
+    private LoggerInterface $logger;
+
     public function __construct(
         EntityRepositoryInterface $categoryRepository,
         LanguageProvider $languageProvider,
         ExistingCategoriesHelper $categoriesHelper,
-        Connection $connection
+        Connection $connection,
+        LoggerInterface $ergonodeSyncLogger
     ) {
         $this->categoryRepository = $categoryRepository;
         $this->categoriesHelper = $categoriesHelper;
         $this->languageProvider = $languageProvider;
         $this->connection = $connection;
+        $this->logger = $ergonodeSyncLogger;
     }
 
     /**
@@ -65,6 +70,9 @@ class CategoryPersistor
                 continue;
             }
 
+            $this->logger->info('Processed category ', [
+                'code' => $code
+            ]);
             $payloads[] = $categoryPayload;
         }
 

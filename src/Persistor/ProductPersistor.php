@@ -42,14 +42,14 @@ class ProductPersistor
         ProductProvider $productProvider,
         ProductTransformerChain $productTransformerChain,
         DefinitionInstanceRegistry $definitionInstanceRegistry,
-        LoggerInterface $syncLogger,
+        LoggerInterface $ergonodeSyncLogger,
         EntityRepositoryInterface $productCategoryRepository
     ) {
         $this->productRepository = $productRepository;
         $this->productProvider = $productProvider;
         $this->productTransformerChain = $productTransformerChain;
         $this->definitionInstanceRegistry = $definitionInstanceRegistry;
-        $this->logger = $syncLogger;
+        $this->logger = $ergonodeSyncLogger;
         $this->productCategoryRepository = $productCategoryRepository;
     }
 
