@@ -21,15 +21,12 @@ class AttributeMappingProvider
 
     private CacheInterface $cache;
 
-    private string $mappingCacheKey;
-
     public function __construct(
         EntityRepositoryInterface $repository,
         CacheInterface $ergonodeAttributeMappingCache
     ) {
         $this->repository = $repository;
         $this->cache = $ergonodeAttributeMappingCache;
-        $this->mappingCacheKey = md5($this->repository->getDefinition()->getEntityName());
     }
 
     public function provideByShopwareKey(string $key, Context $context): ?ErgonodeAttributeMappingEntity
@@ -54,7 +51,7 @@ class AttributeMappingProvider
     private function getAttributeMap(Context $context): array
     {
         try {
-            return $this->cache->get($this->mappingCacheKey, function () use ($context) {
+            return $this->cache->get($this->getMappingCacheKey(), function () use ($context) {
                 $map = [];
 
                 $result = $this->repository->search(new Criteria(), $context);
@@ -72,6 +69,11 @@ class AttributeMappingProvider
 
     public function invalidateCache(): void
     {
-        $this->cache->delete($this->mappingCacheKey);
+        $this->cache->delete($this->getMappingCacheKey());
+    }
+
+    protected function getMappingCacheKey(): string
+    {
+        return md5($this->repository->getDefinition()->getEntityName());
     }
 }

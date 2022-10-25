@@ -16,6 +16,7 @@ class ErgonodeAttributeMappingFixture
         $entity->setUniqueIdentifier(Uuid::uuid4()->toString());
         $entity->setShopwareKey($shopwareKey);
         $entity->setErgonodeKey($ergonodeKey);
+        $entity->setCastToBool(false);
 
         return $entity;
     }

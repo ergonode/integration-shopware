@@ -6,6 +6,7 @@ namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Ergonode\IntegrationShopware\Provider\CustomFieldMappingProvider;
 use Ergonode\IntegrationShopware\Resolver\ProductCustomFieldTransformerResolver;
 use Ergonode\IntegrationShopware\Util\CustomFieldTypeValidator;
 use Shopware\Core\Framework\Context;
@@ -16,13 +17,13 @@ class ProductExistingCustomFieldTransformer implements ProductDataTransformerInt
 {
     private ProductCustomFieldTransformerResolver $transformerResolver;
 
-    private AttributeMappingProvider $customFieldMappingProvider;
+    private CustomFieldMappingProvider $customFieldMappingProvider;
 
     private CustomFieldTypeValidator $validator;
 
     public function __construct(
         ProductCustomFieldTransformerResolver $transformerResolver,
-        AttributeMappingProvider $customFieldMappingProvider,
+        CustomFieldMappingProvider $customFieldMappingProvider,
         CustomFieldTypeValidator $validator
     ) {
         $this->transformerResolver = $transformerResolver;
