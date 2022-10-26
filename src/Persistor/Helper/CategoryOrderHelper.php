@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Ergonode\IntegrationShopware\Entity\CategoryLastChildMapping\CategoryLastChildMappingCollection;
 use Ergonode\IntegrationShopware\Entity\CategoryLastChildMapping\CategoryLastChildMappingDefinition;
 use Ergonode\IntegrationShopware\Entity\CategoryLastChildMapping\CategoryLastChildMappingEntity;
+use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -103,5 +104,17 @@ class CategoryOrderHelper
                 CategoryLastChildMappingDefinition::ENTITY_NAME
             )
         );
+    }
+
+    public function getLastRootCategoryId(): ?string
+    {
+        $result = $this->connection->executeQuery(
+            \sprintf(
+                'SELECT HEX(id) FROM %s WHERE parent_id IS NULL AND after_category_id IS NULL ORDER BY auto_increment ASC LIMIT 1',
+                CategoryDefinition::ENTITY_NAME
+            )
+        )->fetchFirstColumn();
+
+        return $result[0] ? strtolower($result[0]) : null;
     }
 }
