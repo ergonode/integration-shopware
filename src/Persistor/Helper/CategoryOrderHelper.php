@@ -8,13 +8,17 @@ use Doctrine\DBAL\Connection;
 use Ergonode\IntegrationShopware\Entity\CategoryLastChildMapping\CategoryLastChildMappingCollection;
 use Ergonode\IntegrationShopware\Entity\CategoryLastChildMapping\CategoryLastChildMappingDefinition;
 use Ergonode\IntegrationShopware\Entity\CategoryLastChildMapping\CategoryLastChildMappingEntity;
+use Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension;
 use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\AndFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 
 class CategoryOrderHelper
 {
@@ -24,12 +28,16 @@ class CategoryOrderHelper
 
     private Connection $connection;
 
+    private EntityRepositoryInterface $categoryRepository;
+
     public function __construct(
         EntityRepositoryInterface $categoryLastChildMappingRepository,
-        Connection $connection
+        Connection $connection,
+        EntityRepositoryInterface $categoryRepository
     ) {
         $this->repository = $categoryLastChildMappingRepository;
         $this->connection = $connection;
+        $this->categoryRepository = $categoryRepository;
     }
 
     public function getLastCategoryIdForParent(?string $parentCategoryId): ?string
@@ -106,15 +114,19 @@ class CategoryOrderHelper
         );
     }
 
-    public function getLastRootCategoryId(): ?string
+    public function getLastRootCategoryId(Context $context): ?string
     {
-        $result = $this->connection->executeQuery(
-            \sprintf(
-                'SELECT HEX(id) FROM %s WHERE parent_id IS NULL AND after_category_id IS NULL ORDER BY auto_increment ASC LIMIT 1',
-                CategoryDefinition::ENTITY_NAME
-            )
-        )->fetchFirstColumn();
+        $criteria = new Criteria();
+        $criteria->addFilter(new AndFilter(
+            [
+                new EqualsFilter('parentId', NULL),
+                new EqualsFilter('afterCategoryId', NULL)
+            ]
+        ));
+        $criteria->addSorting(new FieldSorting('autoIncrement', FieldSorting::ASCENDING));
+        $criteria->setLimit(1);
+        $res = $this->categoryRepository->searchIds($criteria, $context);
 
-        return $result[0] ? strtolower($result[0]) : null;
+        return $res->firstId();
     }
 }
