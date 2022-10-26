@@ -76,7 +76,7 @@ Component.register('ergonode-import-history', {
                 },
                 {
                     property: 'context',
-                    label: this.$t('ErgonodeIntegrationShopware.importHistory.context.message'),
+                    label: this.$t('ErgonodeIntegrationShopware.importHistory.details.context'),
                 },
             ];
         },
