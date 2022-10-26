@@ -111,7 +111,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
                 $processedKeys[] = $primaryKeys;
 
                 if (!$leafHasNextPage) {
-                    $leafHasNextPage = ['node']['categoryTreeLeafList']['pageInfo']['hasNextPage'] ?? false;
+                    $leafHasNextPage = $edge['node']['categoryTreeLeafList']['pageInfo']['hasNextPage'] ?? false;
                     $leafEndCursor = $edge['node']['categoryTreeLeafList']['pageInfo']['endCursor'] ?? null;
                 }
 
