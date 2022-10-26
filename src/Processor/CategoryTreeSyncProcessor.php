@@ -10,6 +10,7 @@ use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\Persistor\CategoryTreePersistor;
+use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -34,13 +35,16 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
     private CategoryPersistor $categoryPersistor;
 
+    private CategoryOrderHelper $categoryOrderHelper;
+
     public function __construct(
         ErgonodeGqlClientInterface $gqlClient,
         CategoryQueryBuilder $categoryQueryBuilder,
         CategoryTreePersistor $categoryTreePersistor,
         ErgonodeCursorManager $cursorManager,
         LoggerInterface $ergonodeSyncLogger,
-        CategoryPersistor $categoryPersistor
+        CategoryPersistor $categoryPersistor,
+        CategoryOrderHelper $categoryOrderHelper
     ) {
         $this->gqlClient = $gqlClient;
         $this->categoryQueryBuilder = $categoryQueryBuilder;
@@ -48,6 +52,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $this->cursorManager = $cursorManager;
         $this->logger = $ergonodeSyncLogger;
         $this->categoryPersistor = $categoryPersistor;
+        $this->categoryOrderHelper = $categoryOrderHelper;
     }
 
     /**
@@ -87,6 +92,8 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $leafHasNextPage = false;
         $leafEndCursor = null;
         $processedKeys = [];
+
+        $this->fetchCategoryRootId();
         foreach ($result->getEdges() as $edge) {
             $node = $edge['node'] ?? null;
             $currentTreeCode = $node['code'];
@@ -165,5 +172,18 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
     public static function getDefaultPriority(): int
     {
         return 5;
+    }
+
+    /**
+     * Gets ID of last existing top level category
+     * @return void
+     */
+    private function fetchCategoryRootId(): void
+    {
+        $this->categoryTreePersistor->resetLastRootCategoryId();
+        $lastRootCategoryId = $this->categoryOrderHelper->getLastRootCategoryId();
+        if ($lastRootCategoryId) {
+            $this->categoryTreePersistor->setLastRootCategoryId($lastRootCategoryId);
+        }
     }
 }

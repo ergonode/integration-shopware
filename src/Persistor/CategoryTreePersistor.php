@@ -20,6 +20,8 @@ class CategoryTreePersistor
 
     private CategoryOrderHelper $categoryOrderHelper;
 
+    private ?string $lastRootCategoryId = null;
+
     public function __construct(
         EntityRepositoryInterface $categoryRepository,
         ExistingCategoriesHelper $existingCategoriesHelper,
@@ -58,7 +60,6 @@ class CategoryTreePersistor
 
         $payloads = [];
 
-        $lastRootCategoryId = null;
         foreach ($leaves as $leaf) {
             $node = $leaf['node'];
             $parentCategory = $node['parentCategory']['code'] ?? null;
@@ -67,14 +68,14 @@ class CategoryTreePersistor
                 $node['category']['code'],
                 $treeCode,
                 $parentCategory,
-                $lastRootCategoryId
+                $this->getLastRootCategoryId()
             );
 
             $payloads[] = $leafPayload;
 
             // keep categories order on top level within same tree
             if ($parentCategory === null && isset($leafPayload['id'])) {
-                $lastRootCategoryId = $leafPayload['id'];
+                $this->setLastRootCategoryId($leafPayload['id']);
             }
         }
 
@@ -122,5 +123,20 @@ class CategoryTreePersistor
         }
 
         return $result;
+    }
+
+    public function setLastRootCategoryId(string $lastRootCategoryId): void
+    {
+        $this->lastRootCategoryId = $lastRootCategoryId;
+    }
+
+    public function resetLastRootCategoryId(): void
+    {
+        $this->lastRootCategoryId = null;
+    }
+
+    public function getLastRootCategoryId(): ?string
+    {
+        return $this->lastRootCategoryId;
     }
 }
