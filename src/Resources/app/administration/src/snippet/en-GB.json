@@ -53,7 +53,8 @@
         "errors": "Errors",
         "createdAt": "Created at",
         "level": "Level",
-        "message": "Message"
+        "message": "Message",
+        "context": "Additional info"
       }
     },
     "synchronization": {

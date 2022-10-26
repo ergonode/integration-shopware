@@ -1,15 +1,15 @@
 {
     "name": "ergonode/integration-shopware",
     "description": "Shopware Ergonode Integration",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "type": "shopware-platform-plugin",
     "license": "proprietary",
     "authors": [
         {
-            "name": "Strix",
-            "homepage": "https://www.strix.net/",
-            "email": "sales@strix.net",
-            "role": "Developer"
+            "name": "Ergonode",
+            "homepage": "https://www.ergonode.com/",
+            "email": "contact@ergonode.com",
+            "role": "Owner"
         }
     ],
     "extra": {
@@ -28,7 +28,9 @@
         "gmostafa/php-graphql-client": "^1.13"
     },
     "require-dev": {
-        "phpunit/phpunit": "~9.5.17"
+        "phpunit/phpunit": "~9.5.17",
+        "phpmd/phpmd": "^2.13",
+        "phpstan/phpstan": "^1.8.8"
     },
     "autoload": {
         "psr-4": {

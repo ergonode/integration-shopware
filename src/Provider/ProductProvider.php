@@ -37,7 +37,12 @@ class ProductProvider
         $criteria->addFilter(new EqualsAnyFilter('productNumber', $skuList));
         $criteria->addAssociations($associations);
 
-        return $this->productRepository->search($criteria, $context)->getEntities();
+        $result = $this->productRepository->search($criteria, $context)->getEntities();
+        if (!$result instanceof ProductCollection) {
+            throw new \RuntimeException('Invalid product collection');
+        }
+
+        return $result;
     }
 
     /**

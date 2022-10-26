@@ -11,7 +11,6 @@ use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\Persistor\CategoryTreePersistor;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
-use Ergonode\IntegrationShopware\Service\ConfigService;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
@@ -21,7 +20,6 @@ use function count;
 
 class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 {
-    public const DEFAULT_TREE_COUNT = 1;
     public const DEFAULT_LEAF_COUNT = 25;
 
     private ErgonodeGqlClientInterface $gqlClient;
@@ -34,8 +32,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
     private LoggerInterface $logger;
 
-    private ConfigService $configService;
-
     private CategoryPersistor $categoryPersistor;
 
     public function __construct(
@@ -44,7 +40,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         CategoryTreePersistor $categoryTreePersistor,
         ErgonodeCursorManager $cursorManager,
         LoggerInterface $ergonodeSyncLogger,
-        ConfigService $configService,
         CategoryPersistor $categoryPersistor
     ) {
         $this->gqlClient = $gqlClient;
@@ -52,7 +47,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $this->categoryTreePersistor = $categoryTreePersistor;
         $this->cursorManager = $cursorManager;
         $this->logger = $ergonodeSyncLogger;
-        $this->configService = $configService;
         $this->categoryPersistor = $categoryPersistor;
     }
 
@@ -61,17 +55,11 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
      */
     public function processStream(
         array $treeCodes,
-        Context $context,
-        ?int $categoryCount = null
+        Context $context
     ): SyncCounterDTO {
-        $categoryCount = $categoryCount ?? self::DEFAULT_LEAF_COUNT;
         $counter = new SyncCounterDTO();
         $stopwatch = new Stopwatch();
 
-        $treeCursor = $this->cursorManager->getCursor(
-            CategoryTreeStreamResultsProxy::MAIN_FIELD,
-            $context
-        );
         $leafCursor = $this->cursorManager->getCursor(
             CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
             $context
@@ -79,9 +67,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
         $stopwatch->start('query');
         $query = $this->categoryQueryBuilder->buildTreeStream(
-            self::DEFAULT_TREE_COUNT,
-            $categoryCount,
-            $treeCursor,
+            self::DEFAULT_LEAF_COUNT,
             $leafCursor
         );
 
@@ -93,53 +79,38 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             throw new RuntimeException('Request failed.');
         }
 
-        $leafEdges = $result->getEdges()[0]['node']['categoryTreeLeafList']['edges'] ?? [];
-        $leafHasNextPage = $result->getEdges()[0]['node']['categoryTreeLeafList']['pageInfo']['hasNextPage'] ?? false;
-        $leafEndCursor = $result->getEdges()[0]['node']['categoryTreeLeafList']['pageInfo']['endCursor'] ?? null;
-
-        if (0 === count($result->getEdges()) && 0 === count($leafEdges)) {
-            $this->logger->info('End of stream reached.');
-            $counter->setHasNextPage(false);
-
-            return $counter;
-        }
-
         $treeEndCursor = $result->getEndCursor();
         if (null === $treeEndCursor) {
             throw new RuntimeException('Could not retrieve end cursor from the response.');
         }
 
+        $leafHasNextPage = false;
+        $leafEndCursor = null;
+        $processedKeys = [];
         foreach ($result->getEdges() as $edge) {
             $node = $edge['node'] ?? null;
             $currentTreeCode = $node['code'];
 
-            if (false === \in_array($node['code'], $treeCodes)) {
+            if (false === \in_array($currentTreeCode, $treeCodes)) {
                 continue;
             }
 
             $stopwatch->start('process');
 
             try {
+                $leafEdges = $edge['node']['categoryTreeLeafList']['edges'] ?? [];
                 $primaryKeys = $this->categoryTreePersistor->persistLeaves($leafEdges, $currentTreeCode, $context);
 
-                if (false === $leafHasNextPage) {
-                    $this->removeOrphanedCategories($currentTreeCode);
+                $processedKeys[] = $primaryKeys;
 
-                    // TODO:
-                    // Temporary fix for SWERG-169. The issue is that removeOrphanedCategories adds 1 second to the
-                    // last sync time and when the sync is ran for the first time some trees can be processed under
-                    // 1 second resulting in them being completely removed because they have updated_at time before
-                    // the new lastSyncTime
-                    sleep(2);
+                if (!$leafHasNextPage) {
+                    $leafHasNextPage = ['node']['categoryTreeLeafList']['pageInfo']['hasNextPage'] ?? false;
+                    $leafEndCursor = $edge['node']['categoryTreeLeafList']['pageInfo']['endCursor'] ?? null;
                 }
 
-                $entityCount = \count($primaryKeys);
-
-                $counter->incrProcessedEntityCount($entityCount);
-                $counter->setPrimaryKeys($primaryKeys);
-
                 $this->logger->info('Persisted category leaves', [
-                    'count' => $entityCount,
+                    'count' => count($primaryKeys),
+                    'treeCode' => $currentTreeCode
                 ]);
             } catch (Throwable $e) {
                 $this->logger->error('Error while persisting category leaves.', [
@@ -150,10 +121,13 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             } finally {
                 $stopwatch->stop('process');
             }
-
-            break;
         }
 
+        $processedKeys = array_merge(...$processedKeys);
+        $entityCount = \count($processedKeys);
+
+        $counter->incrProcessedEntityCount($entityCount);
+        $counter->setPrimaryKeys($processedKeys);
         if ($leafHasNextPage) {
             $this->logger->info('Category leaves have next page', [
                 'leafCursor' => $leafEndCursor,
@@ -164,16 +138,8 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
                 $context
             );
         } else {
-            $this->logger->info('Category leaves do not have next page', [
-                'treeCursor' => $treeEndCursor,
-            ]);
             $this->cursorManager->deleteCursor(
                 CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
-                $context
-            );
-            $this->cursorManager->persist(
-                $treeEndCursor,
-                CategoryTreeStreamResultsProxy::MAIN_FIELD,
                 $context
             );
         }
@@ -184,25 +150,20 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         return $counter;
     }
 
-    private function removeOrphanedCategories(string $treeCode): void
+    public function removeOrphanedCategories(array $keys): void
     {
-        $lastSync = $this->configService->getLastCategorySyncTimestamp();
-        $removedCategoryCount = $this->categoryPersistor->removeCategoriesUpdatedAtBeforeTimestamp(
-            $lastSync,
-            $treeCode
+        $removedCategoryCount = $this->categoryPersistor->removeOtherCategoriesFromTree(
+            $keys
         );
 
         $this->logger->info('Removed orphaned Ergonode categories', [
-            'treeCode' => $treeCode,
             'count' => $removedCategoryCount,
-            'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM),
+            'time' => (new \DateTime('now'))->format(DATE_ATOM),
         ]);
+    }
 
-        $formattedTime = $this->configService->setLastCategorySyncTimestamp(
-            (new \DateTime('+1 second'))->getTimestamp()
-        );
-        $this->logger->info('Saved lastCategorySyncTime', [
-            'time' => $formattedTime,
-        ]);
+    public static function getDefaultPriority(): int
+    {
+        return 5;
     }
 }

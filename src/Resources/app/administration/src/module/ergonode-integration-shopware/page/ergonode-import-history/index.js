@@ -74,6 +74,10 @@ Component.register('ergonode-import-history', {
                     property: 'message',
                     label: this.$t('ErgonodeIntegrationShopware.importHistory.details.message'),
                 },
+                {
+                    property: 'context',
+                    label: this.$t('ErgonodeIntegrationShopware.importHistory.details.context'),
+                },
             ];
         },
 

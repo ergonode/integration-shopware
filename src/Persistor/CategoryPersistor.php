@@ -9,9 +9,11 @@ use Ergonode\IntegrationShopware\Entity\ErgonodeCategoryMappingExtension\Ergonod
 use Ergonode\IntegrationShopware\Persistor\Helper\ExistingCategoriesHelper;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
 
 class CategoryPersistor
 {
@@ -25,16 +27,20 @@ class CategoryPersistor
 
     private string $defaultLocale;
 
+    private LoggerInterface $logger;
+
     public function __construct(
         EntityRepositoryInterface $categoryRepository,
         LanguageProvider $languageProvider,
         ExistingCategoriesHelper $categoriesHelper,
-        Connection $connection
+        Connection $connection,
+        LoggerInterface $ergonodeSyncLogger
     ) {
         $this->categoryRepository = $categoryRepository;
         $this->categoriesHelper = $categoriesHelper;
         $this->languageProvider = $languageProvider;
         $this->connection = $connection;
+        $this->logger = $ergonodeSyncLogger;
     }
 
     /**
@@ -64,6 +70,9 @@ class CategoryPersistor
                 continue;
             }
 
+            $this->logger->info('Processed category ', [
+                'code' => $code
+            ]);
             $payloads[] = $categoryPayload;
         }
 
@@ -113,22 +122,24 @@ class CategoryPersistor
     /**
      * @return int Number of deleted categories
      */
-    public function removeCategoriesUpdatedAtBeforeTimestamp(int $timestamp, string $treeCode): int
+    public function removeOtherCategoriesFromTree(array $processedIds): int
     {
         $result = $this->connection->executeStatement(
             \sprintf(
                 'DELETE cat FROM %1$s cat
-                 JOIN %2$s ext ON cat.ergonode_category_mapping_extension_id = ext.id
-                 WHERE GREATEST(cat.created_at, COALESCE(cat.updated_at, 0)) < :timestamp
-                 AND ext.tree_code = :treeCode
-                 AND cat.ergonode_category_mapping_extension_id IS NOT NULL;',
+                 INNER JOIN %2$s ext ON cat.ergonode_category_mapping_extension_id = ext.id
+                 LEFT JOIN %3$s sc ON cat.id = sc.navigation_category_id
+                 WHERE HEX(cat.id) NOT IN (:processedIds)
+                 AND cat.ergonode_category_mapping_extension_id IS NOT NULL
+                 AND sc.id IS NULL;',
                 CategoryDefinition::ENTITY_NAME,
-                ErgonodeCategoryMappingExtensionDefinition::ENTITY_NAME
+                ErgonodeCategoryMappingExtensionDefinition::ENTITY_NAME,
+                SalesChannelDefinition::ENTITY_NAME,
             ),
             [
-                'timestamp' => (new \DateTime('@' . $timestamp))->format('Y-m-d H:i:s'),
-                'treeCode' => $treeCode
-            ]
+                'processedIds' => $processedIds
+            ],
+            ['processedIds' => Connection::PARAM_STR_ARRAY]
         );
 
         if (is_int($result)) {

@@ -19,7 +19,7 @@ class SyncHistoryProcessor
             return $record;
         }
 
-        $record['context']['syncHistoryId'] = $this->syncHistoryId;
+        $record['extra']['syncHistoryId'] = $this->syncHistoryId;
 
         return $record;
     }

@@ -37,7 +37,8 @@
         "errors": "Błędów",
         "createdAt": "Utworzono",
         "level": "Poziom",
-        "message": "Komunikat"
+        "message": "Komunikat",
+        "context": "Dodatkowe dane"
       }
     },
     "mappings": {
