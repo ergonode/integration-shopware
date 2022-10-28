@@ -19,6 +19,11 @@ Component.register('ergonode-api-entity-multiselect', {
             },
             default: () => [],
         },
+        disabled: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
     },
 
     data() {

@@ -15,6 +15,10 @@ Component.register('ergonode-api-select', {
         value: {
             required: true
         },
+        disabled: {
+            required: false,
+            default: false,
+        },
     },
     
     data() {
