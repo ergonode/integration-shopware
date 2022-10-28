@@ -31,7 +31,7 @@ services:
   Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClient:
     factory: [ '@Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory', 'createFromPluginConfig' ]
 
-  Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory:
+  Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory: ~
 
   # COMMAND
   Ergonode\IntegrationShopware\Command\CreateAttributeMappingCommand:

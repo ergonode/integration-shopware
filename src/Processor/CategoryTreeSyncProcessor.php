@@ -93,7 +93,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $leafEndCursor = null;
         $processedKeys = [];
 
-        $this->fetchCategoryRootId();
+        $this->fetchCategoryRootId($context);
         foreach ($result->getEdges() as $edge) {
             $node = $edge['node'] ?? null;
             $currentTreeCode = $node['code'];
@@ -111,7 +111,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
                 $processedKeys[] = $primaryKeys;
 
                 if (!$leafHasNextPage) {
-                    $leafHasNextPage = ['node']['categoryTreeLeafList']['pageInfo']['hasNextPage'] ?? false;
+                    $leafHasNextPage = $edge['node']['categoryTreeLeafList']['pageInfo']['hasNextPage'] ?? false;
                     $leafEndCursor = $edge['node']['categoryTreeLeafList']['pageInfo']['endCursor'] ?? null;
                 }
 
@@ -176,12 +176,14 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
     /**
      * Gets ID of last existing top level category
+     *
+     * @param Context $context
      * @return void
      */
-    private function fetchCategoryRootId(): void
+    private function fetchCategoryRootId(Context $context): void
     {
         $this->categoryTreePersistor->resetLastRootCategoryId();
-        $lastRootCategoryId = $this->categoryOrderHelper->getLastRootCategoryId();
+        $lastRootCategoryId = $this->categoryOrderHelper->getLastRootCategoryId($context);
         if ($lastRootCategoryId) {
             $this->categoryTreePersistor->setLastRootCategoryId($lastRootCategoryId);
         }
