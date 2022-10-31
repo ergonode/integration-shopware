@@ -36,17 +36,9 @@ Component.register('ergonode-scheduler-datetime-input', {
         },
     },
 
-
-
     methods: {
         onChange(value) {
             this.$emit('change', value);
         },
-    },
-
-    mounted () {
-        console.log('$props', this.$props);
-        console.log('$attrs', this.$attrs);
-        console.log('$listeners', this.$listeners);
     },
 });
