@@ -45,7 +45,7 @@ Component.register('ergonode-trigger-button', {
             this.isLoadingInternal = true;
             try {
                 let result = await this.ergonodeSynchronizationService.triggerSynchronization(this.endpoint, this.payload);
-                if (!(result?.status === 200)) {
+                if (result?.status !== 200) {
                     throw new Error(result.statusText);
                 }
                 if (!result?.data?.success) {
