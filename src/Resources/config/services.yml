@@ -115,6 +115,9 @@ services:
       - !tagged_iterator { tag: 'ergonode_integration.product_custom_field_transformer' }
 
   # SCHEDULED TASK
+  Ergonode\IntegrationShopware\Service\ScheduledTask\CleanSyncHistoryTask:
+    tags: [ 'shopware.scheduled.task' ]
+
   Ergonode\IntegrationShopware\Service\ScheduledTask\FullSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 

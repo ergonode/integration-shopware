@@ -1,6 +1,6 @@
 <div class="ergonode-api-key-validator">
     <sw-button-process
-        :processSuccess="success"
+        :processSuccess="!!success"
         :isLoading="isLoading"
         @click="verify()"
     >

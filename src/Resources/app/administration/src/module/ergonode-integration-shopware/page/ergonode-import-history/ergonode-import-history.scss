@@ -3,3 +3,13 @@
     padding: 0;
   }
 }
+
+.ergonode-import-history__details-modal .sw-data-grid__body {
+  .sw-data-grid__cell--message,
+  .sw-data-grid__cell--context {
+    .sw-data-grid__cell-content {
+      height: auto;
+      white-space: initial;
+    }
+  }
+}

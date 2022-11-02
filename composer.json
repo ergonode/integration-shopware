@@ -16,6 +16,7 @@
         "shopware-plugin-class": "Ergonode\\IntegrationShopware\\ErgonodeIntegrationShopware",
         "author": "Strix",
         "label": {
+            "pl-PL": "Shopware Ergonode Integration",
             "de-DE": "Shopware Ergonode Integration",
             "en-GB": "Shopware Ergonode Integration"
         }

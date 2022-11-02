@@ -73,10 +73,13 @@ Component.register('ergonode-import-history', {
                 {
                     property: 'message',
                     label: this.$t('ErgonodeIntegrationShopware.importHistory.details.message'),
+                    allowResize: true,
+                    width: '250px',
                 },
                 {
                     property: 'context',
                     label: this.$t('ErgonodeIntegrationShopware.importHistory.details.context'),
+                    allowResize: true,
                 },
             ];
         },
@@ -111,11 +114,11 @@ Component.register('ergonode-import-history', {
                 .setTotalCountMode(1)
                 .addSorting(
                     {
-                        field: 'endDate',
+                        field: 'startDate',
                         order: 'DESC',
                     },
                     {
-                        field: 'startDate',
+                        field: 'endDate',
                         order: 'DESC',
                     },
                 )

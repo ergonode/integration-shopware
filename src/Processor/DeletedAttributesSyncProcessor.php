@@ -12,7 +12,6 @@ use Shopware\Core\Framework\Context;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 
-use function array_reduce;
 use function count;
 
 class DeletedAttributesSyncProcessor
@@ -43,10 +42,7 @@ class DeletedAttributesSyncProcessor
             $stopwatch->start('process');
             $result = $this->orphanEntitiesManager->cleanAttributes($context);
             $stopwatch->stop('process');
-
-            if (false === empty($result)) {
-                $processedEntityCount = array_reduce($result, static fn($carry, $item) => $carry + count($item));
-            }
+            $processedEntityCount = count($result);
 
             $this->logger->info('Processed deleted attributes', [
                 'processedCount' => $processedEntityCount,
@@ -61,7 +57,7 @@ class DeletedAttributesSyncProcessor
         }
 
         $counter->setHasNextPage(false);
-        $counter->incrProcessedEntityCount($processedEntityCount ?? 0);
+        $counter->incrProcessedEntityCount($processedEntityCount);
         $counter->setStopwatch($stopwatch);
         $this->performanceLogger->logPerformance(self::class, $stopwatch);
 

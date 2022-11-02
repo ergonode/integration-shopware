@@ -35,7 +35,7 @@
                         </template>
                         <template #pagination>
                             <sw-pagination
-                                :total="imports?.total"
+                                :total="imports?.total || 0"
                                 :page="listingPage"
                                 :limit="listingLimit"
                                 :steps="steps"
@@ -45,9 +45,11 @@
                         </template>
                     </sw-data-grid>
                     <sw-modal v-if="detailsId"
-                        :title="$t('ErgonodeIntegrationShopware.importHistory.importHistory')"
-                        :closable="true"
-                        @modal-close="hideDetails"
+                              class="ergonode-import-history__details-modal"
+                              :title="$t('ErgonodeIntegrationShopware.importHistory.importHistory')"
+                              :closable="true"
+                              @modal-close="hideDetails"
+                              size="1200px"
                     >
                         <sw-skeleton v-if="isDetailsLoading"></sw-skeleton>
                         <template v-else-if="detailsEntity">
