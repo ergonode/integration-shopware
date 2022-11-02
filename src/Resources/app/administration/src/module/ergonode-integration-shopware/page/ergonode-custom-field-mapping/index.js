@@ -19,6 +19,7 @@ Component.register('ergonode-custom-field-mapping', {
             isCreateLoading: false,
             createShopwareCustomField: null,
             createErgonodeAttribute: null,
+            createCastToBool: null,
             shopwareCustomFields: [],
             ergonodeAttributes: [],
             mappings: [],
@@ -40,6 +41,11 @@ Component.register('ergonode-custom-field-mapping', {
                 {
                     property: 'ergonodeKey',
                     label: this.$t('ErgonodeIntegrationShopware.mappings.ergonodeAttribute'),
+                    inlineEdit: false,
+                },
+                {
+                    property: 'castToBool',
+                    label: this.$t('ErgonodeIntegrationShopware.mappings.castToBool'),
                     inlineEdit: false,
                 },
             ];
@@ -96,6 +102,7 @@ Component.register('ergonode-custom-field-mapping', {
         clearForm () {
             this.createShopwareCustomField = null;
             this.createErgonodeAttribute = null;
+            this.castToBool = null;
         },
 
         async fetchMappings () {
@@ -113,6 +120,7 @@ Component.register('ergonode-custom-field-mapping', {
                 let createdMapping = this.repository.create(Context.Api);
                 createdMapping.shopwareKey = this.createShopwareCustomField;
                 createdMapping.ergonodeKey = this.createErgonodeAttribute;
+                createdMapping.castToBool = this.createCastToBool;
                 await this.repository.save(createdMapping, Context.Api);
 
                 this.clearForm();

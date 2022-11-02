@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Subscriber;
 
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Ergonode\IntegrationShopware\Provider\CustomFieldMappingProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ErgonodeMappingCacheSubscriber implements EventSubscriberInterface
@@ -15,7 +16,7 @@ class ErgonodeMappingCacheSubscriber implements EventSubscriberInterface
 
     public function __construct(
         AttributeMappingProvider $attributeMappingProvider,
-        AttributeMappingProvider $customFieldMappingProvider
+        CustomFieldMappingProvider $customFieldMappingProvider
     ) {
         $this->attributeMappingProvider = $attributeMappingProvider;
         $this->customFieldMappingProvider = $customFieldMappingProvider;
