@@ -15,8 +15,12 @@ use Shopware\Core\Framework\Uuid\Uuid;
 class CategoryTreePersistor
 {
     private EntityRepositoryInterface $categoryRepository;
+
     private ExistingCategoriesHelper $categoriesHelper;
+
     private CategoryOrderHelper $categoryOrderHelper;
+
+    private ?string $lastRootCategoryId = null;
 
     public function __construct(
         EntityRepositoryInterface $categoryRepository,
@@ -58,11 +62,21 @@ class CategoryTreePersistor
 
         foreach ($leaves as $leaf) {
             $node = $leaf['node'];
-            $payloads[] = $this->createCategoryLeafPayload(
+            $parentCategory = $node['parentCategory']['code'] ?? null;
+
+            $leafPayload = $this->createCategoryLeafPayload(
                 $node['category']['code'],
                 $treeCode,
-                $node['parentCategory']['code'] ?? null
+                $parentCategory,
+                $this->getLastRootCategoryId()
             );
+
+            $payloads[] = $leafPayload;
+
+            // keep categories order on top level within same tree
+            if ($parentCategory === null && isset($leafPayload['id'])) {
+                $this->setLastRootCategoryId($leafPayload['id']);
+            }
         }
 
         $writeResult = $this->categoryRepository->upsert($payloads, $context);
@@ -75,7 +89,8 @@ class CategoryTreePersistor
     private function createCategoryLeafPayload(
         string $code,
         string $treeCode,
-        ?string $parentCode = null
+        ?string $parentCode = null,
+        ?string $lastRootCategoryId = null
     ): array {
         $existingCategoryId = $this->categoriesHelper->get($code);
 
@@ -89,13 +104,13 @@ class CategoryTreePersistor
             $createCategory = true;
         }
 
-        $afterCategoryId = $this->categoryOrderHelper->getLastCategoryIdForParent($parentId);
+        $afterCategoryId = $parentCode ? $this->categoryOrderHelper->getLastCategoryIdForParent($parentId) : $lastRootCategoryId;
         $this->categoryOrderHelper->set($parentId, $id);
 
         $result = [
             'id' => $id,
             'parentId' => $parentId,
-            'afterCategoryId' => $afterCategoryId
+            'afterCategoryId' => $afterCategoryId,
         ];
 
         if ($createCategory) {
@@ -103,10 +118,25 @@ class CategoryTreePersistor
             $result[ErgonodeCategoryMappingExtension::EXTENSION_NAME] = [
                 'code' => $code,
                 'treeCode' => $treeCode,
-                'locale' => null
+                'locale' => null,
             ];
         }
 
         return $result;
+    }
+
+    public function setLastRootCategoryId(string $lastRootCategoryId): void
+    {
+        $this->lastRootCategoryId = $lastRootCategoryId;
+    }
+
+    public function resetLastRootCategoryId(): void
+    {
+        $this->lastRootCategoryId = null;
+    }
+
+    public function getLastRootCategoryId(): ?string
+    {
+        return $this->lastRootCategoryId;
     }
 }

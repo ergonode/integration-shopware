@@ -8,12 +8,17 @@ use Doctrine\DBAL\Connection;
 use Ergonode\IntegrationShopware\Entity\CategoryLastChildMapping\CategoryLastChildMappingCollection;
 use Ergonode\IntegrationShopware\Entity\CategoryLastChildMapping\CategoryLastChildMappingDefinition;
 use Ergonode\IntegrationShopware\Entity\CategoryLastChildMapping\CategoryLastChildMappingEntity;
+use Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension;
+use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\AndFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 
 class CategoryOrderHelper
 {
@@ -23,12 +28,16 @@ class CategoryOrderHelper
 
     private Connection $connection;
 
+    private EntityRepositoryInterface $categoryRepository;
+
     public function __construct(
         EntityRepositoryInterface $categoryLastChildMappingRepository,
-        Connection $connection
+        Connection $connection,
+        EntityRepositoryInterface $categoryRepository
     ) {
         $this->repository = $categoryLastChildMappingRepository;
         $this->connection = $connection;
+        $this->categoryRepository = $categoryRepository;
     }
 
     public function getLastCategoryIdForParent(?string $parentCategoryId): ?string
@@ -103,5 +112,21 @@ class CategoryOrderHelper
                 CategoryLastChildMappingDefinition::ENTITY_NAME
             )
         );
+    }
+
+    public function getLastRootCategoryId(Context $context): ?string
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new AndFilter(
+            [
+                new EqualsFilter('parentId', NULL),
+                new EqualsFilter('afterCategoryId', NULL)
+            ]
+        ));
+        $criteria->addSorting(new FieldSorting('autoIncrement', FieldSorting::ASCENDING));
+        $criteria->setLimit(1);
+        $res = $this->categoryRepository->searchIds($criteria, $context);
+
+        return $res->firstId();
     }
 }

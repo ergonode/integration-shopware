@@ -82,10 +82,11 @@ class ProductPersistor
                     'sku' => $mainProductPayload['productNumber']
                 ]);
             } catch (\Throwable $e) {
+                $sku = isset($productData, $productData['node']['sku']) ? $productData['node']['sku'] : null;
                 $this->logger->error('Error while transforming product.', [
                     'message' => $e->getMessage(),
                     'file' => $e->getFile() . ':' . $e->getLine(),
-                    'sku' => $productData['node']['sku'] ?? null,
+                    'sku' => $sku,
                 ]);
             }
         }
