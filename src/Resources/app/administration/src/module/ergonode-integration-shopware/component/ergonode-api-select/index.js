@@ -13,7 +13,11 @@ Component.register('ergonode-api-select', {
     
     props: {
         value: {
-            required: true
+            required: true,
+        },
+        disabled: {
+            required: false,
+            default: false,
         },
     },
     

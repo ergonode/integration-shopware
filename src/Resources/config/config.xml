@@ -63,10 +63,10 @@
         </input-field>
         <input-field type="datetime">
             <name>schedulerStartDatetime</name>
+            <hideHint>true</hideHint>
             <label>Start date and time</label>
             <label lang="de-DE">Start date and time</label>
         </input-field>
-
         <component name="ergonode-timezone-select">
             <name>schedulerTimezone</name>
             <label>Scheduler timezone</label>
