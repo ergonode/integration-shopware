@@ -64,7 +64,7 @@
                                     {{ item.ergonodeKey }} ({{ attributeType('ergonode', item.ergonodeKey) }})
                                 </template>
                                 <template #column-castToBool="{ item }">
-                                    {{ item.castToBool }}
+                                    <sw-data-grid-column-boolean :value="item.castToBool"></sw-data-grid-column-boolean>
                                 </template>
                             </sw-entity-listing>
                         </template>
