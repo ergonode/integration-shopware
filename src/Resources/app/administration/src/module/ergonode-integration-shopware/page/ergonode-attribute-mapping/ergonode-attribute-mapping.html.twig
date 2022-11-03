@@ -22,7 +22,9 @@
                         </sw-single-select>
                         <sw-checkbox-field
                             v-model="createCastToBool"
-                            :label="$t('ErgonodeIntegrationShopware.mappings.castToBool')">
+                            :label="$t('ErgonodeIntegrationShopware.mappings.castToBool')"
+                            :disabled="castToBoolDisabled"
+                        >
                         </sw-checkbox-field>
                         <sw-button
                             variant="primary"
