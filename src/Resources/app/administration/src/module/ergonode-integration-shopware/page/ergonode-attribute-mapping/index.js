@@ -74,6 +74,10 @@ Component.register('ergonode-attribute-mapping', {
             return !(this.createShopwareAttribute && this.createErgonodeAttribute) || this.mappingAlreadyExists;
         },
 
+        castToBoolDisabled () {
+            return this?.ergonodeAttributes?.find(attribute => attribute?.code === this?.createErgonodeAttribute)?.type !== 'select';
+        },
+
         mappingAlreadyExists () {
             return this.mappings.some(mapping =>
                 mapping.shopwareKey.toLowerCase() === this.createShopwareAttribute?.toLowerCase() &&
