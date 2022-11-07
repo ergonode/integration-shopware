@@ -2,7 +2,7 @@ parameters:
     level: 4
 
     bootstrapFiles:
-        - %currentWorkingDirectory%/../../../vendor/autoload.php
+        - %currentWorkingDirectory%/vendor/autoload.php
     paths:
         - %currentWorkingDirectory%
     excludePaths:
