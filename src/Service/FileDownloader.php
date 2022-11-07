@@ -25,7 +25,7 @@ class FileDownloader
     public function download(string $url, string $extension): ?MediaFile
     {
         $request = new Request();
-        $request->query->set('url', $url);
+        $request->query->set('url', $this->ensureHttps($url));
         $request->query->set('extension', $extension);
         $request->request->set('url', $url);
         $request->request->set('extension', $extension);
@@ -40,5 +40,10 @@ class FileDownloader
         }
 
         return null;
+    }
+
+    private function ensureHttps(string $url): string
+    {
+        return str_replace('http://', 'https://', $url);
     }
 }
