@@ -16,5 +16,5 @@ services:
       DATABASE_HOST: mysql
       DATABASE_URL: mysql://shopware:shopware@mysql:3306/shopware
     volumes:
-     - ./:/var/www/html/custom/plugins/ErgonodeIntergrationShopware
+     - ./:/var/www/html/custom/plugins/ErgonodeIntegrationShopware
      - ./run-test.sh:/var/www/html/run-test.sh

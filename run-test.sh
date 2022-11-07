@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
+set -e
 
 cd /var/www/html || exit 1
-composer install -d /var/www/html/custom/plugins/ErgonodeIntegrationShopware
-/var/www/html/custom/plugins/ErgonodeIntegrationShopware/vendor/phpmd/phpmd/src/bin/phpmd src text /var/www/html/custom/plugins/ErgonodeIntegrationShopware/phpmd.xml
-/var/www/html/custom/plugins/ErgonodeIntegrationShopware/vendor/bin/phpstan -c /var/www/html/custom/plugins/ErgonodeIntegrationShopware/phpstan.neon
-php /var/www/html/vendor/phpunit/phpunit/phpunit --configuration /var/www/html/custom/plugins/ErgonodeIntegrationShopware/phpunit.xml
+composer install -d custom/plugins/ErgonodeIntegrationShopware -q
+
+echo "### PHPMD"
+custom/plugins/ErgonodeIntegrationShopware/vendor/phpmd/phpmd/src/bin/phpmd custom/plugins/ErgonodeIntegrationShopware/src ansi custom/plugins/ErgonodeIntegrationShopware/phpmd.xml
+
+echo "### PHPSTAN"
+custom/plugins/ErgonodeIntegrationShopware/vendor/bin/phpstan analyse -c custom/plugins/ErgonodeIntegrationShopware/phpstan.neon --error-format=raw
+
+echo "### PHPUNIT"
+vendor/phpunit/phpunit/phpunit --configuration custom/plugins/ErgonodeIntegrationShopware/phpunit.xml
