@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer\ProductCustomField;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
-use Ergonode\IntegrationShopware\Provider\CustomFieldMappingProvider;
 use Ergonode\IntegrationShopware\Provider\CustomFieldProvider;
 use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
 use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;

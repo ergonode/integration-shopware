@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\ApiAware;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
@@ -37,7 +36,7 @@ class ErgonodeAttributeMappingDefinition extends EntityDefinition
         return new FieldCollection([
             (new IdField('id', 'id'))->addFlags(new ApiAware(), new PrimaryKey(), new Required()),
             (new StringField('shopware_key', 'shopwareKey'))->addFlags(new Required()),
-            (new StringField('ergonode_key', 'ergonodeKey'))->addFlags(new Required())
+            (new StringField('ergonode_key', 'ergonodeKey'))->addFlags(new Required()),
         ]);
     }
 }

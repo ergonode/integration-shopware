@@ -18,15 +18,8 @@
                             :label="$t('ErgonodeIntegrationShopware.mappings.ergonodeAttribute')"
                             :options="ergonodeAttributesSelectOptions"
                             v-model="createErgonodeAttribute"
-                            @change="onChangeErgonodeAttribute"
                         >
                         </sw-single-select>
-                        <sw-checkbox-field
-                            v-model="createCastToBool"
-                            :label="$t('ErgonodeIntegrationShopware.mappings.castToBool')"
-                            :disabled="castToBoolDisabled"
-                        >
-                        </sw-checkbox-field>
                         <sw-button
                             variant="primary"
                             :isLoading="isCreateLoading"
@@ -63,9 +56,6 @@
                                 </template>
                                 <template #column-ergonodeKey="{ item }">
                                     {{ item.ergonodeKey }} ({{ attributeType('ergonode', item.ergonodeKey) }})
-                                </template>
-                                <template #column-castToBool="{ item }">
-                                    <sw-data-grid-column-boolean :value="item.castToBool"></sw-data-grid-column-boolean>
                                 </template>
                             </sw-entity-listing>
                         </template>

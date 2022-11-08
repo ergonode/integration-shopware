@@ -112,7 +112,7 @@ class GqlAttributeResponse
                                         'value' => NULL,
                                     ],
                                 ],
-                                'type_numeric' => 'stock',
+                                'numeric' => 'stock',
                             ],
                         ],
                         1 => [
@@ -210,7 +210,7 @@ class GqlAttributeResponse
                                         'value' => NULL,
                                     ],
                                 ],
-                                'type_text' => 'name',
+                                'text' => 'name',
                             ],
                         ],
                         2 => [
@@ -308,7 +308,7 @@ class GqlAttributeResponse
                                         'value' => NULL,
                                     ],
                                 ],
-                                'type_text' => 'description',
+                                'text' => 'description',
                             ],
                         ],
                         3 => [
@@ -406,7 +406,7 @@ class GqlAttributeResponse
                                         'value' => NULL,
                                     ],
                                 ],
-                                'type_price' => 'price',
+                                'price' => 'price',
                                 'additional_currency' => 'PLN',
                             ],
                         ],
@@ -505,7 +505,7 @@ class GqlAttributeResponse
                                         'value' => NULL,
                                     ],
                                 ],
-                                'type_select' => 'color',
+                                'select' => 'color',
                                 'options' => [
                                     0 => [
                                         'code' => 'black',
@@ -737,7 +737,7 @@ class GqlAttributeResponse
                                         'value' => NULL,
                                     ],
                                 ],
-                                'type_select' => 'size',
+                                'select' => 'size',
                                 'options' => [
                                     0 => [
                                         'code' => 's',
