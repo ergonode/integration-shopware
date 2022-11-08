@@ -19,7 +19,7 @@ Component.register('ergonode-attribute-mapping', {
             isCreateLoading: false,
             createShopwareAttribute: null,
             createErgonodeAttribute: null,
-            createCastToBool: null,
+            createCastToBool: false,
             shopwareAttributes: [],
             ergonodeAttributes: [],
             mappings: [],
@@ -112,7 +112,13 @@ Component.register('ergonode-attribute-mapping', {
         clearForm () {
             this.createShopwareAttribute = null;
             this.createErgonodeAttribute = null;
-            this.castToBool = null;
+            this.createCastToBool = false;
+        },
+
+        onChangeErgonodeAttribute() {
+            if (this.castToBoolDisabled) {
+                this.createCastToBool = false;
+            }
         },
 
         async fetchMappings () {
