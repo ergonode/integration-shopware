@@ -11,6 +11,8 @@ use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 
 class CleanSyncHistoryTaskHandler extends ScheduledTaskHandler
 {
+    private const INTERVAL_DAYS = 30;
+
     private SyncHistoryCleaner $cleaner;
 
     public function __construct(
@@ -31,6 +33,6 @@ class CleanSyncHistoryTaskHandler extends ScheduledTaskHandler
      */
     public function run(): void
     {
-        $this->cleaner->clean(CleanSyncHistoryTask::getDefaultInterval());
+        $this->cleaner->clean(self::INTERVAL_DAYS);
     }
 }

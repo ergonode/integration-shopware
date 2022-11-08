@@ -19,7 +19,6 @@ Component.register('ergonode-attribute-mapping', {
             isCreateLoading: false,
             createShopwareAttribute: null,
             createErgonodeAttribute: null,
-            createCastToBool: null,
             shopwareAttributes: [],
             ergonodeAttributes: [],
             mappings: [],
@@ -41,11 +40,6 @@ Component.register('ergonode-attribute-mapping', {
                 {
                     property: 'ergonodeKey',
                     label: this.$t('ErgonodeIntegrationShopware.mappings.ergonodeAttribute'),
-                    inlineEdit: false,
-                },
-                {
-                    property: 'castToBool',
-                    label: this.$t('ErgonodeIntegrationShopware.mappings.castToBool'),
                     inlineEdit: false,
                 },
             ];
@@ -72,10 +66,6 @@ Component.register('ergonode-attribute-mapping', {
 
         buttonDisabled () {
             return !(this.createShopwareAttribute && this.createErgonodeAttribute) || this.mappingAlreadyExists;
-        },
-
-        castToBoolDisabled () {
-            return this?.ergonodeAttributes?.find(attribute => attribute?.code === this?.createErgonodeAttribute)?.type !== 'select';
         },
 
         mappingAlreadyExists () {
@@ -112,7 +102,6 @@ Component.register('ergonode-attribute-mapping', {
         clearForm () {
             this.createShopwareAttribute = null;
             this.createErgonodeAttribute = null;
-            this.castToBool = null;
         },
 
         async fetchMappings () {
@@ -130,7 +119,6 @@ Component.register('ergonode-attribute-mapping', {
                 let createdMapping = this.repository.create(Context.Api);
                 createdMapping.ergonodeKey = this.createErgonodeAttribute;
                 createdMapping.shopwareKey = this.createShopwareAttribute;
-                createdMapping.castToBool = this.createCastToBool;
                 await this.repository.save(createdMapping, Context.Api);
 
                 this.clearForm();

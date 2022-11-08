@@ -20,10 +20,6 @@
                             v-model="createErgonodeAttribute"
                         >
                         </sw-single-select>
-                        <sw-checkbox-field
-                                v-model="createCastToBool"
-                                :label="$t('ErgonodeIntegrationShopware.mappings.castToBool')">
-                        </sw-checkbox-field>
                         <sw-button
                             variant="primary"
                             :isLoading="isCreateLoading"
@@ -60,9 +56,6 @@
                                 </template>
                                 <template #column-ergonodeKey="{ item }">
                                     {{ item.ergonodeKey }} ({{ type('ergonodeAttributes', item.ergonodeKey) }})
-                                </template>
-                                <template #column-castToBool="{ item }">
-                                    {{ item.castToBool }}
                                 </template>
                             </sw-entity-listing>
                         </template>

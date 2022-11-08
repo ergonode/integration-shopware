@@ -21,7 +21,6 @@
       "customFieldMappings": "Custom field mappings",
       "shopwareAttribute": "Shopware attribute",
       "shopwareCustomField": "Shopware custom field",
-      "castToBool": "Cast to boolean",
       "ergonodeAttribute": "Ergonode attribute",
       "addMapping": "Add mapping",
       "messages": {

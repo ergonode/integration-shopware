@@ -12,8 +12,6 @@ class Constants
 
     public const PRODUCT_CUSTOM_FIELD_SET_NAME = 'ergonode_integration_custom_fields';
 
-    public const ATTRIBUTE_TYPE_SELECT = 'select';
-
     public const SW_PRODUCT_MAPPABLE_FIELDS = [
         'active' => ['bool'],
         'name' => ['text', 'textarea', 'select'],

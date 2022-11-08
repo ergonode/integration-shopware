@@ -6,7 +6,6 @@ namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
-use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
 use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingException;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
@@ -142,7 +141,6 @@ class ProductTransformer implements ProductDataTransformerInterface
             $swKey = $ergonodeAttributeMappingEntity->getShopwareKey();
             $result[$swKey] = $translatedValues[$this->defaultLocale];
             $result = $this->getTranslations($translatedValues, $swKey, $result);
-            $result = $this->castToBool($ergonodeAttributeMappingEntity, $result);
         }
 
         return $result;
@@ -157,20 +155,6 @@ class ProductTransformer implements ProductDataTransformerInterface
 
             $swLocale = IsoCodeConverter::ergonodeToShopwareIso($locale);
             $result['translations'][$swLocale][$swKey] = $value;
-        }
-
-        return $result;
-    }
-
-    private function castToBool(
-        ErgonodeAttributeMappingEntity $ergonodeAttributeMappingEntity,
-        array $result
-    ): array {
-        if (!$ergonodeAttributeMappingEntity->isCastToBool()) {
-            return $result;
-        }
-        foreach ($result as &$value) {
-            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         }
 
         return $result;
