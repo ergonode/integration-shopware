@@ -19,7 +19,7 @@ Component.register('ergonode-custom-field-mapping', {
             isCreateLoading: false,
             createShopwareCustomField: null,
             createErgonodeAttribute: null,
-            createCastToBool: null,
+            createCastToBool: false,
             shopwareCustomFields: [],
             ergonodeAttributes: [],
             mappings: [],
@@ -74,6 +74,10 @@ Component.register('ergonode-custom-field-mapping', {
             return !(this.createShopwareCustomField && this.createErgonodeAttribute) || this.mappingAlreadyExists;
         },
 
+        castToBoolDisabled () {
+            return this?.ergonodeAttributes?.find(attribute => attribute?.code === this?.createErgonodeAttribute)?.type !== 'select';
+        },
+
         mappingAlreadyExists () {
             return this.mappings.some(mapping =>
                 mapping.shopwareKey.toLowerCase() === this.createShopwareCustomField?.toLowerCase() &&
@@ -102,7 +106,13 @@ Component.register('ergonode-custom-field-mapping', {
         clearForm () {
             this.createShopwareCustomField = null;
             this.createErgonodeAttribute = null;
-            this.castToBool = null;
+            this.castToBool = false;
+        },
+
+        onChangeErgonodeAttribute() {
+            if (this.castToBoolDisabled) {
+                this.createCastToBool = false;
+            }
         },
 
         async fetchMappings () {
