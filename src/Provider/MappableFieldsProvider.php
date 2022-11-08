@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Provider;
 
-use Ergonode\IntegrationShopware\Struct\ErgonodeCategory;
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Util\Constants;
 use Ergonode\IntegrationShopware\Util\CustomFieldUtil;
 use Shopware\Core\Content\Product\ProductDefinition;
@@ -18,8 +18,6 @@ use Shopware\Core\System\CustomField\CustomFieldEntity;
 
 use function array_keys;
 use function array_map;
-use function strpos;
-use function substr;
 
 class MappableFieldsProvider
 {
@@ -95,7 +93,6 @@ class MappableFieldsProvider
         return array_values(
             $customFields->map(function (CustomFieldEntity $customField) use ($localeCode) {
                 $ergonodeTypes = CustomFieldUtil::getValidErgonodeTypes($customField);
-                $ergonodeTypes = array_map(fn(string $type) => str_replace('type_', '', $type), $ergonodeTypes);
 
                 return [
                     'code' => $customField->getName(),
@@ -136,7 +133,7 @@ class MappableFieldsProvider
 
                 $attributeCodes[] = [
                     'code' => $code,
-                    'type' => $this->resolveErgonodeAttributeType($node),
+                    'type' => AttributeTypesEnum::getNodeType($node),
                 ];
             }
         }
@@ -158,16 +155,5 @@ class MappableFieldsProvider
         }
 
         return array_merge(...$treeCodes);
-    }
-
-    private function resolveErgonodeAttributeType(array $node): string
-    {
-        foreach ($node as $key => $value) {
-            if (0 === strpos($key, 'type_')) {
-                return substr($key, 5);
-            }
-        }
-
-        return 'unknown';
     }
 }

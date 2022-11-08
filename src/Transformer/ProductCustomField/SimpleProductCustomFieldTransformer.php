@@ -6,9 +6,12 @@ namespace Ergonode\IntegrationShopware\Transformer\ProductCustomField;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Provider\CustomFieldMappingProvider;
+use Ergonode\IntegrationShopware\Provider\CustomFieldProvider;
 use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
 use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
 use Shopware\Core\Framework\Context;
+
+use Shopware\Core\System\CustomField\CustomFieldTypes;
 
 use function in_array;
 use function sprintf;
@@ -17,14 +20,14 @@ class SimpleProductCustomFieldTransformer implements ProductCustomFieldTransform
 {
     private TranslationTransformer $translationTransformer;
 
-    private CustomFieldMappingProvider $customFieldMappingProvider;
+    private CustomFieldProvider $customFieldProvider;
 
     public function __construct(
         TranslationTransformer $translationTransformer,
-        CustomFieldMappingProvider $customFieldMappingProvider
+        CustomFieldProvider $customFieldProvider
     ) {
         $this->translationTransformer = $translationTransformer;
-        $this->customFieldMappingProvider = $customFieldMappingProvider;
+        $this->customFieldProvider = $customFieldProvider;
     }
 
     public function supports(array $node): bool
@@ -44,14 +47,14 @@ class SimpleProductCustomFieldTransformer implements ProductCustomFieldTransform
 
     public function transformNode(array $node, string $customFieldName, Context $context): array
     {
-        $mapping = $this->customFieldMappingProvider->provideByShopwareKey($customFieldName, $context);
+        $customField = $this->customFieldProvider->getCustomFieldByName($customFieldName, $context);
 
         $translations = $this->getTranslatedValues($node['translations']);
 
         return $this->translationTransformer->transform(
             $translations,
             sprintf('customFields.%s', $customFieldName),
-            $mapping && $mapping->isCastToBool()
+            $customField->getType() === CustomFieldTypes::BOOL
         );
 
     }

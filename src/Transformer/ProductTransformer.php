@@ -6,7 +6,7 @@ namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
-use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum as Attr;
 use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingException;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
@@ -14,8 +14,10 @@ use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
 use Ergonode\IntegrationShopware\Util\AttributeTypeValidator;
 use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
+use Ergonode\IntegrationShopware\Util\YesNo;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
+
 use function array_key_exists;
 use function array_merge_recursive;
 use function in_array;
@@ -114,7 +116,7 @@ class ProductTransformer implements ProductDataTransformerInterface
         $translatedValues = [];
         foreach ($valueTranslations as $valueTranslation) {
             $valueKey = ErgonodeApiValueKeyResolverUtil::resolve($valueTranslation['__typename']);
-            switch($valueKey) {
+            switch ($valueKey) {
                 case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_ARRAY:
                     $translatedValues[$valueTranslation['language']] = $valueTranslation[$valueKey]['code'];
                     break;
@@ -138,11 +140,14 @@ class ProductTransformer implements ProductDataTransformerInterface
         array $translatedValues
     ): array {
         $result = [];
-        foreach ($mappingKeys as $ergonodeAttributeMappingEntity) {
-            $swKey = $ergonodeAttributeMappingEntity->getShopwareKey();
+        foreach ($mappingKeys as $mappingEntity) {
+            $swKey = $mappingEntity->getShopwareKey();
             $result[$swKey] = $translatedValues[$this->defaultLocale];
             $result = $this->getTranslations($translatedValues, $swKey, $result);
-            $result = $this->castToBool($ergonodeAttributeMappingEntity, $result);
+
+            if (Attr::isShopwareFieldOfType($swKey, Attr::BOOL)) {
+                $result = $this->castResultsToBoolean($result);
+            }
         }
 
         return $result;
@@ -162,15 +167,10 @@ class ProductTransformer implements ProductDataTransformerInterface
         return $result;
     }
 
-    private function castToBool(
-        ErgonodeAttributeMappingEntity $ergonodeAttributeMappingEntity,
-        array $result
-    ): array {
-        if (!$ergonodeAttributeMappingEntity->isCastToBool()) {
-            return $result;
-        }
+    private function castResultsToBoolean(array $result): array
+    {
         foreach ($result as &$value) {
-            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            $value = YesNo::cast($value);
         }
 
         return $result;

@@ -8,6 +8,7 @@ use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
 use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
+use Ergonode\IntegrationShopware\Util\YesNo;
 use Shopware\Core\Framework\Context;
 
 use function stristr;
@@ -24,8 +25,11 @@ class TranslationTransformer
         $this->languageProvider = $languageProvider;
     }
 
-    public function transform(array $ergonodeTranslation, ?string $shopwareKey = null, ?bool $castValueToBool = false): array
-    {
+    public function transform(
+        array $ergonodeTranslation,
+        ?string $shopwareKey = null,
+        ?bool $castValueToBool = false
+    ): array {
         $translations = [];
 
         foreach ($ergonodeTranslation as $translation) {
@@ -49,7 +53,7 @@ class TranslationTransformer
                 }
 
                 if ($castValueToBool) {
-                    $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                    $value = YesNo::cast($value);
                 }
 
                 if (null !== $shopwareKey) {
