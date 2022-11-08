@@ -73,9 +73,6 @@ class AttributeTypeValidator
     ): void {
         $swKey = $mapping->getShopwareKey();
         $validTypes = $this->getValidTypes($swKey, $context);
-        if ($mapping->isCastToBool() && !in_array(Constants::ATTRIBUTE_TYPE_SELECT, $validTypes)) {
-            $validTypes[] = Constants::ATTRIBUTE_TYPE_SELECT;
-        }
 
         if (empty($ergonodeAttribute)) {
             throw new $this->exceptionClass($mapping, $validTypes);

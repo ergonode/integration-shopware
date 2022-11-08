@@ -15,8 +15,6 @@ class ErgonodeAttributeMappingEntity extends Entity
 
     protected string $ergonodeKey;
 
-    protected bool $castToBool = false;
-
     /**
      * @return string
      */
@@ -47,15 +45,5 @@ class ErgonodeAttributeMappingEntity extends Entity
     public function setErgonodeKey(string $ergonodeKey): void
     {
         $this->ergonodeKey = $ergonodeKey;
-    }
-
-    public function isCastToBool(): bool
-    {
-        return $this->castToBool;
-    }
-
-    public function setCastToBool(bool $castToBool): void
-    {
-        $this->castToBool = $castToBool;
     }
 }

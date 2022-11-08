@@ -24,7 +24,7 @@ class TranslationTransformer
         $this->languageProvider = $languageProvider;
     }
 
-    public function transform(array $ergonodeTranslation, ?string $shopwareKey = null, ?bool $castValueToBool = false): array
+    public function transform(array $ergonodeTranslation, ?string $shopwareKey = null): array
     {
         $translations = [];
 
@@ -46,10 +46,6 @@ class TranslationTransformer
 
                 if (null === $value) {
                     continue;
-                }
-
-                if ($castValueToBool) {
-                    $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
                 }
 
                 if (null !== $shopwareKey) {

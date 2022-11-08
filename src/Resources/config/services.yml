@@ -95,11 +95,13 @@ services:
       $repository: '@ergonode_cursor.repository'
 
   # PROVIDER
-  Ergonode\IntegrationShopware\Provider\AttributeMappingProvider:
+  ergonode.integration_shopware.provider.attribute_mapping_provider:
+    class: Ergonode\IntegrationShopware\Provider\AttributeMappingProvider
     arguments:
       $repository: '@ergonode_attribute_mapping.repository'
 
-  Ergonode\IntegrationShopware\Provider\CustomFieldMappingProvider:
+  ergonode.integration_shopware.provider.custom_field_mapping_provider:
+    class: Ergonode\IntegrationShopware\Provider\AttributeMappingProvider
     arguments:
       $repository: '@ergonode_custom_field_mapping.repository'
 
@@ -138,6 +140,9 @@ services:
 
   Ergonode\IntegrationShopware\Subscriber\ErgonodeMappingCacheSubscriber:
     tags: [ 'kernel.event_subscriber' ]
+    arguments:
+      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
+      $customFieldMappingProvider: '@ergonode.integration_shopware.provider.custom_field_mapping_provider'
 
   Ergonode\IntegrationShopware\Subscriber\UpdatePluginSubscriber:
     arguments:
@@ -162,6 +167,14 @@ services:
   Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer:
     arguments:
       $manufacturerRepository: '@product_manufacturer.repository'
+
+  Ergonode\IntegrationShopware\Transformer\ProductTransformer:
+    arguments:
+      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
+
+  Ergonode\IntegrationShopware\Transformer\ProductExistingCustomFieldTransformer:
+    arguments:
+      $customFieldMappingProvider: '@ergonode.integration_shopware.provider.custom_field_mapping_provider'
 
   # UTIL
   Ergonode\IntegrationShopware\Util\SyncPerformanceLogger:
