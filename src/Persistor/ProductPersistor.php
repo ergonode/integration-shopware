@@ -150,7 +150,7 @@ class ProductPersistor
 
         return array_filter(
             $transformedData->getShopwareData(),
-            fn($value) => !empty($value) || 0 === $value || false === $value
+            fn($value) => !empty($value) || 0 === $value
         );
     }
 
