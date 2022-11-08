@@ -21,12 +21,12 @@ class SyncHistoryCleaner
     /**
      * @throws Exception
      */
-    public function clean(int $interval): void
+    public function clean(int $intervalDays): void
     {
         $this->connection->executeStatement(sprintf(
-            'DELETE FROM %s WHERE `created_at` < NOW() - INTERVAL %u SECOND',
+            'DELETE FROM %s WHERE `created_at` < NOW() - INTERVAL %u DAY',
             ErgonodeSyncHistoryDefinition::ENTITY_NAME,
-            $interval
+            $intervalDays
         ));
     }
 }

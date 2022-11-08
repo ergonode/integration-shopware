@@ -15,6 +15,6 @@ class CleanSyncHistoryTask extends ScheduledTask
 
     public static function getDefaultInterval(): int
     {
-        return 60 * 60 * 24 * 30; // 30d
+        return 60 * 60 * 24; // 1d
     }
 }
