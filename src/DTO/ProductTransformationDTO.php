@@ -16,7 +16,7 @@ class ProductTransformationDTO
 
     private array $entitiesToDelete = [];
 
-    private bool $isVariant = false;
+    private array $bindingCodes = [];
 
     public function __construct(array $ergonodeData, array $shopwareData = [])
     {
@@ -54,14 +54,19 @@ class ProductTransformationDTO
         $this->swProduct = $swProduct;
     }
 
-    public function isVariant(): bool
+    public function getBindingCodes(): array
     {
-        return $this->isVariant;
+        return $this->bindingCodes;
     }
 
-    public function setIsVariant(bool $isVariant): void
+    public function setBindingCodes(array $bindingCodes): void
     {
-        $this->isVariant = $isVariant;
+        $this->bindingCodes = $bindingCodes;
+    }
+
+    public function isVariant(): bool
+    {
+        return false === empty($this->bindingCodes);
     }
 
     public function isUpdate(): bool
