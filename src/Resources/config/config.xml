@@ -5,14 +5,14 @@
         <title>API Settings</title>
         <title lang="de-DE">API Einstellungen</title>
 
-        <input-field>
+        <input-field type="password">
             <name>ergonodeApiEndpoint</name>
             <label>Ergonode GraphQL API endpoint</label>
             <label lang="de-DE">Ergonode GraphQL API endpoint</label>
             <helpText>The value will always be inherited (from "All Sales Channels")!</helpText>
         </input-field>
 
-        <input-field>
+        <input-field type="password">
             <name>ergonodeApiKey</name>
             <label>Ergonode API key</label>
             <label lang="de-DE">Ergonode API key</label>
@@ -61,12 +61,11 @@
             <label>Enable scheduler</label>
             <label lang="de-DE">Enable scheduler</label>
         </input-field>
-        <input-field type="datetime">
+        <component name="ergonode-scheduler-datetime-input">
             <name>schedulerStartDatetime</name>
             <label>Start date and time</label>
             <label lang="de-DE">Start date and time</label>
-        </input-field>
-
+        </component>
         <component name="ergonode-timezone-select">
             <name>schedulerTimezone</name>
             <label>Scheduler timezone</label>

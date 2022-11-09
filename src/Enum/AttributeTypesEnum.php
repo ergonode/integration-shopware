@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Enum;
 
-class AttributeTypesEnum extends AbstractEnum
+class AttributeTypesEnum
 {
     public const DATE = 'type_date';
     public const FILE = 'type_file';
@@ -18,6 +18,10 @@ class AttributeTypesEnum extends AbstractEnum
     public const TEXTAREA = 'type_textarea';
     public const TEXT = 'type_text';
     public const UNIT = 'type_unit';
+    public const TYPES = [
+        self::DATE, self::FILE, self::GALLERY, self::IMAGE, self::SELECT, self::MULTISELECT, self::NUMERIC, self::PRICE,
+        self::RELATION, self::TEXTAREA, self::TEXT, self::UNIT,
+    ];
 
     public static function getNodeType(array $attribute): string
     {
@@ -25,7 +29,7 @@ class AttributeTypesEnum extends AbstractEnum
             return self::TEXT;
         }
 
-        $type = array_intersect(self::cases(), array_keys($attribute));
+        $type = array_intersect(self::TYPES, array_keys($attribute));
 
         return reset($type) ?: self::TEXT;
     }

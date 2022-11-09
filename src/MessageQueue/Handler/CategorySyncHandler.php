@@ -86,7 +86,6 @@ class CategorySyncHandler extends AbstractSyncHandler
             return 0;
         }
 
-        $result = null;
         $primaryKeys = [];
         try {
             foreach ($this->processors as $processor) {
@@ -105,14 +104,6 @@ class CategorySyncHandler extends AbstractSyncHandler
             $indexingMessage = new CategoryIndexingMessage($primaryKeys);
             $indexingMessage->setIndexer('category.indexer');
             $this->messageBus->dispatch($indexingMessage);
-        }
-
-        if (null !== $result && $result->hasNextPage()) {
-            $this->logger->info('Dispatching next CategorySyncMessage because still has next page');
-            $this->messageBus->dispatch(new CategorySync());
-        } else {
-            $this->logger->info('Category sync finished.');
-            $this->categoryOrderHelper->clearSaved();
         }
 
         return $count;
@@ -140,12 +131,20 @@ class CategorySyncHandler extends AbstractSyncHandler
             $primaryKeys[] = $result->getPrimaryKeys();
 
             $currentPage++;
-        } while ($result->hasNextPage() && $currentPage >= self::MAX_PAGES_PER_RUN);
+        } while ($result->hasNextPage() && $currentPage <= self::MAX_PAGES_PER_RUN);
 
         $primaryKeys = array_merge(...$primaryKeys);
 
         if ($processor instanceof CategoryTreeSyncProcessor) {
             $processor->removeOrphanedCategories($result->getPrimaryKeys());
+        }
+
+        if (null !== $result && $result->hasNextPage()) {
+            $this->logger->info('Dispatching next CategorySyncMessage because still has next page');
+            $this->messageBus->dispatch(new CategorySync());
+        } else {
+            $this->logger->info('Category sync finished.');
+            $this->categoryOrderHelper->clearSaved();
         }
 
         return $primaryKeys;

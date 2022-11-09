@@ -24,7 +24,11 @@ Component.register('ergonode-api-key-validator', {
                 parent = parent.$parent;
             }
 
-            return parent?.actualConfigData?.null || {};
+            // handle sales channel inheritance
+            return {
+                ...(parent?.actualConfigData?.null || {}),
+                ...(this.trimNulls(parent?.actualConfigData?.[parent.currentSalesChannelId]) || {}),
+            };
         },
 
         variant () {
@@ -47,7 +51,7 @@ Component.register('ergonode-api-key-validator', {
                     ?
                     this.$t('ErgonodeIntegrationShopware.configuration.verifyCredentials.credentialsCorrect')
                     :
-                        this.$t('ErgonodeIntegrationShopware.configuration.verifyCredentials.credentialsIncorrect')
+                    this.$t('ErgonodeIntegrationShopware.configuration.verifyCredentials.credentialsIncorrect')
                 )
                 :
                 this.$t('ErgonodeIntegrationShopware.configuration.verifyCredentials.verifyCredentials');
@@ -73,7 +77,7 @@ Component.register('ergonode-api-key-validator', {
             } catch ({ message }) {
                 console.error(message);
                 this.notify(this.$t('ErgonodeIntegrationShopware.configuration.verifyCredentials.couldNotVerify'));
-                this.success = undefined;
+                this.success = false;
             } finally {
                 this.isLoading = false;
             }
@@ -84,5 +88,9 @@ Component.register('ergonode-api-key-validator', {
                 message: message || this.message,
             });
         },
+
+        trimNulls(obj) {
+            return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== null));
+        }
     },
 });

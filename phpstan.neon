@@ -2,15 +2,9 @@ parameters:
     level: 4
 
     bootstrapFiles:
-        - %currentWorkingDirectory%/../../../vendor/autoload.php
+        - %currentWorkingDirectory%/vendor/autoload.php
     paths:
-        - %currentWorkingDirectory%
-    excludePaths:
-        - %currentWorkingDirectory%/Components/Smarty
-        - %currentWorkingDirectory%/vendor
-        - %currentWorkingDirectory%/tests/
-        - %currentWorkingDirectory%/Test/
-        - %currentWorkingDirectory%/Resources/smarty
+        - %currentWorkingDirectory%/custom/plugins/ErgonodeIntegrationShopware/src
 
     ignoreErrors:
         - '#apcu_#'
