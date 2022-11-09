@@ -68,8 +68,6 @@ class PropertyGroupTransformer
 
         $dto->setPropertyGroupPayload([
             'id' => $propertyGroup ? $propertyGroup->getId() : null,
-            'displayType' => PropertyGroupDefinition::DISPLAY_TYPE_TEXT,
-            'sortingType' => PropertyGroupDefinition::SORTING_TYPE_ALPHANUMERIC,
             'name' => $code,
             'options' => $options,
             'translations' => $translations,
