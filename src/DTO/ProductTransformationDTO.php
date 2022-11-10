@@ -64,6 +64,11 @@ class ProductTransformationDTO
         $this->bindingCodes = $bindingCodes;
     }
 
+    public function ergonodeDataHasVariants(): bool
+    {
+        return false === empty($this->ergonodeData['variantList']['edges']);
+    }
+
     public function isVariant(): bool
     {
         return false === empty($this->bindingCodes);
