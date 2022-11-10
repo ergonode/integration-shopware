@@ -27,8 +27,7 @@ class CustomFieldTypeValidator extends AttributeTypeValidator
     protected function getValidTypes(string $swKey, Context $context): array
     {
         $customField = $this->customFieldProvider->getCustomFieldByName($swKey, $context);
-        $map = CustomFieldUtil::getValidErgonodeTypes($customField);
 
-        return array_map(fn(string $type) => str_replace('type_', '', $type), $map);
+        return CustomFieldUtil::getValidErgonodeTypes($customField);
     }
 }
