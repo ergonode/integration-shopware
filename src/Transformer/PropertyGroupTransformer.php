@@ -6,15 +6,14 @@ namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\PropertyGroupTransformationDTO;
 use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Extension\PropertyGroup\PropertyGroupExtension;
 use Ergonode\IntegrationShopware\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
-use Ergonode\IntegrationShopware\Util\Constants;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionEntity;
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Content\Property\PropertyGroupEntity;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 
 class PropertyGroupTransformer
@@ -27,11 +26,11 @@ class PropertyGroupTransformer
         $this->translationTransformer = $translationTransformer;
     }
 
-    public function transformAttributeNode(PropertyGroupTransformationDTO $dto, Context $context): PropertyGroupTransformationDTO
+    public function transformAttributeNode(PropertyGroupTransformationDTO $dto): PropertyGroupTransformationDTO
     {
         $node = $dto->getErgonodeData();
 
-        if (Constants::ATTRIBUTE_SCOPE_GLOBAL !== ($node['scope'] ?? null)) { // properties in Shopware are not translatable
+        if (AttributeTypesEnum::SCOPE_GLOBAL !== ($node['scope'] ?? null)) { // properties in Shopware are not translatable
             return $dto;
         }
 
@@ -68,8 +67,6 @@ class PropertyGroupTransformer
 
         $dto->setPropertyGroupPayload([
             'id' => $propertyGroup ? $propertyGroup->getId() : null,
-            'displayType' => PropertyGroupDefinition::DISPLAY_TYPE_TEXT,
-            'sortingType' => PropertyGroupDefinition::SORTING_TYPE_ALPHANUMERIC,
             'name' => $code,
             'options' => $options,
             'translations' => $translations,

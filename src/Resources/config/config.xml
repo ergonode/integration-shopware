@@ -37,7 +37,7 @@
 
         <component name="ergonode-attribute-multiselect">
             <name>crossSellingKeys</name>
-            <attributesType>type_relation</attributesType>
+            <attributesType>relation</attributesType>
             <label>Ergonode attributes as cross selling</label>
             <label lang="de-DE">Ergonode attributes as cross selling</label>
             <helpText>Every selected attribute will create a separate cross-selling collection</helpText>
