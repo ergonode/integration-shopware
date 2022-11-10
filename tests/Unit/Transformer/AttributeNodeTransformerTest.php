@@ -62,8 +62,6 @@ class AttributeNodeTransformerTest extends TestCase
                 null,
                 [
                     'id' => null,
-                    'displayType' => PropertyGroupDefinition::DISPLAY_TYPE_TEXT,
-                    'sortingType' => PropertyGroupDefinition::SORTING_TYPE_ALPHANUMERIC,
                     'name' => 'color',
                     'options' => [
                         [
@@ -168,8 +166,6 @@ class AttributeNodeTransformerTest extends TestCase
                 ]),
                 [
                     'id' => null,
-                    'displayType' => PropertyGroupDefinition::DISPLAY_TYPE_TEXT,
-                    'sortingType' => PropertyGroupDefinition::SORTING_TYPE_ALPHANUMERIC,
                     'name' => 'color',
                     'options' => [
                         [
@@ -277,8 +273,6 @@ class AttributeNodeTransformerTest extends TestCase
                 ]),
                 [
                     'id' => null,
-                    'displayType' => PropertyGroupDefinition::DISPLAY_TYPE_TEXT,
-                    'sortingType' => PropertyGroupDefinition::SORTING_TYPE_ALPHANUMERIC,
                     'name' => 'size',
                     'options' => [
                         [
@@ -420,8 +414,6 @@ class AttributeNodeTransformerTest extends TestCase
                 ]),
                 [
                     'id' => null,
-                    'displayType' => PropertyGroupDefinition::DISPLAY_TYPE_TEXT,
-                    'sortingType' => PropertyGroupDefinition::SORTING_TYPE_ALPHANUMERIC,
                     'name' => 'size',
                     'options' => [
                         [
@@ -555,8 +547,6 @@ class AttributeNodeTransformerTest extends TestCase
                 ]),
                 [
                     'id' => null,
-                    'displayType' => PropertyGroupDefinition::DISPLAY_TYPE_TEXT,
-                    'sortingType' => PropertyGroupDefinition::SORTING_TYPE_ALPHANUMERIC,
                     'name' => 'size',
                     'options' => [
                         [
