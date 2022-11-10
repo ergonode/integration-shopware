@@ -67,7 +67,10 @@ class VariantsTransformer
 
         $entitiesToDelete = [];
         foreach ($transformedVariants as $variant) {
-            $shopwareData = $variant->getShopwareData();
+            $shopwareData = array_filter(
+                $variant->getShopwareData(),
+                fn($value) => !empty($value) || 0 === $value || false === $value
+            );
             $swData['children'][] = $shopwareData;
 
             foreach ($shopwareData['options'] as $optionId) {
