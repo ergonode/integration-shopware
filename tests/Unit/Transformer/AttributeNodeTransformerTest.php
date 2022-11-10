@@ -48,8 +48,7 @@ class AttributeNodeTransformerTest extends TestCase
         $this->mockTranslationTransformation(1 + count($nodeInput['options']));
 
         $output = $this->transformer->transformAttributeNode(
-            new PropertyGroupTransformationDTO($nodeInput),
-            $this->contextMock
+            new PropertyGroupTransformationDTO($nodeInput)
         );
 
         $this->assertSame($expectedOutput, $output->getPropertyGroupPayload());

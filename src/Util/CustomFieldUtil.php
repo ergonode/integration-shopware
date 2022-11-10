@@ -77,10 +77,14 @@ class CustomFieldUtil
                     AttributeTypesEnum::TEXT,
                     AttributeTypesEnum::TEXTAREA,
                 ];
+            case CustomFieldTypes::SWITCH:
+            case CustomFieldTypes::BOOL:
+                return [
+                    AttributeTypesEnum::BOOL
+                ];
             case CustomFieldTypes::COLORPICKER:
             case CustomFieldTypes::ENTITY:
             case CustomFieldTypes::JSON:
-            case CustomFieldTypes::SWITCH:
             default:
                 return [];
         }
