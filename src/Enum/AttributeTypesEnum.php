@@ -4,38 +4,56 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Enum;
 
+use Ergonode\IntegrationShopware\Util\Constants;
+
 class AttributeTypesEnum
 {
-    public const DATE = 'type_date';
-    public const FILE = 'type_file';
-    public const GALLERY = 'type_gallery';
-    public const IMAGE = 'type_image';
-    public const SELECT = 'type_select';
-    public const MULTISELECT = 'type_multiselect';
-    public const NUMERIC = 'type_numeric';
-    public const PRICE = 'type_price';
-    public const RELATION = 'type_relation';
-    public const TEXTAREA = 'type_textarea';
-    public const TEXT = 'type_text';
-    public const UNIT = 'type_unit';
-    public const TYPES = [
-        self::DATE, self::FILE, self::GALLERY, self::IMAGE, self::SELECT, self::MULTISELECT, self::NUMERIC, self::PRICE,
-        self::RELATION, self::TEXTAREA, self::TEXT, self::UNIT,
+    public const SCOPE_GLOBAL = 'GLOBAL';
+    public const SCOPE_LOCAL = 'LOCAL';
+
+    public const BOOL = 'bool';
+
+    public const DATE = 'date';
+    public const FILE = 'file';
+    public const GALLERY = 'gallery';
+    public const IMAGE = 'image';
+    public const SELECT = 'select';
+    public const MULTISELECT = 'multiselect';
+    public const NUMERIC = 'numeric';
+    public const PRICE = 'price';
+    public const RELATION = 'relation';
+    public const TEXTAREA = 'textarea';
+    public const TEXT = 'text';
+    public const UNIT = 'unit';
+
+    public const ERGONODE_TYPES = [
+        self::DATE,
+        self::FILE,
+        self::GALLERY,
+        self::IMAGE,
+        self::SELECT,
+        self::MULTISELECT,
+        self::NUMERIC,
+        self::PRICE,
+        self::RELATION,
+        self::TEXTAREA,
+        self::TEXT,
+        self::UNIT,
     ];
 
-    public static function getNodeType(array $attribute): string
+    public static function getNodeType(array $node): string
     {
-        if (empty($attribute['code'])) {
+        if (empty($node['code'])) {
             return self::TEXT;
         }
 
-        $type = array_intersect(self::TYPES, array_keys($attribute));
+        $type = array_intersect(self::ERGONODE_TYPES, array_keys($node));
 
         return reset($type) ?: self::TEXT;
     }
 
-    public static function getShortNodeType(array $attribute): string
+    public static function isShopwareFieldOfType(string $shopwareKey, string $type): bool
     {
-        return str_replace('type_', '', self::getNodeType($attribute));
+        return in_array($type, Constants::SW_PRODUCT_MAPPABLE_FIELDS[$shopwareKey] ?? []);
     }
 }

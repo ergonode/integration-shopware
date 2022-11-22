@@ -39,17 +39,8 @@ class AttributeTypeValidator
             } catch (InvalidAttributeTypeException $e) {
                 $mappingKeys->remove($key);
 
-                // TODO SWERG-84: remove inlined context from message after adding context display in admin
                 $this->logger->warning(
-                    sprintf(
-                        '%s [sku: %s; actualType: %s, validTypes: %s, ergonodeKey: %s; shopwareKey: %s]',
-                        $e->getMessage(),
-                        $logContext['sku'] ?? '',
-                        $e->getActualType(),
-                        $e->getValidTypesStr(),
-                        $e->getMapping()->getErgonodeKey(),
-                        $e->getMapping()->getShopwareKey(),
-                    ),
+                    $e->getMessage(),
                     array_merge($logContext, [
                         'actualType' => $e->getActualType(),
                         'validTypes' => $e->getValidTypes(),
@@ -74,11 +65,15 @@ class AttributeTypeValidator
         $swKey = $mapping->getShopwareKey();
         $validTypes = $this->getValidTypes($swKey, $context);
 
+        if (in_array(AttributeTypesEnum::BOOL, $validTypes)) {
+            $validTypes = [AttributeTypesEnum::SELECT];
+        }
+
         if (empty($ergonodeAttribute)) {
             throw new $this->exceptionClass($mapping, $validTypes);
         }
 
-        $actualType = AttributeTypesEnum::getShortNodeType($ergonodeAttribute);
+        $actualType = AttributeTypesEnum::getNodeType($ergonodeAttribute);
 
         if (false === in_array($actualType, $validTypes)) {
             throw new $this->exceptionClass($mapping, $validTypes, $actualType);
