@@ -23,11 +23,8 @@
 
     <!-- Naming -->
     <rule ref="rulesets/naming.xml/ConstructorWithNameAsEnclosingClass" />
-    <!--<rule ref="rulesets/naming.xml/BooleanGetMethodName" />-->
 
     <!-- Unused -->
-<!--    <rule ref="rulesets/unusedcode.xml/UnusedPrivateField" />-->
-    <!--<rule ref="rulesets/unusedcode.xml/UnusedLocalVariable" />-->
     <rule ref="rulesets/unusedcode.xml/UnusedPrivateMethod" />
 
     <!--Exclude Unit Tests / Resources / DependencyInjection-->

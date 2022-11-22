@@ -16,7 +16,7 @@ use Shopware\Core\System\Tax\TaxEntity;
 
 class ProductTaxTransformerTest extends TestCase
 {
-    private const TEST_TAX_RATE = 19;
+    private const TEST_TAX_RATE = 19.1;
     private const TEST_TAX_ID = 'cc75d746500b47f4b51711e9ad91d674';
 
     private ProductTaxTransformer $productTaxTransformer;
