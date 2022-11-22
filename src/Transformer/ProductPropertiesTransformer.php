@@ -10,6 +10,7 @@ use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Provider\PropertyGroupOptionProvider;
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
+use Shopware\Core\Content\Product\Aggregate\ProductOption\ProductOptionDefinition;
 use Shopware\Core\Content\Product\Aggregate\ProductProperty\ProductPropertyDefinition;
 use Shopware\Core\Framework\Context;
 
@@ -17,10 +18,12 @@ use function array_filter;
 use function array_flip;
 use function array_intersect_key;
 use function array_values;
-use function is_array;
 
 class ProductPropertiesTransformer implements ProductDataTransformerInterface
 {
+    const FIELD_PROPERTIES = 'properties';
+    const FIELD_OPTIONS = 'options';
+
     private PropertyGroupOptionProvider $optionProvider;
 
     private TranslationTransformer $translationTransformer;
@@ -43,20 +46,26 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
 
         $optionMapping = $this->getOptionsMapping($options, $context);
 
-        $propertyIds = array_values(array_intersect_key($optionMapping, array_flip($options)));
-
         $swData = $productData->getShopwareData();
-        $swData['properties'] = $propertyIds;
+        $swData['properties'] = array_values(array_intersect_key($optionMapping, array_flip($options)));
 
         if ($productData->isVariant()) {
-            $swData['options'] = $propertyIds;
+            $codes = $productData->getBindingCodes();
+            $bindingOptions = $this->arrayFilterStartsWith($options, $codes);
+
+            $swData['options'] = array_values(array_intersect_key($optionMapping, array_flip($bindingOptions)));
         }
 
         $productData->setShopwareData($swData);
 
         $productData->addEntitiesToDelete(
             ProductPropertyDefinition::ENTITY_NAME,
-            $this->getProductOptionsDeletePayload($productData)
+            $this->getProductPropertiesDeletePayload($productData)
+        );
+
+        $productData->addEntitiesToDelete(
+            ProductOptionDefinition::ENTITY_NAME,
+            $this->getProductPropertiesDeletePayload($productData, self::FIELD_OPTIONS)
         );
 
         return $productData;
@@ -129,21 +138,42 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
         return $optionsMapping;
     }
 
-    private function getProductOptionsDeletePayload(ProductTransformationDTO $dto): array
+    private function arrayFilterStartsWith(array $haystacks, array $needles): array
     {
-        if (null === $dto->getSwProduct()) {
+        return array_filter($haystacks, function (string $haystack) use ($needles) {
+            $matched = array_filter($needles, fn(string $needle) => str_starts_with($haystack, $needle));
+
+            return false === empty($matched);
+        });
+    }
+
+    private function getProductPropertiesDeletePayload(
+        ProductTransformationDTO $dto,
+        string $field = self::FIELD_PROPERTIES
+    ): array {
+        if (
+            false === in_array($field, [self::FIELD_OPTIONS, self::FIELD_PROPERTIES]) ||
+            null === $dto->getSwProduct()
+        ) {
             return [];
         }
 
-        $properties = $dto->getSwProduct()->getProperties();
-        if (null === $properties) {
+        $getter = sprintf('get%s', ucfirst($field));
+
+        $currentProperties = $dto->getSwProduct()->$getter();
+        if (null === $currentProperties) {
+            return [];
+        }
+
+        $newProperties = $dto->getShopwareData()[$field] ?? [];
+        if (empty($newProperties)) {
             return [];
         }
 
         $newPropertyIds = array_filter(
-            array_map(fn(array $property) => $property['id'] ?? null, $dto->getShopwareData()['properties'])
+            array_map(fn(array $property) => $property['id'] ?? null, $newProperties)
         );
-        $propertyIds = $properties->getIds();
+        $propertyIds = $currentProperties->getIds();
 
         $idsToDelete = array_diff($propertyIds, $newPropertyIds);
 

@@ -9,21 +9,35 @@ use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingExceptio
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Transformer\ProductTransformerChain;
+use Ergonode\IntegrationShopware\Transformer\VariantsTransformer;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Product\ProductDefinition;
+use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityRepositoryNotFoundException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
+use Throwable;
+
 use function array_filter;
+use function array_key_exists;
+use function array_map;
 use function array_values;
 use function is_array;
 
 class ProductPersistor
 {
+    /**
+     * @var ProductEntity[]
+     */
     private array $existingProductCache = [];
+
+    /**
+     * @var string[]
+     */
+    private array $existingVariantSkus = [];
 
     private EntityRepositoryInterface $productRepository;
 
@@ -37,13 +51,16 @@ class ProductPersistor
 
     private EntityRepositoryInterface $productCategoryRepository;
 
+    private VariantsTransformer $variantsTransformer;
+
     public function __construct(
         EntityRepositoryInterface $productRepository,
         ProductProvider $productProvider,
         ProductTransformerChain $productTransformerChain,
         DefinitionInstanceRegistry $definitionInstanceRegistry,
         LoggerInterface $ergonodeSyncLogger,
-        EntityRepositoryInterface $productCategoryRepository
+        EntityRepositoryInterface $productCategoryRepository,
+        VariantsTransformer $variantsTransformer
     ) {
         $this->productRepository = $productRepository;
         $this->productProvider = $productProvider;
@@ -51,6 +68,7 @@ class ProductPersistor
         $this->definitionInstanceRegistry = $definitionInstanceRegistry;
         $this->logger = $ergonodeSyncLogger;
         $this->productCategoryRepository = $productCategoryRepository;
+        $this->variantsTransformer = $variantsTransformer;
     }
 
     /**
@@ -61,27 +79,24 @@ class ProductPersistor
     {
         $this->loadExistingProductCache($productListData, $context);
         $payloads = [];
-        $existingVariants = [];
+
         foreach ($productListData as $productData) {
             try {
-                $mainProductPayload = $this->getProductPayload($productData['node'], false, $context);
-                if ($this->isProductProcessedAsVariant($mainProductPayload, $existingVariants)) {
+                $mainProductPayload = $this->getProductPayload($productData['node'], $context);
+                if (empty($mainProductPayload)) {
                     continue;
-                }
-
-                foreach ($productData['node']['variantList']['edges'] ?? [] as $variantData) {
-                    $childrenPayload = $this->getProductPayload($variantData['node'], true, $context);
-                    $existingVariants[] = $childrenPayload['productNumber'];
-                    $payloads = $this->removeVariantsProcessedAsMain($childrenPayload, $payloads);
-                    $mainProductPayload['children'][] = $childrenPayload;
                 }
 
                 $payloads[$mainProductPayload['productNumber']] = $mainProductPayload;
 
+                foreach ($mainProductPayload['children'] ?? [] as $childrenPayload) {
+                    $payloads = $this->removeVariantsProcessedAsMain($childrenPayload, $payloads);
+                }
+
                 $this->logger->info('Processed product.', [
-                    'sku' => $mainProductPayload['productNumber']
+                    'sku' => $mainProductPayload['productNumber'],
                 ]);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $sku = isset($productData, $productData['node']['sku']) ? $productData['node']['sku'] : null;
                 $this->logger->error('Error while transforming product.', [
                     'message' => $e->getMessage(),
@@ -93,7 +108,7 @@ class ProductPersistor
 
         $productIds = [];
         foreach ($payloads as $payload) {
-            if (\array_key_exists('id', $payload)) {
+            if (array_key_exists('id', $payload)) {
                 $productIds[] = $payload['id'];
             }
         }
@@ -111,7 +126,7 @@ class ProductPersistor
     public function deleteProductIds(array $productIds, Context $context): void
     {
         $this->productRepository->delete(
-            \array_map(static fn($id) => ['id' => $id], $productIds),
+            array_map(static fn($id) => ['id' => $id], array_values($productIds)),
             $context
         );
     }
@@ -133,19 +148,25 @@ class ProductPersistor
     /**
      * @throws MissingRequiredProductMappingException
      */
-    private function getProductPayload(array $productData, bool $isVariant, Context $context): array
+    private function getProductPayload(array $productData, Context $context): array
     {
         $sku = $productData['sku'];
+        if ($this->isProductProcessedAsVariant($sku)) {
+            return [];
+        }
+
         $existingProduct = $this->existingProductCache[$sku] ?? null;
 
         $dto = new ProductTransformationDTO($productData);
-        $dto->setIsVariant($isVariant);
         $dto->setSwProduct($existingProduct);
 
         $transformedData = $this->productTransformerChain->transform(
             $dto,
             $context
         );
+
+        $transformedData = $this->variantsTransformer->transform($transformedData, $context);
+
         $this->deleteEntities($dto, $context);
 
         return array_filter(
@@ -185,6 +206,9 @@ class ProductPersistor
         $entities = $this->productProvider->getProductsBySkuList($skus, $context, [
             'media',
             'properties',
+            'options',
+            'children',
+            'configuratorSettings',
             'crossSellings.assignedProducts',
             'crossSellings.' . AbstractErgonodeMappingExtension::EXTENSION_NAME,
         ]);
@@ -194,9 +218,9 @@ class ProductPersistor
         }
     }
 
-    private function isProductProcessedAsVariant(array $payload, array $existingVariants): bool
+    private function isProductProcessedAsVariant(string $sku): bool
     {
-        if (isset($payload['productNumber']) && isset($existingVariants[$payload['productNumber']])) {
+        if (in_array($sku, $this->existingVariantSkus)) {
             return true;
         }
 
