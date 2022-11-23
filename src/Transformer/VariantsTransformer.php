@@ -40,7 +40,7 @@ class VariantsTransformer
         $swData = $productData->getShopwareData();
         $ergonodeData = $productData->getErgonodeData();
 
-        $swVariants = $this->getExistingVariants($productData->getSwProduct(), $context);
+        $swVariants = $this->getExistingVariants($productData, $context);
 
         $bindings = $ergonodeData['bindings'] ?? [];
 
@@ -118,16 +118,13 @@ class VariantsTransformer
     /**
      * @return array<string, ProductEntity> <sku, ProductEntity>
      */
-    private function getExistingVariants(?ProductEntity $product, Context $context): array
+    private function getExistingVariants(ProductTransformationDTO $productData, Context $context): array
     {
-        if (null === $product) {
+        if (false === $productData->swProductHasVariants()) {
             return [];
         }
 
-        $variants = $product->getChildren();
-        if (empty($variants)) {
-            return [];
-        }
+        $variants = $productData->getSwProduct()->getChildren();
 
         $skus = $variants->map(fn(ProductEntity $variant) => $variant->getProductNumber());
         if (empty($skus)) {
@@ -150,24 +147,20 @@ class VariantsTransformer
         return $variants;
     }
 
-    private function getVariantsDeletePayload(ProductTransformationDTO $dto): array
+    private function getVariantsDeletePayload(ProductTransformationDTO $productData): array
     {
-        $swMainProduct = $dto->getSwProduct();
-        if (null === $swMainProduct) {
+        if (false === $productData->swProductHasVariants()) {
             return [];
         }
 
-        $newChildren = $dto->getShopwareData()['children'] ?? [];
+        $swProduct = $productData->getSwProduct();
+
+        $newChildren = $productData->getShopwareData()['children'] ?? [];
         if (empty($newChildren)) {
             return [];
         }
 
-        $currentVariants = $swMainProduct->getChildren();
-        if (null === $currentVariants || 0 === $currentVariants->count()) {
-            return [];
-        }
-
-        $currentVariantIds = $swMainProduct->getChildren()->getIds();
+        $currentVariantIds = $swProduct->getChildren()->getIds();
         $newVariantIds = array_filter(
             array_map(fn(array $child) => $child['id'] ?? null, $newChildren)
         );
