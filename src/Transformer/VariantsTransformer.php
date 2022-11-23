@@ -118,8 +118,12 @@ class VariantsTransformer
     /**
      * @return array<string, ProductEntity> <sku, ProductEntity>
      */
-    private function getExistingVariants(ProductEntity $product, Context $context): array
+    private function getExistingVariants(?ProductEntity $product, Context $context): array
     {
+        if (null === $product) {
+            return [];
+        }
+
         $variants = $product->getChildren();
         if (empty($variants)) {
             return [];
