@@ -39,6 +39,7 @@ class VariantsTransformer
 
         $swData = $productData->getShopwareData();
         $ergonodeData = $productData->getErgonodeData();
+        $parentProduct = $productData->getSwProduct();
 
         $swVariants = $this->getExistingVariants($productData, $context);
 
@@ -47,15 +48,15 @@ class VariantsTransformer
         $transformedVariants = [];
 
         foreach ($ergonodeData['variantList']['edges'] ?? [] as $variantData) {
-            $shopwareData = $variantData['node'];
-            if (empty($shopwareData)) {
+            $variantNode = $variantData['node'];
+            if (empty($variantNode)) {
                 continue;
             }
 
-            $sku = $shopwareData['sku'];
+            $sku = $variantNode['sku'];
             $existingProduct = $swVariants[$sku] ?? null;
 
-            $dto = new ProductTransformationDTO($shopwareData);
+            $dto = new ProductTransformationDTO($variantNode);
             $dto->setBindingCodes(array_filter(array_map(fn(array $binding) => $binding['code'] ?? null, $bindings)));
             $dto->setSwProduct($existingProduct);
 
@@ -71,6 +72,11 @@ class VariantsTransformer
                 $variant->getShopwareData(),
                 fn($value) => !empty($value) || 0 === $value || false === $value
             );
+
+            if (null !== $parentProduct) {
+                $shopwareData['parentId'] = $parentProduct->getId();
+            }
+
             $swData['children'][] = $shopwareData;
 
             foreach ($shopwareData['options'] as $optionId) {
@@ -120,13 +126,26 @@ class VariantsTransformer
      */
     private function getExistingVariants(ProductTransformationDTO $productData, Context $context): array
     {
-        if (false === $productData->swProductHasVariants()) {
-            return [];
+        $skus = [];
+
+        $ergonodeVariants = $productData->getErgonodeData()['variantList']['edges'] ?? null;
+        if (null !== $ergonodeVariants) {
+            $skus = array_merge(
+                $skus,
+                array_filter(
+                    array_map(fn(array $edge) => $edge['node']['sku'] ?? null, $ergonodeVariants)
+                )
+            );
         }
 
-        $variants = $productData->getSwProduct()->getChildren();
+        if ($productData->swProductHasVariants()) {
+            $variants = $productData->getSwProduct()->getChildren();
+            $skus = array_merge(
+                $skus,
+                $variants->map(fn(ProductEntity $variant) => $variant->getProductNumber())
+            );
+        }
 
-        $skus = $variants->map(fn(ProductEntity $variant) => $variant->getProductNumber());
         if (empty($skus)) {
             return [];
         }
