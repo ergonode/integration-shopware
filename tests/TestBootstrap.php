@@ -30,8 +30,8 @@ function getProjectDir(): string
 
 define('TEST_PROJECT_DIR', getProjectDir());
 
-$loader = require TEST_PROJECT_DIR . '/vendor/autoload.php'; // load shopware deps
-$loader = require TEST_PROJECT_DIR . '/custom/plugins/ErgonodeIntegrationShopware/vendor/autoload.php'; // load plugin deps
+$loader = require_once TEST_PROJECT_DIR . '/vendor/autoload.php'; // load shopware deps
+$loader = require_once TEST_PROJECT_DIR . '/custom/plugins/ErgonodeIntegrationShopware/vendor/autoload.php'; // load plugin deps
 
 $loader->addPsr4('Ergonode\\IntegrationShopware\\', TEST_PROJECT_DIR . '/custom/plugins/ErgonodeIntegrationShopware/src', true);
 $loader->addPsr4('Ergonode\\IntegrationShopware\\Tests\\', TEST_PROJECT_DIR . '/custom/plugins/ErgonodeIntegrationShopware/tests', true);
