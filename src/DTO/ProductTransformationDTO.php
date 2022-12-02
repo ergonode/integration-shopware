@@ -94,6 +94,9 @@ class ProductTransformationDTO
         return $this->entitiesToDelete;
     }
 
+    /**
+     * @param array $payload [ 'id' => 'entityId' ] OR [ [ 'id' => 'entityId1' ], [ 'id' => 'entityId2' ] ]
+     */
     public function addEntitiesToDelete(string $entityName, array $payload): void
     {
         if (empty($payload)) {
@@ -104,10 +107,15 @@ class ProductTransformationDTO
             $this->entitiesToDelete[$entityName] = [];
         }
 
-        $this->entitiesToDelete[$entityName] = array_merge_recursive(
-            $this->entitiesToDelete[$entityName],
-            $payload
-        );
+        foreach ($payload as $payloadPart) {
+            if (!is_array($payloadPart)) {
+                $this->entitiesToDelete[$entityName][] = $payload;
+
+                return;
+            }
+
+            $this->addEntitiesToDelete($entityName, $payloadPart);
+        }
     }
 
     public function unsetSwData(string $fieldKey): void
