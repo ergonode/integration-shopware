@@ -7,7 +7,8 @@ namespace Ergonode\IntegrationShopware\Transformer;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
-use Ergonode\IntegrationShopware\Util\ChecksumContainer;
+use Ergonode\IntegrationShopware\Struct\ChecksumContainer;
+use Ergonode\IntegrationShopware\Struct\ProductContainer;
 use Shopware\Core\Content\Product\Aggregate\ProductConfiguratorSetting\ProductConfiguratorSettingDefinition;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Content\Product\ProductEntity;
@@ -19,16 +20,20 @@ class VariantsTransformer
 
     private ProductTransformerChain $productTransformerChain;
 
-    private ChecksumContainer $checksums;
+    private ChecksumContainer $checksumContainer;
+
+    private ProductContainer $productContainer;
 
     public function __construct(
         ProductProvider $productProvider,
         ProductTransformerChain $productTransformerChain,
-        ChecksumContainer $checksums
+        ChecksumContainer $checksumContainer,
+        ProductContainer $productContainer
     ) {
         $this->productProvider = $productProvider;
         $this->productTransformerChain = $productTransformerChain;
-        $this->checksums = $checksums;
+        $this->checksumContainer = $checksumContainer;
+        $this->productContainer = $productContainer;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
@@ -40,7 +45,7 @@ class VariantsTransformer
         $swData = $productData->getShopwareData();
         $ergonodeData = $productData->getErgonodeData();
 
-        $swVariants = $this->getExistingVariants($productData, $context);
+        $this->loadExistingVariants($productData, $context);
 
         $bindings = $ergonodeData['bindings'] ?? [];
 
@@ -53,7 +58,7 @@ class VariantsTransformer
             }
 
             $sku = $shopwareData['sku'];
-            $existingProduct = $swVariants[$sku] ?? null;
+            $existingProduct = $this->productContainer->get($sku);
 
             $dto = new ProductTransformationDTO($shopwareData);
             $dto->setBindingCodes(array_filter(array_map(fn(array $binding) => $binding['code'] ?? null, $bindings)));
@@ -77,7 +82,7 @@ class VariantsTransformer
                 if (
                     false === isset($swData['id']) ||
                     false === isset($optionId['id']) ||
-                    $this->checksums->exists($swData['id'], $optionId['id'])
+                    $this->checksumContainer->exists($swData['id'], $optionId['id'])
                 ) {
                     continue;
                 }
@@ -87,7 +92,7 @@ class VariantsTransformer
                     'optionId' => $optionId['id'],
                 ];
 
-                $this->checksums->push($swData['id'], $optionId['id']);
+                $this->checksumContainer->push($swData['id'], $optionId['id']);
             }
 
             $entitiesToDelete[] = $variant->getEntitiesToDelete();
@@ -110,25 +115,22 @@ class VariantsTransformer
             $this->getConfiguratorSettingsDeletePayload($productData)
         );
 
-        $this->checksums->clear();
+        $this->checksumContainer->clear();
 
         return $productData;
     }
 
-    /**
-     * @return array<string, ProductEntity> <sku, ProductEntity>
-     */
-    private function getExistingVariants(ProductTransformationDTO $productData, Context $context): array
+    private function loadExistingVariants(ProductTransformationDTO $productData, Context $context): void
     {
         if (false === $productData->swProductHasVariants()) {
-            return [];
+            return;
         }
 
         $variants = $productData->getSwProduct()->getChildren();
 
         $skus = $variants->map(fn(ProductEntity $variant) => $variant->getProductNumber());
         if (empty($skus)) {
-            return [];
+            return;
         }
 
         $entities = $this->productProvider->getProductsBySkuList($skus, $context, [
@@ -139,12 +141,9 @@ class VariantsTransformer
             'crossSellings.' . AbstractErgonodeMappingExtension::EXTENSION_NAME,
         ]);
 
-        $variants = [];
         foreach ($entities as $productEntity) {
-            $variants[$productEntity->getProductNumber()] = $productEntity;
+            $this->productContainer->set($productEntity->getProductNumber(), $productEntity);
         }
-
-        return $variants;
     }
 
     private function getVariantsDeletePayload(ProductTransformationDTO $productData): array
