@@ -11,7 +11,7 @@ services:
   _instanceof:
     # EXTENSION
     Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension:
-      tags: [ 'shopware.entity.extension' ]
+      tags: [ 'shopware.entity.extension' ]F
 
     # TRANSFORMER
     Ergonode\IntegrationShopware\Transformer\CustomField\CustomFieldTransformerInterface:
@@ -163,6 +163,7 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductPropertiesTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductCrossSellingTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductDeliveryTimeTransformer'
 
   Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer:
     arguments:
