@@ -39,8 +39,8 @@ class CustomFieldTransformer
 
         $typedTransformer = $this->customFieldTransformerResolver->resolve($node);
 
-        if (!empty($node['label'])) {
-            $label = $this->translationTransformer->transform($node['label']);
+        if (!empty($node['name'])) {
+            $label = $this->translationTransformer->transform($node['name']);
         }
 
         return array_merge_recursive(

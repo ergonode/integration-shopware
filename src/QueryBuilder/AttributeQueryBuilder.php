@@ -36,7 +36,7 @@ class AttributeQueryBuilder
                             ->setSelectionSet([
                                 'code',
                                 'scope',
-                                (new Query('label'))
+                                (new Query('name'))
                                     ->setSelectionSet([
                                         'language',
                                         'value',
@@ -64,7 +64,7 @@ class AttributeQueryBuilder
                                         (new Query('options'))
                                             ->setSelectionSet([
                                                 new Query('code'),
-                                                (new Query('label'))
+                                                (new Query('name'))
                                                     ->setSelectionSet([
                                                         'language',
                                                         'value',
@@ -77,7 +77,7 @@ class AttributeQueryBuilder
                                         (new Query('options'))
                                             ->setSelectionSet([
                                                 new Query('code'),
-                                                (new Query('label'))
+                                                (new Query('name'))
                                                     ->setSelectionSet([
                                                         'language',
                                                         'value',

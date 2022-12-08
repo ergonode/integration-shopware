@@ -619,7 +619,7 @@ class ProductQueryBuilder
                 (new InlineFragment('ProductRelationAttribute'))
                     ->setSelectionSet([
                         new Query('code', AttributeTypesEnum::RELATION),
-                        (new Query('label'))
+                        (new Query('name'))
                             ->setSelectionSet([
                                 'language',
                                 'value',

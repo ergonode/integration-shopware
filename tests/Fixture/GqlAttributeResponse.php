@@ -22,7 +22,7 @@ class GqlAttributeResponse
                             'node' => [
                                 'code' => 'stock',
                                 'scope' => 'GLOBAL',
-                                'label' => [
+                                'name' => [
                                     0 => [
                                         'language' => 'pl_PL',
                                         'value' => NULL,
@@ -120,7 +120,7 @@ class GqlAttributeResponse
                             'node' => [
                                 'code' => 'name',
                                 'scope' => 'LOCAL',
-                                'label' => [
+                                'name' => [
                                     0 => [
                                         'language' => 'pl_PL',
                                         'value' => NULL,
@@ -218,7 +218,7 @@ class GqlAttributeResponse
                             'node' => [
                                 'code' => 'description',
                                 'scope' => 'LOCAL',
-                                'label' => [
+                                'name' => [
                                     0 => [
                                         'language' => 'pl_PL',
                                         'value' => NULL,
@@ -316,7 +316,7 @@ class GqlAttributeResponse
                             'node' => [
                                 'code' => 'price',
                                 'scope' => 'GLOBAL',
-                                'label' => [
+                                'name' => [
                                     0 => [
                                         'language' => 'pl_PL',
                                         'value' => NULL,
@@ -415,7 +415,7 @@ class GqlAttributeResponse
                             'node' => [
                                 'code' => 'color',
                                 'scope' => 'GLOBAL',
-                                'label' => [
+                                'name' => [
                                     0 => [
                                         'language' => 'pl_PL',
                                         'value' => 'kolor',
@@ -509,7 +509,7 @@ class GqlAttributeResponse
                                 'options' => [
                                     0 => [
                                         'code' => 'black',
-                                        'label' => [
+                                        'name' => [
                                             0 => [
                                                 'language' => 'pl_PL',
                                                 'value' => 'czarny',
@@ -542,7 +542,7 @@ class GqlAttributeResponse
                                     ],
                                     1 => [
                                         'code' => 'white',
-                                        'label' => [
+                                        'name' => [
                                             0 => [
                                                 'language' => 'pl_PL',
                                                 'value' => 'biały',
@@ -575,7 +575,7 @@ class GqlAttributeResponse
                                     ],
                                     2 => [
                                         'code' => 'blue',
-                                        'label' => [
+                                        'name' => [
                                             0 => [
                                                 'language' => 'pl_PL',
                                                 'value' => 'niebieski',
@@ -608,7 +608,7 @@ class GqlAttributeResponse
                                     ],
                                     3 => [
                                         'code' => 'violet',
-                                        'label' => [
+                                        'name' => [
                                             0 => [
                                                 'language' => 'pl_PL',
                                                 'value' => 'fioletowy',
@@ -647,7 +647,7 @@ class GqlAttributeResponse
                             'node' => [
                                 'code' => 'size',
                                 'scope' => 'GLOBAL',
-                                'label' => [
+                                'name' => [
                                     0 => [
                                         'language' => 'pl_PL',
                                         'value' => 'rozmiar',
@@ -741,7 +741,7 @@ class GqlAttributeResponse
                                 'options' => [
                                     0 => [
                                         'code' => 's',
-                                        'label' => [
+                                        'name' => [
                                             0 => [
                                                 'language' => 'pl_PL',
                                                 'value' => 'S',
@@ -774,7 +774,7 @@ class GqlAttributeResponse
                                     ],
                                     1 => [
                                         'code' => 'm',
-                                        'label' => [
+                                        'name' => [
                                             0 => [
                                                 'language' => 'pl_PL',
                                                 'value' => 'M',
@@ -807,7 +807,7 @@ class GqlAttributeResponse
                                     ],
                                     2 => [
                                         'code' => 'l',
-                                        'label' => [
+                                        'name' => [
                                             0 => [
                                                 'language' => 'pl_PL',
                                                 'value' => 'L',
@@ -840,7 +840,7 @@ class GqlAttributeResponse
                                     ],
                                     3 => [
                                         'code' => 'xl',
-                                        'label' => [
+                                        'name' => [
                                             0 => [
                                                 'language' => 'pl_PL',
                                                 'value' => 'XL',
