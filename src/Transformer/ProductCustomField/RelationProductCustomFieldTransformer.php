@@ -45,7 +45,7 @@ class RelationProductCustomFieldTransformer implements ProductCustomFieldTransfo
             $ids = [];
             foreach ($value as $product) {
                 if (isset($product['sku'])) {
-                    $product = $this->productProvider->getProductBySku($product['sku'], $context);
+                    $product = $this->productProvider->getProductBySku((string)$product['sku'], $context);
                     if (null === $product) {
                         continue; // product might not exist at this point; for example will be created later
                     }

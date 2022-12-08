@@ -85,7 +85,7 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
             );
 
             $defaultLocale = $this->languageProvider->getDefaultLanguageLocale($context);
-            $translations = $this->translationTransformer->transform($node['attribute']['label'], 'name');
+            $translations = $this->translationTransformer->transform($node['attribute']['name'], 'name');
             if (!isset($translations[$defaultLocale])) {
                 // prevent error when missing default language translation in Ergonode, use code as name
                 $translations[$defaultLocale] = [

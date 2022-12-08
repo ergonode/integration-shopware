@@ -37,8 +37,8 @@ class PropertyGroupTransformer
         $code = $node['code'];
 
         $translations = [];
-        if (!empty($node['label'])) {
-            $translations = $this->translationTransformer->transform($node['label'], 'name');
+        if (!empty($node['name'])) {
+            $translations = $this->translationTransformer->transform($node['name'], 'name');
         }
 
         $propertyGroup = $dto->getSwPropertyGroup();
@@ -52,7 +52,7 @@ class PropertyGroupTransformer
                     $options[] = [
                         'id' => $existingOption ? $existingOption->getId() : null,
                         'name' => $option['code'],
-                        'translations' => $this->translationTransformer->transform($option['label'], 'name'),
+                        'translations' => $this->translationTransformer->transform($option['name'], 'name'),
                         'extensions' => [
                             AbstractErgonodeMappingExtension::EXTENSION_NAME => [
                                 'id' => $existingOption ? $this->getEntityExtensionId($existingOption) : null,
