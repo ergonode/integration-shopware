@@ -66,7 +66,7 @@ class TranslationTransformerTest extends TestCase
                 [],
             ],
             [
-                GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][4]['node']['label'],
+                GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][4]['node']['name'],
                 'custom_shopware_field_name',
                 [
                     'pl-PL' => [
@@ -78,7 +78,7 @@ class TranslationTransformerTest extends TestCase
                 ],
             ],
             [
-                GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][5]['node']['label'],
+                GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][5]['node']['name'],
                 'name',
                 [
                     'pl-PL' => [
@@ -90,7 +90,7 @@ class TranslationTransformerTest extends TestCase
                 ],
             ],
             [
-                GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][5]['node']['label'],
+                GqlAttributeResponse::attributeStreamResponse()['data']['attributeStream']['edges'][5]['node']['name'],
                 null,
                 [
                     'pl-PL' => 'rozmiar',

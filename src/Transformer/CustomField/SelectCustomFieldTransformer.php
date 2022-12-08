@@ -36,7 +36,7 @@ class SelectCustomFieldTransformer implements CustomFieldTransformerInterface
         $options = [];
 
         foreach ($node['options'] ?? [] as $option) {
-            $label = $this->translationTransformer->transform($option['label']);
+            $label = $this->translationTransformer->transform($option['name']);
 
             $options[] = [
                 'value' => $option['code'],
