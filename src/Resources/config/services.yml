@@ -11,7 +11,7 @@ services:
   _instanceof:
     # EXTENSION
     Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension:
-      tags: [ 'shopware.entity.extension' ]F
+      tags: [ 'shopware.entity.extension' ]
 
     # TRANSFORMER
     Ergonode\IntegrationShopware\Transformer\CustomField\CustomFieldTransformerInterface:

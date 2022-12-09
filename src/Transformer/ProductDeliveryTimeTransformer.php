@@ -23,27 +23,16 @@ class ProductDeliveryTimeTransformer implements ProductDataTransformerInterface
     {
         $swData = $productData->getShopwareData();
         $productDeliveryTime = $swData['deliveryTime'];
+        if (empty($productDeliveryTime)) {
+            return $productData;
+        }
         unset($swData['deliveryTime']);
 
-        $deliveryTimeId = $this->getDeliveryTimeEntityId($productDeliveryTime, $context);
+        $deliveryTimeId = $this->deliveryTimeProvider->getIdByName($productDeliveryTime, $context);
 
         $swData['deliveryTimeId'] = $deliveryTimeId;
         $productData->setShopwareData($swData);
 
         return  $productData;
-    }
-
-    private function getDeliveryTimeEntityId(?string $productDeliveryTime, Context $context): ?string
-    {
-        if (null === $productDeliveryTime) {
-            return null;
-        }
-
-        $deliveryTimeEntity = $this->deliveryTimeProvider->getByName($productDeliveryTime, $context);
-        if (null !== $deliveryTimeEntity) {
-            return $deliveryTimeEntity->getId();
-        }
-
-        return null;
     }
 }

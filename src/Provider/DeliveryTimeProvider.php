@@ -19,10 +19,13 @@ class DeliveryTimeProvider
         $this->deliveryTimeRepository = $deliveryTimeRepository;
     }
 
-    public function getByName(?string $productDeliveryTime, Context $context): ?DeliveryTimeEntity
+    public function getIdByName(string $productDeliveryTime, Context $context): ?string
     {
         $criteria = new  Criteria();
         $criteria->addFilter(new EqualsFilter('name', $productDeliveryTime));
-        return $this->deliveryTimeRepository->search($criteria, $context)->first();
+        $deliveryTimeEntity = $this->deliveryTimeRepository->search($criteria, $context)->first() ;
+
+
+        return $deliveryTimeEntity ? $deliveryTimeEntity->getId() : null;
     }
 }
