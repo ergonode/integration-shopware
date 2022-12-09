@@ -87,7 +87,7 @@ class ProductTransformer implements ProductDataTransformerInterface
             }
 
             $translatedValues = $this->getTranslatedValues($edge['node']['translations']);
-
+//            dump($edge['node']['translations']);
             if (false === array_key_exists($this->defaultLocale, $translatedValues)) {
                 throw new RuntimeException(
                     sprintf('Default locale %s not found in product data', $this->defaultLocale)
@@ -118,6 +118,10 @@ class ProductTransformer implements ProductDataTransformerInterface
             $valueKey = ErgonodeApiValueKeyResolverUtil::resolve($valueTranslation['__typename']);
             switch ($valueKey) {
                 case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_ARRAY:
+                    if ($valueTranslation[$valueKey] === null) {
+                        $translatedValues[$valueTranslation['language']] = null;
+                        break;
+                    }
                     $translatedValues[$valueTranslation['language']] = $valueTranslation[$valueKey]['code'];
                     break;
                 case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_MULTI_ARRAY:
