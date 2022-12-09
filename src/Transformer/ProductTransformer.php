@@ -87,7 +87,6 @@ class ProductTransformer implements ProductDataTransformerInterface
             }
 
             $translatedValues = $this->getTranslatedValues($edge['node']['translations']);
-//            dump($edge['node']['translations']);
             if (false === array_key_exists($this->defaultLocale, $translatedValues)) {
                 throw new RuntimeException(
                     sprintf('Default locale %s not found in product data', $this->defaultLocale)

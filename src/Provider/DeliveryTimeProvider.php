@@ -23,8 +23,7 @@ class DeliveryTimeProvider
     {
         $criteria = new  Criteria();
         $criteria->addFilter(new EqualsFilter('name', $productDeliveryTime));
-        $deliveryTimeEntity = $this->deliveryTimeRepository->search($criteria, $context)->first() ;
-
+        $deliveryTimeEntity = $this->deliveryTimeRepository->search($criteria, $context)->first();
 
         return $deliveryTimeEntity ? $deliveryTimeEntity->getId() : null;
     }
