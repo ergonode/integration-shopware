@@ -10,6 +10,7 @@
             <label>Ergonode GraphQL API endpoint</label>
             <label lang="de-DE">Ergonode GraphQL API endpoint</label>
             <helpText>The value will always be inherited (from "All Sales Channels")! This field MUST be filled in for All Sales Channels and MUST NOT be modified or deleted for each individual channel</helpText>
+            <helpText lang="de-DE">Der Wert wird immer vererbt (von "Alle Verkaufskanäle")! Dieses Feld MUSS für alle Verkaufskanäle ausgefüllt werden und DARF NICHT für jeden einzelnen Kanal geändert oder gelöscht werden</helpText>
         </input-field>
 
         <input-field type="password">
@@ -17,6 +18,7 @@
             <label>Ergonode API key</label>
             <label lang="de-DE">Ergonode API key</label>
             <helpText>This field MUST be filled in for All Sales Channels. It MAY then be modified for each individual channel or removed from a specific channel if needed</helpText>
+            <helpText lang="de-DE">Dieses Feld MUSS für alle Verkaufskanäle ausgefüllt werden. Es KANN dann für jeden einzelnen Kanal geändert oder bei Bedarf aus einem bestimmten Kanal entfernt werden.</helpText>
         </input-field>
 
         <component name="ergonode-api-key-validator">
@@ -33,7 +35,7 @@
             <label>Ergonode attributes as custom fields</label>
             <label lang="de-DE">Ergonode attributes as custom fields</label>
             <helpText>Every selected attribute will be fetched as product custom field. (This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels)</helpText>
-            <helpText lang="de-DE">Every selected attribute will be fetched as product custom field</helpText>
+            <helpText lang="de-DE">Jedes ausgewählte Attribut wird als benutzerdefiniertes Produktfeld abgerufen. (Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen)</helpText>
         </component>
 
         <component name="ergonode-attribute-multiselect">
@@ -42,7 +44,7 @@
             <label>Ergonode attributes as cross selling</label>
             <label lang="de-DE">Ergonode attributes as cross selling</label>
             <helpText>Every selected attribute will create a separate cross-selling collection. (This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels)</helpText>
-            <helpText lang="de-DE">Every selected attribute will create a separate cross-selling collection</helpText>
+            <helpText lang="de-DE">Jedes ausgewählte Attribut erstellt eine separate Cross-Selling-Kollektion. (Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen)</helpText>
         </component>
     </card>
     <card>
@@ -53,6 +55,7 @@
             <label>Category trees to synchronize</label>
             <label lang="de-DE">Category trees to synchronize</label>
             <helpText>This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels</helpText>
+            <helpText lang="de-DE">Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen</helpText>
         </component>
     </card>
     <card>
@@ -63,18 +66,21 @@
             <label>Enable scheduler</label>
             <label lang="de-DE">Enable scheduler</label>
             <helpText>This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels</helpText>
+            <helpText lang="de-DE">Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen</helpText>
         </input-field>
         <component name="ergonode-scheduler-datetime-input">
             <name>schedulerStartDatetime</name>
             <label>Start date and time</label>
             <label lang="de-DE">Start date and time</label>
             <helpText>This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels</helpText>
+            <helpText lang="de-DE">Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen</helpText>
         </component>
         <component name="ergonode-timezone-select">
             <name>schedulerTimezone</name>
             <label>Scheduler timezone</label>
             <label lang="de-DE">Scheduler timezone</label>
             <helpText>This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels</helpText>
+            <helpText lang="de-DE">Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen</helpText>
         </component>
         <input-field type="int">
             <name>schedulerRecurrenceHour</name>
@@ -84,7 +90,7 @@
             <min>0</min>
             <defaultValue>0</defaultValue>
             <helpText>How often the scheduler should run? Hour interval. (This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels)</helpText>
-            <helpText lang="de-DE">How often the scheduler should run? Hourly interval</helpText>
+            <helpText lang="de-DE">Wie oft soll der Scheduler laufen? Stündliches Intervall. (Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen)</helpText>
         </input-field>
         <input-field type="int">
             <name>schedulerRecurrenceMinute</name>
@@ -94,7 +100,7 @@
             <min>0</min>
             <defaultValue>0</defaultValue>
             <helpText>How often the scheduler should run? Minute interval. (This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels)</helpText>
-            <helpText lang="de-DE">How often the scheduler should run? Minute interval</helpText>
+            <helpText lang="de-DE">Wie oft soll der Scheduler laufen? Minuten Intervall. (Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen)</helpText>
         </input-field>
     </card>
 </config>
