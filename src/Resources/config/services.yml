@@ -163,6 +163,7 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductPropertiesTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductCrossSellingTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductDeliveryTimeTransformer'
 
   Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer:
     arguments:
