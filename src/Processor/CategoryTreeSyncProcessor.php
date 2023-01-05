@@ -12,6 +12,7 @@ use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\Persistor\CategoryTreePersistor;
 use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
@@ -33,6 +34,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
     private LoggerInterface $logger;
 
+    private ConfigService $configService;
     private CategoryPersistor $categoryPersistor;
 
     private CategoryOrderHelper $categoryOrderHelper;
@@ -43,6 +45,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         CategoryTreePersistor $categoryTreePersistor,
         ErgonodeCursorManager $cursorManager,
         LoggerInterface $ergonodeSyncLogger,
+        ConfigService $configService,
         CategoryPersistor $categoryPersistor,
         CategoryOrderHelper $categoryOrderHelper
     ) {
@@ -51,6 +54,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $this->categoryTreePersistor = $categoryTreePersistor;
         $this->cursorManager = $cursorManager;
         $this->logger = $ergonodeSyncLogger;
+        $this->configService = $configService;
         $this->categoryPersistor = $categoryPersistor;
         $this->categoryOrderHelper = $categoryOrderHelper;
     }
@@ -113,6 +117,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
                 if (!$leafHasNextPage) {
                     $leafHasNextPage = $edge['node']['categoryTreeLeafList']['pageInfo']['hasNextPage'] ?? false;
                     $leafEndCursor = $edge['node']['categoryTreeLeafList']['pageInfo']['endCursor'] ?? null;
+                    sleep(2);
                 }
 
                 $this->logger->info('Persisted category leaves', [
@@ -157,15 +162,18 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         return $counter;
     }
 
-    public function removeOrphanedCategories(array $keys): void
+    public function removeOrphanedCategories(array $treeCode): void
     {
-        $removedCategoryCount = $this->categoryPersistor->removeOtherCategoriesFromTree(
-            $keys
-        );
+        $lastSync = $this->configService->getLastCategorySyncTimestamp();
 
+        $removedCategoryCount = $this->categoryPersistor->removeCategoriesUpdatedAtBeforeTimestamp(
+            $lastSync,
+            $treeCode
+        );
         $this->logger->info('Removed orphaned Ergonode categories', [
+            'treeCode' => $treeCode,
             'count' => $removedCategoryCount,
-            'time' => (new \DateTime('now'))->format(DATE_ATOM),
+            'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM),
         ]);
     }
 

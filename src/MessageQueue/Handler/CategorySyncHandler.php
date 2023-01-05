@@ -117,6 +117,7 @@ class CategorySyncHandler extends AbstractSyncHandler
             'Starting category processor',
             [
                 'processor' => $processorClass,
+                'category_tree_codes' => $categoryTreeCodes
             ]
         );
 
@@ -136,13 +137,21 @@ class CategorySyncHandler extends AbstractSyncHandler
         $primaryKeys = array_merge(...$primaryKeys);
 
         if ($processor instanceof CategoryTreeSyncProcessor) {
-            $processor->removeOrphanedCategories($result->getPrimaryKeys());
+            $processor->removeOrphanedCategories($categoryTreeCodes);
         }
 
         if (null !== $result && $result->hasNextPage()) {
             $this->logger->info('Dispatching next CategorySyncMessage because still has next page');
             $this->messageBus->dispatch(new CategorySync());
         } else {
+            if ($processor instanceof CategoryTreeSyncProcessor) {
+                $formattedTime = $this->configService->setLastCategorySyncTimestamp(
+                    (new \DateTime('+1 second'))->getTimestamp()
+                );
+                $this->logger->info('Saved lastCategorySyncTime', [
+                    'time' => $formattedTime,
+                ]);
+            }
             $this->logger->info('Category sync finished.');
             $this->categoryOrderHelper->clearSaved();
         }
