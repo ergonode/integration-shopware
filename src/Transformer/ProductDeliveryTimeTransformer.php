@@ -22,7 +22,7 @@ class ProductDeliveryTimeTransformer implements ProductDataTransformerInterface
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $swData = $productData->getShopwareData();
-        $productDeliveryTime = $swData['deliveryTime'];
+        $productDeliveryTime = $swData['deliveryTime'] ?? null;
         if (empty($productDeliveryTime)) {
             return $productData;
         }
