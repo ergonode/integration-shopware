@@ -35,6 +35,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
     private LoggerInterface $logger;
 
     private ConfigService $configService;
+
     private CategoryPersistor $categoryPersistor;
 
     private CategoryOrderHelper $categoryOrderHelper;
