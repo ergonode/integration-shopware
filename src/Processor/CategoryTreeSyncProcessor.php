@@ -118,6 +118,12 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
                 if (!$leafHasNextPage) {
                     $leafHasNextPage = $edge['node']['categoryTreeLeafList']['pageInfo']['hasNextPage'] ?? false;
                     $leafEndCursor = $edge['node']['categoryTreeLeafList']['pageInfo']['endCursor'] ?? null;
+                    // TODO:
+                    // Restore code removed in SWERG-174.
+                    // Temporary fix for SWERG-169. The issue is that removeOrphanedCategories adds 1 second to the
+                    // last sync time and when the sync is ran for the first time some trees can be processed under
+                    // 1 second resulting in them being completely removed because they have updated_at time before
+                    // the new lastSyncTime
                     sleep(2);
                 }
 
