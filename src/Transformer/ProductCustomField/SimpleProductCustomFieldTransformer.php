@@ -62,9 +62,11 @@ class SimpleProductCustomFieldTransformer implements ProductCustomFieldTransform
     {
         foreach ($valueTranslations as &$valueTranslation) {
             $valueKey = ErgonodeApiValueKeyResolverUtil::resolve($valueTranslation['__typename']);
+
+            $translatedValue = null;
             switch($valueKey) {
                 case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_ARRAY:
-                    $translatedValue = $valueTranslation[$valueKey]['code'];
+                        $translatedValue = $valueTranslation[$valueKey]['code'] ?? null;
                     break;
                 case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_MULTI_ARRAY:
                     $translatedValue = array_column(
@@ -73,11 +75,13 @@ class SimpleProductCustomFieldTransformer implements ProductCustomFieldTransform
                     );
                     break;
                 default:
-                    $translatedValue = $valueTranslation[$valueKey];
+                    $translatedValue = $valueTranslation[$valueKey] ?? null;
                     break;
             }
 
-            $valueTranslation['value'] = $translatedValue;
+            if ($translatedValue) {
+                $valueTranslation['value'] = $translatedValue;
+            }
         }
 
         return $valueTranslations;
