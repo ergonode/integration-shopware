@@ -57,6 +57,12 @@
             <helpText>This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels</helpText>
             <helpText lang="de-DE">Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen</helpText>
         </component>
+        <input-field>
+            <name>lastCategorySyncTime</name>
+            <label>Last category synchronization completion time</label>
+            <label lang="de-DE">Last category synchronization completion time</label>
+            <disabled>true</disabled>
+        </input-field>
     </card>
     <card>
         <title>Scheduler</title>
