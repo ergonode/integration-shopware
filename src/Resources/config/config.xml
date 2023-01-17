@@ -57,6 +57,12 @@
             <helpText>This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels</helpText>
             <helpText lang="de-DE">Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen</helpText>
         </component>
+        <input-field>
+            <name>lastCategorySyncTime</name>
+            <label>Last category synchronization completion time</label>
+            <label lang="de-DE">Last category synchronization completion time</label>
+            <disabled>true</disabled>
+        </input-field>
     </card>
     <card>
         <title>Scheduler</title>
@@ -102,5 +108,17 @@
             <helpText>How often the scheduler should run? Minute interval. (This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels)</helpText>
             <helpText lang="de-DE">Wie oft soll der Scheduler laufen? Minuten Intervall. (Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen)</helpText>
         </input-field>
+    </card>
+    <card>
+        <title>Pictograms</title>
+        <title lang="de-DE">Piktogramme</title>
+        <component name="sw-entity-single-select">
+            <name>propertyGroupDisplayTypeImage</name>
+            <entity>property_group</entity>
+            <label>Property group used as pictograms</label>
+            <label lang="de-DE">Eigenschaftsgruppe als Piktogramme verwendet</label>
+            <helpText>This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels</helpText>
+            <helpText lang="de-DE">Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen</helpText>
+        </component>
     </card>
 </config>
