@@ -32,7 +32,6 @@
       "details": {
         "importDetails": "Szczegóły importu",
         "details": "Szczegóły",
-        "importDetails": "Szczegóły importu",
         "processed": "Przetworzonych",
         "errors": "Błędów",
         "createdAt": "Utworzono",
@@ -72,6 +71,14 @@
         "label": "Integracja z Ergonode",
         "synchronisation_triggerer": "Wyzwalanie synchronizacji",
         "history_viewer": "Przeglądanie historii importów"
+      }
+    }
+  },
+  "sw-product-stream": {
+    "filter": {
+      "values": {
+        "purchaseUnit": "Jednostka sprzedaży",
+        "referenceUnit": "Podstawowa jednostka"
       }
     }
   }

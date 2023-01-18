@@ -33,6 +33,6 @@ class ProductDeliveryTimeTransformer implements ProductDataTransformerInterface
         $swData['deliveryTimeId'] = $deliveryTimeId;
         $productData->setShopwareData($swData);
 
-        return  $productData;
+        return $productData;
     }
 }
