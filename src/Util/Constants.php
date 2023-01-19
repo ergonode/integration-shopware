@@ -58,7 +58,7 @@ class Constants
         'tax.rate' => 'sw-product.priceForm.labelTaxRate',
         'price.net' => 'global.sw-price-field.labelPriceNet',
         'price.gross' => 'global.sw-price-field.labelPriceGross',
-        'purchaseUnit' => 'sw-product-stream.filter.values.purchaseUnit',
-        'referenceUnit' => 'sw-product-stream.filter.values.referenceUnit',
+        'purchaseUnit' => 'sw-product.priceForm.labelPurchaseUnit',
+        'referenceUnit' => 'sw-product.priceForm.labelReferenceUnit',
     ];
 }

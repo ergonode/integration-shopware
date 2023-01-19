@@ -73,13 +73,5 @@
         "history_viewer": "Przeglądanie historii importów"
       }
     }
-  },
-  "sw-product-stream": {
-    "filter": {
-      "values": {
-        "purchaseUnit": "Jednostka sprzedaży",
-        "referenceUnit": "Podstawowa jednostka"
-      }
-    }
   }
 }

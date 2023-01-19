@@ -74,13 +74,5 @@
         "history_viewer": "View import history"
       }
     }
-  },
-  "sw-product-stream": {
-    "filter": {
-      "values": {
-        "purchaseUnit": "Selling unit",
-        "referenceUnit": "Basic unit"
-      }
-    }
   }
 }
