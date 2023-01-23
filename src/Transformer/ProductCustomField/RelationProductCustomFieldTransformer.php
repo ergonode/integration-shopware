@@ -57,13 +57,12 @@ class RelationProductCustomFieldTransformer implements ProductCustomFieldTransfo
                     if (null === $product) {
                         continue; // product might not exist at this point; for example will be created later
                     }
-
+                    if ($componentName != null && $componentName === self::CUSTOM_FIELD_COMPONENT_NAME_SINGLE) {
+                        $ids = $product->getId();
+                        break;
+                    }
                     $ids[] = $product->getId();
                 }
-            }
-
-            if ($componentName != null && $componentName == self::CUSTOM_FIELD_COMPONENT_NAME_SINGLE) {
-                $ids = $ids[0];
             }
 
             $value = [
