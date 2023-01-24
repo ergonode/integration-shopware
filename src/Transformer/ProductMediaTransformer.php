@@ -41,7 +41,7 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
             !is_array($swData[self::SW_PRODUCT_FIELD_MEDIA])
         ) {
             $productData->unsetSwData(self::SW_PRODUCT_FIELD_MEDIA);
-
+            $this->addEntitiesToDelete($productData);
             return $productData;
         }
 
@@ -71,19 +71,17 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
 
         $productData->setShopwareData($swData);
 
-        $toDelete = $this->getProductMediaDeletePayload($productData);
-        if (!empty($toDelete)) {
-            $productData->addEntitiesToDelete(
-                ProductMediaDefinition::ENTITY_NAME,
-                $toDelete
-            );
-        }
+        $this->addEntitiesToDelete($productData);
 
         return $productData;
     }
 
-    private function buildProductMediaPayload(string $mediaId, int $position, ProductTransformationDTO $productData, Context $context): array
-    {
+    private function buildProductMediaPayload(
+        string $mediaId,
+        int $position,
+        ProductTransformationDTO $productData,
+        Context $context
+    ): array {
         $productMedia = null;
         if (null !== $productData->getSwProduct()) {
             $productMedia = $this->productMediaProvider->getProductMedia(
@@ -125,5 +123,16 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
         $idsToDelete = array_diff($productMediaIds, $newProductMediaIds);
 
         return array_map(fn(string $id) => ['id' => $id], $idsToDelete);
+    }
+
+    private function addEntitiesToDelete(ProductTransformationDTO $productData): void
+    {
+        $toDelete = $this->getProductMediaDeletePayload($productData);
+        if (!empty($toDelete)) {
+            $productData->addEntitiesToDelete(
+                ProductMediaDefinition::ENTITY_NAME,
+                $toDelete
+            );
+        }
     }
 }
