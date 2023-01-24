@@ -42,6 +42,7 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
         ) {
             $productData->unsetSwData(self::SW_PRODUCT_FIELD_MEDIA);
             $this->addEntitiesToDelete($productData);
+
             return $productData;
         }
 
