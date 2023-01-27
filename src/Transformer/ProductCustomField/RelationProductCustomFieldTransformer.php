@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer\ProductCustomField;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Provider\CustomFieldProvider;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
 use Shopware\Core\Framework\Context;
@@ -13,16 +14,22 @@ use function is_array;
 
 class RelationProductCustomFieldTransformer implements ProductCustomFieldTransformerInterface
 {
+    private const CUSTOM_FIELD_COMPONENT_NAME_SINGLE = 'sw-entity-single-select';
+
     private TranslationTransformer $translationTransformer;
 
     private ProductProvider $productProvider;
 
+    private CustomFieldProvider $customFieldProvider;
+
     public function __construct(
         TranslationTransformer $translationTransformer,
-        ProductProvider $productProvider
+        ProductProvider $productProvider,
+        CustomFieldProvider $customFieldProvider
     ) {
         $this->translationTransformer = $translationTransformer;
         $this->productProvider = $productProvider;
+        $this->customFieldProvider = $customFieldProvider;
     }
 
     public function supports(array $node): bool
@@ -32,6 +39,7 @@ class RelationProductCustomFieldTransformer implements ProductCustomFieldTransfo
 
     public function transformNode(array $node, string $customFieldName, Context $context): array
     {
+        $componentName = $this->getComponentNameByCustomFieldName($customFieldName, $context);
         $translated = $this->translationTransformer->transform(
             $node['translations']
         );
@@ -49,7 +57,10 @@ class RelationProductCustomFieldTransformer implements ProductCustomFieldTransfo
                     if (null === $product) {
                         continue; // product might not exist at this point; for example will be created later
                     }
-
+                    if ($componentName != null && $componentName === self::CUSTOM_FIELD_COMPONENT_NAME_SINGLE) {
+                        $ids = $product->getId();
+                        break;
+                    }
                     $ids[] = $product->getId();
                 }
             }
@@ -62,5 +73,11 @@ class RelationProductCustomFieldTransformer implements ProductCustomFieldTransfo
         }
 
         return $translated;
+    }
+
+    public function getComponentNameByCustomFieldName(string $customFieldName, Context $context): ?string
+    {
+        $customField = $this->customFieldProvider->getCustomFieldByName($customFieldName, $context);
+        return $customField->getConfig()['componentName'] ?? null;
     }
 }

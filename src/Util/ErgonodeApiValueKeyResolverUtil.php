@@ -24,9 +24,9 @@ class ErgonodeApiValueKeyResolverUtil
                 return self::TYPE_VALUE_ARRAY;
             case 'MultiSelectAttributeValueTranslation':
                 return self::TYPE_VALUE_MULTI_ARRAY;
-            case 'FileAttributeValueTranslation':
             case 'ImageAttributeValueTranslation':
                 return 'value_multimedia';
+            case 'FileAttributeValueTranslation':
             case 'GalleryAttributeValueTranslation':
                 return 'value_multimedia_array';
             case 'ProductRelationAttributeValueTranslation':
