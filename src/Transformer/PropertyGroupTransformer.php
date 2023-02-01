@@ -12,7 +12,6 @@ use Ergonode\IntegrationShopware\Extension\PropertyGroup\PropertyGroupExtension;
 use Ergonode\IntegrationShopware\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionEntity;
-use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Content\Property\PropertyGroupEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 
