@@ -41,7 +41,8 @@ class Constants
         'shippingFree' => [Attr::BOOL],
         'restockTime' => [Attr::NUMERIC],
         'markAsTopseller' => [Attr::BOOL],
-        'deliveryTime' => [Attr::SELECT]
+        'deliveryTime' => [Attr::SELECT],
+        'scaleUnit' => [Attr::MULTISELECT],
     ];
 
     public const DEFAULT_TRANSLATION_KEY = 'sw-product-stream.filter.values.';
