@@ -105,6 +105,10 @@ services:
     arguments:
       $repository: '@ergonode_custom_field_mapping.repository'
 
+  Ergonode\IntegrationShopware\Provider\UnitProvider:
+    arguments:
+      $unitRepository: '@unit.repository'
+
   # RESOLVER
   Ergonode\IntegrationShopware\Resolver\CustomFieldTransformerResolver:
     arguments:
@@ -164,6 +168,7 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductCrossSellingTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductDeliveryTimeTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductScaleUnitTransformer'
 
   Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer:
     arguments:
@@ -176,6 +181,10 @@ services:
   Ergonode\IntegrationShopware\Transformer\ProductExistingCustomFieldTransformer:
     arguments:
       $customFieldMappingProvider: '@ergonode.integration_shopware.provider.custom_field_mapping_provider'
+
+  Ergonode\IntegrationShopware\Transformer\ProductScaleUnitTransformer:
+    arguments:
+      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
 
   # UTIL
   Ergonode\IntegrationShopware\Util\SyncPerformanceLogger:
