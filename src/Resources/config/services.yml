@@ -190,3 +190,8 @@ services:
   Ergonode\IntegrationShopware\Util\SyncPerformanceLogger:
     arguments:
       $enabled: '%ergonode_integration.use_performance_logger%'
+
+  # Persistor
+  Ergonode\IntegrationShopware\Persistor\UnitPersistor:
+    arguments:
+      $unitRepository: '@unit.repository'

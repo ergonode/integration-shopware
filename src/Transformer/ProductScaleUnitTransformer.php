@@ -2,43 +2,40 @@
 
 declare(strict_types=1);
 
-
 namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
-use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
+use Ergonode\IntegrationShopware\Persistor\UnitPersistor;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\UnitProvider;
 use Ergonode\IntegrationShopware\Util\AttributeTypeValidator;
+use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Uuid\Uuid;
 
 class ProductScaleUnitTransformer implements ProductDataTransformerInterface
 {
     private const SHOPWARE_SCALE_UNIT_CODE = 'scaleUnit';
 
     private AttributeMappingProvider $attributeMappingProvider;
-    private AttributeTypeValidator $attributeTypeValidator;
     private UnitProvider $unitProvider;
+    private UnitPersistor $unitPersistor;
 
     public function __construct(
         AttributeMappingProvider $attributeMappingProvider,
-        AttributeTypeValidator $attributeTypeValidator,
+        UnitPersistor $unitPersistor,
         UnitProvider $unitProvider
     ) {
         $this->attributeMappingProvider = $attributeMappingProvider;
-        $this->attributeTypeValidator = $attributeTypeValidator;
         $this->unitProvider = $unitProvider;
+        $this->unitPersistor = $unitPersistor;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
-//        $unitId = $this->unitProvider->getIdByName('sztuka', $context);
-//        dd($unitId);
-//        return $productData;
-
-//        $swData = $productData->getShopwareData();
-//        dd($swData);
+        $swData = $productData->getShopwareData();
         $ergonodeData = $productData->getErgonodeData();
+
         $mappingKeys = $this->attributeMappingProvider->provideByShopwareKey(
             self::SHOPWARE_SCALE_UNIT_CODE,
             $context
@@ -46,29 +43,49 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
         if ($mappingKeys === null) {
             return $productData;
         }
-
         $ergonodeKey = $mappingKeys->getErgonodeKey();
-        $ergonodeAttributeMappingCollection = new ErgonodeAttributeMappingCollection([$mappingKeys]);
+
         foreach ($ergonodeData['attributeList']['edges'] as $edge) {
             $code = $edge['node']['attribute']['code'];
             if ($code !== $ergonodeKey) {
                 continue;
             }
-            $this->attributeTypeValidator->filterWrongAttributes(
-                $edge['node']['attribute'] ?? [],
-                $ergonodeAttributeMappingCollection,
-                $context,
-                ['sku' => $ergonodeData['sku']]
-            );
-//            $unitId = $this->unitProvider->getIdByName();
-//            dump($edge);
-//            dd($unitId);
-//            dump($edge);
+            $translationValues = $this->getTranslationValuesWithConvertedIso($edge['node']['translations']);
+            $uniqueTranslationValues = array_unique($translationValues);
+            $unit = $this->unitProvider->getUnitByNames($uniqueTranslationValues, $context);
+            if ($unit === null) {
+                $payload = $this->createPayload($translationValues);
+                $this->unitPersistor->persist($payload, $context);
+                $swData['unitId'] = $payload['id'];
+            } else {
+                $swData['unitId'] = $unit->getId();
+            }
+
+            $productData->setShopwareData($swData);
         }
-
-//            dd('a');
-//        $productScaleUnit = $swData['scale_unit'];
-
         return $productData;
+    }
+
+    private function getTranslationValuesWithConvertedIso(array $translations): array
+    {
+        $translationValues = [];
+        foreach ($translations as $translation) {
+            $code = $translation['value_array']['code'];
+            $translationValues[IsoCodeConverter::ergonodeToShopwareIso($translation['language'])] = $code;
+        }
+        return $translationValues;
+    }
+
+    private function createPayload(array $translations): array
+    {
+        $id = Uuid::randomHex();
+        $payload = ['id' => $id];
+        foreach ($translations as $key => $translation) {
+            $payload['translations'][$key] = [
+                'name' => $translation,
+                'shortCode' => $translation
+            ];
+        }
+        return $payload;
     }
 }
