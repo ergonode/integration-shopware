@@ -9,7 +9,6 @@ use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\UnitProvider;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 class ProductScaleUnitTransformer implements ProductDataTransformerInterface
@@ -17,17 +16,14 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
     private const SHOPWARE_SCALE_UNIT_CODE = 'scaleUnit';
 
     private AttributeMappingProvider $attributeMappingProvider;
-    private EntityRepository $unitRepository;
     private UnitProvider $unitProvider;
 
     public function __construct(
         AttributeMappingProvider $attributeMappingProvider,
-        EntityRepository $unitRepository,
         UnitProvider $unitProvider
     ) {
         $this->attributeMappingProvider = $attributeMappingProvider;
         $this->unitProvider = $unitProvider;
-        $this->unitRepository = $unitRepository;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
@@ -54,7 +50,7 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
             $unit = $this->unitProvider->getUnitByNames($uniqueTranslationValues, $context);
             if ($unit === null) {
                 $payload = $this->createPayload($translationValues);
-                $this->unitRepository->upsert([$payload], $context);
+                $swData['unit'] = $payload;
                 $swData['unitId'] = $payload['id'];
             } else {
                 $swData['unitId'] = $unit->getId();
