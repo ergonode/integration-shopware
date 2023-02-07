@@ -50,7 +50,7 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
             $uniqueTranslationValues = array_unique($translationValues);
             $unit = $this->unitProvider->getUnitByNames($uniqueTranslationValues, $context);
             if ($unit === null) {
-                $payload = $this->createPayload($translationValues, $code);
+                $payload = $this->createPayload($translationValues);
                 $swData['unit'] = $payload;
             }
             $swData['unitId'] = $unit ? $unit->getId() : null;
