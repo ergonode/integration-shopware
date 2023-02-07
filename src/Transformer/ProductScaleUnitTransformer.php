@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
-use Ergonode\IntegrationShopware\Persistor\UnitPersistor;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\UnitProvider;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 class ProductScaleUnitTransformer implements ProductDataTransformerInterface
@@ -17,17 +17,17 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
     private const SHOPWARE_SCALE_UNIT_CODE = 'scaleUnit';
 
     private AttributeMappingProvider $attributeMappingProvider;
+    private EntityRepository $unitRepository;
     private UnitProvider $unitProvider;
-    private UnitPersistor $unitPersistor;
 
     public function __construct(
         AttributeMappingProvider $attributeMappingProvider,
-        UnitPersistor $unitPersistor,
+        EntityRepository $unitRepository,
         UnitProvider $unitProvider
     ) {
         $this->attributeMappingProvider = $attributeMappingProvider;
         $this->unitProvider = $unitProvider;
-        $this->unitPersistor = $unitPersistor;
+        $this->unitRepository = $unitRepository;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
@@ -39,7 +39,7 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
             self::SHOPWARE_SCALE_UNIT_CODE,
             $context
         );
-        if ($mappingKeys === null) {
+        if (null === $mappingKeys) {
             return $productData;
         }
         $ergonodeKey = $mappingKeys->getErgonodeKey();
@@ -54,7 +54,7 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
             $unit = $this->unitProvider->getUnitByNames($uniqueTranslationValues, $context);
             if ($unit === null) {
                 $payload = $this->createPayload($translationValues);
-                $this->unitPersistor->persist($payload, $context);
+                $this->unitRepository->upsert([$payload], $context);
                 $swData['unitId'] = $payload['id'];
             } else {
                 $swData['unitId'] = $unit->getId();
@@ -62,6 +62,7 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
 
             $productData->setShopwareData($swData);
         }
+
         return $productData;
     }
 
