@@ -185,7 +185,6 @@ services:
   Ergonode\IntegrationShopware\Transformer\ProductScaleUnitTransformer:
     arguments:
       $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
-      $unitRepository: '@unit.repository'
 
   # UTIL
   Ergonode\IntegrationShopware\Util\SyncPerformanceLogger:

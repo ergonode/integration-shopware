@@ -64,10 +64,10 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
     private function getTranslationValuesWithConvertedIso(array $translations): array
     {
         $translationValues = [];
-        foreach ($translations as $translation) {
-            $code = $translation['value_array']['code'];
-            $translationValues[IsoCodeConverter::ergonodeToShopwareIso($translation['language'])] = $code;
+        foreach ($translations[0]['value_array']['name'] as $name) {
+            $translationValues[IsoCodeConverter::ergonodeToShopwareIso($name['language'])] = $name['value'];
         }
+
         return $translationValues;
     }
 
