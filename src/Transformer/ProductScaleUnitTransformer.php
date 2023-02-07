@@ -36,6 +36,7 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
             $context
         );
         if (null === $mappingKeys) {
+            unset($swData['unit']);
             return $productData;
         }
         $ergonodeKey = $mappingKeys->getErgonodeKey();
@@ -49,12 +50,10 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
             $uniqueTranslationValues = array_unique($translationValues);
             $unit = $this->unitProvider->getUnitByNames($uniqueTranslationValues, $context);
             if ($unit === null) {
-                $payload = $this->createPayload($translationValues);
+                $payload = $this->createPayload($translationValues, $code);
                 $swData['unit'] = $payload;
-                $swData['unitId'] = $payload['id'];
-            } else {
-                $swData['unitId'] = $unit->getId();
             }
+            $swData['unitId'] = $unit ? $unit->getId() : null;
         }
         $productData->setShopwareData($swData);
 
@@ -65,7 +64,8 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
     {
         $translationValues = [];
         foreach ($translations[0]['value_array']['name'] as $name) {
-            $translationValues[IsoCodeConverter::ergonodeToShopwareIso($name['language'])] = $name['value'];
+            $translationValues[IsoCodeConverter::ergonodeToShopwareIso($name['language'])] =
+                $name['value'] ?? $translations[0]['value_array']['code'];
         }
 
         return $translationValues;
@@ -73,12 +73,11 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
 
     private function createPayload(array $translations): array
     {
-        $id = Uuid::randomHex();
-        $payload = ['id' => $id];
+        $payload = [];
         foreach ($translations as $key => $translation) {
             $payload['translations'][$key] = [
                 'name' => $translation,
-                'shortCode' => $translation
+                'shortCode' => $translation,
             ];
         }
         return $payload;
