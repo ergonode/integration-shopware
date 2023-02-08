@@ -83,6 +83,9 @@ class VariantsTransformer
             }
 
             $swData['children'][] = $shopwareData;
+            if (property_exists(ProductEntity::class, 'displayParent')) {
+                $swData['displayParent'] = true;
+            }
 
             foreach ($shopwareData['options'] as $optionId) {
                 if (
