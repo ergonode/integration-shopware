@@ -105,10 +105,6 @@ services:
     arguments:
       $repository: '@ergonode_custom_field_mapping.repository'
 
-#  Ergonode\IntegrationShopware\Provider\UnitProvider:
-#    arguments:
-#      $unitRepository: '@unit.repository'
-
   # RESOLVER
   Ergonode\IntegrationShopware\Resolver\CustomFieldTransformerResolver:
     arguments:
