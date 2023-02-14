@@ -219,6 +219,11 @@ class ProductQueryBuilder
                                                                             ->setAlias('value_array')
                                                                             ->setSelectionSet([
                                                                                 'code',
+                                                                                (new Query('name'))
+                                                                                    ->setSelectionSet([
+                                                                                        'language',
+                                                                                        'value',
+                                                                                    ]),
                                                                             ]),
                                                                     ]),
 

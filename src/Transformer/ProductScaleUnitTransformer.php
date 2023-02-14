@@ -36,7 +36,7 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
             $context
         );
         if (null === $mappingKeys) {
-            unset($swData['unit']);
+            unset($swData['scaleUnit']);
             return $productData;
         }
         $ergonodeKey = $mappingKeys->getErgonodeKey();
@@ -48,13 +48,10 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
             }
             $translationValues = $this->getTranslationValuesWithConvertedIso($edge['node']['translations']);
             $uniqueTranslationValues = array_unique($translationValues);
-            $unit = $this->unitProvider->getUnitByNames($uniqueTranslationValues, $context);
-            if ($unit === null) {
-                $payload = $this->createPayload($translationValues);
-                $swData['unit'] = $payload;
-            }
-            $swData['unitId'] = $unit ? $unit->getId() : null;
+            $payload = $this->createPayload($translationValues, $uniqueTranslationValues, $context);
+            $swData['unit'] = $payload;
         }
+        unset($swData['scaleUnit']);
         $productData->setShopwareData($swData);
 
         return $productData;
@@ -71,15 +68,19 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
         return $translationValues;
     }
 
-    private function createPayload(array $translations): array
+    private function createPayload(array $translations, array $uniqueTranslationValues, Context $context): array
     {
         $payload = [];
+
+        $unit = $this->unitProvider->getUnitByNames($uniqueTranslationValues, $context);
+        $payload['id'] = $unit ? $unit->getId() : null;
         foreach ($translations as $key => $translation) {
             $payload['translations'][$key] = [
                 'name' => $translation,
                 'shortCode' => $translation,
             ];
         }
+
         return $payload;
     }
 }
