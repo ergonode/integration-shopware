@@ -11,6 +11,7 @@ use GraphQL\Query;
 class ProductQueryBuilder
 {
     private const ATTRIBUTE_LIST_COUNT = 1000;
+    private const VARIANT_LIST_COUNT = 300;
 
     public function build(int $count, ?string $cursor = null): Query
     {
@@ -47,6 +48,7 @@ class ProductQueryBuilder
                                                 'code',
                                             ]),
                                         (new Query('variantList'))
+                                            ->setArguments(['first' => self::VARIANT_LIST_COUNT])
                                             ->setSelectionSet([
                                                 (new Query('edges'))
                                                     ->setSelectionSet([
@@ -320,6 +322,7 @@ class ProductQueryBuilder
                                 'code',
                             ]),
                         (new Query('variantList'))
+                            ->setArguments(['first' => self::VARIANT_LIST_COUNT])
                             ->setSelectionSet([
                                 (new Query('edges'))
                                     ->setSelectionSet([
