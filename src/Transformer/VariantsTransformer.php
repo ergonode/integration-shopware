@@ -87,9 +87,14 @@ class VariantsTransformer
             foreach ($shopwareData['options'] as $optionId) {
                 if (
                     false === isset($swData['id']) ||
-                    false === isset($optionId['id']) ||
                     $this->checksumContainer->exists($swData['id'], $optionId['id'])
                 ) {
+                    if (isset($optionId['id'])){
+                        $swData['configuratorSettings'][] = [
+                            'productId' => '',
+                            'optionId' => $optionId['id'],
+                        ];
+                    }
                     continue;
                 }
 
