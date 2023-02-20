@@ -86,24 +86,18 @@ class VariantsTransformer
 
             foreach ($shopwareData['options'] as $optionId) {
                 if (
-                    false === isset($swData['id']) ||
-                    $this->checksumContainer->exists($swData['id'], $optionId['id'])
+                    false === isset($optionId['id']) ||
+                    $this->checksumContainer->exists($swData['productNumber'], $optionId['id'])
                 ) {
-                    if (isset($optionId['id'])){
-                        $swData['configuratorSettings'][] = [
-                            'productId' => '',
-                            'optionId' => $optionId['id'],
-                        ];
-                    }
                     continue;
                 }
 
                 $swData['configuratorSettings'][] = [
-                    'productId' => $swData['id'],
+                    'productId' => $swData['id'] ?? null,
                     'optionId' => $optionId['id'],
                 ];
 
-                $this->checksumContainer->push($swData['id'], $optionId['id']);
+                $this->checksumContainer->push($swData['productNumber'], $optionId['id']);
             }
 
             $entitiesToDelete[] = $variant->getEntitiesToDelete();
