@@ -19,7 +19,7 @@ use function count;
 
 class ProductSyncProcessor
 {
-    public const DEFAULT_PRODUCT_COUNT = 25;
+    public const DEFAULT_PRODUCT_COUNT = 10;
 
     private ErgonodeGqlClientInterface $gqlClient;
 
