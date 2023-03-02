@@ -53,7 +53,7 @@ class SimpleProductCustomFieldTransformer implements ProductCustomFieldTransform
         return $this->translationTransformer->transform(
             $translations,
             sprintf('customFields.%s', $customFieldName),
-            $customField->getType() === CustomFieldTypes::BOOL
+            (is_null($customField) ? null : $customField->getType()) === CustomFieldTypes::BOOL
         );
 
     }
