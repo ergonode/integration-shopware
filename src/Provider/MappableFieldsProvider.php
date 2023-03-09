@@ -9,7 +9,7 @@ use Ergonode\IntegrationShopware\Util\Constants;
 use Ergonode\IntegrationShopware\Util\CustomFieldUtil;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
@@ -23,7 +23,7 @@ class MappableFieldsProvider
 {
     private ErgonodeAttributeProvider $ergonodeAttributeProvider;
 
-    private EntityRepositoryInterface $customFieldRepository;
+    private EntityRepository $customFieldRepository;
 
     private LanguageProvider $languageProvider;
 
@@ -31,7 +31,7 @@ class MappableFieldsProvider
 
     public function __construct(
         ErgonodeAttributeProvider $ergonodeAttributeProvider,
-        EntityRepositoryInterface $customFieldRepository,
+        EntityRepository $customFieldRepository,
         LanguageProvider $languageProvider,
         ErgonodeCategoryProvider $ergonodeCategoryProvider
     ) {

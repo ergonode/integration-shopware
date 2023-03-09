@@ -6,16 +6,16 @@ namespace Ergonode\IntegrationShopware\Provider;
 
 use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class ProductMediaProvider
 {
-    private EntityRepositoryInterface $productMediaRepository;
+    private EntityRepository $productMediaRepository;
 
     public function __construct(
-        EntityRepositoryInterface $productMediaRepository
+        EntityRepository $productMediaRepository
     ) {
         $this->productMediaRepository = $productMediaRepository;
     }

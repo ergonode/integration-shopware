@@ -6,7 +6,7 @@ namespace Ergonode\IntegrationShopware\Service\ScheduledTask;
 
 use Doctrine\DBAL\Exception;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryCleaner;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 
 class CleanSyncHistoryTaskHandler extends ScheduledTaskHandler
@@ -16,7 +16,7 @@ class CleanSyncHistoryTaskHandler extends ScheduledTaskHandler
     private SyncHistoryCleaner $cleaner;
 
     public function __construct(
-        EntityRepositoryInterface $scheduledTaskRepository,
+        EntityRepository $scheduledTaskRepository,
         SyncHistoryCleaner $cleaner
     ) {
         parent::__construct($scheduledTaskRepository);

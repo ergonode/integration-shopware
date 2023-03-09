@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Throwable;
 
@@ -34,13 +34,13 @@ class SyncHistoryLogger
 
     private LoggerInterface $syncLogger;
 
-    private EntityRepositoryInterface $repository;
+    private EntityRepository $repository;
 
     public function __construct(
         string $kernelLogsDir,
         string $kernelEnv,
         LoggerInterface $ergonodeSyncLogger,
-        EntityRepositoryInterface $repository
+        EntityRepository $repository
     ) {
         $this->kernelLogsDir = $kernelLogsDir;
         $this->kernelEnv = $kernelEnv;

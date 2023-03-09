@@ -8,17 +8,17 @@ use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionCollection;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class PropertyGroupOptionProvider
 {
-    private EntityRepositoryInterface $propertyGroupOptionRepository;
+    private EntityRepository $propertyGroupOptionRepository;
 
     public function __construct(
-        EntityRepositoryInterface $propertyGroupOptionRepository
+        EntityRepository $propertyGroupOptionRepository
     ) {
         $this->propertyGroupOptionRepository = $propertyGroupOptionRepository;
     }

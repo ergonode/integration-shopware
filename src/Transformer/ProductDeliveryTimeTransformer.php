@@ -7,7 +7,7 @@ namespace Ergonode\IntegrationShopware\Transformer;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Provider\DeliveryTimeProvider;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class ProductDeliveryTimeTransformer implements ProductDataTransformerInterface
 {

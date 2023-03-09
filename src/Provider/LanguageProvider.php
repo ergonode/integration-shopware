@@ -7,16 +7,16 @@ namespace Ergonode\IntegrationShopware\Provider;
 use RuntimeException;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\Language\LanguageCollection;
 use Shopware\Core\System\Language\LanguageEntity;
 
 class LanguageProvider
 {
-    private EntityRepositoryInterface $languageRepository;
+    private EntityRepository $languageRepository;
 
-    public function __construct(EntityRepositoryInterface $languageRepository)
+    public function __construct(EntityRepository $languageRepository)
     {
         $this->languageRepository = $languageRepository;
     }

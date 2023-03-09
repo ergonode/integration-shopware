@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Provider;
 
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\System\Locale\LocaleCollection;
 
 class LocaleProvider
 {
-    private EntityRepositoryInterface $localeRepository;
+    private EntityRepository $localeRepository;
 
-    public function __construct(EntityRepositoryInterface $localeRepository)
+    public function __construct(EntityRepository $localeRepository)
     {
         $this->localeRepository = $localeRepository;
     }

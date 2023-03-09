@@ -8,7 +8,7 @@ use Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension;
 use Shopware\Core\Content\Category\CategoryCollection;
 use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\BeforeDeleteEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
@@ -21,13 +21,13 @@ use function array_values;
 
 class DeleteCategoryExtensionSubscriber implements EventSubscriberInterface
 {
-    private EntityRepositoryInterface $ergonodeCategoryMappingExtensionRepository;
+    private EntityRepository $ergonodeCategoryMappingExtensionRepository;
 
-    private EntityRepositoryInterface $categoryRepository;
+    private EntityRepository $categoryRepository;
 
     public function __construct(
-        EntityRepositoryInterface $ergonodeCategoryMappingExtensionRepository,
-        EntityRepositoryInterface $categoryRepository
+        EntityRepository $ergonodeCategoryMappingExtensionRepository,
+        EntityRepository $categoryRepository
     ) {
         $this->ergonodeCategoryMappingExtensionRepository = $ergonodeCategoryMappingExtensionRepository;
         $this->categoryRepository = $categoryRepository;

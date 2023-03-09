@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Provider;
 
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\DeliveryTime\DeliveryTimeEntity;
 
 class DeliveryTimeProvider
 {
-    private EntityRepositoryInterface $deliveryTimeRepository;
+    private EntityRepository $deliveryTimeRepository;
 
-    public function __construct(EntityRepositoryInterface $deliveryTimeRepository)
+    public function __construct(EntityRepository $deliveryTimeRepository)
     {
         $this->deliveryTimeRepository = $deliveryTimeRepository;
     }

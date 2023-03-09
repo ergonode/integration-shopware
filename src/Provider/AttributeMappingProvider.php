@@ -8,7 +8,7 @@ use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttribu
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
 use Psr\Cache\InvalidArgumentException;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Contracts\Cache\CacheInterface;
 
@@ -17,14 +17,14 @@ use function md5;
 
 class AttributeMappingProvider
 {
-    private EntityRepositoryInterface $repository;
+    private EntityRepository $repository;
 
     private CacheInterface $cache;
 
     private string $mappingCacheKey;
 
     public function __construct(
-        EntityRepositoryInterface $repository,
+        EntityRepository $repository,
         CacheInterface $ergonodeAttributeMappingCache
     ) {
         $this->repository = $repository;

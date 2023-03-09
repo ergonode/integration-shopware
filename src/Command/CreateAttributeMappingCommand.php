@@ -8,7 +8,7 @@ use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttribu
 use Ergonode\IntegrationShopware\Provider\MappableFieldsProvider;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,12 +20,12 @@ class CreateAttributeMappingCommand extends Command
 
     private Context $context;
 
-    private EntityRepositoryInterface $repository;
+    private EntityRepository $repository;
 
     private MappableFieldsProvider $mappableFieldsProvider;
 
     public function __construct(
-        EntityRepositoryInterface $repository,
+        EntityRepository $repository,
         MappableFieldsProvider $mappableFieldsProvider
     ) {
         $this->context = new Context(new SystemSource());

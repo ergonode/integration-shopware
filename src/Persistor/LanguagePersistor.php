@@ -7,19 +7,19 @@ namespace Ergonode\IntegrationShopware\Persistor;
 use Ergonode\IntegrationShopware\Api\LanguageListStreamResultsProxy;
 use Ergonode\IntegrationShopware\Provider\LocaleProvider;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\Language\LanguageDefinition;
 use Shopware\Core\System\Locale\LocaleCollection;
 use Shopware\Core\System\Locale\LocaleEntity;
 
 class LanguagePersistor
 {
-    private EntityRepositoryInterface $languageRepository;
+    private EntityRepository $languageRepository;
 
     private LocaleProvider $localeProvider;
 
     public function __construct(
-        EntityRepositoryInterface $languageRepository,
+        EntityRepository $languageRepository,
         LocaleProvider $localeProvider
     ) {
         $this->languageRepository = $languageRepository;
