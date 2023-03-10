@@ -78,6 +78,7 @@ class VariantsTransformer
                 fn($value) => !empty($value) || 0 === $value || false === $value
             );
 
+
             if (null !== $parentProduct) {
                 $shopwareData['parentId'] = $parentProduct->getId();
             }
@@ -112,11 +113,6 @@ class VariantsTransformer
         foreach ($entitiesToDelete as $entityName => $payloads) {
             $productData->addEntitiesToDelete($entityName, $payloads);
         }
-
-        $productData->addEntitiesToDelete(
-            ProductDefinition::ENTITY_NAME,
-            $this->getVariantsDeletePayload($productData)
-        );
 
         $productData->addEntitiesToDelete(
             ProductConfiguratorSettingDefinition::ENTITY_NAME,
