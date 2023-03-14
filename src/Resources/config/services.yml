@@ -20,8 +20,12 @@ services:
     Ergonode\IntegrationShopware\Transformer\ProductCustomField\ProductCustomFieldTransformerInterface:
       tags: [ 'ergonode_integration.product_custom_field_transformer' ]
 
+    # PROCESSOR
     Ergonode\IntegrationShopware\Processor\CategoryProcessorInterface:
       tags: [ 'ergonode_integration.category_processor' ]
+
+    Ergonode\IntegrationShopware\Processor\Attribute\AttributeCustomProcessorInterface:
+      tags: [ 'ergonode_integration.attribute_custom_processor' ]
 
   # WIRE WHOLE NAMESPACE
   Ergonode\IntegrationShopware\:
@@ -105,6 +109,11 @@ services:
     arguments:
       $repository: '@ergonode_custom_field_mapping.repository'
 
+
+  Ergonode\IntegrationShopware\Processor\Attribute\AttributeCustomProcessorResolver:
+    arguments:
+      $processors: !tagged_iterator 'ergonode_integration.attribute_custom_processor'
+
   # RESOLVER
   Ergonode\IntegrationShopware\Resolver\CustomFieldTransformerResolver:
     arguments:
@@ -164,6 +173,7 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductCrossSellingTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductDeliveryTimeTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductScaleUnitTransformer'
 
   Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer:
     arguments:
@@ -177,7 +187,18 @@ services:
     arguments:
       $customFieldMappingProvider: '@ergonode.integration_shopware.provider.custom_field_mapping_provider'
 
+  Ergonode\IntegrationShopware\Transformer\ProductScaleUnitTransformer:
+    arguments:
+      $mappingExtensionRepository: '@ergonode_mapping_extension.repository'
+
   # UTIL
   Ergonode\IntegrationShopware\Util\SyncPerformanceLogger:
     arguments:
       $enabled: '%ergonode_integration.use_performance_logger%'
+
+  # PROCESSOR
+  Ergonode\IntegrationShopware\Processor\Attribute\ScaleUnitAttributeProcessor:
+    arguments:
+      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
+      $unitRepository: '@unit.repository'
+      $mappingExtensionRepository: '@ergonode_mapping_extension.repository'

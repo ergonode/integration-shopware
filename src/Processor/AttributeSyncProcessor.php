@@ -44,7 +44,7 @@ class AttributeSyncProcessor
 
         foreach ($generator as $attributeStream) {
             $counter->incrProcessedEntityCount(
-                $this->persistBindingAttributes($attributeStream, $context)
+                $this->persistSelectAttributes($attributeStream, $context)
             );
             $counter->incrProcessedEntityCount(
                 $this->persistCustomFields($attributeStream, $context)
@@ -54,15 +54,15 @@ class AttributeSyncProcessor
         return $counter;
     }
 
-    private function persistBindingAttributes(AttributeStreamResultsProxy $attributes, Context $context): int
+    private function persistSelectAttributes(AttributeStreamResultsProxy $attributes, Context $context): int
     {
-        $bindingAttributes = $attributes->filterByAttributeTypes([
+        $selectAttributes = $attributes->filterByAttributeTypes([
             AttributeTypesEnum::SELECT,
             AttributeTypesEnum::MULTISELECT,
         ]);
 
-        if ($bindingAttributes instanceof AttributeStreamResultsProxy) {
-            return count($this->propertyGroupPersistor->persistStream($bindingAttributes, $context));
+        if ($selectAttributes instanceof AttributeStreamResultsProxy) {
+            return count($this->propertyGroupPersistor->persistStream($selectAttributes, $context));
         }
 
         return 0;

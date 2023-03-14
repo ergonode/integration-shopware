@@ -150,11 +150,6 @@ class ProductSyncProcessor
             return $counter;
         }
 
-        $endCursor = $result->getEndCursor();
-        if (null === $endCursor) {
-            throw new RuntimeException('Could not retrieve end cursor from the response.');
-        }
-
         $stopwatch->start('process');
         $primaryKeys = $this->productPersistor->persist([['node' => $result->getProductData()]], $context);
         $stopwatch->stop('process');
@@ -193,6 +188,6 @@ class ProductSyncProcessor
             return;
         }
 
-        $this->productPersistor->deleteOrphanedSkus($sku, $context, $result->getVariants()['edges']);
+        $this->productPersistor->deleteOrphanedSkus($sku, $context, $result->getVariants()['edges'] ?? []);
     }
 }

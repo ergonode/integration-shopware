@@ -42,6 +42,7 @@ class Constants
         'restockTime' => [Attr::NUMERIC],
         'markAsTopseller' => [Attr::BOOL],
         'deliveryTime' => [Attr::SELECT],
+        'scaleUnit' => [Attr::SELECT],
     ];
 
     public const DEFAULT_TRANSLATION_KEY = 'sw-product-stream.filter.values.';
@@ -60,5 +61,6 @@ class Constants
         'price.gross' => 'global.sw-price-field.labelPriceGross',
         'purchaseUnit' => 'sw-product.priceForm.labelPurchaseUnit',
         'referenceUnit' => 'sw-product.priceForm.labelReferenceUnit',
+        'scaleUnit' => 'sw-product-stream.filter.values.unit',
     ];
 }
