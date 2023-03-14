@@ -7,7 +7,6 @@ namespace Ergonode\IntegrationShopware\Transformer;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum as Attr;
-use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingException;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
@@ -56,9 +55,6 @@ class ProductTransformer implements ProductDataTransformerInterface
         $this->attributeTypeValidator = $attributeTypeValidator;
     }
 
-    /**
-     * @throws MissingRequiredProductMappingException
-     */
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $ergonodeData = $productData->getErgonodeData();

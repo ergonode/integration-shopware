@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Persistor;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
-use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingException;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Struct\ProductContainer;
 use Ergonode\IntegrationShopware\Transformer\ProductTransformerChain;
 use Ergonode\IntegrationShopware\Transformer\VariantsTransformer;
+use Ergonode\IntegrationShopware\Util\Constants;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
@@ -66,7 +66,6 @@ class ProductPersistor
     }
 
     /**
-     * @throws MissingRequiredProductMappingException
      * @returns array Persisted primary keys
      */
     public function persist(array $productListData, Context $context): array
@@ -92,6 +91,9 @@ class ProductPersistor
                 'variantSkus' => array_map(
                     fn(array $child) => $child['productNumber'], $mainProductPayload['children'] ?? []
                 ),
+                'categoryIds' => array_map(
+                    fn(array $category) => $category['id'], $mainProductPayload['categories'] ?? []
+                ),
             ]);
         }
 
@@ -102,7 +104,9 @@ class ProductPersistor
             }
         }
 
-        $this->clearProductCategories($productIds, $context);
+        if (false === $context->hasState(Constants::STATE_PRODUCT_APPEND_CATEGORIES)) {
+            $this->clearProductCategories($productIds, $context);
+        }
 
         $writeResult = $this->productRepository->upsert(
             array_values($payloads),
@@ -134,9 +138,6 @@ class ProductPersistor
         }
     }
 
-    /**
-     * @throws MissingRequiredProductMappingException
-     */
     private function getProductPayload(array $productData, Context $context): array
     {
         if (empty($productData)) {

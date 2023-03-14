@@ -8,6 +8,8 @@ use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum as Attr;
 
 class Constants
 {
+    public const STATE_PRODUCT_APPEND_CATEGORIES = 'ergonode-product-append-categories';
+
     public const PRODUCT_CUSTOM_FIELD_SET_NAME = 'ergonode_integration_custom_fields';
 
     public const SW_PRODUCT_MAPPABLE_FIELDS = [

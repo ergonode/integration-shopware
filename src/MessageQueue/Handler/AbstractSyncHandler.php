@@ -11,6 +11,7 @@ use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\MessageQueue\Handler\AbstractMessageHandler;
 use Symfony\Component\Lock\LockFactory;
+
 use function sprintf;
 
 abstract class AbstractSyncHandler extends AbstractMessageHandler
@@ -28,7 +29,6 @@ abstract class AbstractSyncHandler extends AbstractMessageHandler
         LockFactory $lockFactory,
         LoggerInterface $ergonodeSyncLogger
     ) {
-        $this->context = $this->createContext();
         $this->syncHistoryService = $syncHistoryService;
         $this->lockFactory = $lockFactory;
         $this->logger = $ergonodeSyncLogger;
@@ -43,9 +43,11 @@ abstract class AbstractSyncHandler extends AbstractMessageHandler
             return;
         }
 
+        $this->context = $this->createContext($message);
+
         $id = $this->syncHistoryService->start($this->getTaskName(), $this->context);
 
-        $count = $this->runSync();
+        $count = $this->runSync($message);
 
         $this->syncHistoryService->finish($id, $this->context, $count);
     }
@@ -62,10 +64,10 @@ abstract class AbstractSyncHandler extends AbstractMessageHandler
         return sprintf('%s.%s.%s', 'ErgonodeIntegration', $this->getTaskName(), 'lock');
     }
 
-    protected function createContext(): Context
+    protected function createContext($message): Context
     {
         return new Context(new SystemSource());
     }
 
-    abstract protected function runSync(): int;
+    abstract protected function runSync($message): int;
 }

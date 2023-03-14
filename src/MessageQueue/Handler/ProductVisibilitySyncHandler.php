@@ -31,7 +31,7 @@ class ProductVisibilitySyncHandler extends AbstractSyncHandler
         return [ProductVisibilitySync::class];
     }
 
-    public function runSync(): int
+    public function runSync($message): int
     {
         $count = 0;
 

@@ -13,12 +13,12 @@ class ProductResultsProxy extends AbstractResultsProxy
         return $this->getMainData();
     }
 
-    public function hasNextPage(): bool
+    public function hasVariantsNextPage(): bool
     {
         return (bool) ($this->getVariants()['pageInfo']['hasNextPage'] ?? false);
     }
 
-    public function getEndCursor(): ?string
+    public function getVariantsEndCursor(): ?string
     {
         return $this->getVariants()['pageInfo']['endCursor'] ?? null;
     }
@@ -26,5 +26,20 @@ class ProductResultsProxy extends AbstractResultsProxy
     public function getVariants(): array
     {
         return $this->getMainData()['variantList'] ?? [];
+    }
+
+    public function hasCategoriesNextPage(): bool
+    {
+        return (bool) ($this->getCategories()['pageInfo']['hasNextPage'] ?? false);
+    }
+
+    public function getCategoriesEndCursor(): ?string
+    {
+        return $this->getCategories()['pageInfo']['endCursor'] ?? null;
+    }
+
+    public function getCategories(): array
+    {
+        return $this->getMainData()['categoryList'] ?? [];
     }
 }

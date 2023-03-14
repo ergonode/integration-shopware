@@ -33,7 +33,7 @@ class DeletedProductSyncHandler extends AbstractSyncHandler
         return [DeletedProductSync::class];
     }
 
-    public function runSync(): int
+    public function runSync($message): int
     {
         $currentPage = 0;
         $count = 0;

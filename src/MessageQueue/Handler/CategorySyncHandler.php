@@ -67,15 +67,15 @@ class CategorySyncHandler extends AbstractSyncHandler
         return [CategorySync::class];
     }
 
-    protected function createContext(): Context
+    protected function createContext($message): Context
     {
-        $context = parent::createContext();
+        $context = parent::createContext($message);
         $context->addState(EntityIndexerRegistry::DISABLE_INDEXING);
 
         return $context;
     }
 
-    public function runSync(): int
+    public function runSync($message): int
     {
         $count = 0;
 

@@ -9,6 +9,9 @@ use Ergonode\IntegrationShopware\Provider\CategoryProvider;
 use Shopware\Core\Content\Category\CategoryEntity;
 use Shopware\Core\Framework\Context;
 
+use function array_merge;
+use function array_values;
+
 class ProductCategoryTransformer implements ProductDataTransformerInterface
 {
     private CategoryProvider $categoryProvider;
@@ -35,16 +38,15 @@ class ProductCategoryTransformer implements ProductDataTransformerInterface
 
             $categoryCollection = $this->categoryProvider->getCategoriesByCode($categoryCode, $context);
 
-            $categoryIds = \array_merge(
-                $categoryIds,
-                $categoryCollection->map(
-                    static fn(CategoryEntity $categoryEntity) => ['id' => $categoryEntity->getId()]
-                )
+            $categoryIds[] = $categoryCollection->map(
+                static fn(CategoryEntity $categoryEntity) => ['id' => $categoryEntity->getId()]
             );
         }
 
+        $categoryIds = array_merge(...$categoryIds);
+
         $swData = $productData->getShopwareData();
-        $swData['categories'] = \array_values($categoryIds);
+        $swData['categories'] = array_values($categoryIds);
         $productData->setShopwareData($swData);
 
         return $productData;
