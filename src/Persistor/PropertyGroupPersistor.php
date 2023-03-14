@@ -6,6 +6,7 @@ namespace Ergonode\IntegrationShopware\Persistor;
 
 use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
 use Ergonode\IntegrationShopware\DTO\PropertyGroupTransformationDTO;
+use Ergonode\IntegrationShopware\Processor\Attribute\AttributeCustomProcessorResolver;
 use Ergonode\IntegrationShopware\Provider\PropertyGroupProvider;
 use Ergonode\IntegrationShopware\Transformer\PropertyGroupTransformer;
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
@@ -25,16 +26,20 @@ class PropertyGroupPersistor
 
     private PropertyGroupProvider $propertyGroupProvider;
 
+    private AttributeCustomProcessorResolver $attributeCustomProcessorResolver;
+
     public function __construct(
         EntityRepositoryInterface $propertyGroupRepository,
         EntityRepositoryInterface $propertyGroupOptionRepository,
         PropertyGroupTransformer $propertyGroupTransformer,
-        PropertyGroupProvider $propertyGroupProvider
+        PropertyGroupProvider $propertyGroupProvider,
+        AttributeCustomProcessorResolver $attributeCustomProcessorResolver
     ) {
         $this->propertyGroupRepository = $propertyGroupRepository;
         $this->propertyGroupOptionRepository = $propertyGroupOptionRepository;
         $this->propertyGroupTransformer = $propertyGroupTransformer;
         $this->propertyGroupProvider = $propertyGroupProvider;
+        $this->attributeCustomProcessorResolver = $attributeCustomProcessorResolver;
     }
 
     public function persistStream(AttributeStreamResultsProxy $attributes, Context $context): array
@@ -44,6 +49,11 @@ class PropertyGroupPersistor
 
         foreach ($attributes->getEdges() as $attribute) {
             if (empty($node = $attribute['node']) || empty($code = $node['code'])) {
+                continue;
+            }
+
+            if ($customProcessor = $this->attributeCustomProcessorResolver->resolve($node, $context)) {
+                $customProcessor->process($node, $context);
                 continue;
             }
 

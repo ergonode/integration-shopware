@@ -25,6 +25,6 @@ class ProductResultsProxy extends AbstractResultsProxy
 
     public function getVariants(): array
     {
-        return $this->getMainData()['variantList'];
+        return $this->getMainData()['variantList'] ?? [];
     }
 }

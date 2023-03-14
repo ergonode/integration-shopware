@@ -37,6 +37,7 @@ class ProductTransformer implements ProductDataTransformerInterface
         'packUnit',
         'packUnitPlural',
         'customSearchKeywords',
+        'scaleUnit',
     ];
 
     private AttributeMappingProvider $attributeMappingProvider;
