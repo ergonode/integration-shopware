@@ -82,6 +82,8 @@ class DebugPersistProductStream extends Command
         try {
             do {
                 $io->progressAdvance();
+                // please note this function process only first page of variants.
+                // Variants pagination is included in ProductSyncHandler
                 $result = $this->productSyncProcessor->processStream($context);
 
                 $entityCount += $result->getProcessedEntityCount();
