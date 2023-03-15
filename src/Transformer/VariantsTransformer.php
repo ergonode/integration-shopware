@@ -78,27 +78,30 @@ class VariantsTransformer
                 fn($value) => !empty($value) || 0 === $value || false === $value
             );
 
+
             if (null !== $parentProduct) {
                 $shopwareData['parentId'] = $parentProduct->getId();
             }
 
             $swData['children'][] = $shopwareData;
+            if (property_exists(ProductEntity::class, 'displayParent')) {
+                $swData['displayParent'] = true;
+            }
 
             foreach ($shopwareData['options'] as $optionId) {
                 if (
-                    false === isset($swData['id']) ||
                     false === isset($optionId['id']) ||
-                    $this->checksumContainer->exists($swData['id'], $optionId['id'])
+                    $this->checksumContainer->exists($swData['productNumber'], $optionId['id'])
                 ) {
                     continue;
                 }
 
                 $swData['configuratorSettings'][] = [
-                    'productId' => $swData['id'],
+                    'productId' => $swData['id'] ?? null,
                     'optionId' => $optionId['id'],
                 ];
 
-                $this->checksumContainer->push($swData['id'], $optionId['id']);
+                $this->checksumContainer->push($swData['productNumber'], $optionId['id']);
             }
 
             $entitiesToDelete[] = $variant->getEntitiesToDelete();
@@ -110,11 +113,6 @@ class VariantsTransformer
         foreach ($entitiesToDelete as $entityName => $payloads) {
             $productData->addEntitiesToDelete($entityName, $payloads);
         }
-
-        $productData->addEntitiesToDelete(
-            ProductDefinition::ENTITY_NAME,
-            $this->getVariantsDeletePayload($productData)
-        );
 
         $productData->addEntitiesToDelete(
             ProductConfiguratorSettingDefinition::ENTITY_NAME,

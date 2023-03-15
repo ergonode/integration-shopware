@@ -13,8 +13,18 @@ class ProductResultsProxy extends AbstractResultsProxy
         return $this->getMainData();
     }
 
+    public function hasNextPage(): bool
+    {
+        return (bool) ($this->getVariants()['pageInfo']['hasNextPage'] ?? false);
+    }
+
+    public function getEndCursor(): ?string
+    {
+        return $this->getVariants()['pageInfo']['endCursor'] ?? null;
+    }
+
     public function getVariants(): array
     {
-        return $this->getMainData()['variantList']['edges'] ?? [];
+        return $this->getMainData()['variantList'] ?? [];
     }
 }

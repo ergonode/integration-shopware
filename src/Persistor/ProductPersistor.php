@@ -252,4 +252,21 @@ class ProductPersistor
 
         return $skus ?? [];
     }
+
+    public function deleteOrphanedSkus(string $sku, Context $context, array $ergonodeData)
+    {
+        $product = $this->productProvider->getProductBySku($sku, $context, ['children']);
+
+        $ergonodeSkus = array_map(function ($record) {
+            return $record['node']['sku'];
+        }, $ergonodeData);
+        $variantIdsToDelete = [];
+        foreach ($product->getChildren() as $variant) {
+            if (!in_array($variant->getProductNumber(), $ergonodeSkus)) {
+                $variantIdsToDelete[] = $variant->getId();
+            }
+        }
+
+        $this->deleteProductIds($variantIdsToDelete, $context);
+    }
 }

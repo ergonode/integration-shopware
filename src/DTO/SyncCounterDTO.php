@@ -16,6 +16,8 @@ class SyncCounterDTO
 
     private ?Stopwatch $stopwatch = null;
 
+    private array $skusWithAdditionalVariants = [];
+
     public function hasNextPage(): bool
     {
         return $this->hasNextPage;
@@ -59,5 +61,15 @@ class SyncCounterDTO
     public function hasStopwatch(): bool
     {
         return null !== $this->stopwatch;
+    }
+
+    public function getSkusWithAdditionalVariants(): array
+    {
+        return $this->skusWithAdditionalVariants;
+    }
+
+    public function setSkusWithAdditionalVariants(array $skus): void
+    {
+        $this->skusWithAdditionalVariants = $skus;
     }
 }

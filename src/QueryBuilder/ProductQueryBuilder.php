@@ -11,6 +11,7 @@ use GraphQL\Query;
 class ProductQueryBuilder
 {
     private const ATTRIBUTE_LIST_COUNT = 1000;
+    private const VARIANT_LIST_COUNT = 25;
 
     public function build(int $count, ?string $cursor = null): Query
     {
@@ -47,7 +48,13 @@ class ProductQueryBuilder
                                                 'code',
                                             ]),
                                         (new Query('variantList'))
+                                            ->setArguments(['first' => self::VARIANT_LIST_COUNT])
                                             ->setSelectionSet([
+                                                (new Query('pageInfo'))
+                                                    ->setSelectionSet([
+                                                        'endCursor',
+                                                        'hasNextPage',
+                                                    ]),
                                                 (new Query('edges'))
                                                     ->setSelectionSet([
                                                         (new Query('node'))
@@ -304,8 +311,13 @@ class ProductQueryBuilder
             ]);
     }
 
-    public function buildProductWithVariants(string $sku): Query
+    public function buildProductWithVariants(string $sku, ?string $cursor = null): Query
     {
+        $variantArguments = ['first' => self::VARIANT_LIST_COUNT];
+        if ($cursor) {
+            $variantArguments['after'] = $cursor;
+        }
+
         return (new Query('product'))
             ->setArguments(['sku' => $sku])
             ->setSelectionSet([
@@ -320,7 +332,13 @@ class ProductQueryBuilder
                                 'code',
                             ]),
                         (new Query('variantList'))
+                            ->setArguments($variantArguments)
                             ->setSelectionSet([
+                                (new Query('pageInfo'))
+                                    ->setSelectionSet([
+                                        'endCursor',
+                                        'hasNextPage',
+                                    ]),
                                 (new Query('edges'))
                                     ->setSelectionSet([
                                         (new Query('node'))
@@ -492,6 +510,11 @@ class ProductQueryBuilder
                                                             ->setAlias('value_array')
                                                             ->setSelectionSet([
                                                                 'code',
+                                                                (new Query('name'))
+                                                                    ->setSelectionSet([
+                                                                        'value',
+                                                                        'language'
+                                                                    ])
                                                             ]),
                                                     ]),
 
@@ -572,6 +595,29 @@ class ProductQueryBuilder
                             ->setSelectionSet([
                                 'sku',
                                 '__typename',
+                            ]),
+                    ]),
+            ]);
+    }
+
+    public function buildVariantSkusForProduct(string $sku): Query
+    {
+        return (new Query('product'))
+            ->setArguments(['sku' => $sku])
+            ->setSelectionSet([
+                (new InlineFragment('VariableProduct'))
+                    ->setSelectionSet([
+                        (new Query('variantList'))
+                            ->setArguments(['first' => 10000]) // allow unlimited
+                            ->setSelectionSet([
+                                (new Query('edges'))
+                                    ->setSelectionSet([
+                                        (new Query('node'))
+                                            ->setSelectionSet([
+                                                'sku',
+                                            ]),
+                                    ]),
+                                'totalCount',
                             ]),
                     ]),
             ]);
