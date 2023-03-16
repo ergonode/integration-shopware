@@ -11,16 +11,16 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Product\ProductCollection;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Symfony\Contracts\Cache\CacheInterface;
 
 class AttributeMappingProviderTest extends TestCase
 {
     /**
-     * @var MockObject|EntityRepositoryInterface
+     * @var MockObject|EntityRepository
      */
-    private EntityRepositoryInterface $mappingRepositoryMock;
+    private EntityRepository $mappingRepositoryMock;
 
     /**
      * @var MockObject|CacheInterface
@@ -36,7 +36,7 @@ class AttributeMappingProviderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mappingRepositoryMock = $this->createMock(EntityRepositoryInterface::class);
+        $this->mappingRepositoryMock = $this->createMock(EntityRepository::class);
         $this->contextMock = $this->createMock(Context::class);
         $this->cacheMock = $this->createMock(CacheInterface::class);
         $this->mockCacheResult();

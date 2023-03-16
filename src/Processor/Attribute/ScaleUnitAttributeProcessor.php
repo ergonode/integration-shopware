@@ -7,7 +7,7 @@ use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMapping
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -23,14 +23,14 @@ class ScaleUnitAttributeProcessor implements AttributeCustomProcessorInterface
 
     private AttributeMappingProvider $attributeMappingProvider;
 
-    private EntityRepositoryInterface $unitRepository;
+    private EntityRepository $unitRepository;
 
-    private EntityRepositoryInterface $mappingExtensionRepository;
+    private EntityRepository $mappingExtensionRepository;
 
     public function __construct(
         AttributeMappingProvider $attributeMappingProvider,
-        EntityRepositoryInterface $unitRepository,
-        EntityRepositoryInterface $mappingExtensionRepository
+        EntityRepository $unitRepository,
+        EntityRepository $mappingExtensionRepository
     ) {
         $this->attributeMappingProvider = $attributeMappingProvider;
         $this->unitRepository = $unitRepository;

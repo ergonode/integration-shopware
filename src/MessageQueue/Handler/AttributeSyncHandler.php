@@ -9,8 +9,10 @@ use Ergonode\IntegrationShopware\Processor\AttributeSyncProcessor;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Throwable;
 
+#[AsMessageHandler]
 class AttributeSyncHandler extends AbstractSyncHandler
 {
     private AttributeSyncProcessor $attributeSyncProcessor;
@@ -26,9 +28,9 @@ class AttributeSyncHandler extends AbstractSyncHandler
         $this->attributeSyncProcessor = $attributeSyncProcessor;
     }
 
-    public static function getHandledMessages(): iterable
+    public function __invoke(AttributeSync $message)
     {
-        return [AttributeSync::class];
+        $this->handleMessage($message);
     }
 
     public function runSync($message): int

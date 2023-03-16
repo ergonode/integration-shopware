@@ -10,7 +10,7 @@ use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Content\Category\CategoryEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\BeforeDeleteEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
@@ -23,16 +23,16 @@ use function array_values;
 
 class DeleteCategoryExtensionSubscriber implements EventSubscriberInterface
 {
-    private EntityRepositoryInterface $ergonodeCategoryMappingExtensionRepository;
+    private EntityRepository $ergonodeCategoryMappingExtensionRepository;
 
-    private EntityRepositoryInterface $categoryRepository;
+    private EntityRepository $categoryRepository;
 
-    private EntityRepositoryInterface $ergonodeCategoryMappingRepository;
+    private EntityRepository $ergonodeCategoryMappingRepository;
 
     public function __construct(
-        EntityRepositoryInterface $ergonodeCategoryMappingExtensionRepository,
-        EntityRepositoryInterface $categoryRepository,
-        EntityRepositoryInterface $ergonodeCategoryMappingRepository
+        EntityRepository $ergonodeCategoryMappingExtensionRepository,
+        EntityRepository $categoryRepository,
+        EntityRepository $ergonodeCategoryMappingRepository
     ) {
         $this->ergonodeCategoryMappingExtensionRepository = $ergonodeCategoryMappingExtensionRepository;
         $this->categoryRepository = $categoryRepository;

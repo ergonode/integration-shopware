@@ -8,15 +8,15 @@ use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(name: 'ergonode:debug:history')]
 class DebugSyncHistory extends Command
 {
-    protected static $defaultName = 'ergonode:debug:history';
-
     private Context $context;
 
     private SyncHistoryLogger $syncHistoryService;

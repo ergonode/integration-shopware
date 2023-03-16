@@ -7,6 +7,7 @@ namespace Ergonode\IntegrationShopware\Command;
 use Ergonode\IntegrationShopware\Processor\ProductVisibilitySyncProcessor;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,10 +16,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Temporary debug command
  */
+#[AsCommand(name: 'ergonode:debug:segment-mapping')]
 class DebugPersistSegmentMapping extends Command
 {
-    protected static $defaultName = 'ergonode:debug:segment-mapping';
-
     private Context $context;
 
     private ProductVisibilitySyncProcessor $productVisibilitySyncProcessor;

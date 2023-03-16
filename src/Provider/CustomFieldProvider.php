@@ -6,7 +6,7 @@ namespace Ergonode\IntegrationShopware\Provider;
 
 use Ergonode\IntegrationShopware\Util\Constants;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -17,13 +17,13 @@ class CustomFieldProvider
 {
     private ?string $customFieldSetId = null;
 
-    private EntityRepositoryInterface $customFieldRepository;
+    private EntityRepository $customFieldRepository;
 
-    private EntityRepositoryInterface $customFieldSetRepository;
+    private EntityRepository $customFieldSetRepository;
 
     public function __construct(
-        EntityRepositoryInterface $customFieldRepository,
-        EntityRepositoryInterface $customFieldSetRepository
+        EntityRepository $customFieldRepository,
+        EntityRepository $customFieldSetRepository
     ) {
         $this->customFieldRepository = $customFieldRepository;
         $this->customFieldSetRepository = $customFieldSetRepository;

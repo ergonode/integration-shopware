@@ -8,17 +8,17 @@ use Ergonode\IntegrationShopware\DTO\ProductVisibilityDTO;
 use Ergonode\IntegrationShopware\Transformer\ProductVisibilityTransformer;
 use Shopware\Core\Content\Product\Aggregate\ProductVisibility\ProductVisibilityDefinition;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class ProductVisibilityPersistor
 {
     private ProductVisibilityTransformer $transformer;
 
-    private EntityRepositoryInterface $productVisibilityRepository;
+    private EntityRepository $productVisibilityRepository;
 
     public function __construct(
         ProductVisibilityTransformer $transformer,
-        EntityRepositoryInterface $productVisibilityRepository
+        EntityRepository $productVisibilityRepository
     ) {
         $this->transformer = $transformer;
         $this->productVisibilityRepository = $productVisibilityRepository;

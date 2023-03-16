@@ -11,9 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route(defaults={"_routeScope"={"api"}})
- */
+#[Route(defaults: ['_routeScope' => ['api']])]
 class ClearCursorsController extends AbstractController
 {
     private ErgonodeCursorManager $cursorManager;
@@ -27,13 +25,9 @@ class ClearCursorsController extends AbstractController
     }
 
     /**
-     * @Route(
-     *     "/api/_action/ergonode/clear-cursors",
-     *     name="api.admin.ergonode.clear-cursors",
-     *     methods={"POST"}
-     * )
      * @return JsonResponse
      */
+    #[Route(path: '/api/_action/ergonode/clear-cursors', name: 'api.admin.ergonode.clear-cursors', methods: ['POST'])]
     public function clearCursors(Context $context): JsonResponse
     {
         $success = false;

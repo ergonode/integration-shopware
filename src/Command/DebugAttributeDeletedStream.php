@@ -9,16 +9,16 @@ use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Manager\OrphanEntitiesManager;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(name: 'ergonode:debug:attribute-deleted-stream')]
 class DebugAttributeDeletedStream extends Command
 {
-    protected static $defaultName = 'ergonode:debug:attribute-deleted-stream';
-
     private Context $context;
 
     private OrphanEntitiesManager $orphanEntitiesManager;

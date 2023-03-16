@@ -13,14 +13,17 @@ use Shopware\Core\Content\Product\DataAbstractionLayer\ProductIndexingMessage;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexerRegistry;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
+#[AsMessageHandler]
 class ProductSyncHandler extends AbstractSyncHandler
 {
     private const MAX_PAGES_PER_RUN = 4;
 
     private ProductSyncProcessor $productSyncProcessor;
+
     private MessageBusInterface $messageBus;
 
     public function __construct(
@@ -36,9 +39,9 @@ class ProductSyncHandler extends AbstractSyncHandler
         $this->messageBus = $messageBus;
     }
 
-    public static function getHandledMessages(): iterable
+    public function __invoke(ProductSync $message)
     {
-        return [ProductSync::class];
+        $this->handleMessage($message);
     }
 
     protected function createContext($message): Context

@@ -10,7 +10,7 @@ use Generator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
@@ -26,7 +26,7 @@ class ConfigServiceTest extends TestCase
     private $systemConfigServiceMock;
 
     /**
-     * @var MockObject|EntityRepositoryInterface
+     * @var MockObject|EntityRepository
      */
     private $salesChannelRepositoryMock;
 
@@ -38,7 +38,7 @@ class ConfigServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->systemConfigServiceMock = $this->createMock(SystemConfigService::class);
-        $this->salesChannelRepositoryMock = $this->createMock(EntityRepositoryInterface::class);
+        $this->salesChannelRepositoryMock = $this->createMock(EntityRepository::class);
 
         $this->contextMock = $this->createMock(Context::class);
 

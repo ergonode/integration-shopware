@@ -9,7 +9,7 @@ use Ergonode\IntegrationShopware\Entity\CategoryLastChildMapping\CategoryLastChi
 use Ergonode\IntegrationShopware\Entity\CategoryLastChildMapping\CategoryLastChildMappingDefinition;
 use Ergonode\IntegrationShopware\Entity\CategoryLastChildMapping\CategoryLastChildMappingEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\AndFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
@@ -21,16 +21,16 @@ class CategoryOrderHelper
 {
     private array $lastCategoryMapping = [];
 
-    private EntityRepositoryInterface $repository;
+    private EntityRepository $repository;
 
     private Connection $connection;
 
-    private EntityRepositoryInterface $categoryRepository;
+    private EntityRepository $categoryRepository;
 
     public function __construct(
-        EntityRepositoryInterface $categoryLastChildMappingRepository,
+        EntityRepository $categoryLastChildMappingRepository,
         Connection $connection,
-        EntityRepositoryInterface $categoryRepository
+        EntityRepository $categoryRepository
     ) {
         $this->repository = $categoryLastChildMappingRepository;
         $this->connection = $connection;

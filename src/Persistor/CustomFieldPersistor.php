@@ -10,22 +10,22 @@ use Ergonode\IntegrationShopware\Transformer\CustomFieldTransformer;
 use Ergonode\IntegrationShopware\Util\Constants;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\CustomField\CustomFieldDefinition;
 
 class CustomFieldPersistor
 {
-    private EntityRepositoryInterface $customFieldRepository;
+    private EntityRepository $customFieldRepository;
 
-    private EntityRepositoryInterface $customFieldSetRepository;
+    private EntityRepository $customFieldSetRepository;
 
     private CustomFieldTransformer $customFieldTransformer;
 
     private CustomFieldProvider $customFieldProvider;
 
     public function __construct(
-        EntityRepositoryInterface $customFieldRepository,
-        EntityRepositoryInterface $customFieldSetRepository,
+        EntityRepository $customFieldRepository,
+        EntityRepository $customFieldSetRepository,
         CustomFieldTransformer $customFieldTransformer,
         CustomFieldProvider $customFieldProvider
     ) {

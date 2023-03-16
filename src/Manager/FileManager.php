@@ -9,7 +9,7 @@ use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\MediaService;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
@@ -19,12 +19,12 @@ class FileManager
 
     private FileDownloader $fileDownloader;
 
-    private EntityRepositoryInterface $mediaRepository;
+    private EntityRepository $mediaRepository;
 
     public function __construct(
         MediaService $mediaService,
         FileDownloader $fileDownloader,
-        EntityRepositoryInterface $mediaRepository
+        EntityRepository $mediaRepository
     ) {
         $this->mediaService = $mediaService;
         $this->fileDownloader = $fileDownloader;

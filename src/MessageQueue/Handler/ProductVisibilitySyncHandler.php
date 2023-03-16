@@ -9,8 +9,10 @@ use Ergonode\IntegrationShopware\Processor\ProductVisibilitySyncProcessor;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Throwable;
 
+#[AsMessageHandler]
 class ProductVisibilitySyncHandler extends AbstractSyncHandler
 {
     private ProductVisibilitySyncProcessor $productVisibilitySyncProcessor;
@@ -26,9 +28,9 @@ class ProductVisibilitySyncHandler extends AbstractSyncHandler
         $this->productVisibilitySyncProcessor = $productVisibilitySyncProcessor;
     }
 
-    public static function getHandledMessages(): iterable
+    public function __invoke(ProductVisibilitySync $message)
     {
-        return [ProductVisibilitySync::class];
+        $this->handleMessage($message);
     }
 
     public function runSync($message): int

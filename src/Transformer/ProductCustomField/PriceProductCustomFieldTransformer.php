@@ -8,7 +8,7 @@ use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\Currency\CurrencyEntity;
@@ -17,11 +17,11 @@ class PriceProductCustomFieldTransformer implements ProductCustomFieldTransforme
 {
     private TranslationTransformer $translationTransformer;
 
-    private EntityRepositoryInterface $currencyRepository;
+    private EntityRepository $currencyRepository;
 
     public function __construct(
         TranslationTransformer $translationTransformer,
-        EntityRepositoryInterface $currencyRepository
+        EntityRepository $currencyRepository
     ) {
         $this->translationTransformer = $translationTransformer;
         $this->currencyRepository = $currencyRepository;
