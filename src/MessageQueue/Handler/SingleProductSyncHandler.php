@@ -41,6 +41,11 @@ class SingleProductSyncHandler extends AbstractSyncHandler
         $this->messageBus = $messageBus;
     }
 
+    public function __invoke(SingleProductSync $message)
+    {
+        $this->handleMessage($message);
+    }
+
     public static function getHandledMessages(): iterable
     {
         return [SingleProductSync::class];

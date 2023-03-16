@@ -64,6 +64,11 @@ class CategorySyncHandler extends AbstractSyncHandler
         $this->categoryOrderHelper = $categoryOrderHelper;
     }
 
+    public function __invoke(CategorySync $message)
+    {
+        $this->handleMessage($message);
+    }
+
     public static function getHandledMessages(): iterable
     {
         return [CategorySync::class];

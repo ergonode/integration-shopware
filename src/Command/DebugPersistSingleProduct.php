@@ -43,7 +43,7 @@ class DebugPersistSingleProduct extends Command
     {
         $sku = $input->getArgument('sku');
 
-        $this->singleProductSyncHandler->handle(new SingleProductSync($sku));
+        $this->singleProductSyncHandler->handleMessage(new SingleProductSync($sku));
 
         return self::SUCCESS;
     }

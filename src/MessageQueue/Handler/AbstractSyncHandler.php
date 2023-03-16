@@ -9,7 +9,6 @@ use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Lock\LockFactory;
 
 use Symfony\Component\Lock\LockInterface;
