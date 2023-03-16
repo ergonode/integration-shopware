@@ -8,6 +8,7 @@ use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
 use Ergonode\IntegrationShopware\Api\ProductResultsProxy;
 use Ergonode\IntegrationShopware\Api\ProductStreamResultsProxy;
 use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
+use Ergonode\IntegrationShopware\Exception\MissingRequiredProductMappingException;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Persistor\ProductPersistor;
 use Ergonode\IntegrationShopware\QueryBuilder\ProductQueryBuilder;
@@ -122,7 +123,10 @@ class ProductSyncProcessor
     }
 
     /**
-     * @param int $productCount Number of products to process (products per page)
+     * @param string $sku
+     * @param Context $context
+     * @return SyncCounterDTO
+     * @throws MissingRequiredProductMappingException
      */
     public function processSingle(string $sku, Context $context): SyncCounterDTO
     {

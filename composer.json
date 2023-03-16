@@ -43,5 +43,10 @@
         "psr-4": {
             "Ergonode\\IntegrationShopware\\Tests\\": "tests/"
         }
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": true
+        }
     }
 }
