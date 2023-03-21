@@ -53,7 +53,10 @@ class ProductSyncProcessor
     }
 
     /**
-     * @param int $productCount Number of products to process (products per page)
+     * @param Context $context
+     * @param int $productCount
+     *
+     * @return SyncCounterDTO
      */
     public function processStream(Context $context, int $productCount = self::DEFAULT_PRODUCT_COUNT): SyncCounterDTO
     {
