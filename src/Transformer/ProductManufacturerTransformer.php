@@ -3,7 +3,8 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
-use Shopware\Core\Content\Product\Aggregate\ProductManufacturer\ProductManufacturerDefinition;
+use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
+use Ergonode\IntegrationShopware\Processor\Attribute\ManufacturerAttributeProcessor;
 use Shopware\Core\Content\Product\Aggregate\ProductManufacturer\ProductManufacturerEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -14,9 +15,12 @@ class ProductManufacturerTransformer implements ProductDataTransformerInterface
 {
     private EntityRepositoryInterface $manufacturerRepository;
 
-    public function __construct(EntityRepositoryInterface $manufacturerRepository)
+    private EntityRepositoryInterface $mappingExtensionRepository;
+
+    public function __construct(EntityRepositoryInterface $manufacturerRepository, EntityRepositoryInterface $mappingExtensionRepository)
     {
         $this->manufacturerRepository = $manufacturerRepository;
+        $this->mappingExtensionRepository = $mappingExtensionRepository;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
@@ -27,36 +31,30 @@ class ProductManufacturerTransformer implements ProductDataTransformerInterface
             return $productData;
         }
 
-        $manufacturerId = $this->findOrCreateManufacturer($manufacturerName, $context);
+        $manufacturerId = $this->findManufacturer($manufacturerName, $context);
 
-        $shopwareData['manufacturer'] = ['id' => $manufacturerId];
+        $shopwareData['manufacturer'] = $manufacturerId ? ['id' => $manufacturerId] : null;
         $productData->setShopwareData($shopwareData);
 
         return $productData;
     }
 
-    private function findOrCreateManufacturer(string $name, Context $context): string
+    private function findManufacturer(string $name, Context $context): ?string
     {
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('name', $name));
-        $result = $this->manufacturerRepository->search($criteria, $context);
+        $criteria->addFilter(new EqualsFilter('code', $name));
+        $criteria->addFilter(new EqualsFilter('type', ManufacturerAttributeProcessor::MAPPING_TYPE));
+        $result = $this->mappingExtensionRepository->search($criteria, $context);
 
-        if ($result->count() > 0) {
-            $manufacturerEntity = $result->getEntities()->first();
-            if (!$manufacturerEntity instanceof ProductManufacturerEntity) {
-                throw new \RuntimeException('Something went wrong when fetching manufacturer entity');
-            }
+        $mapping = $result->first();
+        if ($mapping instanceof ErgonodeMappingExtensionEntity) {
+            $manufacturerCriteria = new Criteria();
+            $manufacturerCriteria->addFilter(new EqualsFilter('id', $mapping->getId()));
+            $result = $this->manufacturerRepository->searchIds($manufacturerCriteria, $context);
 
-            return $manufacturerEntity->getId();
+            return $result->firstId();
         }
 
-        $writeResult = $this->manufacturerRepository->upsert([['name' => $name]], $context);
-        $keys = $writeResult->getPrimaryKeys(ProductManufacturerDefinition::ENTITY_NAME);
-
-        if (empty($keys)) {
-            throw new \Exception(sprintf('Failed creating manufacturer %s', $name));
-        }
-
-        return $keys[0];
+        return null;
     }
 }
