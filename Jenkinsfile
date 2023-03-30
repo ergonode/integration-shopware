@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'jenkins-slave1'
+        label 'Slave-1-VMware'
     }
     
     stages {
