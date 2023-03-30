@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Build shopware and start test') {
             when {
-                expression { BRANCH_NAME ==~ /(PR.*)/ }
+                expression { BRANCH_NAME ==~ /(MR.*)/ }
             }
             steps {
                 sh script: "docker-compose up -d --build", label: 'Build and start Shopware'
