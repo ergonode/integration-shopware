@@ -70,6 +70,7 @@ class SingleProductSyncHandler extends AbstractSyncHandler
     public function runSync(): int
     {
         // do nothing, use runSyncWithMessage as message is required for this handler
+        return 0;
     }
 
     public function runSyncWithMessage(SingleProductSync $message): int

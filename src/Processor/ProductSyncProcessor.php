@@ -121,9 +121,6 @@ class ProductSyncProcessor
         return $counter;
     }
 
-    /**
-     * @param int $productCount Number of products to process (products per page)
-     */
     public function processSingle(string $sku, Context $context): SyncCounterDTO
     {
         $counter = new SyncCounterDTO();
