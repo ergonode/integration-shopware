@@ -165,29 +165,6 @@ class VariantsTransformer
         }
     }
 
-    private function getVariantsDeletePayload(ProductTransformationDTO $productData): array
-    {
-        if (false === $productData->swProductHasVariants()) {
-            return [];
-        }
-
-        $swProduct = $productData->getSwProduct();
-
-        $newChildren = $productData->getShopwareData()['children'] ?? [];
-        if (empty($newChildren)) {
-            return [];
-        }
-
-        $currentVariantIds = $swProduct->getChildren()->getIds();
-        $newVariantIds = array_filter(
-            array_map(fn(array $child) => $child['id'] ?? null, $newChildren)
-        );
-
-        $idsToDelete = array_diff($currentVariantIds, $newVariantIds);
-
-        return array_map(static fn($id) => ['id' => $id], array_values($idsToDelete));
-    }
-
     private function getConfiguratorSettingsDeletePayload(ProductTransformationDTO $productData): array
     {
         $swProduct = $productData->getSwProduct();
