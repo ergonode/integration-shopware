@@ -31,7 +31,7 @@ class AttributeSyncHandler extends AbstractSyncHandler
         return [AttributeSync::class];
     }
 
-    public function runSync(): int
+    public function runSync($message): int
     {
         $count = 0;
 

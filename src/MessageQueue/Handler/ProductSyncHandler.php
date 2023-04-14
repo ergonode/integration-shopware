@@ -41,15 +41,15 @@ class ProductSyncHandler extends AbstractSyncHandler
         return [ProductSync::class];
     }
 
-    protected function createContext(): Context
+    protected function createContext($message): Context
     {
-        $context = parent::createContext();
+        $context = parent::createContext($message);
         $context->addState(EntityIndexerRegistry::DISABLE_INDEXING);
 
         return $context;
     }
 
-    public function runSync(): int
+    public function runSync($message): int
     {
         $currentPage = 0;
         $count = 0;
@@ -63,8 +63,8 @@ class ProductSyncHandler extends AbstractSyncHandler
                 $count += $result->getProcessedEntityCount();
                 $primaryKeys = \array_merge($primaryKeys, $result->getPrimaryKeys());
 
-                foreach ($result->getSkusWithAdditionalVariants() as $sku) {
-                    $this->messageBus->dispatch(new SingleProductSync($sku));
+                foreach ($result->getSeparateProcessSkus() as $sku) {
+                    $this->messageBus->dispatch(new SingleProductSync($sku, true));
                 }
 
                 if (self::MAX_PAGES_PER_RUN !== null && ++$currentPage >= self::MAX_PAGES_PER_RUN) {

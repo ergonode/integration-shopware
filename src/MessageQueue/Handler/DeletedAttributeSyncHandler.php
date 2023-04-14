@@ -31,7 +31,7 @@ class DeletedAttributeSyncHandler extends AbstractSyncHandler
         return [DeletedAttributeSync::class];
     }
 
-    public function runSync(): int
+    public function runSync($message): int
     {
         $count = 0;
 

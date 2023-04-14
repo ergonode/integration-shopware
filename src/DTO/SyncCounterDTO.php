@@ -16,7 +16,7 @@ class SyncCounterDTO
 
     private ?Stopwatch $stopwatch = null;
 
-    private array $skusWithAdditionalVariants = [];
+    private array $separateProcessSkus = [];
 
     public function hasNextPage(): bool
     {
@@ -63,13 +63,13 @@ class SyncCounterDTO
         return null !== $this->stopwatch;
     }
 
-    public function getSkusWithAdditionalVariants(): array
+    public function getSeparateProcessSkus(): array
     {
-        return $this->skusWithAdditionalVariants;
+        return $this->separateProcessSkus;
     }
 
-    public function setSkusWithAdditionalVariants(array $skus): void
+    public function setSeparateProcessSkus(array $separateProcessSkus): void
     {
-        $this->skusWithAdditionalVariants = $skus;
+        $this->separateProcessSkus = $separateProcessSkus;
     }
 }

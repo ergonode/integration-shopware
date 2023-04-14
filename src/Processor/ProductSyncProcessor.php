@@ -11,11 +11,13 @@ use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Persistor\ProductPersistor;
 use Ergonode\IntegrationShopware\QueryBuilder\ProductQueryBuilder;
+use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Ergonode\IntegrationShopware\Util\SyncPerformanceLogger;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\Stopwatch\Stopwatch;
+
 use function count;
 
 class ProductSyncProcessor
@@ -51,7 +53,10 @@ class ProductSyncProcessor
     }
 
     /**
-     * @param int $productCount Number of products to process (products per page)
+     * @param Context $context
+     * @param int $productCount
+     *
+     * @return SyncCounterDTO
      */
     public function processStream(Context $context, int $productCount = self::DEFAULT_PRODUCT_COUNT): SyncCounterDTO
     {
@@ -73,6 +78,7 @@ class ProductSyncProcessor
 
         if (0 === count($result->getProductData()['edges'])) {
             $this->logger->info('End of stream reached.');
+
             return $counter;
         }
 
@@ -87,26 +93,31 @@ class ProductSyncProcessor
 
         $this->cursorManager->persist($endCursor, ProductStreamResultsProxy::MAIN_FIELD, $context);
 
-        $skusWithAdditionalVariants = [];
-        // store cursors for products which have more variants than allowed limit in query builder
+        $separateProcessSkus = [];
+        // store cursors for products which have more variants or categories than allowed limit in query builder
         foreach ($result->getProductData()['edges'] as $mainProductEdge) {
-            $variantPageInfo = $mainProductEdge['node']['variantList']['pageInfo'] ?? [];
-            if (empty($variantPageInfo)) {
+            $sku = $mainProductEdge['node']['sku'] ?? '';
+            if (empty($sku)) {
                 continue;
             }
 
-            if (isset($variantPageInfo['hasNextPage'], $variantPageInfo['endCursor'], $mainProductEdge['node']['sku'])) {
-                if ($variantPageInfo['hasNextPage']) {
-                    $this->cursorManager->persist(
-                        $variantPageInfo['endCursor'],
-                        sprintf(ProductStreamResultsProxy::VARIANT_FIELD_PATTERN, $mainProductEdge['node']['sku']),
-                        $context
-                    );
+            $hasMoreVariants = $this->saveCursor(
+                $mainProductEdge['node'],
+                ProductStreamResultsProxy::VARIANT_LIST_FIELD,
+                $context
+            );
+            if (false === $hasMoreVariants) {
+                $this->deleteOrphanedVariants($mainProductEdge['node']['sku'], $context);
+            }
 
-                    $skusWithAdditionalVariants[] = $mainProductEdge['node']['sku'];
-                } else {
-                    $this->deleteOrphanedVariants($mainProductEdge['node']['sku'], $context);
-                }
+            $hasMoreCategories = $this->saveCursor(
+                $mainProductEdge['node'],
+                ProductStreamResultsProxy::CATEGORY_LIST_FIELD,
+                $context
+            );
+
+            if ($hasMoreVariants || $hasMoreCategories) {
+                $separateProcessSkus[] = $sku;
             }
         }
 
@@ -114,7 +125,7 @@ class ProductSyncProcessor
         $counter->setPrimaryKeys($primaryKeys);
         $counter->setHasNextPage($result->hasNextPage());
         $counter->setStopwatch($stopwatch);
-        $counter->setSkusWithAdditionalVariants($skusWithAdditionalVariants);
+        $counter->setSeparateProcessSkus($separateProcessSkus);
 
         $this->performanceLogger->logPerformance(self::class, $stopwatch);
 
@@ -126,14 +137,18 @@ class ProductSyncProcessor
         $counter = new SyncCounterDTO();
         $stopwatch = new Stopwatch();
 
-        $cursorEntity = $this->cursorManager->getCursorEntity(
-            sprintf(ProductStreamResultsProxy::VARIANT_FIELD_PATTERN, $sku),
-            $context
-        );
-        $cursor = $cursorEntity ? $cursorEntity->getCursor() : null;
+        $variantsCursorKey = CodeBuilderUtil::build(ProductStreamResultsProxy::VARIANT_LIST_FIELD, $sku);
+        $categoriesCursorKey = CodeBuilderUtil::build(ProductStreamResultsProxy::CATEGORY_LIST_FIELD, $sku);
+
+        $variantsCursor = $this->cursorManager->getCursorEntity($variantsCursorKey, $context);
+        $categoriesCursor = $this->cursorManager->getCursorEntity($categoriesCursorKey, $context);
 
         $stopwatch->start('query');
-        $query = $this->productQueryBuilder->buildProductWithVariants($sku, $cursor);
+        $query = $this->productQueryBuilder->buildProductWithVariants(
+            $sku,
+            $variantsCursor ? $variantsCursor->getCursor() : null,
+            $categoriesCursor ? $categoriesCursor->getCursor() : null
+        );
         /** @var ProductResultsProxy|null $result */
         $result = $this->gqlClient->query($query, ProductResultsProxy::class);
         $stopwatch->stop('query');
@@ -144,6 +159,7 @@ class ProductSyncProcessor
 
         if (0 === count($result->getProductData())) {
             $this->logger->info('End of stream reached.');
+
             return $counter;
         }
 
@@ -151,22 +167,25 @@ class ProductSyncProcessor
         $primaryKeys = $this->productPersistor->persist([['node' => $result->getProductData()]], $context);
         $stopwatch->stop('process');
 
-        if ($result->hasNextPage()) {
-            $this->cursorManager->persist(
-                $result->getEndCursor(),
-                sprintf(ProductStreamResultsProxy::VARIANT_FIELD_PATTERN, $sku),
-                $context
-            );
-        } else {
-            $this->cursorManager->deleteCursor(
-                sprintf(ProductStreamResultsProxy::VARIANT_FIELD_PATTERN, $sku),
-                $context
-            );
+        $variantsEndCursor = $result->getVariantsEndCursor();
+        if (null !== $variantsEndCursor) {
+            $this->cursorManager->persist($variantsEndCursor, $variantsCursorKey, $context);
+        }
+
+        $categoriesEndCursor = $result->getCategoriesEndCursor();
+        if (null !== $categoriesEndCursor) {
+            $this->cursorManager->persist($categoriesEndCursor, $categoriesCursorKey, $context);
+        }
+
+        $hasNextPage = $result->hasVariantsNextPage() || $result->hasCategoriesNextPage();
+        if (false === $hasNextPage) {
+            $this->cursorManager->deleteCursor($variantsCursorKey, $context);
+            $this->cursorManager->deleteCursor($categoriesCursorKey, $context);
         }
 
         $counter->incrProcessedEntityCount(count($primaryKeys));
         $counter->setPrimaryKeys($primaryKeys);
-        $counter->setHasNextPage($result->hasNextPage());
+        $counter->setHasNextPage($hasNextPage);
         $counter->setStopwatch($stopwatch);
 
         $this->performanceLogger->logPerformance(self::class, $stopwatch);
@@ -186,5 +205,31 @@ class ProductSyncProcessor
         }
 
         $this->productPersistor->deleteOrphanedSkus($sku, $context, $result->getVariants()['edges'] ?? []);
+    }
+
+    /**
+     * @return bool $node['$fieldName']['pageInfo']['hasNextPage']
+     */
+    private function saveCursor(array $node, string $fieldName, Context $context): bool
+    {
+        if (empty($node)) {
+            return false;
+        }
+
+        $sku = $node['sku'] ?? '';
+        $pageInfo = $node[$fieldName]['pageInfo'] ?? [];
+        if (empty($sku) || empty($pageInfo) || false === isset($pageInfo['hasNextPage'], $pageInfo['endCursor'])) {
+            return false;
+        }
+
+        if ($pageInfo['hasNextPage']) {
+            $this->cursorManager->persist(
+                $pageInfo['endCursor'],
+                CodeBuilderUtil::build($fieldName, $sku),
+                $context
+            );
+        }
+
+        return $pageInfo['hasNextPage'];
     }
 }

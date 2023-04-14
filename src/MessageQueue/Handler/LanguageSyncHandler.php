@@ -31,7 +31,7 @@ class LanguageSyncHandler extends AbstractSyncHandler
         return [LanguageSync::class];
     }
 
-    public function runSync(): int
+    public function runSync($message): int
     {
         $count = 0;
 

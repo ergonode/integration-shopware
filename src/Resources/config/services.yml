@@ -178,6 +178,7 @@ services:
   Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer:
     arguments:
       $manufacturerRepository: '@product_manufacturer.repository'
+      $mappingExtensionRepository: '@ergonode_mapping_extension.repository'
 
   Ergonode\IntegrationShopware\Transformer\ProductTransformer:
     arguments:
@@ -201,4 +202,10 @@ services:
     arguments:
       $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
       $unitRepository: '@unit.repository'
+      $mappingExtensionRepository: '@ergonode_mapping_extension.repository'
+
+  Ergonode\IntegrationShopware\Processor\Attribute\ManufacturerAttributeProcessor:
+    arguments:
+      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
+      $manufacturerRepository: '@product_manufacturer.repository'
       $mappingExtensionRepository: '@ergonode_mapping_extension.repository'

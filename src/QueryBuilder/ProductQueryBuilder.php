@@ -12,6 +12,7 @@ class ProductQueryBuilder
 {
     private const ATTRIBUTE_LIST_COUNT = 1000;
     private const VARIANT_LIST_COUNT = 25;
+    private const CATEGORY_LIST_COUNT = 50;
 
     public function build(int $count, ?string $cursor = null): Query
     {
@@ -167,7 +168,13 @@ class ProductQueryBuilder
                                             ]),
                                     ]),
                                 (new Query('categoryList'))
+                                    ->setArguments(['first' => self::CATEGORY_LIST_COUNT])
                                     ->setSelectionSet([
+                                        (new Query('pageInfo'))
+                                            ->setSelectionSet([
+                                                'endCursor',
+                                                'hasNextPage',
+                                            ]),
                                         (new Query('edges'))
                                             ->setSelectionSet([
                                                 (new Query('node'))
@@ -311,11 +318,19 @@ class ProductQueryBuilder
             ]);
     }
 
-    public function buildProductWithVariants(string $sku, ?string $cursor = null): Query
-    {
-        $variantArguments = ['first' => self::VARIANT_LIST_COUNT];
-        if ($cursor) {
-            $variantArguments['after'] = $cursor;
+    public function buildProductWithVariants(
+        string $sku,
+        ?string $variantsCursor = null,
+        ?string $categoriesCursor = null
+    ): Query {
+        $variantListArguments = ['first' => self::VARIANT_LIST_COUNT];
+        if (null !== $variantsCursor) {
+            $variantArguments['after'] = $variantsCursor;
+        }
+
+        $categoryListArguments = ['first' => self::CATEGORY_LIST_COUNT];
+        if (null !== $categoriesCursor) {
+            $categoryListArguments['after'] = $categoriesCursor;
         }
 
         return (new Query('product'))
@@ -332,7 +347,7 @@ class ProductQueryBuilder
                                 'code',
                             ]),
                         (new Query('variantList'))
-                            ->setArguments($variantArguments)
+                            ->setArguments($variantListArguments)
                             ->setSelectionSet([
                                 (new Query('pageInfo'))
                                     ->setSelectionSet([
@@ -451,7 +466,13 @@ class ProductQueryBuilder
                             ]),
                     ]),
                 (new Query('categoryList'))
+                    ->setArguments($categoryListArguments)
                     ->setSelectionSet([
+                        (new Query('pageInfo'))
+                            ->setSelectionSet([
+                                'endCursor',
+                                'hasNextPage',
+                            ]),
                         (new Query('edges'))
                             ->setSelectionSet([
                                 (new Query('node'))
@@ -513,8 +534,8 @@ class ProductQueryBuilder
                                                                 (new Query('name'))
                                                                     ->setSelectionSet([
                                                                         'value',
-                                                                        'language'
-                                                                    ])
+                                                                        'language',
+                                                                    ]),
                                                             ]),
                                                     ]),
 
