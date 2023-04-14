@@ -12,6 +12,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\MessageQueue\Handler\AbstractMessageHandler;
 use Symfony\Component\Lock\LockFactory;
 
+use Symfony\Component\Lock\LockInterface;
 use function sprintf;
 
 abstract class AbstractSyncHandler extends AbstractMessageHandler
@@ -23,6 +24,8 @@ abstract class AbstractSyncHandler extends AbstractMessageHandler
     protected LockFactory $lockFactory;
 
     protected LoggerInterface $logger;
+
+    protected ?LockInterface $lock = null;
 
     public function __construct(
         SyncHistoryLogger $syncHistoryService,
@@ -36,8 +39,8 @@ abstract class AbstractSyncHandler extends AbstractMessageHandler
 
     public function handle($message): void
     {
-        $lock = $this->lockFactory->createLock($this->getLockName());
-        if (false === $lock->acquire()) {
+        $this->lock = $this->lockFactory->createLock($this->getLockName());
+        if (false === $this->lock->acquire()) {
             $this->logger->error(sprintf('%s is locked.', $this->getTaskName()));
 
             return;
@@ -50,6 +53,8 @@ abstract class AbstractSyncHandler extends AbstractMessageHandler
         $count = $this->runSync($message);
 
         $this->syncHistoryService->finish($id, $this->context, $count);
+
+        $this->lock = null;
     }
 
     protected function getTaskName(): string
