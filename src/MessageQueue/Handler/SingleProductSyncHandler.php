@@ -125,6 +125,9 @@ class SingleProductSyncHandler extends AbstractSyncHandler
                     new SingleProductSync($message->getSku(), $message->shouldAppendCategories())
                 );
             } else {
+                // refresh lock so the sync is not running anymore
+                $this->lock = $this->lockFactory->createLock($this->getLockName());
+                $this->lock->acquire();
                 $this->productSyncProcessor->deleteOrphanedVariants($message->getSku(), $this->context);
             }
         }
