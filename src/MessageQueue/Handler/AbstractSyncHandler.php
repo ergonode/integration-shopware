@@ -25,8 +25,6 @@ abstract class AbstractSyncHandler extends AbstractMessageHandler
 
     protected LoggerInterface $logger;
 
-    protected ?LockInterface $lock = null;
-
     public function __construct(
         SyncHistoryLogger $syncHistoryService,
         LockFactory $lockFactory,
@@ -39,8 +37,8 @@ abstract class AbstractSyncHandler extends AbstractMessageHandler
 
     public function handle($message): void
     {
-        $this->lock = $this->lockFactory->createLock($this->getLockName());
-        if (false === $this->lock->acquire()) {
+        $lock = $this->lockFactory->createLock($this->getLockName());
+        if (false === $lock->acquire()) {
             $this->logger->error(sprintf('%s is locked.', $this->getTaskName()));
 
             return;
@@ -53,8 +51,6 @@ abstract class AbstractSyncHandler extends AbstractMessageHandler
         $count = $this->runSync($message);
 
         $this->syncHistoryService->finish($id, $this->context, $count);
-
-        $this->lock = null;
     }
 
     protected function getTaskName(): string
