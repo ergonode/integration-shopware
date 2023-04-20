@@ -325,7 +325,7 @@ class ProductQueryBuilder
     ): Query {
         $variantListArguments = ['first' => self::VARIANT_LIST_COUNT];
         if (null !== $variantsCursor) {
-            $variantArguments['after'] = $variantsCursor;
+            $variantListArguments['after'] = $variantsCursor;
         }
 
         $categoryListArguments = ['first' => self::CATEGORY_LIST_COUNT];
