@@ -103,6 +103,11 @@ class ProductQueryBuilder
                                                                                                             ->setAlias('value_multi_array')
                                                                                                             ->setSelectionSet([
                                                                                                                 'code',
+                                                                                                                (new Query('name'))
+                                                                                                                    ->setSelectionSet([
+                                                                                                                        'value',
+                                                                                                                        'language',
+                                                                                                                    ]),
                                                                                                             ]),
                                                                                                     ]),
                                                                                                 (new InlineFragment('SelectAttributeValueTranslation'))
@@ -111,6 +116,11 @@ class ProductQueryBuilder
                                                                                                             ->setAlias('value_array')
                                                                                                             ->setSelectionSet([
                                                                                                                 'code',
+                                                                                                                (new Query('name'))
+                                                                                                                    ->setSelectionSet([
+                                                                                                                        'value',
+                                                                                                                        'language',
+                                                                                                                    ]),
                                                                                                             ]),
                                                                                                     ]),
 
@@ -225,6 +235,11 @@ class ProductQueryBuilder
                                                                             ->setAlias('value_multi_array')
                                                                             ->setSelectionSet([
                                                                                 'code',
+                                                                                (new Query('name'))
+                                                                                    ->setSelectionSet([
+                                                                                        'value',
+                                                                                        'language',
+                                                                                    ]),
                                                                             ]),
                                                                     ]),
                                                                 (new InlineFragment('SelectAttributeValueTranslation'))
@@ -233,6 +248,11 @@ class ProductQueryBuilder
                                                                             ->setAlias('value_array')
                                                                             ->setSelectionSet([
                                                                                 'code',
+                                                                                (new Query('name'))
+                                                                                    ->setSelectionSet([
+                                                                                        'value',
+                                                                                        'language',
+                                                                                    ]),
                                                                             ]),
                                                                     ]),
 
@@ -401,6 +421,11 @@ class ProductQueryBuilder
                                                                                             ->setAlias('value_multi_array')
                                                                                             ->setSelectionSet([
                                                                                                 'code',
+                                                                                                (new Query('name'))
+                                                                                                    ->setSelectionSet([
+                                                                                                        'value',
+                                                                                                        'language',
+                                                                                                    ]),
                                                                                             ]),
                                                                                     ]),
                                                                                 (new InlineFragment('SelectAttributeValueTranslation'))
@@ -409,6 +434,11 @@ class ProductQueryBuilder
                                                                                             ->setAlias('value_array')
                                                                                             ->setSelectionSet([
                                                                                                 'code',
+                                                                                                (new Query('name'))
+                                                                                                    ->setSelectionSet([
+                                                                                                        'value',
+                                                                                                        'language',
+                                                                                                    ]),
                                                                                             ]),
                                                                                     ]),
 
@@ -523,6 +553,11 @@ class ProductQueryBuilder
                                                             ->setAlias('value_multi_array')
                                                             ->setSelectionSet([
                                                                 'code',
+                                                                (new Query('name'))
+                                                                    ->setSelectionSet([
+                                                                        'value',
+                                                                        'language',
+                                                                    ]),
                                                             ]),
                                                     ]),
                                                 (new InlineFragment('SelectAttributeValueTranslation'))

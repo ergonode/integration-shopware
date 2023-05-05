@@ -118,13 +118,34 @@ class ProductTransformer implements ProductDataTransformerInterface
                         $translatedValues[$valueTranslation['language']] = null;
                         break;
                     }
+
+                    // get translation if exist, if not use code
+                    foreach ($valueTranslation[$valueKey]['name'] ?? [] as $nameRecord) {
+                        if ($nameRecord['language'] == $valueTranslation['language']
+                            && !is_null($nameRecord['value'])) {
+                            $translatedValues[$valueTranslation['language']] = $nameRecord['value'];
+                            break 2;
+                        }
+                    }
+
                     $translatedValues[$valueTranslation['language']] = $valueTranslation[$valueKey]['code'];
                     break;
                 case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_MULTI_ARRAY:
-                    $translatedValues[$valueTranslation['language']] = array_column(
-                        $valueTranslation[$valueKey],
-                        'code'
-                    );
+                    $values = [];
+                    $records = $valueTranslation[$valueKey];
+                    // get translation if exist, if not use code
+                    foreach ($records as $record) {
+                        foreach ($record['name'] ?? [] as $nameRecord) {
+                            if ($nameRecord['language'] == $valueTranslation['language']) {
+                                if (!is_null($nameRecord['value'])) {
+                                    $values[] = $nameRecord['value'];
+                                    continue;
+                                }
+                                $values[] = $record['code'];
+                            }
+                        }
+                    }
+                    $translatedValues[$valueTranslation['language']] = $values;
                     break;
                 default:
                     $translatedValues[$valueTranslation['language']] = $valueTranslation[$valueKey];
@@ -132,6 +153,7 @@ class ProductTransformer implements ProductDataTransformerInterface
             }
         }
 
+        //dump($translatedValues);
         return $translatedValues;
     }
 
