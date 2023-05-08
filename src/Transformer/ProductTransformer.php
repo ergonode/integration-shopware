@@ -111,49 +111,33 @@ class ProductTransformer implements ProductDataTransformerInterface
     {
         $translatedValues = [];
         foreach ($valueTranslations as $valueTranslation) {
+            $language = $valueTranslation['language'];
             $valueKey = ErgonodeApiValueKeyResolverUtil::resolve($valueTranslation['__typename']);
             switch ($valueKey) {
                 case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_ARRAY:
                     if ($valueTranslation[$valueKey] === null) {
-                        $translatedValues[$valueTranslation['language']] = null;
+                        $translatedValues[$language] = null;
                         break;
                     }
-
-                    // get translation if exist, if not use code
-                    foreach ($valueTranslation[$valueKey]['name'] ?? [] as $nameRecord) {
-                        if ($nameRecord['language'] == $valueTranslation['language']
-                            && !is_null($nameRecord['value'])) {
-                            $translatedValues[$valueTranslation['language']] = $nameRecord['value'];
-                            break 2;
-                        }
-                    }
-
-                    $translatedValues[$valueTranslation['language']] = $valueTranslation[$valueKey]['code'];
+                    $translatedValues[$language] = empty($valueTranslation[$valueKey]['name'])
+                        ? $valueTranslation[$valueKey]['code']
+                        : $valueTranslation[$valueKey]['name'];
                     break;
                 case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_MULTI_ARRAY:
                     $values = [];
-                    $records = $valueTranslation[$valueKey];
-                    // get translation if exist, if not use code
-                    foreach ($records as $record) {
-                        foreach ($record['name'] ?? [] as $nameRecord) {
-                            if ($nameRecord['language'] == $valueTranslation['language']) {
-                                if (!is_null($nameRecord['value'])) {
-                                    $values[] = $nameRecord['value'];
-                                    continue;
-                                }
-                                $values[] = $record['code'];
-                            }
-                        }
+                    foreach ($valueTranslation[$valueKey] as $record) {
+                        $values[] = empty($record['name'])
+                            ? $record['code']
+                            : $record['name'];
                     }
-                    $translatedValues[$valueTranslation['language']] = $values;
+                    $translatedValues[$language] = $values;
                     break;
                 default:
-                    $translatedValues[$valueTranslation['language']] = $valueTranslation[$valueKey];
+                    $translatedValues[$language] = $valueTranslation[$valueKey];
                     break;
             }
         }
 
-        //dump($translatedValues);
         return $translatedValues;
     }
 
