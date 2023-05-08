@@ -111,23 +111,29 @@ class ProductTransformer implements ProductDataTransformerInterface
     {
         $translatedValues = [];
         foreach ($valueTranslations as $valueTranslation) {
+            $language = $valueTranslation['language'];
             $valueKey = ErgonodeApiValueKeyResolverUtil::resolve($valueTranslation['__typename']);
             switch ($valueKey) {
                 case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_ARRAY:
                     if ($valueTranslation[$valueKey] === null) {
-                        $translatedValues[$valueTranslation['language']] = null;
+                        $translatedValues[$language] = null;
                         break;
                     }
-                    $translatedValues[$valueTranslation['language']] = $valueTranslation[$valueKey]['code'];
+                    $translatedValues[$language] = empty($valueTranslation[$valueKey]['name'])
+                        ? $valueTranslation[$valueKey]['code']
+                        : $valueTranslation[$valueKey]['name'];
                     break;
                 case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_MULTI_ARRAY:
-                    $translatedValues[$valueTranslation['language']] = array_column(
-                        $valueTranslation[$valueKey],
-                        'code'
-                    );
+                    $values = [];
+                    foreach ($valueTranslation[$valueKey] as $record) {
+                        $values[] = empty($record['name'])
+                            ? $record['code']
+                            : $record['name'];
+                    }
+                    $translatedValues[$language] = $values;
                     break;
                 default:
-                    $translatedValues[$valueTranslation['language']] = $valueTranslation[$valueKey];
+                    $translatedValues[$language] = $valueTranslation[$valueKey];
                     break;
             }
         }
