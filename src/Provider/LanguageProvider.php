@@ -53,4 +53,20 @@ class LanguageProvider
 
         return null;
     }
+
+    public function getActiveLocaleCodes(Context $context): array
+    {
+        $criteria = new Criteria();
+        $criteria->addAssociation('locale');
+
+        /** @var LanguageEntity[] $languages */
+        $languages = $this->languageRepository->search($criteria, $context);
+
+        $result = [];
+        foreach ($languages as $language) {
+            $result[] = $language->getLocale()->getCode();
+        }
+
+        return $result;
+    }
 }

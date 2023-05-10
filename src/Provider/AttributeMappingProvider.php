@@ -70,6 +70,31 @@ class AttributeMappingProvider
         }
     }
 
+    /**
+     * @param Context $context
+     *
+     * @return ErgonodeAttributeMappingEntity[]
+     *
+     */
+    public function getAttributeMapByErgonodeKeys(Context $context): array
+    {
+        try {
+            return $this->cache->get($this->mappingCacheKey, function () use ($context) {
+                $map = [];
+
+                $result = $this->repository->search(new Criteria(), $context);
+                /** @var ErgonodeAttributeMappingEntity $entity */
+                foreach ($result->getEntities() as $entity) {
+                    $map[$entity->getErgonodeKey()] = $entity;
+                }
+
+                return $map;
+            });
+        } catch (InvalidArgumentException $e) {
+            return [];
+        }
+    }
+
     public function invalidateCache(): void
     {
         $this->cache->delete($this->mappingCacheKey);
