@@ -24,6 +24,12 @@ Component.register('ergonode-tabs', {
                 },
                 {
                     routeObject: {
+                        path: 'category-mapping',
+                    },
+                    label: this.$t('ErgonodeIntegrationShopware.tabs.categoryMappings'),
+                },
+                {
+                    routeObject: {
                         path: 'synchronization',
                     },
                     label: this.$t('ErgonodeIntegrationShopware.tabs.synchronization'),

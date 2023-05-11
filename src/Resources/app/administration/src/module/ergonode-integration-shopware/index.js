@@ -28,6 +28,14 @@ Shopware.Module.register('ergonode-integration-shopware', {
                 privilege: 'ergonode_custom_field_mapping.viewer',
             }
         },
+        categoryMapping: {
+            name: 'ergonode-category-mapping',
+            component: 'ergonode-category-mapping',
+            path: 'category-mapping',
+            meta: {
+                privilege: 'ergonode_category_mapping.viewer',
+            }
+        },
         importHistory: {
             name: 'ergonode-import-history',
             component: 'ergonode-import-history',
@@ -67,6 +75,13 @@ Shopware.Module.register('ergonode-integration-shopware', {
             label: 'ErgonodeIntegrationShopware.tabs.customFieldMappings',
             parent: 'ergonode-integration',
             privilege: 'ergonode_custom_field_mapping.viewer',
+        },
+        {
+            id: 'ergonode.mapping.category',
+            path: 'ergonode.integration.shopware.categoryMapping',
+            label: 'ErgonodeIntegrationShopware.tabs.categoryMappings',
+            parent: 'ergonode-integration',
+            privilege: 'ergonode_category_mapping.viewer',
         },
         {
             id: 'ergonode.synchronization',

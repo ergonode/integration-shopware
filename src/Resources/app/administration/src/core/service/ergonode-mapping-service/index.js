@@ -16,6 +16,12 @@ export default class ErgonodeMappingService extends ApiService {
             headers: this.getBasicHeaders(),
         });
     }
+    
+    async getShopwareCategories() {
+        return await this.client.get('ergonode/shopware-categories', {
+            headers: this.getBasicHeaders(),
+        });
+    }
 
     async getErgonodeAttributes(types = []) {
         return await this.client.get('ergonode/ergonode-attributes', {
@@ -25,7 +31,16 @@ export default class ErgonodeMappingService extends ApiService {
             },
         });
     }
-
+    
+    async getErgonodeCategories(types = []) {
+        return await this.client.get('ergonode/ergonode-categories', {
+            headers: this.getBasicHeaders(),
+            params: {
+                ...(types?.length && { types }),
+            },
+        });
+    }
+    
     async getErgonodeCategoryTrees() {
         return await this.client.get('ergonode/ergonode-category-trees', {
             headers: this.getBasicHeaders()
