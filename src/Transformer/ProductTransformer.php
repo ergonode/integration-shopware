@@ -9,6 +9,7 @@ use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttribu
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum as Attr;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
+use Ergonode\IntegrationShopware\Provider\LocaleProvider;
 use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
 use Ergonode\IntegrationShopware\Util\AttributeTypeValidator;
 use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
@@ -68,6 +69,8 @@ class ProductTransformer implements ProductDataTransformerInterface
 
         $result = [];
 
+        $attributeMap = $this->attributeMappingProvider->getAttributeMapByErgonodeKeys($context);
+
         foreach ($ergonodeData['attributeList']['edges'] as $edge) {
             $code = $edge['node']['attribute']['code'];
             $mappingKeys = $this->attributeMappingProvider->provideByErgonodeKey($code, $context);
@@ -94,6 +97,21 @@ class ProductTransformer implements ProductDataTransformerInterface
                 $result,
                 $this->getTransformedResult($mappingKeys, $translatedValues)
             );
+
+            // attribute is already processed
+            if (isset($attributeMap[$code])) {
+                unset($attributeMap[$code]);
+            }
+        }
+
+        // unset values that did not come from Ergonode
+        foreach ($attributeMap as $mappingEntity) {
+            $result[$mappingEntity->getShopwareKey()] = null;
+
+            $locales = $this->languageProvider->getActiveLocaleCodes($context);
+            foreach ($locales as $locale) {
+                $result['translations'][$locale][$mappingEntity->getShopwareKey()] = null;
+            }
         }
 
         if ($productData->isUpdate()) {
