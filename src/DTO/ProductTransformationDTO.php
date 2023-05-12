@@ -18,10 +18,13 @@ class ProductTransformationDTO
 
     private array $bindingCodes = [];
 
-    public function __construct(array $ergonodeData, array $shopwareData = [])
+    private bool $isInitialPaginatedImport;
+
+    public function __construct(array $ergonodeData, array $shopwareData = [], bool $isInitialPaginatedImport = false)
     {
         $this->ergonodeData = $ergonodeData;
         $this->shopwareData = $shopwareData;
+        $this->isInitialPaginatedImport = $isInitialPaginatedImport;
     }
 
     public function getErgonodeData(): array
@@ -121,5 +124,10 @@ class ProductTransformationDTO
     public function unsetSwData(string $fieldKey): void
     {
         unset($this->shopwareData[$fieldKey]);
+    }
+
+    public function isInitialPaginatedImport(): bool
+    {
+        return $this->isInitialPaginatedImport;
     }
 }

@@ -44,24 +44,24 @@ class PropertyGroupTransformer
 
         $options = [];
         if (!empty($node['options'])) {
-            foreach ($node['options'] as $option) {
-                if (!empty($option['code'])) {
-                    $existingOption = $propertyGroup ? $this->getOptionByCode($propertyGroup, $option['code']) : null;
-
-                    $options[] = [
-                        'id' => $existingOption ? $existingOption->getId() : null,
-                        'name' => $option['code'],
-                        'translations' => $this->translationTransformer->transform($option['name'], 'name'),
-                        'extensions' => [
-                            AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                                'id' => $existingOption ? $this->getEntityExtensionId($existingOption) : null,
-                                'code' => CodeBuilderUtil::build($code, $option['code']),
-                                'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
-                            ],
-                        ],
-                    ];
-                }
-            }
+            //foreach ($node['options'] as $option) {
+            //    if (!empty($option['code'])) {
+            //        $existingOption = $propertyGroup ? $this->getOptionByCode($propertyGroup, $option['code']) : null;
+            //
+            //        $options[] = [
+            //            'id' => $existingOption ? $existingOption->getId() : null,
+            //            'name' => $option['code'],
+            //            'translations' => $this->translationTransformer->transform($option['name'], 'name'),
+            //            'extensions' => [
+            //                AbstractErgonodeMappingExtension::EXTENSION_NAME => [
+            //                    'id' => $existingOption ? $this->getEntityExtensionId($existingOption) : null,
+            //                    'code' => CodeBuilderUtil::build($code, $option['code']),
+            //                    'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
+            //                ],
+            //            ],
+            //        ];
+            //    }
+            //}
         }
 
         $dto->setPropertyGroupPayload([

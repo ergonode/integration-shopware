@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Persistor;
 
+use Ergonode\IntegrationShopware\Api\ProductStreamResultsProxy;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
+use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Struct\ProductContainer;
 use Ergonode\IntegrationShopware\Transformer\ProductTransformerChain;
 use Ergonode\IntegrationShopware\Transformer\VariantsTransformer;
+use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Ergonode\IntegrationShopware\Util\Constants;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Product\ProductDefinition;
@@ -45,6 +48,8 @@ class ProductPersistor
 
     private ProductContainer $productContainer;
 
+    private ErgonodeCursorManager $cursorManager;
+
     public function __construct(
         EntityRepositoryInterface $productRepository,
         ProductProvider $productProvider,
@@ -53,7 +58,8 @@ class ProductPersistor
         LoggerInterface $ergonodeSyncLogger,
         EntityRepositoryInterface $productCategoryRepository,
         VariantsTransformer $variantsTransformer,
-        ProductContainer $productContainer
+        ProductContainer $productContainer,
+        ErgonodeCursorManager $cursorManager
     ) {
         $this->productRepository = $productRepository;
         $this->productProvider = $productProvider;
@@ -63,6 +69,7 @@ class ProductPersistor
         $this->productCategoryRepository = $productCategoryRepository;
         $this->variantsTransformer = $variantsTransformer;
         $this->productContainer = $productContainer;
+        $this->cursorManager = $cursorManager;
     }
 
     /**
@@ -148,25 +155,27 @@ class ProductPersistor
 
         $existingProduct = $this->productContainer->get($sku);
 
-        $dto = new ProductTransformationDTO($productData);
+        $isInitialPaginatedImport = $this->checkIsInitialPaginatedImport($productData, $context);
+
+        $dto = new ProductTransformationDTO($productData, [], $isInitialPaginatedImport);
         $dto->setSwProduct($existingProduct);
 
-        try {
+        //try {
             $transformedData = $this->productTransformerChain->transform(
                 $dto,
                 $context
             );
 
             $transformedData = $this->variantsTransformer->transform($transformedData, $context);
-        } catch (Throwable $e) {
-            $this->logger->error('Error while transforming product. Product has been omitted.', [
-                'sku' => $sku,
-                'message' => $e->getMessage(),
-                'file' => $e->getFile() . ':' . $e->getLine(),
-            ]);
-
-            return [];
-        }
+        //} catch (Throwable $e) {
+        //    $this->logger->error('Error while transforming product. Product has been omitted.', [
+        //        'sku' => $sku,
+        //        'message' => $e->getMessage(),
+        //        'file' => $e->getFile() . ':' . $e->getLine(),
+        //    ]);
+        //
+        //    return [];
+        //}
 
         try {
             $this->deleteEntities($dto, $context);
@@ -269,5 +278,18 @@ class ProductPersistor
         }
 
         $this->deleteProductIds($variantIdsToDelete, $context);
+    }
+
+    private function checkIsInitialPaginatedImport(array $productData, Context $context): bool
+    {
+        if ($productData['__typename'] == 'VariableProduct') {
+            $sku = $productData['sku'];
+            $variantsCursorKey = CodeBuilderUtil::build(ProductStreamResultsProxy::VARIANT_LIST_FIELD, $sku);
+            $variantsCursor = $this->cursorManager->getCursorEntity($variantsCursorKey, $context);
+
+            return is_null($variantsCursor);
+        }
+
+        return false;
     }
 }
