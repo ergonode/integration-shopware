@@ -8,7 +8,7 @@ use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
-use Ergonode\IntegrationShopware\Service\PropertyGroupOptionService;
+use Ergonode\IntegrationShopware\Provider\PropertyGroupOptionProvider;
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Shopware\Core\Content\Product\Aggregate\ProductOption\ProductOptionDefinition;
 use Shopware\Core\Content\Product\Aggregate\ProductProperty\ProductPropertyDefinition;
@@ -25,15 +25,15 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
     const FIELD_PROPERTIES = 'properties';
     const FIELD_OPTIONS = 'options';
 
-    private PropertyGroupOptionService $optionService;
+    private PropertyGroupOptionProvider $optionProvider;
 
     private TranslationTransformer $translationTransformer;
 
     public function __construct(
-        PropertyGroupOptionService $optionService,
+        PropertyGroupOptionProvider $optionProvider,
         TranslationTransformer $translationTransformer
     ) {
-        $this->optionService = $optionService;
+        $this->optionProvider = $optionProvider;
         $this->translationTransformer = $translationTransformer;
     }
 
@@ -123,7 +123,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
      */
     private function getOptionsMapping(array $options, Context $context): array
     {
-        $optionEntities = $this->optionService->getOptionsByMappingArray(array_unique($options), $context);
+        $optionEntities = $this->optionProvider->getOptionsByMappingArray(array_unique($options), $context);
 
         $optionsMapping = [];
         foreach ($optionEntities as $option) {
