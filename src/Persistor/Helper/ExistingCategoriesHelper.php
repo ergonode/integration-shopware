@@ -10,7 +10,7 @@ use Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension;
 use Ergonode\IntegrationShopware\Provider\CategoryProvider;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 
@@ -20,9 +20,9 @@ class ExistingCategoriesHelper
 
     private CategoryProvider $categoryProvider;
 
-    private EntityRepository $ergonodeCategoryMappingRepository;
+    private EntityRepositoryInterface $ergonodeCategoryMappingRepository;
 
-    public function __construct(CategoryProvider $categoryProvider, EntityRepository $ergonodeCategoryMappingRepository)
+    public function __construct(CategoryProvider $categoryProvider, EntityRepositoryInterface $ergonodeCategoryMappingRepository)
     {
         $this->categoryProvider = $categoryProvider;
         $this->ergonodeCategoryMappingRepository = $ergonodeCategoryMappingRepository;

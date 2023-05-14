@@ -212,7 +212,3 @@ services:
       $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
       $manufacturerRepository: '@product_manufacturer.repository'
       $mappingExtensionRepository: '@ergonode_mapping_extension.repository'
-
-  Ergonode\IntegrationShopware\Persistor\Helper\ExistingCategoriesHelper:
-    arguments:
-      $ergonodeCategoryMappingRepository: '@ergonode_category_mapping.repository'
