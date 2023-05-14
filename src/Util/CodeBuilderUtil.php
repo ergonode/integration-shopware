@@ -6,7 +6,8 @@ namespace Ergonode\IntegrationShopware\Util;
 
 class CodeBuilderUtil
 {
-    public const ADVANCED_JOIN = '__';
+    public const EXTENDED_JOIN = '__';
+
     public static function build(string $prefix, string $suffix): string
     {
         return sprintf('%s__%s', $prefix, $suffix);
@@ -14,6 +15,6 @@ class CodeBuilderUtil
 
     public static function buildExtended(string $prefix, string $suffix): string
     {
-        return sprintf('%s%s%s', $prefix, self::ADVANCED_JOIN, $suffix);
+        return sprintf('%s%s%s', $prefix, self::EXTENDED_JOIN, $suffix);
     }
 }

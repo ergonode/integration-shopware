@@ -8,12 +8,13 @@ use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
-use Ergonode\IntegrationShopware\Provider\PropertyGroupOptionProvider;
+use Ergonode\IntegrationShopware\Service\PropertyGroupOptionService;
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Shopware\Core\Content\Product\Aggregate\ProductOption\ProductOptionDefinition;
 use Shopware\Core\Content\Product\Aggregate\ProductProperty\ProductPropertyDefinition;
 use Shopware\Core\Framework\Context;
 
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use function array_filter;
 use function array_flip;
 use function array_intersect_key;
@@ -24,16 +25,20 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
     const FIELD_PROPERTIES = 'properties';
     const FIELD_OPTIONS = 'options';
 
-    private PropertyGroupOptionProvider $optionProvider;
+    private PropertyGroupOptionService $optionService;
 
     private TranslationTransformer $translationTransformer;
 
+    private EntityRepositoryInterface $ergonodeMappingExtensionRepository;
+
     public function __construct(
-        PropertyGroupOptionProvider $optionProvider,
-        TranslationTransformer $translationTransformer
+        PropertyGroupOptionService $optionService,
+        TranslationTransformer $translationTransformer,
+        EntityRepositoryInterface $ergonodeMappingExtensionRepository
     ) {
-        $this->optionProvider = $optionProvider;
+        $this->optionService = $optionService;
         $this->translationTransformer = $translationTransformer;
+        $this->ergonodeMappingExtensionRepository = $ergonodeMappingExtensionRepository;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
@@ -43,6 +48,8 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
         $selectAttributes = $this->getSelectAttributes($ergonodeData);
 
         $options = $this->transformSelectAttributes($selectAttributes);
+
+        $this->updateLegacyOptionsMapping($selectAttributes, $context);
 
         $optionMapping = $this->getOptionsMapping($options, $context);
 
@@ -84,7 +91,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
         );
     }
 
-    private function transformSelectAttributes(array $selectAttributes): array
+    private function transformSelectAttributes(array $selectAttributes, bool $useLegacySyntax = false): array
     {
         $transformed = [];
 
@@ -106,6 +113,18 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
                 $value = [$value];
             }
 
+            // build array of old -> new syntax codes
+            if ($useLegacySyntax) {
+                foreach ($value as $option) {
+                    $transformed[CodeBuilderUtil::build(
+                        $node['attribute']['code'],
+                        $option['code']
+                    )] = CodeBuilderUtil::buildExtended($node['attribute']['code'], $option['code']);
+                }
+
+                continue;
+            }
+
             $optionCodes = [];
             foreach ($value as $option) {
                 $optionCodes[] = CodeBuilderUtil::buildExtended($node['attribute']['code'], $option['code']);
@@ -122,7 +141,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
      */
     private function getOptionsMapping(array $options, Context $context): array
     {
-        $optionEntities = $this->optionProvider->getOptionsByMappingArray(array_unique($options), $context);
+        $optionEntities = $this->optionService->getOptionsByMappingArray(array_unique($options), $context);
 
         $optionsMapping = [];
         foreach ($optionEntities as $option) {
@@ -184,5 +203,30 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
             'productId' => $dto->getSwProduct()->getId(),
             'optionId' => $id,
         ], $idsToDelete);
+    }
+
+    /**
+     * Updates stored option codes from old syntax with single _ to new syntax with double __
+     * @param array $selectAttributes
+     * @param Context $context
+     *
+     * @return void
+     *
+     */
+    private function updateLegacyOptionsMapping(array $selectAttributes, Context $context)
+    {
+        $options = $this->transformSelectAttributes($selectAttributes, true);
+
+        $oldCodes = array_keys($options);
+        $oldRecords = $this->optionService->getOptionsByMappingArray($oldCodes, $context);
+        foreach ($oldRecords as $oldRecord) {
+            $extension = $oldRecord->getExtension(AbstractErgonodeMappingExtension::EXTENSION_NAME);
+            if ($extension instanceof ErgonodeMappingExtensionEntity && isset($options[$extension->getCode()])) {
+                $this->ergonodeMappingExtensionRepository->update([
+                    'id' => $extension->getId(),
+                    'code' => $options[$extension->getCode()],
+                ], $context);
+            }
+        }
     }
 }

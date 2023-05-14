@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ergonode\IntegrationShopware\Provider;
+namespace Ergonode\IntegrationShopware\Service;
 
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
@@ -13,7 +13,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
-class PropertyGroupOptionProvider
+class PropertyGroupOptionService
 {
     private EntityRepositoryInterface $propertyGroupOptionRepository;
 
