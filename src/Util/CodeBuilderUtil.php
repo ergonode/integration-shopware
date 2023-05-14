@@ -10,7 +10,7 @@ class CodeBuilderUtil
 
     public static function build(string $prefix, string $suffix): string
     {
-        return sprintf('%s__%s', $prefix, $suffix);
+        return sprintf('%s_%s', $prefix, $suffix);
     }
 
     public static function buildExtended(string $prefix, string $suffix): string

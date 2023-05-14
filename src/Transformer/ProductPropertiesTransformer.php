@@ -29,16 +29,12 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
 
     private TranslationTransformer $translationTransformer;
 
-    private EntityRepositoryInterface $ergonodeMappingExtensionRepository;
-
     public function __construct(
         PropertyGroupOptionService $optionService,
-        TranslationTransformer $translationTransformer,
-        EntityRepositoryInterface $ergonodeMappingExtensionRepository
+        TranslationTransformer $translationTransformer
     ) {
         $this->optionService = $optionService;
         $this->translationTransformer = $translationTransformer;
-        $this->ergonodeMappingExtensionRepository = $ergonodeMappingExtensionRepository;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
@@ -48,8 +44,6 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
         $selectAttributes = $this->getSelectAttributes($ergonodeData);
 
         $options = $this->transformSelectAttributes($selectAttributes);
-
-        $this->updateLegacyOptionsMapping($selectAttributes, $context);
 
         $optionMapping = $this->getOptionsMapping($options, $context);
 
@@ -91,7 +85,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
         );
     }
 
-    private function transformSelectAttributes(array $selectAttributes, bool $useLegacySyntax = false): array
+    private function transformSelectAttributes(array $selectAttributes): array
     {
         $transformed = [];
 
@@ -111,18 +105,6 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
             /** If array is associative for a select option, convert it to multidimensional array as for multiselect */
             if (isset($value['code'])) {
                 $value = [$value];
-            }
-
-            // build array of old -> new syntax codes
-            if ($useLegacySyntax) {
-                foreach ($value as $option) {
-                    $transformed[CodeBuilderUtil::build(
-                        $node['attribute']['code'],
-                        $option['code']
-                    )] = CodeBuilderUtil::buildExtended($node['attribute']['code'], $option['code']);
-                }
-
-                continue;
             }
 
             $optionCodes = [];
@@ -162,7 +144,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
         return array_filter($haystacks, function (string $haystack) use ($needles) {
             $matched = array_filter(
                 $needles,
-                fn(string $needle) => str_starts_with($haystack, sprintf('%s%s', $needle, CodeBuilderUtil::ADVANCED_JOIN))
+                fn(string $needle) => str_starts_with($haystack, sprintf('%s%s', $needle, CodeBuilderUtil::EXTENDED_JOIN))
             );
 
             return false === empty($matched);
@@ -203,30 +185,5 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
             'productId' => $dto->getSwProduct()->getId(),
             'optionId' => $id,
         ], $idsToDelete);
-    }
-
-    /**
-     * Updates stored option codes from old syntax with single _ to new syntax with double __
-     * @param array $selectAttributes
-     * @param Context $context
-     *
-     * @return void
-     *
-     */
-    private function updateLegacyOptionsMapping(array $selectAttributes, Context $context)
-    {
-        $options = $this->transformSelectAttributes($selectAttributes, true);
-
-        $oldCodes = array_keys($options);
-        $oldRecords = $this->optionService->getOptionsByMappingArray($oldCodes, $context);
-        foreach ($oldRecords as $oldRecord) {
-            $extension = $oldRecord->getExtension(AbstractErgonodeMappingExtension::EXTENSION_NAME);
-            if ($extension instanceof ErgonodeMappingExtensionEntity && isset($options[$extension->getCode()])) {
-                $this->ergonodeMappingExtensionRepository->update([
-                    'id' => $extension->getId(),
-                    'code' => $options[$extension->getCode()],
-                ], $context);
-            }
-        }
     }
 }
