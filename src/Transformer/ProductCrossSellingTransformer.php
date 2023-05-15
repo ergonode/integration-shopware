@@ -104,7 +104,7 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
                 'extensions' => [
                     AbstractErgonodeMappingExtension::EXTENSION_NAME => [
                         'id' => $existingCrossSelling ? $this->extensionManager->getEntityExtensionId($existingCrossSelling) : null,
-                        'code' => CodeBuilderUtil::build($productData->getErgonodeData()['sku'], $code),
+                        'code' => CodeBuilderUtil::buildExtended($productData->getErgonodeData()['sku'], $code),
                         'type' => ProductCrossSellingExtension::ERGONODE_TYPE,
                     ],
                 ],
@@ -144,7 +144,7 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 
         return $this->productCrossSellingProvider->getProductCrossSellingByMapping(
             $swProduct->getId(),
-            CodeBuilderUtil::build($swProduct->getProductNumber(), $code),
+            CodeBuilderUtil::buildExtended($swProduct->getProductNumber(), $code),
             $context,
             ['assignedProducts']
         );

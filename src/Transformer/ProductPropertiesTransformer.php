@@ -14,6 +14,7 @@ use Shopware\Core\Content\Product\Aggregate\ProductOption\ProductOptionDefinitio
 use Shopware\Core\Content\Product\Aggregate\ProductProperty\ProductPropertyDefinition;
 use Shopware\Core\Framework\Context;
 
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use function array_filter;
 use function array_flip;
 use function array_intersect_key;
@@ -108,7 +109,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
 
             $optionCodes = [];
             foreach ($value as $option) {
-                $optionCodes[] = CodeBuilderUtil::build($node['attribute']['code'], $option['code']);
+                $optionCodes[] = CodeBuilderUtil::buildExtended($node['attribute']['code'], $option['code']);
             }
 
             $transformed = array_merge($transformed, $optionCodes);
@@ -141,7 +142,10 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
     private function arrayFilterStartsWith(array $haystacks, array $needles): array
     {
         return array_filter($haystacks, function (string $haystack) use ($needles) {
-            $matched = array_filter($needles, fn(string $needle) => str_starts_with($haystack, $needle));
+            $matched = array_filter(
+                $needles,
+                fn(string $needle) => str_starts_with($haystack, sprintf('%s%s', $needle, CodeBuilderUtil::EXTENDED_JOIN))
+            );
 
             return false === empty($matched);
         });
