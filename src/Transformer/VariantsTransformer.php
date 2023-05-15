@@ -110,6 +110,7 @@ class VariantsTransformer
         $productData->setShopwareData($swData);
 
         $entitiesToDelete = array_merge_recursive(...$entitiesToDelete);
+
         foreach ($entitiesToDelete as $entityName => $payloads) {
             $productData->addEntitiesToDelete($entityName, $payloads);
         }
@@ -174,6 +175,10 @@ class VariantsTransformer
 
         $configuratorSettings = $swProduct->getConfiguratorSettings();
         if (null === $configuratorSettings) {
+            return [];
+        }
+
+        if (!$productData->isInitialPaginatedImport()) {
             return [];
         }
 
