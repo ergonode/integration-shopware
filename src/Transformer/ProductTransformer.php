@@ -106,6 +106,10 @@ class ProductTransformer implements ProductDataTransformerInterface
 
         // unset values that did not come from Ergonode
         foreach ($attributeMap as $mappingEntity) {
+            // dont unset name as its required in shopware for all translations
+            if ($mappingEntity->getShopwareKey() === 'name') {
+                continue;
+            }
             $result[$mappingEntity->getShopwareKey()] = null;
 
             $locales = $this->languageProvider->getActiveLocaleCodes($context);
