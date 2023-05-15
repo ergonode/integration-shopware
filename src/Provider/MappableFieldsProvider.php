@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Provider;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Ergonode\IntegrationShopware\Util\Constants;
 use Ergonode\IntegrationShopware\Util\CustomFieldUtil;
+use Shopware\Core\Content\Category\CategoryCollection;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -29,16 +31,24 @@ class MappableFieldsProvider
 
     private ErgonodeCategoryProvider $ergonodeCategoryProvider;
 
+    private EntityRepositoryInterface $categoryRepository;
+
+    private ConfigService $configService;
+
     public function __construct(
         ErgonodeAttributeProvider $ergonodeAttributeProvider,
         EntityRepositoryInterface $customFieldRepository,
         LanguageProvider $languageProvider,
-        ErgonodeCategoryProvider $ergonodeCategoryProvider
+        ErgonodeCategoryProvider $ergonodeCategoryProvider,
+        EntityRepositoryInterface $categoryRepository,
+        ConfigService $configService
     ) {
         $this->ergonodeAttributeProvider = $ergonodeAttributeProvider;
         $this->customFieldRepository = $customFieldRepository;
         $this->languageProvider = $languageProvider;
         $this->ergonodeCategoryProvider = $ergonodeCategoryProvider;
+        $this->categoryRepository = $categoryRepository;
+        $this->configService = $configService;
     }
 
     /**
@@ -155,5 +165,52 @@ class MappableFieldsProvider
         }
 
         return array_merge(...$treeCodes);
+    }
+
+    public function getShopwareCategories(Context $context): array
+    {
+        $criteria = new Criteria();
+
+        /** @var CategoryCollection $categories */
+        $categories = $this->categoryRepository->search($criteria, $context)->getEntities();
+
+        $result = [];
+        foreach ($categories as $category) {
+            $result[] = [
+                'name' => $category->getTranslation('name'),
+                'id' => $category->getId(),
+            ];
+        }
+
+        $names = array_column($result, 'name');
+        array_multisort($result, SORT_ASC, $names);
+
+        return $result;
+    }
+
+    public function getErgonodeCategories(): array
+    {
+        $categoryTreeCodes = $this->configService->getCategoryTreeCodes();
+
+        $categoryTrees = $this->ergonodeCategoryProvider->provideCategories($categoryTreeCodes);
+
+        $result = [];
+        foreach ($categoryTrees as $categoryTreeData) {
+            foreach ($categoryTreeData as $category) {
+                $code = $category['node']['category']['code'] ?? null;
+                if (!$code) {
+                    continue;
+                }
+
+                $result[] = [
+                    'code' => $code,
+                ];
+            }
+        }
+
+        $codes = array_column($result, 'code');
+        array_multisort($result, SORT_ASC, $codes);
+
+        return $result;
     }
 }

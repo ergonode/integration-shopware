@@ -12,6 +12,7 @@
     "tabs": {
       "attributeMappings": "Attribute mappings",
       "customFieldMappings": "Custom field mappings",
+      "categoryMappings": "Category mappings",
       "importHistory": "Import history",
       "synchronization": "Synchronization"
     },
@@ -19,6 +20,7 @@
       "attributeMappingGeneral": "Attribute mapping",
       "attributeMappings": "Attribute mappings",
       "customFieldMappings": "Custom field mappings",
+      "categoryMappings": "Category mappings",
       "shopwareAttribute": "Shopware attribute",
       "shopwareCustomField": "Shopware custom field",
       "ergonodeAttribute": "Ergonode attribute",

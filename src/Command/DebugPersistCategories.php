@@ -8,6 +8,7 @@ use Ergonode\IntegrationShopware\Api\CategoryStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\CategoryTreeStreamResultsProxy;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\MessageQueue\Handler\CategorySyncHandler;
+use Ergonode\IntegrationShopware\MessageQueue\Message\CategorySync;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\Console\Command\Command;
@@ -73,9 +74,9 @@ class DebugPersistCategories extends Command
             $io->info('Cursors deleted');
         }
 
-        $count = $this->handler->runSync();
+        $this->handler->handle(new CategorySync());
 
-        $io->success(\sprintf('Processed %d entities', $count));
+        $io->success('Processed entities');
 
         return self::SUCCESS;
     }

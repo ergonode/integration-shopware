@@ -50,6 +50,9 @@ services:
   Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingDefinition:
     tags: [ 'shopware.entity.definition' ]
 
+  Ergonode\IntegrationShopware\Entity\ErgonodeCategoryMapping\ErgonodeCategoryMappingDefinition:
+    tags: [ 'shopware.entity.definition' ]
+
   Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeCustomFieldMappingDefinition:
     tags: [ 'shopware.entity.definition' ]
 
