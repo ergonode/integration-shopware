@@ -287,7 +287,7 @@ class ProductPersistor
             $variantsCursorKey = CodeBuilderUtil::build(ProductStreamResultsProxy::VARIANT_LIST_FIELD, $sku);
             $variantsCursor = $this->cursorManager->getCursorEntity($variantsCursorKey, $context);
 
-            return is_null($variantsCursor);
+            return $variantsCursor === null;
         }
 
         return false;
