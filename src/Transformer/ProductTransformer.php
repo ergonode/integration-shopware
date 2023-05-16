@@ -12,6 +12,7 @@ use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Provider\LocaleProvider;
 use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
 use Ergonode\IntegrationShopware\Util\AttributeTypeValidator;
+use Ergonode\IntegrationShopware\Util\Constants;
 use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Ergonode\IntegrationShopware\Util\YesNo;
@@ -26,6 +27,17 @@ use function sprintf;
 
 class ProductTransformer implements ProductDataTransformerInterface
 {
+    const ALLOWED_CLEANUP_TYPES = [
+        Attr::DATE,
+        Attr::SELECT,
+        Attr::MULTISELECT,
+        Attr::NUMERIC,
+        Attr::PRICE,
+        Attr::TEXTAREA,
+        Attr::TEXT,
+        Attr::UNIT,
+    ];
+
     private string $defaultLocale;
 
     private const TRANSLATABLE_KEYS = [
@@ -106,7 +118,18 @@ class ProductTransformer implements ProductDataTransformerInterface
 
         // unset values that did not come from Ergonode
         foreach ($attributeMap as $mappingEntity) {
-            // dont unset name as its required in shopware for all translations
+            $types = Constants::SW_PRODUCT_MAPPABLE_FIELDS[$mappingEntity->getShopwareKey()] ?? [];
+            if (empty($types)) {
+                continue;
+            }
+            // allow cleanup only for particular types that have translations
+            foreach ($types as $type) {
+                if (!in_array($type, self::ALLOWED_CLEANUP_TYPES)) {
+                    continue 2;
+                }
+            }
+
+            // keep product name translations regardless if they are in Ergonode or not
             if ($mappingEntity->getShopwareKey() === 'name') {
                 continue;
             }
