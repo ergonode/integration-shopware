@@ -96,7 +96,9 @@ class VariantsTransformer
                     continue;
                 }
 
+                $existingConfigurationId = $this->getExistingConfigurationId($parentProduct, $optionId['id']);
                 $swData['configuratorSettings'][] = [
+                    'id' => $existingConfigurationId ?? null,
                     'productId' => $swData['id'] ?? null,
                     'optionId' => $optionId['id'],
                 ];
@@ -185,5 +187,17 @@ class VariantsTransformer
         $idsToDelete = $configuratorSettings->getIds();
 
         return array_map(static fn($id) => ['id' => $id], array_values($idsToDelete));
+    }
+
+    private function getExistingConfigurationId(ProductEntity $product, string $optionId): ?string
+    {
+        foreach ($product->getConfiguratorSettings() as $configuratorSetting) {
+            if ($configuratorSetting->getProductId() == $product->getId()
+                && $configuratorSetting->getOptionId() == $optionId) {
+                return $configuratorSetting->getId();
+            }
+        }
+
+        return null;
     }
 }
