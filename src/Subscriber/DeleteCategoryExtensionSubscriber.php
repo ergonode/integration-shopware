@@ -7,6 +7,8 @@ namespace Ergonode\IntegrationShopware\Subscriber;
 use Ergonode\IntegrationShopware\Extension\ErgonodeCategoryMappingExtension;
 use Shopware\Core\Content\Category\CategoryCollection;
 use Shopware\Core\Content\Category\CategoryDefinition;
+use Shopware\Core\Content\Category\CategoryEntity;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\BeforeDeleteEvent;
@@ -25,12 +27,16 @@ class DeleteCategoryExtensionSubscriber implements EventSubscriberInterface
 
     private EntityRepositoryInterface $categoryRepository;
 
+    private EntityRepositoryInterface $ergonodeCategoryMappingRepository;
+
     public function __construct(
         EntityRepositoryInterface $ergonodeCategoryMappingExtensionRepository,
-        EntityRepositoryInterface $categoryRepository
+        EntityRepositoryInterface $categoryRepository,
+        EntityRepositoryInterface $ergonodeCategoryMappingRepository
     ) {
         $this->ergonodeCategoryMappingExtensionRepository = $ergonodeCategoryMappingExtensionRepository;
         $this->categoryRepository = $categoryRepository;
+        $this->ergonodeCategoryMappingRepository = $ergonodeCategoryMappingRepository;
     }
 
     public static function getSubscribedEvents(): array
@@ -47,10 +53,13 @@ class DeleteCategoryExtensionSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $this->deleteMappings($categories, $event->getContext());
+
         $deletePayloads = $this->buildCategoryExtensionDeletePayloads($categories);
         if (empty($deletePayloads)) {
             return;
         }
+
 
         $context = $event->getContext();
         $event->addSuccess(function () use ($deletePayloads, $context) {
@@ -97,5 +106,22 @@ class DeleteCategoryExtensionSubscriber implements EventSubscriberInterface
                 })
             )
         );
+    }
+
+    private function deleteMappings(CategoryCollection $categories, Context $context)
+    {
+        $categoryIds = array_values(
+            array_filter(
+                $categories->map(static function (CategoryEntity $entity) {
+                    return $entity->getId();
+                })
+            )
+        );
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsAnyFilter('shopwareId', $categoryIds));
+        $mappingIds = $this->ergonodeCategoryMappingRepository->searchIds($criteria, $context);
+        if (!empty($mappingIds->getIds())) {
+            $this->ergonodeCategoryMappingRepository->delete([array_values($mappingIds->getIds())], $context);
+        }
     }
 }
