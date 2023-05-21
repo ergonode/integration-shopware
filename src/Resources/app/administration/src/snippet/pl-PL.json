@@ -48,6 +48,8 @@
       "shopwareAttribute": "Atrybut Shopware",
       "shopwareCustomField": "Pole dodatkowe Shopware",
       "ergonodeAttribute": "Atrybut Ergonode",
+      "shopwareCategory": "Kategoria Shopware",
+      "ergonodeCategory": "Kategoria Ergonode",
       "addMapping": "Dodaj mapowanie",
       "messages": {
         "mappingCreationSuccessful": "Pomyślnie utworzono mapowanie.",

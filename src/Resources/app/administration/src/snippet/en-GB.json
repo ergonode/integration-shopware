@@ -22,8 +22,10 @@
       "customFieldMappings": "Custom field mappings",
       "categoryMappings": "Category mappings",
       "shopwareAttribute": "Shopware attribute",
+      "shopwareCategory": "Shopware category",
       "shopwareCustomField": "Shopware custom field",
       "ergonodeAttribute": "Ergonode attribute",
+      "ergonodeCategory": "Ergonode category",
       "addMapping": "Add mapping",
       "messages": {
         "mappingCreationSuccessful": "A mapping has been successfully created.",
