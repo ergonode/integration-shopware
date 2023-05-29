@@ -32,7 +32,6 @@ class ProductTransformer implements ProductDataTransformerInterface
         Attr::SELECT,
         Attr::MULTISELECT,
         Attr::NUMERIC,
-        Attr::PRICE,
         Attr::TEXTAREA,
         Attr::TEXT,
         Attr::UNIT,
