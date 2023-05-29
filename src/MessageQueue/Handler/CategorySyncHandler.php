@@ -149,9 +149,9 @@ class CategorySyncHandler extends AbstractSyncHandler
                 $this->logger->info('Saved lastCategorySyncTime', [
                     'time' => $formattedTime,
                 ]);
+                $this->categoryOrderHelper->clearSaved();
             }
             $this->logger->info('Category sync finished.');
-            $this->categoryOrderHelper->clearSaved();
         }
 
         return $primaryKeys;
