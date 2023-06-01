@@ -8,24 +8,24 @@ use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeCustomF
 use Ergonode\IntegrationShopware\Provider\MappableFieldsProvider;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(name: 'ergonode:custom-fields:create-mapping')]
 class CreateCustomFieldMappingCommand extends Command
 {
-    protected static $defaultName = 'ergonode:custom-fields:create-mapping';
-
     private Context $context;
 
-    private EntityRepositoryInterface $repository;
+    private EntityRepository $repository;
 
     private MappableFieldsProvider $mappableFieldsProvider;
 
     public function __construct(
-        EntityRepositoryInterface $repository,
+        EntityRepository $repository,
         MappableFieldsProvider $mappableFieldsProvider
     ) {
         $this->context = new Context(new SystemSource());

@@ -7,15 +7,15 @@ namespace Ergonode\IntegrationShopware\Command;
 use Ergonode\IntegrationShopware\Processor\LanguageSyncProcessor;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(name: 'ergonode:languages:sync')]
 class SyncLanguagesCommand extends Command
 {
-    protected static $defaultName = 'ergonode:languages:sync';
-
     private Context $context;
 
     private LanguageSyncProcessor $processor;

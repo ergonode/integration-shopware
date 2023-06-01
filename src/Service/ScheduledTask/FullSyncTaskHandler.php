@@ -12,32 +12,25 @@ use Ergonode\IntegrationShopware\MessageQueue\Message\LanguageSync;
 use Ergonode\IntegrationShopware\MessageQueue\Message\ProductSync;
 use Ergonode\IntegrationShopware\MessageQueue\Message\ProductVisibilitySync;
 use Ergonode\IntegrationShopware\Service\ConfigService;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class FullSyncTaskHandler extends ScheduledTaskHandler
+#[AsMessageHandler]
+class FullSyncTaskHandler
 {
     private ConfigService $configService;
 
     private MessageBusInterface $messageBus;
 
     public function __construct(
-        EntityRepositoryInterface $scheduledTaskRepository,
         ConfigService $configService,
         MessageBusInterface $messageBus
     ) {
-        parent::__construct($scheduledTaskRepository);
         $this->configService = $configService;
         $this->messageBus = $messageBus;
     }
 
-    public static function getHandledMessages(): iterable
-    {
-        return [FullSyncTask::class];
-    }
-
-    public function run(): void
+    public function __invoke(FullSyncTask $message): void
     {
         if (!$this->shouldRun()) {
             return;

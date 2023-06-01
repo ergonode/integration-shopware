@@ -11,16 +11,16 @@ use Ergonode\IntegrationShopware\Provider\PropertyGroupProvider;
 use Ergonode\IntegrationShopware\Transformer\PropertyGroupTransformer;
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 use function array_map;
 use function array_merge;
 
 class PropertyGroupPersistor
 {
-    private EntityRepositoryInterface $propertyGroupRepository;
+    private EntityRepository $propertyGroupRepository;
 
-    private EntityRepositoryInterface $propertyGroupOptionRepository;
+    private EntityRepository $propertyGroupOptionRepository;
 
     private PropertyGroupTransformer $propertyGroupTransformer;
 
@@ -29,8 +29,8 @@ class PropertyGroupPersistor
     private AttributeCustomProcessorResolver $attributeCustomProcessorResolver;
 
     public function __construct(
-        EntityRepositoryInterface $propertyGroupRepository,
-        EntityRepositoryInterface $propertyGroupOptionRepository,
+        EntityRepository $propertyGroupRepository,
+        EntityRepository $propertyGroupOptionRepository,
         PropertyGroupTransformer $propertyGroupTransformer,
         PropertyGroupProvider $propertyGroupProvider,
         AttributeCustomProcessorResolver $attributeCustomProcessorResolver

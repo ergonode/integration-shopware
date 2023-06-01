@@ -16,9 +16,11 @@ use Shopware\Core\Content\Category\DataAbstractionLayer\CategoryIndexingMessage;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexerRegistry;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
+#[AsMessageHandler]
 class CategorySyncHandler extends AbstractSyncHandler
 {
     private const MAX_PAGES_PER_RUN = 10;
@@ -60,6 +62,11 @@ class CategorySyncHandler extends AbstractSyncHandler
         $this->messageBus = $messageBus;
         $this->performanceLogger = $performanceLogger;
         $this->categoryOrderHelper = $categoryOrderHelper;
+    }
+
+    public function __invoke(CategorySync $message)
+    {
+        $this->handleMessage($message);
     }
 
     public static function getHandledMessages(): iterable
@@ -117,7 +124,7 @@ class CategorySyncHandler extends AbstractSyncHandler
             'Starting category processor',
             [
                 'processor' => $processorClass,
-                'category_tree_codes' => $categoryTreeCodes
+                'category_tree_codes' => $categoryTreeCodes,
             ]
         );
 

@@ -9,7 +9,7 @@ use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Shopware\Core\Content\Product\Aggregate\ProductManufacturer\ProductManufacturerDefinition;
 use Shopware\Core\Content\Product\Aggregate\ProductManufacturer\ProductManufacturerEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -23,14 +23,14 @@ class ManufacturerAttributeProcessor implements AttributeCustomProcessorInterfac
 
     private AttributeMappingProvider $attributeMappingProvider;
 
-    private EntityRepositoryInterface $manufacturerRepository;
+    private EntityRepository $manufacturerRepository;
 
-    private EntityRepositoryInterface $mappingExtensionRepository;
+    private EntityRepository $mappingExtensionRepository;
 
     public function __construct(
         AttributeMappingProvider $attributeMappingProvider,
-        EntityRepositoryInterface $manufacturerRepository,
-        EntityRepositoryInterface $mappingExtensionRepository
+        EntityRepository $manufacturerRepository,
+        EntityRepository $mappingExtensionRepository
     ) {
         $this->attributeMappingProvider = $attributeMappingProvider;
         $this->manufacturerRepository = $manufacturerRepository;

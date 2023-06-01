@@ -12,11 +12,11 @@ use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class CategoryPersistor
 {
-    private EntityRepositoryInterface $categoryRepository;
+    private EntityRepository $categoryRepository;
 
     private ExistingCategoriesHelper $categoriesHelper;
 
@@ -29,7 +29,7 @@ class CategoryPersistor
     private LoggerInterface $logger;
 
     public function __construct(
-        EntityRepositoryInterface $categoryRepository,
+        EntityRepository $categoryRepository,
         LanguageProvider $languageProvider,
         ExistingCategoriesHelper $categoriesHelper,
         Connection $connection,

@@ -9,8 +9,10 @@ use Ergonode\IntegrationShopware\Processor\DeletedProductSyncProcessor;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Throwable;
 
+#[AsMessageHandler]
 class DeletedProductSyncHandler extends AbstractSyncHandler
 {
     private const MAX_PAGES_PER_RUN = 25;
@@ -28,9 +30,9 @@ class DeletedProductSyncHandler extends AbstractSyncHandler
         $this->deletedProductSyncProcessor = $deletedProductSyncProcessor;
     }
 
-    public static function getHandledMessages(): iterable
+    public function __invoke(DeletedProductSync $message)
     {
-        return [DeletedProductSync::class];
+        $this->handleMessage($message);
     }
 
     public function runSync($message): int

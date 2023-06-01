@@ -5,19 +5,18 @@ namespace Ergonode\IntegrationShopware\Transformer;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
 use Ergonode\IntegrationShopware\Processor\Attribute\ManufacturerAttributeProcessor;
-use Shopware\Core\Content\Product\Aggregate\ProductManufacturer\ProductManufacturerEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class ProductManufacturerTransformer implements ProductDataTransformerInterface
 {
-    private EntityRepositoryInterface $manufacturerRepository;
+    private EntityRepository $manufacturerRepository;
 
-    private EntityRepositoryInterface $mappingExtensionRepository;
+    private EntityRepository $mappingExtensionRepository;
 
-    public function __construct(EntityRepositoryInterface $manufacturerRepository, EntityRepositoryInterface $mappingExtensionRepository)
+    public function __construct(EntityRepository $manufacturerRepository, EntityRepository $mappingExtensionRepository)
     {
         $this->manufacturerRepository = $manufacturerRepository;
         $this->mappingExtensionRepository = $mappingExtensionRepository;

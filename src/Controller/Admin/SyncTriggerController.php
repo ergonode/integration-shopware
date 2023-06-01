@@ -19,9 +19,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route(defaults={"_routeScope"={"api"}})
- */
+#[Route(defaults: ['_routeScope' => ['api']])]
 class SyncTriggerController extends AbstractController
 {
     private MessageBusInterface $messageBus;
@@ -37,16 +35,12 @@ class SyncTriggerController extends AbstractController
     }
 
     /**
-     * @Route(
-     *     "/api/_action/ergonode/trigger-sync",
-     *     name="api.admin.ergonode.trigger-sync",
-     *     methods={"POST"}
-     * )
      *
      * @param RequestDataBag $dataBag
      * @param Context $context
      * @return JsonResponse
      */
+    #[Route(path: '/api/_action/ergonode/trigger-sync', name: 'api.admin.ergonode.trigger-sync', methods: ['POST'])]
     public function triggerSync(RequestDataBag $dataBag, Context $context): JsonResponse
     {
         $force = $dataBag->getBoolean('force');

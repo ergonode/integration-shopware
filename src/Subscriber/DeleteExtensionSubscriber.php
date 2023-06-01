@@ -11,7 +11,7 @@ use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\BeforeDeleteEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -28,12 +28,12 @@ class DeleteExtensionSubscriber implements EventSubscriberInterface
         ProductCrossSellingDefinition::ENTITY_NAME,
     ];
 
-    private EntityRepositoryInterface $ergonodeMappingExtensionRepository;
+    private EntityRepository $ergonodeMappingExtensionRepository;
 
     private DefinitionInstanceRegistry $definitionInstanceRegistry;
 
     public function __construct(
-        EntityRepositoryInterface $ergonodeMappingExtensionRepository,
+        EntityRepository $ergonodeMappingExtensionRepository,
         DefinitionInstanceRegistry $definitionInstanceRegistry
     ) {
         $this->ergonodeMappingExtensionRepository = $ergonodeMappingExtensionRepository;

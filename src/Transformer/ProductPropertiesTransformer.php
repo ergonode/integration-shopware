@@ -14,7 +14,6 @@ use Shopware\Core\Content\Product\Aggregate\ProductOption\ProductOptionDefinitio
 use Shopware\Core\Content\Product\Aggregate\ProductProperty\ProductPropertyDefinition;
 use Shopware\Core\Framework\Context;
 
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use function array_filter;
 use function array_flip;
 use function array_intersect_key;

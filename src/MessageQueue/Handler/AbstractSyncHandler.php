@@ -9,13 +9,12 @@ use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\MessageQueue\Handler\AbstractMessageHandler;
 use Symfony\Component\Lock\LockFactory;
 
 use Symfony\Component\Lock\LockInterface;
 use function sprintf;
 
-abstract class AbstractSyncHandler extends AbstractMessageHandler
+abstract class AbstractSyncHandler
 {
     protected Context $context;
 
@@ -35,7 +34,7 @@ abstract class AbstractSyncHandler extends AbstractMessageHandler
         $this->logger = $ergonodeSyncLogger;
     }
 
-    public function handle($message): void
+    public function handleMessage($message): void
     {
         $lock = $this->lockFactory->createLock($this->getLockName());
         if (false === $lock->acquire()) {

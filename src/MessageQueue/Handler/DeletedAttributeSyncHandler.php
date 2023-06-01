@@ -9,8 +9,10 @@ use Ergonode\IntegrationShopware\Processor\DeletedAttributesSyncProcessor;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Throwable;
 
+#[AsMessageHandler]
 class DeletedAttributeSyncHandler extends AbstractSyncHandler
 {
     private DeletedAttributesSyncProcessor $deletedAttributesSyncProcessor;
@@ -26,9 +28,9 @@ class DeletedAttributeSyncHandler extends AbstractSyncHandler
         $this->deletedAttributesSyncProcessor = $deletedAttributesSyncProcessor;
     }
 
-    public static function getHandledMessages(): iterable
+    public function __invoke(DeletedAttributeSync $message)
     {
-        return [DeletedAttributeSync::class];
+        $this->handleMessage($message);
     }
 
     public function runSync($message): int

@@ -9,8 +9,10 @@ use Ergonode\IntegrationShopware\Processor\LanguageSyncProcessor;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Throwable;
 
+#[AsMessageHandler]
 class LanguageSyncHandler extends AbstractSyncHandler
 {
     private LanguageSyncProcessor $languageSyncProcessor;
@@ -26,9 +28,9 @@ class LanguageSyncHandler extends AbstractSyncHandler
         $this->languageSyncProcessor = $languageSyncProcessor;
     }
 
-    public static function getHandledMessages(): iterable
+    public function __invoke(LanguageSync $message)
     {
-        return [LanguageSync::class];
+        $this->handleMessage($message);
     }
 
     public function runSync($message): int

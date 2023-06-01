@@ -7,17 +7,17 @@ namespace Ergonode\IntegrationShopware\Provider;
 use Shopware\Core\Content\Product\ProductCollection;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class ProductProvider
 {
-    private EntityRepositoryInterface $productRepository;
+    private EntityRepository $productRepository;
 
     public function __construct(
-        EntityRepositoryInterface $productRepository
+        EntityRepository $productRepository
     ) {
         $this->productRepository = $productRepository;
     }

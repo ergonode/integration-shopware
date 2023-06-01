@@ -32,10 +32,7 @@ class YesNo
         'b',
     ];
 
-    /**
-     * @param string|bool|int $value
-     */
-    public static function cast($value): bool
+    public static function cast(string|bool|int $value): bool
     {
         if (in_array($value, self::TRUE_LIKE, true)) {
             return true;
