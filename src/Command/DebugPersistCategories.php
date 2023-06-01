@@ -11,6 +11,7 @@ use Ergonode\IntegrationShopware\MessageQueue\Handler\CategorySyncHandler;
 use Ergonode\IntegrationShopware\MessageQueue\Message\CategorySync;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -20,10 +21,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Temporary debug command
  */
+#[AsCommand(name: 'ergonode:debug:category-persist')]
 class DebugPersistCategories extends Command
 {
-    protected static $defaultName = 'ergonode:debug:category-persist';
-
     private CategorySyncHandler $handler;
 
     private ErgonodeCursorManager $cursorManager;

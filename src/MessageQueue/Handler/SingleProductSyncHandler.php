@@ -10,16 +10,17 @@ use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Ergonode\IntegrationShopware\Util\Constants;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Shopware\Core\Content\Product\DataAbstractionLayer\ProductIndexingMessage;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexerRegistry;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
 use function array_merge;
 
+#[AsMessageHandler]
 class SingleProductSyncHandler extends AbstractSyncHandler
 {
     private const MAX_PAGES_PER_RUN = 4;
@@ -38,6 +39,11 @@ class SingleProductSyncHandler extends AbstractSyncHandler
 
         $this->productSyncProcessor = $productSyncProcessor;
         $this->messageBus = $messageBus;
+    }
+
+    public function __invoke(SingleProductSync $message)
+    {
+        $this->handleMessage($message);
     }
 
     public static function getHandledMessages(): iterable

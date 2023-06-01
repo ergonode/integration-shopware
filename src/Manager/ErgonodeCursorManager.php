@@ -7,17 +7,17 @@ namespace Ergonode\IntegrationShopware\Manager;
 use Ergonode\IntegrationShopware\Entity\ErgonodeCursor\ErgonodeCursorCollection;
 use Ergonode\IntegrationShopware\Entity\ErgonodeCursor\ErgonodeCursorEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 
 class ErgonodeCursorManager
 {
-    private EntityRepositoryInterface $repository;
+    private EntityRepository $repository;
 
     public function __construct(
-        EntityRepositoryInterface $repository
+        EntityRepository $repository
     ) {
         $this->repository = $repository;
     }

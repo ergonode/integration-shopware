@@ -9,12 +9,12 @@ use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\Persistor\Helper\ExistingCategoriesHelper;
 use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 class CategoryTreePersistor
 {
-    private EntityRepositoryInterface $categoryRepository;
+    private EntityRepository $categoryRepository;
 
     private ExistingCategoriesHelper $categoriesHelper;
 
@@ -23,7 +23,7 @@ class CategoryTreePersistor
     private ?string $lastRootCategoryId = null;
 
     public function __construct(
-        EntityRepositoryInterface $categoryRepository,
+        EntityRepository $categoryRepository,
         ExistingCategoriesHelper $existingCategoriesHelper,
         CategoryOrderHelper $categoryOrderHelper
     ) {

@@ -50,6 +50,7 @@ class ProductVisibilitySyncProcessor
                     $skuSalesChannelsMap[$product['node']['sku']][] = $salesChannelClient->getSalesChannelId();
                 }
             }
+
         }
 
         foreach ($skuSalesChannelsMap as $sku => $salesChannelIds) {

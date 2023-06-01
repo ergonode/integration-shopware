@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Service\History;
 
+use Monolog\LogRecord;
+
 class SyncHistoryProcessor
 {
     private ?string $syncHistoryId;
@@ -13,13 +15,15 @@ class SyncHistoryProcessor
         $this->syncHistoryId = $syncHistoryId;
     }
 
-    public function __invoke(array $record): array
+    public function __invoke(LogRecord $record): LogRecord
     {
         if (null === $this->syncHistoryId) {
             return $record;
         }
 
-        $record['extra']['syncHistoryId'] = $this->syncHistoryId;
+        $extra = $record->extra;
+        $extra['syncHistoryId'] = $this->syncHistoryId;
+        $record->extra = $extra;
 
         return $record;
     }

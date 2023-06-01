@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route(defaults={"_routeScope"={"api"}})
- */
+#[Route(defaults: ['_routeScope' => ['api']])]
 class SyncHistoryController extends AbstractController
 {
     private SyncHistoryLogger $syncHistoryService;
@@ -23,15 +21,11 @@ class SyncHistoryController extends AbstractController
     }
 
     /**
-     * @Route(
-     *     "/api/ergonode/sync-history-log/{id}",
-     *     name="api.ergonode.syncHistoryLog",
-     *     methods={"GET"}
-     * )
      *
      * @param string $id
      * @return JsonResponse
      */
+    #[Route(path: '/api/ergonode/sync-history-log/{id}', name: 'api.ergonode.syncHistoryLog', methods: ['GET'])]
     public function syncHistoryLog(string $id): JsonResponse
     {
         if (empty($id)) {

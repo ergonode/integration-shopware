@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityRepositoryNotFoundException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
@@ -32,7 +32,7 @@ use function is_array;
 
 class ProductPersistor
 {
-    private EntityRepositoryInterface $productRepository;
+    private EntityRepository $productRepository;
 
     private ProductProvider $productProvider;
 
@@ -42,7 +42,7 @@ class ProductPersistor
 
     private LoggerInterface $logger;
 
-    private EntityRepositoryInterface $productCategoryRepository;
+    private EntityRepository $productCategoryRepository;
 
     private VariantsTransformer $variantsTransformer;
 
@@ -51,12 +51,12 @@ class ProductPersistor
     private ErgonodeCursorManager $cursorManager;
 
     public function __construct(
-        EntityRepositoryInterface $productRepository,
+        EntityRepository $productRepository,
         ProductProvider $productProvider,
         ProductTransformerChain $productTransformerChain,
         DefinitionInstanceRegistry $definitionInstanceRegistry,
         LoggerInterface $ergonodeSyncLogger,
-        EntityRepositoryInterface $productCategoryRepository,
+        EntityRepository $productCategoryRepository,
         VariantsTransformer $variantsTransformer,
         ProductContainer $productContainer,
         ErgonodeCursorManager $cursorManager

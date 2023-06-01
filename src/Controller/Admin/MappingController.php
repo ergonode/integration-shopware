@@ -12,9 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route(defaults={"_routeScope"={"api"}})
- */
+#[Route(defaults: ['_routeScope' => ['api']])]
 class MappingController extends AbstractController
 {
     private MappableFieldsProvider $mappableFieldsProvider;
@@ -25,9 +23,7 @@ class MappingController extends AbstractController
         $this->mappableFieldsProvider = $mappableFieldsProvider;
     }
 
-    /**
-     * @Route("/api/ergonode/ergonode-attributes", name="api.ergonode.ergonodeAttributes", methods={"GET"})
-     */
+    #[Route(path: '/api/ergonode/ergonode-attributes', name: 'api.ergonode.ergonodeAttributes', methods: ['GET'])]
     public function ergonodeAttributes(QueryDataBag $dataBag): JsonResponse
     {
         $types = $dataBag->get('types', []);
@@ -48,9 +44,7 @@ class MappingController extends AbstractController
         ], Response::HTTP_OK);
     }
 
-    /**
-     * @Route("/api/ergonode/ergonode-category-trees", name="api.ergonode.ergonodeCategoryTrees", methods={"GET"})
-     */
+    #[Route(path: '/api/ergonode/ergonode-category-trees', name: 'api.ergonode.ergonodeCategoryTrees', methods: ['GET'])]
     public function ergonodeCategoryTrees(): JsonResponse
     {
         $codes = $this->mappableFieldsProvider->getErgonodeCategoryTreeCodes();
@@ -60,9 +54,7 @@ class MappingController extends AbstractController
         ], Response::HTTP_OK);
     }
 
-    /**
-     * @Route("/api/ergonode/shopware-attributes", name="api.ergonode.shopwareAttributes", methods={"GET"})
-     */
+    #[Route(path: '/api/ergonode/shopware-attributes', name: 'api.ergonode.shopwareAttributes', methods: ['GET'])]
     public function shopwareAttributes(): JsonResponse
     {
         $attributes = $this->mappableFieldsProvider->getShopwareAttributesWithTypes();
@@ -72,9 +64,7 @@ class MappingController extends AbstractController
         ], Response::HTTP_OK);
     }
 
-    /**
-     * @Route("/api/ergonode/shopware-custom-fields", name="api.ergonode.shopwareCustomFields", methods={"GET"})
-     */
+    #[Route(path: '/api/ergonode/shopware-custom-fields', name: 'api.ergonode.shopwareCustomFields', methods: ['GET'])]
     public function shopwareCustomFields(Context $context): JsonResponse
     {
         $attributes = $this->mappableFieldsProvider->getShopwareCustomFieldsWithTypes($context);
@@ -112,6 +102,7 @@ class MappingController extends AbstractController
     /**
      * @Route("/api/ergonode/timezones", name="api.ergonode.timezones", methods={"GET"})
      */
+    #[Route(path: '/api/ergonode/timezones', name: 'api.ergonode.timezones', methods: ['GET'])]
     public function timezones(): JsonResponse
     {
         $timezones = timezone_identifiers_list();

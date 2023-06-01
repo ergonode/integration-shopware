@@ -10,7 +10,7 @@ use Ergonode\IntegrationShopware\Transformer\ProductTaxTransformer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\System\Tax\TaxEntity;
 
@@ -27,7 +27,7 @@ class ProductTaxTransformerTest extends TestCase
     private $taxProvider;
 
     /**
-     * @var MockObject|EntityRepositoryInterface
+     * @var MockObject|EntityRepository
      */
     private $taxRepository;
 
@@ -41,7 +41,7 @@ class ProductTaxTransformerTest extends TestCase
         $this->contextMock = $this->createMock(Context::class);
 
         $this->taxProvider = $this->createMock(TaxProvider::class);
-        $this->taxRepository = $this->createMock(EntityRepositoryInterface::class);
+        $this->taxRepository = $this->createMock(EntityRepository::class);
 
         $this->productTaxTransformer = new ProductTaxTransformer($this->taxProvider, $this->taxRepository);
     }

@@ -7,16 +7,16 @@ namespace Ergonode\IntegrationShopware\Transformer;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Provider\UnitProvider;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class ProductScaleUnitTransformer implements ProductDataTransformerInterface
 {
-    private EntityRepositoryInterface $mappingExtensionRepository;
+    private EntityRepository $mappingExtensionRepository;
 
     public function __construct(
-        EntityRepositoryInterface $mappingExtensionRepository
+        EntityRepository $mappingExtensionRepository
     ) {
         $this->mappingExtensionRepository = $mappingExtensionRepository;
     }

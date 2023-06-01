@@ -9,6 +9,7 @@ use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Processor\ProductSyncProcessor;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,10 +19,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Temporary debug command
  */
+#[AsCommand(name: 'ergonode:debug:product-persist-stream')]
 class DebugPersistProductStream extends Command
 {
-    protected static $defaultName = 'ergonode:debug:product-persist-stream';
-
     private ProductSyncProcessor $productSyncProcessor;
 
     private ErgonodeCursorManager $cursorManager;

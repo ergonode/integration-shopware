@@ -7,15 +7,15 @@ namespace Ergonode\IntegrationShopware\Command;
 use Ergonode\IntegrationShopware\Processor\AttributeSyncProcessor;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(name: 'ergonode:attributes:sync')]
 class SyncAttributesCommand extends Command
 {
-    protected static $defaultName = 'ergonode:attributes:sync';
-
     private Context $context;
 
     private AttributeSyncProcessor $processor;

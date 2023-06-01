@@ -14,9 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
 
-/**
- * @Route(defaults={"_routeScope"={"api"}})
- */
+#[Route(defaults: ['_routeScope' => ['api']])]
 class TestCredentialsController extends AbstractController
 {
     private ErgonodeGqlClientFactory $clientFactory;
@@ -35,13 +33,7 @@ class TestCredentialsController extends AbstractController
         $this->ergonodeApiLogger = $ergonodeApiLogger;
     }
 
-    /**
-     * @Route(
-     *     "/api/_action/ergonode/test-credentials",
-     *     name="api.admin.ergonode.test-credentials",
-     *     methods={"POST"}
-     * )
-     */
+    #[Route(path: '/api/_action/ergonode/test-credentials', name: 'api.admin.ergonode.test-credentials', methods: ['POST'])]
     public function testCredentials(RequestDataBag $dataBag): JsonResponse
     {
         $client = $this->clientFactory->create(

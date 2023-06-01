@@ -6,7 +6,7 @@ namespace Ergonode\IntegrationShopware\Service;
 
 use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
@@ -19,11 +19,11 @@ class ConfigService
 
     private SystemConfigService $configService;
 
-    private EntityRepositoryInterface $salesChannelRepository;
+    private EntityRepository $salesChannelRepository;
 
     public function __construct(
         SystemConfigService $configService,
-        EntityRepositoryInterface $salesChannelRepository
+        EntityRepository $salesChannelRepository
     ) {
         $this->configService = $configService;
         $this->salesChannelRepository = $salesChannelRepository;

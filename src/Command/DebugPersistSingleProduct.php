@@ -6,6 +6,7 @@ namespace Ergonode\IntegrationShopware\Command;
 
 use Ergonode\IntegrationShopware\MessageQueue\Handler\SingleProductSyncHandler;
 use Ergonode\IntegrationShopware\MessageQueue\Message\SingleProductSync;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,11 +15,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Temporary debug command
  */
+#[AsCommand(name: 'ergonode:debug:product-persist')]
 class DebugPersistSingleProduct extends Command
 {
-    protected static $defaultName = 'ergonode:debug:product-persist';
-
-
     private SingleProductSyncHandler $singleProductSyncHandler;
 
     public function __construct(
@@ -44,7 +43,7 @@ class DebugPersistSingleProduct extends Command
     {
         $sku = $input->getArgument('sku');
 
-        $this->singleProductSyncHandler->handle(new SingleProductSync($sku));
+        $this->singleProductSyncHandler->handleMessage(new SingleProductSync($sku));
 
         return self::SUCCESS;
     }

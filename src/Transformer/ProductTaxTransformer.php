@@ -7,7 +7,7 @@ namespace Ergonode\IntegrationShopware\Transformer;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Provider\TaxProvider;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\Tax\TaxDefinition;
 
 class ProductTaxTransformer implements ProductDataTransformerInterface
@@ -16,9 +16,9 @@ class ProductTaxTransformer implements ProductDataTransformerInterface
 
     private TaxProvider $taxProvider;
 
-    private EntityRepositoryInterface $taxRepository;
+    private EntityRepository $taxRepository;
 
-    public function __construct(TaxProvider $taxProvider, EntityRepositoryInterface $taxRepository)
+    public function __construct(TaxProvider $taxProvider, EntityRepository $taxRepository)
     {
         $this->taxProvider = $taxProvider;
         $this->taxRepository = $taxRepository;
