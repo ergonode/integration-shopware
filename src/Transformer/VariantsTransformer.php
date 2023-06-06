@@ -10,7 +10,6 @@ use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Struct\ChecksumContainer;
 use Ergonode\IntegrationShopware\Struct\ProductContainer;
 use Shopware\Core\Content\Product\Aggregate\ProductConfiguratorSetting\ProductConfiguratorSettingDefinition;
-use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
 
@@ -96,7 +95,10 @@ class VariantsTransformer
                     continue;
                 }
 
-                $existingConfigurationId = $this->getExistingConfigurationId($parentProduct, $optionId['id']);
+                if (null !== $parentProduct) {
+                    $existingConfigurationId = $this->getExistingConfigurationId($parentProduct, $optionId['id']);
+                }
+
                 $swData['configuratorSettings'][] = [
                     'id' => $existingConfigurationId ?? null,
                     'productId' => $swData['id'] ?? null,
