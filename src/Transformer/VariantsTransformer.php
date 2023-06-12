@@ -87,7 +87,7 @@ class VariantsTransformer
                 $swData['displayParent'] = true;
             }
 
-            foreach ($shopwareData['options'] as $optionId) {
+            foreach ($shopwareData['options'] ?? [] as $optionId) {
                 if (
                     false === isset($optionId['id']) ||
                     $this->checksumContainer->exists($swData['productNumber'], $optionId['id'])

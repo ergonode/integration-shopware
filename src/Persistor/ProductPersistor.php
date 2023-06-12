@@ -263,13 +263,17 @@ class ProductPersistor
         return $skus ?? [];
     }
 
-    public function deleteOrphanedSkus(string $sku, Context $context, array $ergonodeData)
+    public function deleteOrphanedSkus(string $sku, Context $context, array $ergonodeData): void
     {
         $product = $this->productProvider->getProductBySku($sku, $context, ['children']);
+        if (null === $product) {
+            return;
+        }
 
         $ergonodeSkus = array_map(function ($record) {
             return $record['node']['sku'];
         }, $ergonodeData);
+
         $variantIdsToDelete = [];
         foreach ($product->getChildren() as $variant) {
             if (!in_array($variant->getProductNumber(), $ergonodeSkus)) {
@@ -282,7 +286,7 @@ class ProductPersistor
 
     private function checkIsInitialPaginatedImport(array $productData, Context $context): bool
     {
-        if ($productData['__typename'] == 'VariableProduct') {
+        if ($productData['__typename'] === 'VariableProduct') {
             $sku = $productData['sku'];
             $variantsCursorKey = CodeBuilderUtil::build(ProductStreamResultsProxy::VARIANT_LIST_FIELD, $sku);
             $variantsCursor = $this->cursorManager->getCursorEntity($variantsCursorKey, $context);
