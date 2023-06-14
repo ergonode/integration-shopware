@@ -9,10 +9,8 @@ use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttribu
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum as Attr;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
-use Ergonode\IntegrationShopware\Provider\LocaleProvider;
 use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
 use Ergonode\IntegrationShopware\Util\AttributeTypeValidator;
-use Ergonode\IntegrationShopware\Util\Constants;
 use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Ergonode\IntegrationShopware\Util\YesNo;
@@ -27,16 +25,6 @@ use function sprintf;
 
 class ProductTransformer implements ProductDataTransformerInterface
 {
-    const ALLOWED_CLEANUP_TYPES = [
-        Attr::DATE,
-        Attr::SELECT,
-        Attr::MULTISELECT,
-        Attr::NUMERIC,
-        Attr::TEXTAREA,
-        Attr::TEXT,
-        Attr::UNIT,
-    ];
-
     private string $defaultLocale;
 
     private const TRANSLATABLE_KEYS = [
@@ -80,8 +68,6 @@ class ProductTransformer implements ProductDataTransformerInterface
 
         $result = [];
 
-        $attributeMap = $this->attributeMappingProvider->getAttributeMapByErgonodeKeys($context);
-
         foreach ($ergonodeData['attributeList']['edges'] as $edge) {
             $code = $edge['node']['attribute']['code'];
             $mappingKeys = $this->attributeMappingProvider->provideByErgonodeKey($code, $context);
@@ -108,36 +94,6 @@ class ProductTransformer implements ProductDataTransformerInterface
                 $result,
                 $this->getTransformedResult($mappingKeys, $translatedValues)
             );
-
-            // attribute is already processed
-            if (isset($attributeMap[$code])) {
-                unset($attributeMap[$code]);
-            }
-        }
-
-        // unset values that did not come from Ergonode
-        foreach ($attributeMap as $mappingEntity) {
-            $types = Constants::SW_PRODUCT_MAPPABLE_FIELDS[$mappingEntity->getShopwareKey()] ?? [];
-            if (empty($types)) {
-                continue;
-            }
-            // allow cleanup only for particular types that have translations
-            foreach ($types as $type) {
-                if (!in_array($type, self::ALLOWED_CLEANUP_TYPES)) {
-                    continue 2;
-                }
-            }
-
-            // keep product name translations regardless if they are in Ergonode or not
-            if ($mappingEntity->getShopwareKey() === 'name') {
-                continue;
-            }
-            $result[$mappingEntity->getShopwareKey()] = null;
-
-            $locales = $this->languageProvider->getActiveLocaleCodes($context);
-            foreach ($locales as $locale) {
-                $result['translations'][$locale][$mappingEntity->getShopwareKey()] = null;
-            }
         }
 
         if ($productData->isUpdate()) {
