@@ -101,6 +101,19 @@ services:
     arguments:
       $repository: '@ergonode_cursor.repository'
 
+  # PROCESSOR
+  Ergonode\IntegrationShopware\Processor\Attribute\ScaleUnitAttributeProcessor:
+    arguments:
+      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
+      $unitRepository: '@unit.repository'
+      $mappingExtensionRepository: '@ergonode_mapping_extension.repository'
+
+  Ergonode\IntegrationShopware\Processor\Attribute\ManufacturerAttributeProcessor:
+    arguments:
+      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
+      $manufacturerRepository: '@product_manufacturer.repository'
+      $mappingExtensionRepository: '@ergonode_mapping_extension.repository'
+
   # PROVIDER
   ergonode.integration_shopware.provider.attribute_mapping_provider:
     class: Ergonode\IntegrationShopware\Provider\AttributeMappingProvider
@@ -111,7 +124,6 @@ services:
     class: Ergonode\IntegrationShopware\Provider\AttributeMappingProvider
     arguments:
       $repository: '@ergonode_custom_field_mapping.repository'
-
 
   Ergonode\IntegrationShopware\Processor\Attribute\AttributeCustomProcessorResolver:
     arguments:
@@ -160,6 +172,7 @@ services:
     arguments:
       $registry: '@Shopware\Core\Framework\MessageQueue\ScheduledTask\Registry\TaskRegistry'
     tags: [ 'kernel.event_subscriber' ]
+
   # TRANSFORMER
   Ergonode\IntegrationShopware\Transformer\ProductTransformerChain:
     arguments:
@@ -177,6 +190,7 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductDeliveryTimeTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductScaleUnitTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductMinMaxQuantityTransformer'
 
   Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer:
     arguments:
@@ -200,15 +214,3 @@ services:
     arguments:
       $enabled: '%ergonode_integration.use_performance_logger%'
 
-  # PROCESSOR
-  Ergonode\IntegrationShopware\Processor\Attribute\ScaleUnitAttributeProcessor:
-    arguments:
-      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
-      $unitRepository: '@unit.repository'
-      $mappingExtensionRepository: '@ergonode_mapping_extension.repository'
-
-  Ergonode\IntegrationShopware\Processor\Attribute\ManufacturerAttributeProcessor:
-    arguments:
-      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
-      $manufacturerRepository: '@product_manufacturer.repository'
-      $mappingExtensionRepository: '@ergonode_mapping_extension.repository'

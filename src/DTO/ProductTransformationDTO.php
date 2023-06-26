@@ -57,6 +57,16 @@ class ProductTransformationDTO
         $this->swProduct = $swProduct;
     }
 
+    public function getSwProductId(): ?string
+    {
+        $swProduct = $this->getSwProduct();
+        if (null === $swProduct) {
+            return null;
+        }
+
+        return $swProduct->getId();
+    }
+
     public function getBindingCodes(): array
     {
         return $this->bindingCodes;
@@ -129,5 +139,10 @@ class ProductTransformationDTO
     public function isInitialPaginatedImport(): bool
     {
         return $this->isInitialPaginatedImport;
+    }
+
+    public function getSku(): string
+    {
+        return $this->ergonodeData['sku'] ?? '';
     }
 }
