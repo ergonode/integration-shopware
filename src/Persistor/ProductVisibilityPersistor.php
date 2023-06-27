@@ -29,8 +29,11 @@ class ProductVisibilityPersistor
         $dto = new ProductVisibilityDTO($sku, $salesChannelIds);
         $dto = $this->transformer->transform($dto, $context);
 
-        $created = $this->productVisibilityRepository->create($dto->getCreatePayload(), $context);
+        if (empty($dto->getCreatePayload()) && empty($dto->getDeletePayload())) {
+            return [];
+        }
 
+        $created = $this->productVisibilityRepository->create($dto->getCreatePayload(), $context);
         $this->productVisibilityRepository->delete($dto->getDeletePayload(), $context);
 
         return $created->getPrimaryKeys(ProductVisibilityDefinition::ENTITY_NAME);
