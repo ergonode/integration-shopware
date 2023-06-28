@@ -8,11 +8,9 @@ use Ergonode\IntegrationShopware\Api\CategoryTreeStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
 use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
-use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\Persistor\CategoryTreePersistor;
 use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
-use Ergonode\IntegrationShopware\Service\ConfigService;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
@@ -34,10 +32,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
     private LoggerInterface $logger;
 
-    private ConfigService $configService;
-
-    private CategoryPersistor $categoryPersistor;
-
     private CategoryOrderHelper $categoryOrderHelper;
 
     public function __construct(
@@ -46,8 +40,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         CategoryTreePersistor $categoryTreePersistor,
         ErgonodeCursorManager $cursorManager,
         LoggerInterface $ergonodeSyncLogger,
-        ConfigService $configService,
-        CategoryPersistor $categoryPersistor,
         CategoryOrderHelper $categoryOrderHelper
     ) {
         $this->gqlClient = $gqlClient;
@@ -55,8 +47,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $this->categoryTreePersistor = $categoryTreePersistor;
         $this->cursorManager = $cursorManager;
         $this->logger = $ergonodeSyncLogger;
-        $this->configService = $configService;
-        $this->categoryPersistor = $categoryPersistor;
         $this->categoryOrderHelper = $categoryOrderHelper;
     }
 
@@ -74,10 +64,15 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
             $context
         );
+        $treeCursor = $this->cursorManager->getCursor(
+            CategoryTreeStreamResultsProxy::MAIN_FIELD,
+            $context
+        );
 
         $stopwatch->start('query');
         $query = $this->categoryQueryBuilder->buildTreeStream(
             self::DEFAULT_LEAF_COUNT,
+            $treeCursor,
             $leafCursor
         );
 
@@ -88,6 +83,15 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         if (null === $result) {
             throw new RuntimeException('Request failed.');
         }
+
+        $leafEdges = $result->getEdges()[0]['node']['categoryTreeLeafList']['edges'] ?? [];
+        if (0 === count($result->getEdges()) && 0 === count($leafEdges)) {
+            $this->logger->info('End of stream reached.');
+            $counter->setHasNextPage(false);
+
+            return $counter;
+        }
+
 
         $treeEndCursor = $result->getEndCursor();
         if (null === $treeEndCursor) {
@@ -146,6 +150,11 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
         $counter->incrProcessedEntityCount($entityCount);
         $counter->setPrimaryKeys($processedKeys);
+        $this->cursorManager->persist(
+            $treeEndCursor,
+            CategoryTreeStreamResultsProxy::MAIN_FIELD,
+            $context
+        );
         if ($leafHasNextPage) {
             $this->logger->info('Category leaves have next page', [
                 'leafCursor' => $leafEndCursor,
@@ -168,24 +177,9 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         return $counter;
     }
 
-    public function removeOrphanedCategories(array $treeCode): void
-    {
-        $lastSync = $this->configService->getLastCategorySyncTimestamp();
-
-        $removedCategoryCount = $this->categoryPersistor->removeCategoriesUpdatedAtBeforeTimestamp(
-            $lastSync,
-            $treeCode
-        );
-        $this->logger->info('Removed orphaned Ergonode categories', [
-            'treeCode' => $treeCode,
-            'count' => $removedCategoryCount,
-            'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM),
-        ]);
-    }
-
     public static function getDefaultPriority(): int
     {
-        return 5;
+        return 15;
     }
 
     /**
