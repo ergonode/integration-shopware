@@ -15,7 +15,7 @@ use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOp
 use Shopware\Core\Content\Property\PropertyGroupEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -24,11 +24,11 @@ class PropertyGroupTransformer
 {
     private TranslationTransformer $translationTransformer;
 
-    private EntityRepositoryInterface $mappingExtensionRepository;
+    private EntityRepository $mappingExtensionRepository;
 
     public function __construct(
         TranslationTransformer $translationTransformer,
-        EntityRepositoryInterface $mappingExtensionRepository
+        EntityRepository $mappingExtensionRepository
     ) {
         $this->translationTransformer = $translationTransformer;
         $this->mappingExtensionRepository = $mappingExtensionRepository;
