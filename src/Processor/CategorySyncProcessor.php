@@ -10,6 +10,7 @@ use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Persistor\CategoryPersistor;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
@@ -30,18 +31,22 @@ class CategorySyncProcessor implements CategoryProcessorInterface
 
     private LoggerInterface $logger;
 
+    private ConfigService $configService;
+
     public function __construct(
         ErgonodeGqlClientInterface $gqlClient,
         CategoryQueryBuilder $categoryQueryBuilder,
         CategoryPersistor $categoryPersistor,
         ErgonodeCursorManager $cursorManager,
-        LoggerInterface $ergonodeSyncLogger
+        LoggerInterface $ergonodeSyncLogger,
+        ConfigService $configService
     ) {
         $this->gqlClient = $gqlClient;
         $this->categoryQueryBuilder = $categoryQueryBuilder;
         $this->categoryPersistor = $categoryPersistor;
         $this->cursorManager = $cursorManager;
         $this->logger = $ergonodeSyncLogger;
+        $this->configService = $configService;
     }
 
     /**
@@ -116,5 +121,21 @@ class CategorySyncProcessor implements CategoryProcessorInterface
     public static function getDefaultPriority(): int
     {
         return 10;
+    }
+
+
+    public function removeOrphanedCategories(array $treeCode): void
+    {
+        $lastSync = $this->configService->getLastCategorySyncTimestamp();
+
+        $removedCategoryCount = $this->categoryPersistor->removeCategoriesUpdatedAtBeforeTimestamp(
+            $lastSync,
+            $treeCode
+        );
+        $this->logger->info('Removed orphaned Ergonode categories', [
+            'treeCode' => $treeCode,
+            'count' => $removedCategoryCount,
+            'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM),
+        ]);
     }
 }

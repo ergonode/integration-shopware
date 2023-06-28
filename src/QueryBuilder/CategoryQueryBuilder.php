@@ -8,6 +8,8 @@ use GraphQL\Query;
 
 class CategoryQueryBuilder
 {
+    public const DEFAULT_TREE_COUNT = 50;
+
     public function buildTree(string $treeCode, int $count, ?string $cursor): Query
     {
         $listArguments = ['first' => $count];
@@ -91,14 +93,21 @@ class CategoryQueryBuilder
 
     public function buildTreeStream(
         int $categoryLeafCount,
+        ?string $treeCursor = null,
         ?string $categoryLeafCursor = null
     ): Query {
+        $treeArguments = ['first' => self::DEFAULT_TREE_COUNT];
+        if ($treeCursor) {
+            $treeArguments['after'] = $treeCursor;
+        }
+
         $categoryLeafArguments = ['first' => $categoryLeafCount];
         if ($categoryLeafCursor !== null) {
             $categoryLeafArguments['after'] = $categoryLeafCursor;
         }
 
         return (new Query('categoryTreeStream'))
+            ->setArguments($treeArguments)
             ->setSelectionSet([
                 'totalCount',
                 (new Query('pageInfo'))
