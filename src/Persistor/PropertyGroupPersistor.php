@@ -62,7 +62,7 @@ class PropertyGroupPersistor
             $dto = new PropertyGroupTransformationDTO($node);
             $dto->setSwPropertyGroup($propertyGroup);
 
-            $dto = $this->propertyGroupTransformer->transformAttributeNode($dto);
+            $dto = $this->propertyGroupTransformer->transformAttributeNode($dto, $context);
 
             $propertyGroupPayload = $dto->getPropertyGroupPayload();
             if (empty($propertyGroupPayload)) {
