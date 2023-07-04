@@ -83,7 +83,9 @@ class ProductTransformer implements ProductDataTransformerInterface
                 continue;
             }
 
-            $translatedValues = $this->getTranslatedValues($edge['node']['translations']);
+            $isCodeAsValueAttribute = $this->isCodeAsValueAttribute($mappingKeys);
+
+            $translatedValues = $this->getTranslatedValues($edge['node']['translations'], $isCodeAsValueAttribute);
             if (false === array_key_exists($this->defaultLocale, $translatedValues)) {
                 throw new RuntimeException(
                     sprintf('Default locale %s not found in product data', $this->defaultLocale)
@@ -107,7 +109,7 @@ class ProductTransformer implements ProductDataTransformerInterface
         return $productData;
     }
 
-    private function getTranslatedValues(array $valueTranslations): array
+    private function getTranslatedValues(array $valueTranslations, bool $isCodeAsValueAttribute): array
     {
         $translatedValues = [];
         foreach ($valueTranslations as $valueTranslation) {
@@ -119,14 +121,14 @@ class ProductTransformer implements ProductDataTransformerInterface
                         $translatedValues[$language] = null;
                         break;
                     }
-                    $translatedValues[$language] = empty($valueTranslation[$valueKey]['name'])
+                    $translatedValues[$language] = empty($valueTranslation[$valueKey]['name']) || $isCodeAsValueAttribute
                         ? $valueTranslation[$valueKey]['code']
                         : $valueTranslation[$valueKey]['name'];
                     break;
                 case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_MULTI_ARRAY:
                     $values = [];
                     foreach ($valueTranslation[$valueKey] as $record) {
-                        $values[] = empty($record['name'])
+                        $values[] = empty($record['name']) || $isCodeAsValueAttribute
                             ? $record['code']
                             : $record['name'];
                     }
@@ -180,5 +182,19 @@ class ProductTransformer implements ProductDataTransformerInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Returns names of Ergondoe attributes that we should use code instead of translated name
+     */
+    private function isCodeAsValueAttribute(ErgonodeAttributeMappingCollection $mappingKeys): bool
+    {
+        foreach ($mappingKeys as $mappingKey) {
+            if ($mappingKey->getShopwareKey() === 'manufacturer') {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
