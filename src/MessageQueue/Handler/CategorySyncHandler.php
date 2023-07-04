@@ -7,6 +7,7 @@ namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 use Ergonode\IntegrationShopware\MessageQueue\Message\CategorySync;
 use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\Processor\CategoryProcessorInterface;
+use Ergonode\IntegrationShopware\Processor\CategorySyncProcessor;
 use Ergonode\IntegrationShopware\Processor\CategoryTreeSyncProcessor;
 use Ergonode\IntegrationShopware\Service\ConfigService;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
@@ -147,7 +148,7 @@ class CategorySyncHandler extends AbstractSyncHandler
             $this->logger->info('Dispatching next CategorySyncMessage because still has next page');
             $this->messageBus->dispatch(new CategorySync());
         } else {
-            if ($processor instanceof CategoryTreeSyncProcessor) {
+            if ($processor instanceof CategorySyncProcessor) {
                 $processor->removeOrphanedCategories($categoryTreeCodes);
 
                 $formattedTime = $this->configService->setLastCategorySyncTimestamp(
