@@ -74,13 +74,14 @@
             <helpText>This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels</helpText>
             <helpText lang="de-DE">Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen</helpText>
         </input-field>
-        <component name="ergonode-scheduler-datetime-input">
+        <input-field type="datetime">
             <name>schedulerStartDatetime</name>
             <label>Start date and time</label>
             <label lang="de-DE">Start date and time</label>
             <helpText>This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels</helpText>
             <helpText lang="de-DE">Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen</helpText>
-        </component>
+            <hideHint>true</hideHint>
+        </input-field>
         <component name="ergonode-timezone-select">
             <name>schedulerTimezone</name>
             <label>Scheduler timezone</label>
