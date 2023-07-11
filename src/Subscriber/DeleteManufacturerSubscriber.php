@@ -38,7 +38,7 @@ class DeleteManufacturerSubscriber implements EventSubscriberInterface
         }
         $context = $event->getContext();
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsAnyFilter('id', $ids);
+        $criteria->addFilter(new EqualsAnyFilter('id', $ids));
         $mappingIds = $this->ergonodeMappingExtensionRepository->searchIds($criteria, $context);
         if (!empty($mappingIds->getIds())) {
             $this->ergonodeMappingExtensionRepository->delete(array_values($mappingIds->getData()), $context);
