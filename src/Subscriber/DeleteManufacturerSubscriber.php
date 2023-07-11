@@ -7,7 +7,7 @@ namespace Ergonode\IntegrationShopware\Subscriber;
 use Shopware\Core\Content\Product\Aggregate\ProductManufacturer\ProductManufacturerCollection;
 use Shopware\Core\Content\Product\Aggregate\ProductManufacturer\ProductManufacturerDefinition;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\BeforeDeleteEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
@@ -17,13 +17,13 @@ use function array_values;
 
 class DeleteManufacturerSubscriber implements EventSubscriberInterface
 {
-    private EntityRepository $ergonodeMappingExtensionRepository;
+    private EntityRepositoryInterface $ergonodeMappingExtensionRepository;
 
-    private EntityRepository $manufacturerRepository;
+    private EntityRepositoryInterface $manufacturerRepository;
 
     public function __construct(
-        EntityRepository $manufacturerRepository,
-        EntityRepository $ergonodeMappingExtensionRepository
+        EntityRepositoryInterface $manufacturerRepository,
+        EntityRepositoryInterface $ergonodeMappingExtensionRepository
     ) {
         $this->ergonodeMappingExtensionRepository = $ergonodeMappingExtensionRepository;
         $this->manufacturerRepository = $manufacturerRepository;
