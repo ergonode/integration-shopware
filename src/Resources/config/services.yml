@@ -159,6 +159,11 @@ services:
   Ergonode\IntegrationShopware\Subscriber\DeleteCategoryExtensionSubscriber:
     tags: [ 'kernel.event_subscriber' ]
 
+  Ergonode\IntegrationShopware\Subscriber\DeleteManufacturerSubscriber:
+    arguments:
+      $manufacturerRepository: '@product_manufacturer.repository'
+    tags: [ 'kernel.event_subscriber' ]
+
   Ergonode\IntegrationShopware\Subscriber\ClearCursorsSubscriber:
     tags: [ 'kernel.event_subscriber' ]
 
