@@ -24,8 +24,8 @@
     "require": {
         "php": ">= 8.1",
         "ext-json": "*",
-        "shopware/administration": "~6.5|6.5.0.0-rc1",
-        "shopware/core": "~6.5|6.5.0.0-rc1",
+        "shopware/administration": "6.5.3.*",
+        "shopware/core": "6.5.3.*",
         "gmostafa/php-graphql-client": "^1.13"
     },
     "require-dev": {
