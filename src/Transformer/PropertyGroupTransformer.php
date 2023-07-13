@@ -13,28 +13,19 @@ use Ergonode\IntegrationShopware\Extension\PropertyGroupOption\PropertyGroupOpti
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionEntity;
 use Shopware\Core\Content\Property\PropertyGroupEntity;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\Uuid\Uuid;
 
 class PropertyGroupTransformer
 {
     private TranslationTransformer $translationTransformer;
 
-    private EntityRepository $mappingExtensionRepository;
-
     public function __construct(
-        TranslationTransformer $translationTransformer,
-        EntityRepository $mappingExtensionRepository
+        TranslationTransformer $translationTransformer
     ) {
         $this->translationTransformer = $translationTransformer;
-        $this->mappingExtensionRepository = $mappingExtensionRepository;
     }
 
-    public function transformAttributeNode(PropertyGroupTransformationDTO $dto, Context $context): PropertyGroupTransformationDTO
+    public function transformAttributeNode(PropertyGroupTransformationDTO $dto): PropertyGroupTransformationDTO
     {
         $node = $dto->getErgonodeData();
 
@@ -57,13 +48,6 @@ class PropertyGroupTransformer
                 if (!empty($option['code'])) {
                     $existingOption = $propertyGroup ? $this->getOptionByCode($propertyGroup, $option['code']) : null;
 
-
-                    $optionCode = CodeBuilderUtil::buildExtended($code, $option['code']);
-                    // if no option, delete any possible legaacy records in extension repository
-                    if (!$existingOption) {
-                        $this->deleteOptionByCode($optionCode, $context);
-                    }
-
                     $options[] = [
                         'id' => $existingOption ? $existingOption->getId() : null,
                         'name' => $option['code'],
@@ -71,7 +55,7 @@ class PropertyGroupTransformer
                         'extensions' => [
                             AbstractErgonodeMappingExtension::EXTENSION_NAME => [
                                 'id' => $existingOption ? $this->getEntityExtensionId($existingOption) : null,
-                                'code' => $optionCode,
+                                'code' => CodeBuilderUtil::buildExtended($code, $option['code']),
                                 'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                             ],
                         ],
@@ -153,15 +137,5 @@ class PropertyGroupTransformer
         }
 
         return $idsToDelete;
-    }
-
-    private function deleteOptionByCode(string $code, Context $context): void
-    {
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('code', $code));
-        $ids = $this->mappingExtensionRepository->searchIds($criteria, $context)->getIds();
-        if (!empty($ids)) {
-            $this->mappingExtensionRepository->delete(array_map(static fn($id) => ['id' => $id], $ids), $context);
-        }
     }
 }
