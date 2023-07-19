@@ -12,11 +12,12 @@ use Ergonode\IntegrationShopware\MessageQueue\Message\LanguageSync;
 use Ergonode\IntegrationShopware\MessageQueue\Message\ProductSync;
 use Ergonode\IntegrationShopware\MessageQueue\Message\ProductVisibilitySync;
 use Ergonode\IntegrationShopware\Service\ConfigService;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-#[AsMessageHandler]
-class FullSyncTaskHandler
+//#[AsMessageHandler] - remove comment and `ScheduledTaskHandler` in SW 6.6.0
+class FullSyncTaskHandler extends ScheduledTaskHandler
 {
     private ConfigService $configService;
 
@@ -24,13 +25,20 @@ class FullSyncTaskHandler
 
     public function __construct(
         ConfigService $configService,
-        MessageBusInterface $messageBus
+        MessageBusInterface $messageBus,
+        EntityRepository $scheduledTaskRepository
     ) {
         $this->configService = $configService;
         $this->messageBus = $messageBus;
+        parent::__construct($scheduledTaskRepository);
     }
 
-    public function __invoke(FullSyncTask $message): void
+    public static function getHandledMessages(): iterable
+    {
+        return [FullSyncTask::class];
+    }
+
+    public function run(): void
     {
         if (!$this->shouldRun()) {
             return;
@@ -43,7 +51,7 @@ class FullSyncTaskHandler
         $this->messageBus->dispatch(new ProductVisibilitySync());
         $this->messageBus->dispatch(new DeletedProductSync());
         $this->messageBus->dispatch(new DeletedAttributeSync());
-
+        
         $this->configService->setLastFullSyncDatetime(
             new \DateTime('now', new \DateTimeZone($this->configService->getSchedulerStartTimezone()))
         );

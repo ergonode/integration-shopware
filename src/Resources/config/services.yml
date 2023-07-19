@@ -145,6 +145,16 @@ services:
   Ergonode\IntegrationShopware\Service\ScheduledTask\FullSyncTask:
     tags: [ 'shopware.scheduled.task' ]
 
+  Ergonode\IntegrationShopware\Service\ScheduledTask\FullSyncTaskHandler:
+    tags: [ 'messenger.message_handler' ]
+    arguments:
+      $scheduledTaskRepository: '@scheduled_task.repository'
+
+  Ergonode\IntegrationShopware\Service\ScheduledTask\CleanSyncHistoryTaskHandler:
+    tags: [ 'messenger.message_handler' ]
+    arguments:
+      $scheduledTaskRepository: '@scheduled_task.repository'
+
   # SERVICE
   Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger:
     arguments:
