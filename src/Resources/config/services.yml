@@ -194,6 +194,7 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductDeliveryTimeTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductScaleUnitTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductMinMaxQuantityTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductDigitalTransformer'
 
   Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer:
     arguments:
