@@ -7,6 +7,7 @@ class ProductAttributeData
 {
     private const ATTRIBUTE_FILE  = 'FileAttribute';
     private const ATTRIBUTE_IMAGE = 'ImageAttribute';
+    private const ATTRIBUTE_GALLERY = 'GalleryAttribute';
 
     private array $translations;
 
@@ -34,6 +35,7 @@ class ProductAttributeData
                     );
                     break;
                 case self::ATTRIBUTE_FILE:
+                case self::ATTRIBUTE_GALLERY:
                     foreach ($translation['value_multimedia_array'] as $translationRecord) {
                         $this->translations[$translation['language']][] = new ProductFileData(
                             $translationRecord['name'],

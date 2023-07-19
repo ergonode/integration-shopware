@@ -16,6 +16,8 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route(defaults: ['_routeScope' => ['api']])]
 class MappingController extends AbstractController
 {
+    private const VARIABLE_PRODUCT = 'VariableProduct';
+
     private MappableFieldsProvider $mappableFieldsProvider;
 
     private ErgonodeProductProvider $ergonodeProductProvider;
@@ -123,7 +125,7 @@ class MappingController extends AbstractController
         $type = $dataBag->get('type', []);
 
         $products = [];
-        if ($type == 'VariableProduct') {
+        if ($type == self::VARIABLE_PRODUCT) {
             $products = $this->ergonodeProductProvider->provideVariableProducts();
         }
 

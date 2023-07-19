@@ -42,6 +42,7 @@ class ProductDigitalTransformer implements ProductDataTransformerInterface
             if ($productData->getSwProductId()) {
                 $this->clearOldDownloads([], $productData->getSwProductId(), $context);
             }
+
             return $productData;
         }
         $swData = $productData->getShopwareData();
@@ -52,21 +53,7 @@ class ProductDigitalTransformer implements ProductDataTransformerInterface
         $productModel = new ProductData($ergoData);
         $value = $productModel->findValueForAttributeCode($code);
 
-        $downloads = [];
-        if ($value instanceof ProductAttributeData) {
-            $existingDownloads = $productData->getSwProduct()->getDownloads();
-            $translation = $value->getTranslation('pl_PL');
-            $translationData = is_array($translation) ? $translation : [$translation];
-            foreach ($translationData as $value) {
-                if (is_null($value)) {
-                    continue;
-                }
-                $downloadData = $this->getDownloadData($value, $existingDownloads, $context);
-                if ($downloadData) {
-                    $downloads[] = $downloadData;
-                }
-            }
-        }
+        $downloads = $this->getDownloadsFromValue($value, $productData, $context);
 
         if ($productData->getSwProductId()) {
             $this->clearOldDownloads($downloads, $productData->getSwProductId(), $context);
@@ -121,6 +108,30 @@ class ProductDigitalTransformer implements ProductDataTransformerInterface
         if (!empty($idsToDelete)) {
             $this->productDownloadRepository->delete($idsToDelete, $context);
         }
+    }
+
+    private function getDownloadsFromValue(
+        ?ProductAttributeData $value,
+        ProductTransformationDTO $productData,
+        Context $context
+    ): array {
+        $downloads = [];
+        if ($value instanceof ProductAttributeData) {
+            $existingDownloads = $productData->getSwProduct()->getDownloads();
+            $translation = $value->getTranslation('pl_PL');
+            $translationData = is_array($translation) ? $translation : [$translation];
+            foreach ($translationData as $value) {
+                if (is_null($value)) {
+                    continue;
+                }
+                $downloadData = $this->getDownloadData($value, $existingDownloads, $context);
+                if ($downloadData) {
+                    $downloads[] = $downloadData;
+                }
+            }
+        }
+
+        return $downloads;
     }
 
 }
