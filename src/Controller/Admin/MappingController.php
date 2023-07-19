@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Controller\Admin;
 
+use Ergonode\IntegrationShopware\Provider\ErgonodeProductProvider;
 use Ergonode\IntegrationShopware\Provider\MappableFieldsProvider;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
@@ -15,12 +16,18 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route(defaults: ['_routeScope' => ['api']])]
 class MappingController extends AbstractController
 {
+    private const VARIABLE_PRODUCT = 'VariableProduct';
+
     private MappableFieldsProvider $mappableFieldsProvider;
 
+    private ErgonodeProductProvider $ergonodeProductProvider;
+
     public function __construct(
-        MappableFieldsProvider $mappableFieldsProvider
+        MappableFieldsProvider $mappableFieldsProvider,
+        ErgonodeProductProvider $ergonodeProductProvider
     ) {
         $this->mappableFieldsProvider = $mappableFieldsProvider;
+        $this->ergonodeProductProvider = $ergonodeProductProvider;
     }
 
     #[Route(path: '/api/ergonode/ergonode-attributes', name: 'api.ergonode.ergonodeAttributes', methods: ['GET'])]
@@ -109,6 +116,21 @@ class MappingController extends AbstractController
 
         return new JsonResponse([
             'data' => $timezones,
+        ], Response::HTTP_OK);
+    }
+
+    #[Route(path: '/api/ergonode/ergonode-products', name: 'api.ergonode.ergonodeProducts', methods: ['GET'])]
+    public function ergonodeProducts(QueryDataBag $dataBag): JsonResponse
+    {
+        $type = $dataBag->get('type', []);
+
+        $products = [];
+        if ($type == self::VARIABLE_PRODUCT) {
+            $products = $this->ergonodeProductProvider->provideVariableProducts();
+        }
+
+        return new JsonResponse([
+            'data' => $products,
         ], Response::HTTP_OK);
     }
 }

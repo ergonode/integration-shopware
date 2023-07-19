@@ -48,6 +48,27 @@
         </component>
     </card>
     <card>
+        <title>Digital products</title>
+        <title lang="de-DE">Digital products</title>
+
+        <component name="ergonode-product-multiselect">
+            <name>digitalProductsKeys</name>
+            <productType>VariableProduct</productType>
+            <label>Shopware digital products</label>
+            <label lang="de-DE">Shopware digital products</label>
+            <helpText>Every selected product will be sent to Shopware as digital product</helpText>
+            <helpText lang="de-DE">Every selected product will be sent to Shopware as digital product</helpText>
+        </component>
+        <component name="ergonode-attribute-select">
+            <name>digitalProductAttribute</name>
+            <attributesType>image,file,gallery</attributesType>
+            <label>Ergonode attribute used for digital products</label>
+            <label lang="de-DE">Ergonode attribute used for digital products</label>
+            <helpText>Ergonode attribute used for digital products</helpText>
+            <helpText lang="de-DE">Ergonode attribute used for digital products</helpText>
+        </component>
+    </card>
+    <card>
         <title>Category Sync</title>
         <title lang="de-DE">Category Sync</title>
         <component name="ergonode-category-tree-multiselect">
