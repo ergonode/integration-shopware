@@ -26,8 +26,14 @@ export default class ErgonodeMappingService extends ApiService {
     async getErgonodeAttributes(types = []) {
         return await this.client.get('ergonode/ergonode-attributes', {
             headers: this.getBasicHeaders(),
+            params: {types},
+        });
+    }
+    async getErgonodeProducts(type = null) {
+        return await this.client.get('ergonode/ergonode-products', {
+            headers: this.getBasicHeaders(),
             params: {
-                ...(types?.length && { types }),
+                type
             },
         });
     }

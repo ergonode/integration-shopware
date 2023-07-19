@@ -12,6 +12,7 @@ class ProductQueryBuilder
 {
     private const ATTRIBUTE_LIST_COUNT = 1000;
     private const VARIANT_LIST_COUNT = 25;
+    private const MAX_PRODUCT_COUNT = 200;
     private const CATEGORY_LIST_COUNT = 50;
 
     public function build(int $count, ?string $cursor = null): Query
@@ -647,12 +648,45 @@ class ProductQueryBuilder
             ]);
     }
 
+    public function buildVariableProducts(?string $cursor): Query
+    {
+        $arguments = [
+            'first' => self::MAX_PRODUCT_COUNT,
+        ];
+
+        if ($cursor !== null) {
+            $arguments['after'] = $cursor;
+        }
+
+        return (new Query('productStream'))
+            ->setArguments($arguments)
+            ->setSelectionSet([
+                'totalCount',
+                (new Query('pageInfo'))
+                    ->setSelectionSet([
+                        'endCursor',
+                        'hasNextPage',
+                    ]),
+                (new Query('edges'))
+                    ->setSelectionSet([
+                        (new Query('node'))
+                            ->setSelectionSet([
+                                (new InlineFragment('VariableProduct'))
+                                    ->setSelectionSet([
+                                        'sku',
+                                    ]),
+                            ]),
+                    ]),
+            ]);
+    }
+
     private function getAttributeFragment(): Query
     {
         return (new Query('attribute'))
             ->setSelectionSet([
                 'code',
                 'scope',
+                '__typename',
                 (new InlineFragment('DateAttribute'))
                     ->setSelectionSet([
                         new Query('code', AttributeTypesEnum::DATE),

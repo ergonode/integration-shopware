@@ -1,6 +1,6 @@
 const { Component, Mixin } = Shopware;
 
-Component.extend('ergonode-attribute-multiselect', 'ergonode-api-entity-multiselect', {
+Component.extend('ergonode-attribute-select', 'ergonode-api-entity-select', {
     props: {
         attributesType: {
             type: String,
@@ -9,13 +9,13 @@ Component.extend('ergonode-attribute-multiselect', 'ergonode-api-entity-multisel
     computed: {
         filteredValue() {
             return (Array.isArray(this.value)
-                    ?
-                    this.value
-                    :
-                    [this.value]
+            ?
+            this.value
+            :
+            [this.value]
             ).filter(value => this.ergonodeOptions.some(option => option?.code === value));
         },
-
+        
         options() {
             return this.ergonodeOptions.map(option => {
                 return {
@@ -25,15 +25,13 @@ Component.extend('ergonode-attribute-multiselect', 'ergonode-api-entity-multisel
             });
         },
     },
-
+    
     methods: {
         fetchOptionsRequest() {
             let types = []
             if (this.attributesType) {
                 types = this.attributesType.split(',');
             }
-            
-            console.log(types);
             
             return this.ergonodeMappingService.getErgonodeAttributes(types)
         }

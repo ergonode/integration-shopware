@@ -150,4 +150,15 @@ class ConfigService
 
         return $formatted;
     }
+
+
+    public function getDigitalProductKeys(): array
+    {
+        return $this->configService->get(self::CONFIG_NAMESPACE . 'digitalProductsKeys');
+    }
+
+    public function getDigitalProductAttribute(): string
+    {
+        return $this->configService->getString(self::CONFIG_NAMESPACE . 'digitalProductAttribute');
+    }
 }
