@@ -14,7 +14,7 @@ use Ergonode\IntegrationShopware\Util\SyncPerformanceLogger;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Category\DataAbstractionLayer\CategoryIndexingMessage;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexerRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -38,7 +38,7 @@ class CategorySyncHandler extends AbstractSyncHandler
 
     private CategoryOrderHelper $categoryOrderHelper;
 
-    private EntityRepositoryInterface $ergonodeCategoryMappingRepository;
+    private EntityRepository $ergonodeCategoryMappingRepository;
 
     /**
      * @param SyncHistoryLogger $syncHistoryService
@@ -59,7 +59,7 @@ class CategorySyncHandler extends AbstractSyncHandler
         MessageBusInterface $messageBus,
         SyncPerformanceLogger $performanceLogger,
         CategoryOrderHelper $categoryOrderHelper,
-        EntityRepositoryInterface $ergonodeCategoryMappingRepository
+        EntityRepository $ergonodeCategoryMappingRepository
     ) {
         parent::__construct($syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
