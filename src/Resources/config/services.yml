@@ -114,6 +114,11 @@ services:
       $manufacturerRepository: '@product_manufacturer.repository'
       $mappingExtensionRepository: '@ergonode_mapping_extension.repository'
 
+  Ergonode\IntegrationShopware\Processor\Attribute\DeliveryTimeAttributeProcessor:
+    arguments:
+      $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
+      $deliveryTimeRepository: '@delivery_time.repository'
+      $mappingExtensionRepository: '@ergonode_mapping_extension.repository'
   # PROVIDER
   ergonode.integration_shopware.provider.attribute_mapping_provider:
     class: Ergonode\IntegrationShopware\Provider\AttributeMappingProvider
