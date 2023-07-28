@@ -22,8 +22,7 @@ class Migration1690444403DeleteLegacyCursors extends MigrationStep
     public function update(Connection $connection): void
     {
         $connection->executeStatement(
-            '
-            DELETE FROM `ergonode_cursor` where query in (:types)',
+            'DELETE FROM `ergonode_cursor` where query in (:types)',
             [
                 'types' => [
                     CategoryStreamResultsProxy::MAIN_FIELD,
