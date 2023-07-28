@@ -124,16 +124,14 @@ class CategorySyncProcessor implements CategoryProcessorInterface
     }
 
 
-    public function removeOrphanedCategories(array $treeCode): void
+    public function removeOrphanedCategories(): void
     {
         $lastSync = $this->configService->getLastCategorySyncTimestamp();
 
         $removedCategoryCount = $this->categoryPersistor->removeCategoriesUpdatedAtBeforeTimestamp(
-            $lastSync,
-            $treeCode
+            $lastSync
         );
         $this->logger->info('Removed orphaned Ergonode categories', [
-            'treeCode' => $treeCode,
             'count' => $removedCategoryCount,
             'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM),
         ]);
