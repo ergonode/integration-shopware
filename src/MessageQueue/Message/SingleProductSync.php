@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\MessageQueue\Message;
 
-class SingleProductSync
+use Shopware\Core\Framework\MessageQueue\AsyncMessageInterface;
+
+class SingleProductSync implements AsyncMessageInterface
 {
     private string $sku;
 

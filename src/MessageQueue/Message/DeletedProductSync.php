@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\MessageQueue\Message;
 
-class DeletedProductSync
+use Shopware\Core\Framework\MessageQueue\AsyncMessageInterface;
+
+class DeletedProductSync implements AsyncMessageInterface
 {
 }

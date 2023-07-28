@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 
+use Ergonode\IntegrationShopware\Api\CategoryStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\CategoryTreeStreamResultsProxy;
+use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\MessageQueue\Message\CategorySync;
 use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\Processor\CategoryProcessorInterface;
@@ -49,6 +52,7 @@ class CategorySyncHandler extends AbstractSyncHandler
      * @param MessageBusInterface $messageBus
      * @param SyncPerformanceLogger $performanceLogger
      * @param CategoryOrderHelper $categoryOrderHelper
+     * @param ErgonodeCursorManager $cursorManager
      */
     public function __construct(
         SyncHistoryLogger $syncHistoryService,
@@ -156,7 +160,7 @@ class CategorySyncHandler extends AbstractSyncHandler
             $this->messageBus->dispatch(new CategorySync());
         } else {
             if ($processor instanceof CategorySyncProcessor) {
-                $processor->removeOrphanedCategories($categoryTreeCodes);
+                $processor->removeOrphanedCategories();
 
                 $formattedTime = $this->configService->setLastCategorySyncTimestamp(
                     (new \DateTime('+1 second'))->getTimestamp()
@@ -165,6 +169,14 @@ class CategorySyncHandler extends AbstractSyncHandler
                     'time' => $formattedTime,
                 ]);
                 $this->categoryOrderHelper->clearSaved();
+                $this->cursorManager->deleteCursors(
+                    [
+                        CategoryStreamResultsProxy::MAIN_FIELD,
+                        CategoryTreeStreamResultsProxy::MAIN_FIELD,
+                        CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
+                    ],
+                    $this->context
+                );
             }
             $this->logger->info('Category sync finished.');
         }
