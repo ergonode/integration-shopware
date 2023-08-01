@@ -22,14 +22,12 @@ class ProductDeliveryTimeTransformer implements ProductDataTransformerInterface
     {
         $swData = $productData->getShopwareData();
         $productDeliveryTime = $swData['deliveryTime'] ?? null;
-        if (empty($productDeliveryTime)) {
-            return $productData;
+        if (!empty($productDeliveryTime)) {
+            $deliveryTimeId = $this->deliveryTimeProvider->getIdByName($productDeliveryTime, $context);
+            $swData['deliveryTimeId'] = $deliveryTimeId;
         }
+
         unset($swData['deliveryTime']);
-
-        $deliveryTimeId = $this->deliveryTimeProvider->getIdByName($productDeliveryTime, $context);
-
-        $swData['deliveryTimeId'] = $deliveryTimeId;
         $productData->setShopwareData($swData);
 
         return $productData;
