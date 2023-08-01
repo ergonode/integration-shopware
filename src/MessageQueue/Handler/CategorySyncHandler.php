@@ -43,6 +43,8 @@ class CategorySyncHandler extends AbstractSyncHandler
 
     private EntityRepository $ergonodeCategoryMappingRepository;
 
+    private ErgonodeCursorManager $cursorManager;
+
     /**
      * @param SyncHistoryLogger $syncHistoryService
      * @param LoggerInterface $ergonodeSyncLogger
@@ -63,7 +65,8 @@ class CategorySyncHandler extends AbstractSyncHandler
         MessageBusInterface $messageBus,
         SyncPerformanceLogger $performanceLogger,
         CategoryOrderHelper $categoryOrderHelper,
-        EntityRepository $ergonodeCategoryMappingRepository
+        EntityRepository $ergonodeCategoryMappingRepository,
+        ErgonodeCursorManager $cursorManager
     ) {
         parent::__construct($syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
@@ -73,6 +76,7 @@ class CategorySyncHandler extends AbstractSyncHandler
         $this->performanceLogger = $performanceLogger;
         $this->categoryOrderHelper = $categoryOrderHelper;
         $this->ergonodeCategoryMappingRepository = $ergonodeCategoryMappingRepository;
+        $this->cursorManager = $cursorManager;
     }
 
     public function __invoke(CategorySync $message)

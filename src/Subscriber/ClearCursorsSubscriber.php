@@ -33,7 +33,7 @@ class ClearCursorsSubscriber implements EventSubscriberInterface
     public function onBeforeSystemConfigChanged(BeforeSystemConfigChangedEvent $event): void
     {
         if (
-            configService::API_ENDPOINT_CONFIG !== $event->getKey() ||
+            ConfigService::API_ENDPOINT_CONFIG !== $event->getKey() ||
             $this->configService->getErgonodeApiEndpoint() === $event->getValue()
         ) {
             return;
