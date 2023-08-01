@@ -11,14 +11,16 @@ use Ergonode\IntegrationShopware\MessageQueue\Message\CategorySync;
 use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\Processor\CategoryProcessorInterface;
 use Ergonode\IntegrationShopware\Processor\CategorySyncProcessor;
-use Ergonode\IntegrationShopware\Processor\CategoryTreeSyncProcessor;
 use Ergonode\IntegrationShopware\Service\ConfigService;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Ergonode\IntegrationShopware\Util\SyncPerformanceLogger;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Category\DataAbstractionLayer\CategoryIndexingMessage;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexerRegistry;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
@@ -38,6 +40,8 @@ class CategorySyncHandler extends AbstractSyncHandler
     private CategoryOrderHelper $categoryOrderHelper;
 
     private ErgonodeCursorManager $cursorManager;
+
+    private EntityRepositoryInterface $ergonodeCategoryMappingRepository;
 
     /**
      * @param SyncHistoryLogger $syncHistoryService
@@ -59,7 +63,8 @@ class CategorySyncHandler extends AbstractSyncHandler
         MessageBusInterface $messageBus,
         SyncPerformanceLogger $performanceLogger,
         CategoryOrderHelper $categoryOrderHelper,
-        ErgonodeCursorManager $cursorManager
+        ErgonodeCursorManager $cursorManager,
+        EntityRepositoryInterface $ergonodeCategoryMappingRepository
     ) {
         parent::__construct($syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
@@ -69,6 +74,7 @@ class CategorySyncHandler extends AbstractSyncHandler
         $this->performanceLogger = $performanceLogger;
         $this->categoryOrderHelper = $categoryOrderHelper;
         $this->cursorManager = $cursorManager;
+        $this->ergonodeCategoryMappingRepository = $ergonodeCategoryMappingRepository;
     }
 
     public static function getHandledMessages(): iterable
@@ -95,6 +101,7 @@ class CategorySyncHandler extends AbstractSyncHandler
             return 0;
         }
 
+        $this->clearLegacyCategoryMappings();
         $primaryKeys = [];
         try {
             foreach ($this->processors as $processor) {
@@ -172,5 +179,18 @@ class CategorySyncHandler extends AbstractSyncHandler
         }
 
         return $primaryKeys;
+    }
+
+    /**
+     * Clears legacy mapping records which don't have category associated with
+     */
+    private function clearLegacyCategoryMappings(): void
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('category.id', null));
+        $mappingIds = $this->ergonodeCategoryMappingRepository->searchIds($criteria, $this->context);
+        if (!empty($mappingIds->getIds())) {
+            $this->ergonodeCategoryMappingRepository->delete(array_values($mappingIds->getData()), $this->context);
+        }
     }
 }
