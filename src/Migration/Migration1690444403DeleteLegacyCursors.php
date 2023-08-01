@@ -2,7 +2,6 @@
 
 namespace Ergonode\IntegrationShopware\Migration;
 
-use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Ergonode\IntegrationShopware\Api\CategoryStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\CategoryTreeStreamResultsProxy;
@@ -22,8 +21,7 @@ class Migration1690444403DeleteLegacyCursors extends MigrationStep
     public function update(Connection $connection): void
     {
         $connection->executeStatement(
-            '
-            DELETE FROM `ergonode_cursor` where query in (:types)',
+            'DELETE FROM `ergonode_cursor` where query in (:types)',
             [
                 'types' => [
                     CategoryStreamResultsProxy::MAIN_FIELD,
@@ -32,7 +30,7 @@ class Migration1690444403DeleteLegacyCursors extends MigrationStep
                 ],
             ],
             [
-                'types' => ArrayParameterType::STRING,
+                'types' => Connection::PARAM_STR_ARRAY,
             ]
         );
     }
