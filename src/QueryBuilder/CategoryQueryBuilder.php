@@ -93,13 +93,9 @@ class CategoryQueryBuilder
 
     public function buildTreeStream(
         int $categoryLeafCount,
-        ?string $treeCursor = null,
         ?string $categoryLeafCursor = null
     ): Query {
         $treeArguments = ['first' => self::DEFAULT_TREE_COUNT];
-        if ($treeCursor) {
-            $treeArguments['after'] = $treeCursor;
-        }
 
         $categoryLeafArguments = ['first' => $categoryLeafCount];
         if ($categoryLeafCursor !== null) {

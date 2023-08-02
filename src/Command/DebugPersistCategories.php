@@ -17,6 +17,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 
 /**
  * Temporary debug command
@@ -24,17 +27,17 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'ergonode:debug:category-persist')]
 class DebugPersistCategories extends Command
 {
-    private CategorySyncHandler $handler;
+    private MessageBusInterface $messageBus;
 
     private ErgonodeCursorManager $cursorManager;
 
     public function __construct(
-        CategorySyncHandler $handler,
+        MessageBusInterface $messageBus,
         ErgonodeCursorManager $cursorManager
     ) {
         parent::__construct();
 
-        $this->handler = $handler;
+        $this->messageBus = $messageBus;
         $this->cursorManager = $cursorManager;
     }
 
@@ -74,7 +77,7 @@ class DebugPersistCategories extends Command
             $io->info('Cursors deleted');
         }
 
-        $this->handler->handle(new CategorySync());
+        $this->messageBus->dispatch(new CategorySync(),[new TransportNamesStamp('sync')]);
 
         $io->success('Processed entities');
 

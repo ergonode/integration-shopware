@@ -222,6 +222,10 @@ services:
     arguments:
       $mappingExtensionRepository: '@ergonode_mapping_extension.repository'
 
+  Ergonode\IntegrationShopware\Transformer\ProductCrossSellingTransformer:
+    arguments:
+      $mappingExtensionRepository: '@ergonode_mapping_extension.repository'
+
   # UTIL
   Ergonode\IntegrationShopware\Util\SyncPerformanceLogger:
     arguments:

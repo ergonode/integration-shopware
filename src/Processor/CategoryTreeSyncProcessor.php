@@ -64,15 +64,10 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
             $context
         );
-        $treeCursor = $this->cursorManager->getCursor(
-            CategoryTreeStreamResultsProxy::MAIN_FIELD,
-            $context
-        );
 
         $stopwatch->start('query');
         $query = $this->categoryQueryBuilder->buildTreeStream(
             self::DEFAULT_LEAF_COUNT,
-            $treeCursor,
             $leafCursor
         );
 
