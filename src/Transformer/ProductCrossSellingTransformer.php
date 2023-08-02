@@ -18,6 +18,9 @@ use Shopware\Core\Content\Product\Aggregate\ProductCrossSelling\ProductCrossSell
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSellingAssignedProducts\ProductCrossSellingAssignedProductsDefinition;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 {
@@ -35,13 +38,16 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 
     private LanguageProvider $languageProvider;
 
+    private EntityRepository $mappingExtensionRepository;
+
     public function __construct(
         ConfigService $configService,
         ProductProvider $productProvider,
         TranslationTransformer $translationTransformer,
         ProductCrossSellingProvider $productCrossSellingProvider,
         ExtensionManager $extensionManager,
-        LanguageProvider $languageProvider
+        LanguageProvider $languageProvider,
+        EntityRepository $mappingExtensionRepository
     ) {
         $this->configService = $configService;
         $this->productProvider = $productProvider;
@@ -49,6 +55,7 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
         $this->productCrossSellingProvider = $productCrossSellingProvider;
         $this->extensionManager = $extensionManager;
         $this->languageProvider = $languageProvider;
+        $this->mappingExtensionRepository = $mappingExtensionRepository;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
@@ -93,6 +100,11 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
                 ];
             }
 
+            $extensionCode = CodeBuilderUtil::buildExtended($productData->getErgonodeData()['sku'], $code);
+            if (!$existingCrossSelling) {
+                $this->deleteLegacyMapping($extensionCode, $context);
+            }
+
             $crossSellings[] = [
                 'id' => $existingCrossSelling ? $existingCrossSelling->getId() : null,
                 'active' => true,
@@ -104,7 +116,7 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
                 'extensions' => [
                     AbstractErgonodeMappingExtension::EXTENSION_NAME => [
                         'id' => $existingCrossSelling ? $this->extensionManager->getEntityExtensionId($existingCrossSelling) : null,
-                        'code' => CodeBuilderUtil::buildExtended($productData->getErgonodeData()['sku'], $code),
+                        'code' => $extensionCode,
                         'type' => ProductCrossSellingExtension::ERGONODE_TYPE,
                     ],
                 ],
@@ -216,5 +228,16 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
         );
 
         return $assignedProducts;
+    }
+
+    private function deleteLegacyMapping(string $extensionCode, Context $context): void
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('code', $extensionCode));
+        $criteria->addFilter(new EqualsFilter('type', ProductCrossSellingExtension::ERGONODE_TYPE));
+        $ids = $this->mappingExtensionRepository->searchIds($criteria, $context)->getIds();
+        if (!empty($ids)) {
+            $this->mappingExtensionRepository->delete(array_map(static fn($id) => ['id' => $id], $ids), $context);
+        }
     }
 }
