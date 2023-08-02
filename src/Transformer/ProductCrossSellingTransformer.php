@@ -18,7 +18,7 @@ use Shopware\Core\Content\Product\Aggregate\ProductCrossSelling\ProductCrossSell
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSellingAssignedProducts\ProductCrossSellingAssignedProductsDefinition;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
@@ -38,7 +38,7 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 
     private LanguageProvider $languageProvider;
 
-    private EntityRepository $mappingExtensionRepository;
+    private EntityRepositoryInterface $mappingExtensionRepository;
 
     public function __construct(
         ConfigService $configService,
@@ -47,7 +47,7 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
         ProductCrossSellingProvider $productCrossSellingProvider,
         ExtensionManager $extensionManager,
         LanguageProvider $languageProvider,
-        EntityRepository $mappingExtensionRepository
+        EntityRepositoryInterface $mappingExtensionRepository
     ) {
         $this->configService = $configService;
         $this->productProvider = $productProvider;
