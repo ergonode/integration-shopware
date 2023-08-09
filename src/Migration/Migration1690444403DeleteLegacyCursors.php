@@ -20,19 +20,23 @@ class Migration1690444403DeleteLegacyCursors extends MigrationStep
 
     public function update(Connection $connection): void
     {
-        $connection->executeStatement(
-            'DELETE FROM `ergonode_cursor` where query in (:types)',
-            [
-                'types' => [
-                    CategoryStreamResultsProxy::MAIN_FIELD,
-                    CategoryTreeStreamResultsProxy::MAIN_FIELD,
-                    CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
+        $result = $connection->fetchOne('SHOW TABLES LIKE \'ergonode_cursor\';');
+
+        if ($result !== false) {
+            $connection->executeStatement(
+                'DELETE FROM `ergonode_cursor` where query in (:types)',
+                [
+                    'types' => [
+                        CategoryStreamResultsProxy::MAIN_FIELD,
+                        CategoryTreeStreamResultsProxy::MAIN_FIELD,
+                        CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
+                    ],
                 ],
-            ],
-            [
-                'types' => Connection::PARAM_STR_ARRAY,
-            ]
-        );
+                [
+                    'types' => Connection::PARAM_STR_ARRAY,
+                ]
+            );
+        }
     }
 
     public function updateDestructive(Connection $connection): void
