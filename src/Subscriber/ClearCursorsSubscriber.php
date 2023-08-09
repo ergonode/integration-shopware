@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Subscriber;
 
+use Doctrine\DBAL\Connection;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Service\ConfigService;
 use Shopware\Core\Framework\Api\Context\SystemSource;
@@ -17,10 +18,13 @@ class ClearCursorsSubscriber implements EventSubscriberInterface
 
     private ConfigService $configService;
 
-    public function __construct(ErgonodeCursorManager $cursorManager, ConfigService $configService)
+    private Connection $connection;
+
+    public function __construct(ErgonodeCursorManager $cursorManager, ConfigService $configService, Connection $connection)
     {
         $this->cursorManager = $cursorManager;
         $this->configService = $configService;
+        $this->connection = $connection;
     }
 
     public static function getSubscribedEvents(): array
@@ -39,9 +43,12 @@ class ClearCursorsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->cursorManager->deleteCursors(
-            [],
-            new Context(new SystemSource())
-        );
+        $result = $this->connection->fetchOne('SHOW TABLES LIKE \'ergonode_cursor\';');
+        if ($result !== false) {
+            $this->cursorManager->deleteCursors(
+                [],
+                new Context(new SystemSource())
+            );
+        }
     }
 }

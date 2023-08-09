@@ -21,10 +21,14 @@ class DatabaseLifecycleManager
         'ergonode_cursor',
         'ergonode_sync_history',
         'ergonode_category_mapping',
+        'ergonode_custom_field_mapping',
     ];
 
     private static array $extendedTableNames = [
-        'category' => 'ergonode_category_mapping_extension_id',
+        'category' => [
+            'ergonode_category_mapping_extension_id',
+            'shopwareId'
+        ],
         'product_cross_selling' => 'ergonode_mapping_extension_id',
         'property_group' => 'ergonode_mapping_extension_id',
         'property_group_option' => 'ergonode_mapping_extension_id',
@@ -69,10 +73,15 @@ class DatabaseLifecycleManager
 
     private function dropExtensionFields(): void
     {
-        foreach (self::$extendedTableNames as $tableName => $fieldName) {
-            $this->connection->executeStatement(
-                sprintf('ALTER TABLE `%s` DROP COLUMN %s', $tableName, $fieldName)
-            );
+        foreach (self::$extendedTableNames as $tableName => $fieldNames) {
+            if (!is_array($fieldNames)) {
+                $fieldNames = [$fieldNames];
+            }
+            foreach ($fieldNames as $fieldName) {
+                $this->connection->executeStatement(
+                    sprintf('ALTER TABLE `%s` DROP COLUMN %s', $tableName, $fieldName)
+                );
+            }
         }
     }
 }
