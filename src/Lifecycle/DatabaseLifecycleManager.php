@@ -78,9 +78,14 @@ class DatabaseLifecycleManager
                 $fieldNames = [$fieldNames];
             }
             foreach ($fieldNames as $fieldName) {
-                $this->connection->executeStatement(
-                    sprintf('ALTER TABLE `%s` DROP COLUMN %s', $tableName, $fieldName)
+                $result = $this->connection->fetchOne(
+                    sprintf('SHOW COLUMNS FROM `%s` LIKE %s', $tableName, $fieldName)
                 );
+                if ($result !== false) {
+                    $this->connection->executeStatement(
+                        sprintf('ALTER TABLE `%s` DROP COLUMN %s', $tableName, $fieldName)
+                    );
+                }
             }
         }
     }
