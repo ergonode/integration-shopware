@@ -23,6 +23,9 @@ use function array_map;
 
 class MappableFieldsProvider
 {
+    public const CATEGORY_TYPE = 'category';
+    public const PRODUCT_TYPE = 'product';
+
     private ErgonodeAttributeProvider $ergonodeAttributeProvider;
 
     private EntityRepository $customFieldRepository;
@@ -59,14 +62,29 @@ class MappableFieldsProvider
         return array_keys(Constants::SW_PRODUCT_MAPPABLE_FIELDS);
     }
 
+    //public function getShopwareAttributesWithTypes(): array
+    //{
+    //    $attributes = [];
+    //    foreach (Constants::SW_PRODUCT_MAPPABLE_FIELDS as $code => $types) {
+    //        $attributes[] = [
+    //            'code' => $code,
+    //            'type' => implode('/', $types),
+    //            'translationKey' => Constants::SW_PRODUCT_TRANSLATION_KEYS[$code] ?? Constants::DEFAULT_TRANSLATION_KEY . $code,
+    //        ];
+    //    }
+    //
+    //    return $attributes;
+    //}
+
+    //public function getShopwareCategoryAttributesWithTypes(): array
     public function getShopwareAttributesWithTypes(): array
     {
         $attributes = [];
-        foreach (Constants::SW_PRODUCT_MAPPABLE_FIELDS as $code => $types) {
+        foreach (Constants::SW_CATEGORY_MAPPABLE_FIELDS as $code => $types) {
             $attributes[] = [
                 'code' => $code,
                 'type' => implode('/', $types),
-                'translationKey' => Constants::SW_PRODUCT_TRANSLATION_KEYS[$code] ?? Constants::DEFAULT_TRANSLATION_KEY . $code,
+                'translationKey' => Constants::SW_CATEGORY_TRANSLATION_KEYS[$code] ?? Constants::DEFAULT_CATEGORY_TRANSLATION_KEY . $code,
             ];
         }
 
@@ -119,15 +137,17 @@ class MappableFieldsProvider
     {
         return array_map(
             fn($data) => $data['code'],
-            $this->getErgonodeAttributesWithTypes($types)
+            $this->getErgonodeAttributesWithTypes(self::PRODUCT_TYPE, $types)
         );
     }
 
-    public function getErgonodeAttributesWithTypes(array $types = []): array
+    public function getErgonodeAttributesWithTypes(string $type = self::PRODUCT_TYPE, array $types = []): array
     {
         $attributeCodes = [];
 
-        $generator = $this->ergonodeAttributeProvider->provideProductAttributes();
+        $generator = $type === self::CATEGORY_TYPE
+            ? $this->ergonodeAttributeProvider->provideCategoryAttributes()
+            : $this->ergonodeAttributeProvider->provideProductAttributes();
 
         foreach ($generator as $attributes) {
             if (!empty($types)) {

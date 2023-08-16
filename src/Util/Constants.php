@@ -48,6 +48,7 @@ class Constants
     ];
 
     public const DEFAULT_TRANSLATION_KEY = 'sw-product-stream.filter.values.';
+    public const DEFAULT_CATEGORY_TRANSLATION_KEY = 'sw-product-stream.filter.values.';
 
     // put translations keys here if key is different from self::DEFAULT_TRANSLATION_KEY
     public const SW_PRODUCT_TRANSLATION_KEYS = [
@@ -64,5 +65,25 @@ class Constants
         'purchaseUnit' => 'sw-product.priceForm.labelPurchaseUnit',
         'referenceUnit' => 'sw-product.priceForm.labelReferenceUnit',
         'scaleUnit' => 'sw-product-stream.filter.values.unit',
+    ];
+
+    public const SW_CATEGORY_MAPPABLE_FIELDS = [
+        'active' => [Attr::BOOL],
+        'name' => [Attr::TEXT, Attr::TEXTAREA, Attr::SELECT],
+        'visible' => [Attr::BOOL],
+        'media' => [Attr::IMAGE],
+        'description' => [Attr::TEXT, Attr::TEXTAREA],
+        'metaTitle' => [Attr::TEXT, Attr::TEXTAREA, Attr::SELECT],
+        'metaDescription' => [Attr::TEXT, Attr::TEXTAREA, Attr::SELECT],
+        'keywords' => [Attr::TEXT, Attr::TEXTAREA, Attr::SELECT],
+    ];
+
+    // put translations keys here if key is different from self::DEFAULT_TRANSLATION_KEY
+    public const SW_CATEGORY_TRANSLATION_KEYS = [
+        'visible' => 'sw-category.base.menu.visible',
+        'media' => 'sw-category.base.menu.imageLabel',
+        'metaTitle' => 'sw-category.base.seo.labelMetaTitle',
+        'metaDescription' => 'sw-category.base.seo.labelMetaDescription',
+        'keywords' => 'sw-category.base.seo.labelKeywords',
     ];
 }

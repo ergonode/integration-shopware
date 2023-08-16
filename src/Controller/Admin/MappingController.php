@@ -33,22 +33,13 @@ class MappingController extends AbstractController
     #[Route(path: '/api/ergonode/ergonode-attributes', name: 'api.ergonode.ergonodeAttributes', methods: ['GET'])]
     public function ergonodeAttributes(QueryDataBag $dataBag): JsonResponse
     {
-        $types = $dataBag->get('types', []);
-        if ($types instanceof QueryDataBag) {
-            $types = $types->all();
-        }
+        return $this->getErgonodeAttributes($dataBag, MappableFieldsProvider::PRODUCT_TYPE);
+    }
 
-        if (!is_array($types)) {
-            return new JsonResponse([
-                'message' => 'Field types must be array.',
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        $attributes = $this->mappableFieldsProvider->getErgonodeAttributesWithTypes($types);
-
-        return new JsonResponse([
-            'data' => $attributes,
-        ], Response::HTTP_OK);
+    #[Route(path: '/api/ergonode/ergonode-category-attributes', name: 'api.ergonode.ergonodeCategoryAttributes', methods: ['GET'])]
+    public function ergonodeCategoryAttributes(QueryDataBag $dataBag): JsonResponse
+    {
+        return $this->getErgonodeAttributes($dataBag, MappableFieldsProvider::CATEGORY_TYPE);
     }
 
     #[Route(path: '/api/ergonode/ergonode-category-trees', name: 'api.ergonode.ergonodeCategoryTrees', methods: ['GET'])]
@@ -63,6 +54,16 @@ class MappingController extends AbstractController
 
     #[Route(path: '/api/ergonode/shopware-attributes', name: 'api.ergonode.shopwareAttributes', methods: ['GET'])]
     public function shopwareAttributes(): JsonResponse
+    {
+        $attributes = $this->mappableFieldsProvider->getShopwareAttributesWithTypes();
+
+        return new JsonResponse([
+            'data' => $attributes,
+        ], Response::HTTP_OK);
+    }
+
+    #[Route(path: '/api/ergonode/shopware-category-attributes', name: 'api.ergonode.shopwareCategoryAttributes', methods: ['GET'])]
+    public function shopwareCategoryAttributes(): JsonResponse
     {
         $attributes = $this->mappableFieldsProvider->getShopwareAttributesWithTypes();
 
@@ -131,6 +132,34 @@ class MappingController extends AbstractController
 
         return new JsonResponse([
             'data' => $products,
+        ], Response::HTTP_OK);
+    }
+
+    private function getErgonodeAttributes(QueryDataBag $dataBag, string $type): JsonResponse
+    {
+        $types = $dataBag->get('types', []);
+        if ($types instanceof QueryDataBag) {
+            $types = $types->all();
+        }
+
+        if (!is_array($types)) {
+            return new JsonResponse([
+                'message' => 'Field types must be array.',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($type == MappableFieldsProvider::CATEGORY_TYPE) {
+            $attributes = $this->mappableFieldsProvider->getErgonodeAttributesWithTypes($type, $types);
+
+            return new JsonResponse([
+                'data' => $attributes,
+            ], Response::HTTP_OK);
+        }
+
+        $attributes = $this->mappableFieldsProvider->getErgonodeAttributesWithTypes($type, $types);
+
+        return new JsonResponse([
+            'data' => $attributes,
         ], Response::HTTP_OK);
     }
 }
