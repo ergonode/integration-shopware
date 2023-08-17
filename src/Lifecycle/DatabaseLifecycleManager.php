@@ -79,7 +79,7 @@ class DatabaseLifecycleManager
             }
             foreach ($fieldNames as $fieldName) {
                 $result = $this->connection->fetchOne(
-                    sprintf('SHOW COLUMNS FROM `%s` LIKE %s', $tableName, $fieldName)
+                    sprintf('SHOW COLUMNS FROM `%s` WHERE `field` LIKE \'%s\'', $tableName, $fieldName)
                 );
                 if ($result !== false) {
                     $this->connection->executeStatement(
