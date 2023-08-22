@@ -34,25 +34,18 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
 
         $codes = $this->configService->getErgonodeCustomFieldKeys();
 
-        $attributes = $this->getAttributesByCodes($productData->getErgonodeData(), $codes);
+        $attributes = $productData->getErgonodeData()->getAttributesByCodes($codes);
 
         $customFields = [];
-        foreach ($attributes as $ergoCustomField) {
-            $node = $ergoCustomField['node'] ?? null;
-            $code = $node['attribute']['code'] ?? null;
-
-            if (empty($node) || empty($code)) {
-                continue;
-            }
-
-            $typedTransformer = $this->transformerResolver->resolve($node);
+        foreach ($attributes as $attribute) {
+            $typedTransformer = $this->transformerResolver->resolve($attribute);
             if (null === $typedTransformer) {
                 continue;
             }
 
             $customFields[] = $typedTransformer->transformNode(
-                $node,
-                CustomFieldUtil::buildCustomFieldName($code),
+                $attribute,
+                CustomFieldUtil::buildCustomFieldName($attribute->getCode()),
                 $context
             );
         }

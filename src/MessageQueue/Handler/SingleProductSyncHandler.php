@@ -95,7 +95,7 @@ class SingleProductSyncHandler extends AbstractSyncHandler
         $count = 0;
         $result = null;
 
-        try {
+        //try {
             $primaryKeys = [];
             do {
                 $result = $this->productSyncProcessor->processSingle(
@@ -110,9 +110,9 @@ class SingleProductSyncHandler extends AbstractSyncHandler
                     break;
                 }
             } while ($result->hasNextPage());
-        } catch (Throwable $e) {
-            $this->logger->error($e->getMessage());
-        }
+        //} catch (Throwable $e) {
+        //    $this->logger->error($e->getMessage());
+        //}
 
         if (false === empty($primaryKeys)) {
             $this->logger->info('Dispatching product indexing message');

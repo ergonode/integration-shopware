@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer\ProductCustomField;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Ergonode\IntegrationShopware\Provider\CustomFieldProvider;
 use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
 use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
@@ -29,18 +30,16 @@ class SimpleProductCustomFieldTransformer implements ProductCustomFieldTransform
         $this->customFieldProvider = $customFieldProvider;
     }
 
-    public function supports(array $node): bool
+    public function supports(ProductAttribute $attribute): bool
     {
-        $type = AttributeTypesEnum::getNodeType($node['attribute']);
-
-        return in_array($type, [
-            AttributeTypesEnum::TEXT,
-            AttributeTypesEnum::TEXTAREA,
-            AttributeTypesEnum::SELECT,
-            AttributeTypesEnum::MULTISELECT,
-            AttributeTypesEnum::NUMERIC,
-            AttributeTypesEnum::UNIT,
-            AttributeTypesEnum::DATE,
+        return in_array($attribute->getType(), [
+            ProductAttribute::TYPE_TEXT,
+            ProductAttribute::TYPE_TEXTAREA,
+            ProductAttribute::TYPE_SELECT,
+            ProductAttribute::TYPE_MULTI_SELECT,
+            ProductAttribute::TYPE_NUMERIC,
+            ProductAttribute::TYPE_UNIT,
+            ProductAttribute::TYPE_DATE,
         ]);
     }
 

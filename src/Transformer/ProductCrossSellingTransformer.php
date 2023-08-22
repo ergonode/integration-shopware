@@ -8,11 +8,13 @@ use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Extension\ProductCrossSelling\ProductCrossSellingExtension;
 use Ergonode\IntegrationShopware\Manager\ExtensionManager;
+use Ergonode\IntegrationShopware\Model\ProductRelationAttribute;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Provider\ProductCrossSellingProvider;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Service\ConfigService;
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
+use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSelling\ProductCrossSellingDefinition;
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSelling\ProductCrossSellingEntity;
 use Shopware\Core\Content\Product\Aggregate\ProductCrossSellingAssignedProducts\ProductCrossSellingAssignedProductsDefinition;
@@ -30,8 +32,6 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 
     private ProductProvider $productProvider;
 
-    private TranslationTransformer $translationTransformer;
-
     private ProductCrossSellingProvider $productCrossSellingProvider;
 
     private ExtensionManager $extensionManager;
@@ -43,7 +43,6 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
     public function __construct(
         ConfigService $configService,
         ProductProvider $productProvider,
-        TranslationTransformer $translationTransformer,
         ProductCrossSellingProvider $productCrossSellingProvider,
         ExtensionManager $extensionManager,
         LanguageProvider $languageProvider,
@@ -51,7 +50,6 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
     ) {
         $this->configService = $configService;
         $this->productProvider = $productProvider;
-        $this->translationTransformer = $translationTransformer;
         $this->productCrossSellingProvider = $productCrossSellingProvider;
         $this->extensionManager = $extensionManager;
         $this->languageProvider = $languageProvider;
@@ -60,29 +58,34 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
-        if ($productData->isVariant()) {
-            return $productData; // cross-selling for variants is not supported by Shopware
-        }
+        //if ($productData->isVariant()) {
+        //    return $productData; // cross-selling for variants is not supported by Shopware
+        //}
 
         $swData = $productData->getShopwareData();
+        $ergonodeData = $productData->getErgonodeData();
 
         $codes = $this->configService->getErgonodeCrossSellingKeys();
 
-        $attributes = array_values($this->getAttributesByCodes($productData->getErgonodeData(), $codes));
+        $attributes = [];
+        foreach ($codes as $code) {
+            $attribute = $ergonodeData->getAttributeByCode($code);
+            if ($attribute instanceof ProductRelationAttribute) {
+                $attributes[] = $attribute;
+            }
+        }
 
         $crossSellings = [];
-        foreach ($attributes as $key => $ergoRelation) {
-            $node = $ergoRelation['node'];
-            $code = $node['attribute']['code'] ?? '';
-
-            if (empty($code)) {
+        $position = 0;
+        foreach ($attributes as $relationAttribute) {
+            $defaultLocale = $this->languageProvider->getDefaultLanguageLocale($context);
+            $defaultTranslation = $relationAttribute->getTranslation(
+                IsoCodeConverter::shopwareToErgonodeIso($defaultLocale)
+            );
+            $skus = $defaultTranslation?->getValue();
+            if (empty($skus)) {
                 continue;
             }
-
-            // cross-selling in Shopware cannot be translatable; getting default language OR first one
-            $value = $this->translationTransformer->transformDefaultLocale($node['translations'], $context);
-            $skus = array_column($value, 'sku');
-
             $productIds = array_values($this->productProvider->getProductIdsBySkus($skus, $context));
 
             $existingCrossSelling = $this->getProductCrossSelling($productData->getSwProduct(), $code, $context);
@@ -91,41 +94,37 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
                 $this->getAssignedProductsPayload($existingCrossSelling, $productIds, $productData)
             );
 
-            $defaultLocale = $this->languageProvider->getDefaultLanguageLocale($context);
-            $translations = $this->translationTransformer->transform($node['attribute']['name'], 'name');
-            if (!isset($translations[$defaultLocale])) {
-                // prevent error when missing default language translation in Ergonode, use code as name
-                $translations[$defaultLocale] = [
-                    'name' => $code
-                ];
-            }
+            $translations[$defaultLocale] = [
+                'name' => $code,
+            ];
 
-            $extensionCode = CodeBuilderUtil::buildExtended($productData->getErgonodeData()['sku'], $code);
+            $extensionCode = CodeBuilderUtil::buildExtended($productData->getErgonodeData()->getSku(), $code);
             if (!$existingCrossSelling) {
                 $this->deleteLegacyMapping($extensionCode, $context);
             }
 
             $crossSellings[] = [
-                'id' => $existingCrossSelling ? $existingCrossSelling->getId() : null,
+                'id' => $existingCrossSelling?->getId(),
                 'active' => true,
                 'type' => ProductCrossSellingDefinition::TYPE_PRODUCT_LIST,
                 'sortBy' => ProductCrossSellingDefinition::SORT_BY_NAME,
-                'position' => $key,
+                'position' => $position,
                 'assignedProducts' => $assignedProducts,
                 'translations' => $translations,
                 'extensions' => [
                     AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                        'id' => $existingCrossSelling ? $this->extensionManager->getEntityExtensionId($existingCrossSelling) : null,
+                        'id' => $existingCrossSelling ? $this->extensionManager->getEntityExtensionId(
+                            $existingCrossSelling
+                        ) : null,
                         'code' => $extensionCode,
                         'type' => ProductCrossSellingExtension::ERGONODE_TYPE,
                     ],
                 ],
             ];
+            $position++;
         }
 
-        if (!empty($crossSellings)) {
-            $swData[self::SW_PRODUCT_FIELD_CROSS_SELLING] = $crossSellings;
-        }
+        $swData->setCrossSellings($crossSellings);
 
         $productData->setShopwareData($swData);
 
@@ -135,14 +134,6 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
         );
 
         return $productData;
-    }
-
-    private function getAttributesByCodes(array $ergonodeData, array $codes): array
-    {
-        return array_filter(
-            $ergonodeData['attributeList']['edges'] ?? [],
-            fn(array $attribute) => in_array($attribute['node']['attribute']['code'] ?? '', $codes)
-        );
     }
 
     private function getProductCrossSelling(
@@ -180,12 +171,13 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
             return [];
         }
 
-        if (!isset($swData[self::SW_PRODUCT_FIELD_CROSS_SELLING])) {
+        if ($swData->getCrossSellings()) {
             return array_map(fn(string $id) => ['id' => $id], $crossSellingIds);
         }
 
         $newCrossSellingIds = array_filter(
-            array_map(fn(array $crossSelling) => $crossSelling['id'] ?? null, $swData[self::SW_PRODUCT_FIELD_CROSS_SELLING])
+            array_map(fn(array $crossSelling) => $crossSelling['id'] ?? null,
+                $swData->getCrossSellings())
         );
 
         $idsToDelete = array_diff($crossSellingIds, $newCrossSellingIds);
@@ -213,8 +205,10 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
         $idsToDelete = [];
         foreach ($existingCrossSelling->getAssignedProducts() ?? [] as $assignedProduct) {
             if (
-                isset($assignedProducts[$assignedProduct->getProductId()]) &&
-                !isset($assignedProducts[$assignedProduct->getProductId()]['id'])
+                isset(
+                    $assignedProducts[$assignedProduct->getProductId()]
+                )
+                && !isset($assignedProducts[$assignedProduct->getProductId()]['id'])
             ) {
                 $assignedProducts[$assignedProduct->getProductId()]['id'] = $assignedProduct->getId();
                 continue;

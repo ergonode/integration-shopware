@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer\ProductCustomField;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
@@ -27,9 +28,9 @@ class PriceProductCustomFieldTransformer implements ProductCustomFieldTransforme
         $this->currencyRepository = $currencyRepository;
     }
 
-    public function supports(array $node): bool
+    public function supports(ProductAttribute $attribute): bool
     {
-        return AttributeTypesEnum::PRICE === AttributeTypesEnum::getNodeType($node['attribute']);
+        return ProductAttribute::TYPE_PRICE === $attribute->getType();
     }
 
     public function transformNode(array $node, string $customFieldName, Context $context): array

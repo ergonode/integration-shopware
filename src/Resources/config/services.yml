@@ -190,13 +190,13 @@ services:
   Ergonode\IntegrationShopware\Transformer\ProductTransformerChain:
     arguments:
       $transformers:
-        - '@Ergonode\IntegrationShopware\Transformer\ProductTransformer'
-        - '@Ergonode\IntegrationShopware\Transformer\ProductCategoryTransformer'
-        - '@Ergonode\IntegrationShopware\Transformer\ProductTaxTransformer'
-        - '@Ergonode\IntegrationShopware\Transformer\ProductPriceTransformer'
-        - '@Ergonode\IntegrationShopware\Transformer\ProductDefaultValuesTransformer'
-        - '@Ergonode\IntegrationShopware\Transformer\ProductMediaTransformer'
-        - '@Ergonode\IntegrationShopware\Transformer\ProductCustomFieldTransformer'
+#        - '@Ergonode\IntegrationShopware\Transformer\ProductTransformer'
+#        - '@Ergonode\IntegrationShopware\Transformer\ProductCategoryTransformer'
+#        - '@Ergonode\IntegrationShopware\Transformer\ProductTaxTransformer'
+#        - '@Ergonode\IntegrationShopware\Transformer\ProductPriceTransformer'
+#        - '@Ergonode\IntegrationShopware\Transformer\ProductDefaultValuesTransformer'
+#        - '@Ergonode\IntegrationShopware\Transformer\ProductMediaTransformer'
+#        - '@Ergonode\IntegrationShopware\Transformer\ProductCustomFieldTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductExistingCustomFieldTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductPropertiesTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductCrossSellingTransformer'

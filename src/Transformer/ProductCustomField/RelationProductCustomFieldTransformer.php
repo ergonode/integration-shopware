@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer\ProductCustomField;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Ergonode\IntegrationShopware\Provider\CustomFieldProvider;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
@@ -32,9 +33,9 @@ class RelationProductCustomFieldTransformer implements ProductCustomFieldTransfo
         $this->customFieldProvider = $customFieldProvider;
     }
 
-    public function supports(array $node): bool
+    public function supports(ProductAttribute $attribute): bool
     {
-        return AttributeTypesEnum::RELATION === AttributeTypesEnum::getNodeType($node['attribute']);
+        return ProductAttribute::TYPE_PRODUCT_RELATION === $attribute->getType();
     }
 
     public function transformNode(array $node, string $customFieldName, Context $context): array

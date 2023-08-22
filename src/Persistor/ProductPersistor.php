@@ -7,6 +7,7 @@ namespace Ergonode\IntegrationShopware\Persistor;
 use Ergonode\IntegrationShopware\Api\ProductStreamResultsProxy;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
+use Ergonode\IntegrationShopware\Factory\ProductDataFactory;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Struct\ProductContainer;
@@ -50,6 +51,8 @@ class ProductPersistor
 
     private ErgonodeCursorManager $cursorManager;
 
+    private ProductDataFactory $productDataFactory;
+
     public function __construct(
         EntityRepository $productRepository,
         ProductProvider $productProvider,
@@ -59,7 +62,8 @@ class ProductPersistor
         EntityRepository $productCategoryRepository,
         VariantsTransformer $variantsTransformer,
         ProductContainer $productContainer,
-        ErgonodeCursorManager $cursorManager
+        ErgonodeCursorManager $cursorManager,
+        ProductDataFactory $productDataFactory
     ) {
         $this->productRepository = $productRepository;
         $this->productProvider = $productProvider;
@@ -70,6 +74,7 @@ class ProductPersistor
         $this->variantsTransformer = $variantsTransformer;
         $this->productContainer = $productContainer;
         $this->cursorManager = $cursorManager;
+        $this->productDataFactory = $productDataFactory;
     }
 
     /**
@@ -157,26 +162,27 @@ class ProductPersistor
 
         $isInitialPaginatedImport = $this->checkIsInitialPaginatedImport($productData, $context);
 
-        $dto = new ProductTransformationDTO($productData, [], $isInitialPaginatedImport);
+        $dto = $this->productDataFactory->create($productData, $isInitialPaginatedImport);
         $dto->setSwProduct($existingProduct);
 
-        try {
+        //try {
             $transformedData = $this->productTransformerChain->transform(
                 $dto,
                 $context
             );
 
             $transformedData = $this->variantsTransformer->transform($transformedData, $context);
-        } catch (Throwable $e) {
-            $this->logger->error('Error while transforming product. Product has been omitted.', [
-                'sku' => $sku,
-                'message' => $e->getMessage(),
-                'file' => $e->getFile() . ':' . $e->getLine(),
-            ]);
+        //} catch (Throwable $e) {
+        //    $this->logger->error('Error while transforming product. Product has been omitted.', [
+        //        'sku' => $sku,
+        //        'message' => $e->getMessage(),
+        //        'file' => $e->getFile() . ':' . $e->getLine(),
+        //    ]);
+        //
+        //    return [];
+        //}
 
-            return [];
-        }
-
+        throw new \Exception('dtp');
         try {
             $this->deleteEntities($dto, $context);
         } catch (Throwable $e) {

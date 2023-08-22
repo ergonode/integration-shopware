@@ -20,15 +20,18 @@ class ProductDeliveryTimeTransformer implements ProductDataTransformerInterface
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
-        $swData = $productData->getShopwareData();
-        $productDeliveryTime = $swData['deliveryTime'] ?? null;
-        if (!empty($productDeliveryTime)) {
+        $shopwareData = $productData->getShopwareData();
+        $ergonodeData = $productData->getErgonodeData();
+
+        $shopwareData->resetDeliveryTime();
+
+        $productDeliveryTime = $ergonodeData->getDeliveryTime();
+        if ($productDeliveryTime) {
             $deliveryTimeId = $this->deliveryTimeProvider->getIdByName($productDeliveryTime, $context);
-            $swData['deliveryTimeId'] = $deliveryTimeId;
+            $shopwareData->setDeliveryTimeId($deliveryTimeId);
         }
 
-        unset($swData['deliveryTime']);
-        $productData->setShopwareData($swData);
+        $productData->setShopwareData($shopwareData);
 
         return $productData;
     }

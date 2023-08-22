@@ -6,6 +6,7 @@ namespace Ergonode\IntegrationShopware\Transformer\ProductCustomField;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Manager\FileManager;
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
 use Shopware\Core\Framework\Context;
 
@@ -27,16 +28,16 @@ class MediaProductCustomFieldTransformer implements ProductCustomFieldTransforme
         $this->fileManager = $fileManager;
     }
 
-    public function supports(array $node): bool
+    public function supports(ProductAttribute $attribute): bool
     {
-        return in_array(AttributeTypesEnum::getNodeType($node['attribute']), [
-            AttributeTypesEnum::IMAGE,
-            AttributeTypesEnum::FILE,
-            AttributeTypesEnum::GALLERY,
+        return in_array($attribute->getType(), [
+            ProductAttribute::TYPE_IMAGE,
+            ProductAttribute::TYPE_FILE,
+            ProductAttribute::TYPE_GALLERY,
         ]);
     }
 
-    public function transformNode(array $node, string $customFieldName, Context $context): array
+    public function transformNode(ProductAttribute $attribute, string $customFieldName, Context $context): array
     {
         $translated = $this->translationTransformer->transform(
             $node['translations']

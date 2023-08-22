@@ -1,0 +1,172 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ergonode\IntegrationShopware\Factory;
+
+use Ergonode\IntegrationShopware\DTO\ProductErgonodeData;
+use Ergonode\IntegrationShopware\DTO\ProductShopwareData;
+use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
+use Ergonode\IntegrationShopware\Model\ProductAttributeOption;
+use Ergonode\IntegrationShopware\Model\ProductGalleryAttribute;
+use Ergonode\IntegrationShopware\Model\ProductGalleryMultimedia;
+use Ergonode\IntegrationShopware\Model\ProductImageAttribute;
+use Ergonode\IntegrationShopware\Model\ProductMultiSelectAttribute;
+use Ergonode\IntegrationShopware\Model\ProductRelationAttribute;
+use Ergonode\IntegrationShopware\Model\ProductSelectAttribute;
+use Ergonode\IntegrationShopware\Model\ProductSimpleAttributeTranslation;
+
+class ProductDataFactory
+{
+    public function create(array $data, bool $isInitialPaginatedImport): ProductTransformationDTO
+    {
+        $ergonodeData = new ProductErgonodeData($data['sku'], $data['__typename'], []);
+        foreach ($data['attributeList']['edges'] ?? [] as $attributeEdge) {
+            $attributeData = $attributeEdge['node'];
+
+            $attribute = $this->transformProductAttribute($attributeData);
+
+            $ergonodeData->addAttribute($attribute);
+        }
+
+        return new ProductTransformationDTO($ergonodeData, new ProductShopwareData([]), $isInitialPaginatedImport);
+    }
+
+    private function transformProductAttribute(array $attributeData): ProductAttribute
+    {
+        $type = $attributeData['attribute']['__typename'];
+        switch ($type) {
+            case ProductAttribute::TYPE_MULTI_SELECT:
+            case ProductAttribute::TYPE_SELECT:
+                return $this->transformSelectAttribute($attributeData, $type);
+            case ProductAttribute::TYPE_IMAGE:
+                return $this->transformImageAttribute($attributeData, $type);
+            case ProductAttribute::TYPE_GALLERY:
+                return $this->transformGalleryAttribute($attributeData, $type);
+            case ProductAttribute::TYPE_PRODUCT_RELATION:
+                return $this->transformRelationAttribute($attributeData, $type);
+            default:
+                $attribute = new ProductAttribute(
+                    $attributeData['attribute']['code'],
+                    $type
+                );
+
+                foreach ($attributeData['translations'] ?? [] as $translation) {
+                    $attributeTranslation = new ProductSimpleAttributeTranslation(
+                        $translation['value'] ?? $translation['value_numeric'] ?? null,
+                        $translation['language']
+                    );
+
+                    $attribute->addTranslation($attributeTranslation);
+                }
+
+                return $attribute;
+        }
+    }
+
+    private function transformSelectAttribute(array $attributeData, string $type): ProductSelectAttribute
+    {
+        $attribute = $type === ProductAttribute::TYPE_SELECT
+            ? new ProductSelectAttribute($attributeData['attribute']['code'], $type)
+            : new ProductMultiSelectAttribute($attributeData['attribute']['code'], $type);
+
+        $existingOptions = [];
+        foreach ($attributeData['translations'] ?? [] as $translation) {
+            $translationRecords = $translation['value_multi_array'] ?? [$translation['value_array'] ?? []];
+            $language = $translation['language'];
+            foreach ($translationRecords as $translationData) {
+                if (empty($translationData)) {
+                    continue;
+                }
+                $code = $translationData['code'];
+                // Ergonode graphql returns one option multiple times for each translation, process it just once
+                if (isset($existingOptions[$code])) {
+                    continue;
+                }
+
+                $attribute->addOption(new ProductAttributeOption(strtolower($code), [$language => $translationData['name']]));
+                $existingOptions[$code] = $code;
+            }
+        }
+
+        return $attribute;
+    }
+
+    private function transformGalleryAttribute(array $attributeData, string $type): ProductGalleryAttribute
+    {
+        $attribute = new ProductGalleryAttribute(
+            $attributeData['attribute']['code'],
+            $type,
+        );
+
+        $translations = $attributeData['translations'] ?? [];
+        foreach ($translations ?? [] as $translation) {
+            $translationRecords = $translation['value_multimedia_array'];
+            $language = $translation['language'];
+            foreach ($translationRecords ?? [] as $translationRecord) {
+                $multimedia = new ProductGalleryMultimedia(
+                    $translationRecord['name']
+                );
+                $multimedia->addTranslation(
+                    new ProductSimpleAttributeTranslation(
+                        $translationRecord['name'], $language
+                    )
+                );
+
+                $attribute->addMultimedia($multimedia);
+            }
+        }
+
+        return $attribute;
+    }
+
+    private function transformImageAttribute(array $attributeData, string $type): ProductImageAttribute
+    {
+        $attribute = new ProductImageAttribute(
+            $attributeData['attribute']['code'],
+            $type,
+        );
+
+        $translations = $attributeData['translations'] ?? [];
+        foreach ($translations ?? [] as $translation) {
+            $translationRecord = $translation['value_multimedia'];
+            $language = $translation['language'];
+            $multimedia = new ProductGalleryMultimedia($translationRecord['name']);
+            $multimedia->addTranslation(
+                new ProductSimpleAttributeTranslation(
+                    $translationRecord['name'], $language
+                )
+            );
+
+            $attribute->addMultimedia($multimedia);
+        }
+
+        return $attribute;
+    }
+
+    private function transformRelationAttribute(array $attributeData, string $type): ProductRelationAttribute
+    {
+        $attribute = new ProductRelationAttribute(
+            $attributeData['attribute']['code'],
+            $type,
+        );
+
+        $translations = $attributeData['translations'] ?? [];
+        foreach ($translations ?? [] as $translation) {
+            $translationRecords = $translation['value_product_array'];
+            $language = $translation['language'];
+            $skus = [];
+            foreach ($translationRecords ?? [] as $translationRecord) {
+                if(!isset($translationRecord['sku'])) {
+                    continue;
+                }
+                $skus[] = $translationRecord['sku'];
+            }
+
+            $attribute->addTranslation(new ProductSimpleAttributeTranslation($skus, $language));
+        }
+
+        return $attribute;
+    }
+}

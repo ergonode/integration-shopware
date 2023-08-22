@@ -8,6 +8,7 @@ use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
+use Ergonode\IntegrationShopware\Model\ProductSelectAttribute;
 use Ergonode\IntegrationShopware\Provider\PropertyGroupOptionProvider;
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Shopware\Core\Content\Product\Aggregate\ProductOption\ProductOptionDefinition;
@@ -21,39 +22,40 @@ use function array_values;
 
 class ProductPropertiesTransformer implements ProductDataTransformerInterface
 {
-    const FIELD_PROPERTIES = 'properties';
-    const FIELD_OPTIONS = 'options';
+    private const FIELD_PROPERTIES = 'properties';
+    private const FIELD_OPTIONS    = 'options';
 
     private PropertyGroupOptionProvider $optionProvider;
 
-    private TranslationTransformer $translationTransformer;
-
     public function __construct(
-        PropertyGroupOptionProvider $optionProvider,
-        TranslationTransformer $translationTransformer
+        PropertyGroupOptionProvider $optionProvider
     ) {
         $this->optionProvider = $optionProvider;
-        $this->translationTransformer = $translationTransformer;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $ergonodeData = $productData->getErgonodeData();
 
-        $selectAttributes = $this->getSelectAttributes($ergonodeData);
+        $selectAttributes = $ergonodeData->getAttributesByTypes([
+            AttributeTypesEnum::SELECT,
+            AttributeTypesEnum::MULTISELECT,
+        ]);
 
-        $options = $this->transformSelectAttributes($selectAttributes);
+        $optionCodes = $this->getOptionCodes($selectAttributes);
 
-        $optionMapping = $this->getOptionsMapping($options, $context);
+        $optionMapping = $this->getOptionsMapping($optionCodes, $context);
 
         $swData = $productData->getShopwareData();
-        $swData['properties'] = array_values(array_intersect_key($optionMapping, array_flip($options)));
 
+        $properties = array_values(array_intersect_key($optionMapping, array_flip($optionCodes)));
+        $swData->setProperties($properties);
         if ($productData->isVariant()) {
             $codes = $productData->getBindingCodes();
-            $bindingOptions = $this->arrayFilterStartsWith($options, $codes);
+            $bindingOptions = $this->arrayFilterStartsWith($optionCodes, $codes);
 
-            $swData['options'] = array_values(array_intersect_key($optionMapping, array_flip($bindingOptions)));
+            $options = array_values(array_intersect_key($optionMapping, array_flip($bindingOptions)));
+            $swData->setOptions($options);
         }
 
         $productData->setShopwareData($swData);
@@ -69,52 +71,6 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
         );
 
         return $productData;
-    }
-
-    private function getSelectAttributes(array $ergonodeData): array
-    {
-        $types = [
-            AttributeTypesEnum::SELECT,
-            AttributeTypesEnum::MULTISELECT,
-        ];
-
-        return array_filter(
-            $ergonodeData['attributeList']['edges'] ?? [],
-            fn(array $attribute) => in_array(AttributeTypesEnum::getNodeType($attribute['node']['attribute']), $types)
-        );
-    }
-
-    private function transformSelectAttributes(array $selectAttributes): array
-    {
-        $transformed = [];
-
-        foreach ($selectAttributes as $attribute) {
-            $node = $attribute['node'];
-            if (empty($node) || empty($node['translations'])) {
-                continue;
-            }
-
-            $translated = $this->translationTransformer->transform($node['translations']);
-
-            $value = reset($translated); // assuming that the attribute is GLOBAL
-            if (!$value) {
-                continue;
-            }
-
-            /** If array is associative for a select option, convert it to multidimensional array as for multiselect */
-            if (isset($value['code'])) {
-                $value = [$value];
-            }
-
-            $optionCodes = [];
-            foreach ($value as $option) {
-                $optionCodes[] = CodeBuilderUtil::buildExtended($node['attribute']['code'], $option['code']);
-            }
-
-            $transformed = array_merge($transformed, $optionCodes);
-        }
-
-        return $transformed;
     }
 
     /**
@@ -143,7 +99,10 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
         return array_filter($haystacks, function (string $haystack) use ($needles) {
             $matched = array_filter(
                 $needles,
-                fn(string $needle) => str_starts_with($haystack, sprintf('%s%s', $needle, CodeBuilderUtil::EXTENDED_JOIN))
+                fn(string $needle) => str_starts_with(
+                    $haystack,
+                    sprintf('%s%s', $needle, CodeBuilderUtil::EXTENDED_JOIN)
+                )
             );
 
             return false === empty($matched);
@@ -155,8 +114,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
         string $field = self::FIELD_PROPERTIES
     ): array {
         if (
-            false === in_array($field, [self::FIELD_OPTIONS, self::FIELD_PROPERTIES]) ||
-            null === $dto->getSwProduct()
+            false === in_array($field, [self::FIELD_OPTIONS, self::FIELD_PROPERTIES]) || null === $dto->getSwProduct()
         ) {
             return [];
         }
@@ -168,7 +126,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
             return [];
         }
 
-        $newProperties = $dto->getShopwareData()[$field] ?? [];
+        $newProperties = $dto->getShopwareData()->getData($field) ?? [];
         if (empty($newProperties)) {
             return [];
         }
@@ -184,5 +142,25 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
             'productId' => $dto->getSwProduct()->getId(),
             'optionId' => $id,
         ], $idsToDelete);
+    }
+
+    /**
+     * @param ProductSelectAttribute[] $selectAttributes
+     * @return string[]
+     */
+    private function getOptionCodes(array $selectAttributes): array
+    {
+        $optionCodes = [];
+        foreach ($selectAttributes as $selectAttribute) {
+            if (!$selectAttribute instanceof ProductSelectAttribute) {
+                continue;
+            }
+
+            foreach ($selectAttribute->getOptions() as $option) {
+                $optionCodes[] = CodeBuilderUtil::buildExtended($selectAttribute->getCode(), $option->getCode());
+            }
+        }
+
+        return $optionCodes;
     }
 }

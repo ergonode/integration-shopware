@@ -20,71 +20,78 @@ class ProductMinMaxQuantityTransformer implements ProductDataTransformerInterfac
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
-        $this->ensureMinLteMax($productData);
+        $shopwareData = $productData->getShopwareData();
+        $ergonodeData = $productData->getErgonodeData();
 
-        $this->ensureGteOne($productData, 'minPurchase');
-        $this->ensureGteOne($productData, 'maxPurchase');
+        $maxPurchase = $ergonodeData->getMaxPurchase();
+        $minPurchase = $ergonodeData->getMinPurchase();
 
-        $this->handleErasing($productData, 'minPurchase');
-        $this->handleErasing($productData, 'maxPurchase');
+        if ($maxPurchase && $minPurchase && $minPurchase > $maxPurchase) {
+            return $this->handleMinGteMax($minPurchase, $maxPurchase, $productData);
+        }
+
+        if ($ergonodeData->getMinPurchase() === 0) {
+            $this->logGteOne(
+                $productData->getSku(),
+                $productData->getSwProductId(),
+                $ergonodeData->getMinPurchase(),
+                'minPurchase'
+            );
+            $shopwareData->setMinPurchase(null);
+        } else {
+            $shopwareData->setMinPurchase($ergonodeData->getMinPurchase());
+        }
+
+        if ($ergonodeData->getMaxPurchase() === 0) {
+            $this->logGteOne(
+                $productData->getSku(),
+                $productData->getSwProductId(),
+                $ergonodeData->getMaxPurchase(),
+                'maxPurchase'
+            );
+            $shopwareData->setMaxPurchase(null);
+        } else {
+            $shopwareData->setMaxPurchase($ergonodeData->getMaxPurchase());
+        }
+
+        $productData->setShopwareData($shopwareData);
 
         return $productData;
     }
 
-    private function ensureMinLteMax(ProductTransformationDTO $productData): void
+    private function logGteOne(string $sku, string $productId, ?int $value, string $key): void
     {
-        $swData = $productData->getShopwareData();
-
-        if (
-            isset($swData['minPurchase'])
-            && isset($swData['maxPurchase'])
-            && $swData['minPurchase'] > $swData['maxPurchase']
-        ) {
-            $this->ergonodeSyncLogger->warning(
-                'Product minPurchase is greater than maxPurchase. Both values have been erased.',
-                [
-                    'minPurchase' => $swData['minPurchase'],
-                    'maxPurchase' => $swData['maxPurchase'],
-                    'sku' => $productData->getSku(),
-                    'productId' => $productData->getSwProductId(),
-                ]
-            );
-
-            $swData['minPurchase'] = null;
-            $swData['maxPurchase'] = null;
-        }
-
-        $productData->setShopwareData($swData);
+        $this->ergonodeSyncLogger->warning(
+            sprintf('Product %s equals 0, but should be greater or equal 1. Value has been erased.', $key),
+            [
+                'value' => $value,
+                'sku' => $sku,
+                'productId' => $productId,
+            ]
+        );
     }
 
-    private function ensureGteOne(ProductTransformationDTO $productData, string $key): void
-    {
-        $swData = $productData->getShopwareData();
+    private function handleMinGteMax(
+        int $minPurchase,
+        int $maxPurchase,
+        ProductTransformationDTO $productData
+    ): ProductTransformationDTO {
+        $shopwareData = $productData->getShopwareData();
+        $this->ergonodeSyncLogger->warning(
+            'Product minPurchase is greater than maxPurchase. Both values have been erased.',
+            [
+                'minPurchase' => $minPurchase,
+                'maxPurchase' => $maxPurchase,
+                'sku' => $productData->getSku(),
+                'productId' => $productData->getSwProductId(),
+            ]
+        );
 
-        if (isset($swData[$key]) && 0 === $swData[$key]) {
-            $this->ergonodeSyncLogger->warning(
-                sprintf('Product %s equals 0, but should be greater or equal 1. Value has been erased.', $key),
-                [
-                    'value' => $swData[$key],
-                    'sku' => $productData->getSku(),
-                    'productId' => $productData->getSwProductId(),
-                ]
-            );
+        $shopwareData->setMinPurchase(null);
+        $shopwareData->setMaxPurchase(null);
 
-            $swData[$key] = null;
-        }
+        $productData->setShopwareData($shopwareData);
 
-        $productData->setShopwareData($swData);
-    }
-
-    private function handleErasing(ProductTransformationDTO $productData, string $key): void
-    {
-        $swData = $productData->getShopwareData();
-
-        if (false === isset($swData[$key])) {
-            $swData[$key] = null;
-        }
-
-        $productData->setShopwareData($swData);
+        return $productData;
     }
 }

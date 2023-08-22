@@ -8,9 +8,9 @@ use Shopware\Core\Content\Product\ProductEntity;
 
 class ProductTransformationDTO
 {
-    private array $ergonodeData;
+    private ProductErgonodeData $ergonodeData;
 
-    private array $shopwareData;
+    private ProductShopwareData $shopwareData;
 
     private ?ProductEntity $swProduct = null;
 
@@ -20,29 +20,27 @@ class ProductTransformationDTO
 
     private bool $isInitialPaginatedImport;
 
-    public function __construct(array $ergonodeData, array $shopwareData = [], bool $isInitialPaginatedImport = false)
-    {
+    public function __construct(
+        ProductErgonodeData $ergonodeData,
+        ProductShopwareData $shopwareData,
+        bool $isInitialPaginatedImport = false
+    ) {
         $this->ergonodeData = $ergonodeData;
         $this->shopwareData = $shopwareData;
         $this->isInitialPaginatedImport = $isInitialPaginatedImport;
     }
 
-    public function getErgonodeData(): array
+    public function getErgonodeData(): ProductErgonodeData
     {
         return $this->ergonodeData;
     }
 
-    public function setErgonodeData(array $ergonodeData): void
-    {
-        $this->ergonodeData = $ergonodeData;
-    }
-
-    public function getShopwareData(): array
+    public function getShopwareData(): ProductShopwareData
     {
         return $this->shopwareData;
     }
 
-    public function setShopwareData(array $shopwareData): void
+    public function setShopwareData(ProductShopwareData $shopwareData): void
     {
         $this->shopwareData = $shopwareData;
     }
@@ -79,6 +77,8 @@ class ProductTransformationDTO
 
     public function ergonodeDataHasVariants(): bool
     {
+        return false;
+        // @todo refactor
         return false === empty($this->ergonodeData['variantList']['edges']);
     }
 
