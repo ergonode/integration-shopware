@@ -17,9 +17,11 @@ class ProductAttribute
     public const TYPE_NUMERIC          = 'NumericAttribute';
     public const TYPE_UNIT             = 'UnitAttribute';
     public const TYPE_DATE             = 'DateAttribute';
+    /** Bool type is used only in Shopware, not exist in Ergonode. Created for data processing purposes */
+    public const TYPE_BOOL             = 'BoolAttribute';
 
     public const SCOPE_LOCAL  = 'local';
-    public const SCOPE_GLOBAL = 'global'
+    public const SCOPE_GLOBAL = 'global';
 
     /**
      * @var ProductSimpleAttributeTranslation[]
@@ -35,7 +37,7 @@ class ProductAttribute
 
     public function addTranslation(ProductSimpleAttributeTranslation $translation): void
     {
-        $this->translations[$translation->language] = $translation;
+        $this->translations[$translation->getLanguage()] = $translation;
     }
 
     public function getTranslations(): array

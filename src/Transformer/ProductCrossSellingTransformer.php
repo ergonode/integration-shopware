@@ -58,9 +58,9 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
-        //if ($productData->isVariant()) {
-        //    return $productData; // cross-selling for variants is not supported by Shopware
-        //}
+        if ($productData->isVariant()) {
+            return $productData; // cross-selling for variants is not supported by Shopware
+        }
 
         $swData = $productData->getShopwareData();
         $ergonodeData = $productData->getErgonodeData();

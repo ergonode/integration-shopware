@@ -9,10 +9,13 @@ use Ergonode\IntegrationShopware\DTO\ProductShopwareData;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Ergonode\IntegrationShopware\Model\ProductAttributeOption;
+use Ergonode\IntegrationShopware\Model\ProductFileAttribute;
 use Ergonode\IntegrationShopware\Model\ProductGalleryAttribute;
 use Ergonode\IntegrationShopware\Model\ProductGalleryMultimedia;
 use Ergonode\IntegrationShopware\Model\ProductImageAttribute;
+use Ergonode\IntegrationShopware\Model\ProductMultimediaTranslation;
 use Ergonode\IntegrationShopware\Model\ProductMultiSelectAttribute;
+use Ergonode\IntegrationShopware\Model\ProductPriceAttribute;
 use Ergonode\IntegrationShopware\Model\ProductRelationAttribute;
 use Ergonode\IntegrationShopware\Model\ProductSelectAttribute;
 use Ergonode\IntegrationShopware\Model\ProductSimpleAttributeTranslation;
@@ -42,8 +45,11 @@ class ProductDataFactory
                 return $this->transformSelectAttribute($attributeData, $type);
             case ProductAttribute::TYPE_IMAGE:
                 return $this->transformImageAttribute($attributeData, $type);
+            case ProductAttribute::TYPE_FILE:
             case ProductAttribute::TYPE_GALLERY:
                 return $this->transformGalleryAttribute($attributeData, $type);
+            case ProductAttribute::TYPE_PRICE:
+                return $this->transformPriceAttribute($attributeData, $type);
             case ProductAttribute::TYPE_PRODUCT_RELATION:
                 return $this->transformRelationAttribute($attributeData, $type);
             default:
@@ -54,7 +60,7 @@ class ProductDataFactory
 
                 foreach ($attributeData['translations'] ?? [] as $translation) {
                     $attributeTranslation = new ProductSimpleAttributeTranslation(
-                        $translation['value'] ?? $translation['value_numeric'] ?? null,
+                        $translation['value_string'] ?? ($translation['value_numeric'] ?? null),
                         $translation['language']
                     );
 
@@ -85,7 +91,9 @@ class ProductDataFactory
                     continue;
                 }
 
-                $attribute->addOption(new ProductAttributeOption(strtolower($code), [$language => $translationData['name']]));
+                $attribute->addOption(
+                    new ProductAttributeOption(strtolower($code), [$language => $translationData['name']])
+                );
                 $existingOptions[$code] = $code;
             }
         }
@@ -95,22 +103,32 @@ class ProductDataFactory
 
     private function transformGalleryAttribute(array $attributeData, string $type): ProductGalleryAttribute
     {
-        $attribute = new ProductGalleryAttribute(
-            $attributeData['attribute']['code'],
-            $type,
-        );
+        if ($type == ProductAttribute::TYPE_FILE) {
+            $attribute = new ProductFileAttribute(
+                $attributeData['attribute']['code'],
+                $type,
+            );
+        } else {
+            $attribute = new ProductGalleryAttribute(
+                $attributeData['attribute']['code'],
+                $type,
+            );
+        }
 
         $translations = $attributeData['translations'] ?? [];
         foreach ($translations ?? [] as $translation) {
             $translationRecords = $translation['value_multimedia_array'];
             $language = $translation['language'];
             foreach ($translationRecords ?? [] as $translationRecord) {
-                $multimedia = new ProductGalleryMultimedia(
-                    $translationRecord['name']
-                );
+                $multimedia = $attribute->getMultimedia($translationRecord['name']) ?? new ProductGalleryMultimedia($translationRecord['name']);
                 $multimedia->addTranslation(
-                    new ProductSimpleAttributeTranslation(
-                        $translationRecord['name'], $language
+                    new ProductMultimediaTranslation(
+                        $translationRecord['name'],
+                        $translationRecord['extension'],
+                        $translationRecord['mime'],
+                        $translationRecord['size'],
+                        $translationRecord['url'],
+                        $language
                     )
                 );
 
@@ -129,18 +147,24 @@ class ProductDataFactory
         );
 
         $translations = $attributeData['translations'] ?? [];
-        foreach ($translations ?? [] as $translation) {
+        $multimedia = new ProductGalleryMultimedia(
+            $translations[array_key_first($translations)]['value_multimedia']['name']
+        );
+        foreach ($translations as $translation) {
             $translationRecord = $translation['value_multimedia'];
             $language = $translation['language'];
-            $multimedia = new ProductGalleryMultimedia($translationRecord['name']);
             $multimedia->addTranslation(
-                new ProductSimpleAttributeTranslation(
-                    $translationRecord['name'], $language
+                new ProductMultimediaTranslation(
+                    $translationRecord['name'],
+                    $translationRecord['extension'],
+                    $translationRecord['mime'],
+                    $translationRecord['size'],
+                    $translationRecord['url'],
+                    $language
                 )
             );
-
-            $attribute->addMultimedia($multimedia);
         }
+        $attribute->addMultimedia($multimedia);
 
         return $attribute;
     }
@@ -158,13 +182,33 @@ class ProductDataFactory
             $language = $translation['language'];
             $skus = [];
             foreach ($translationRecords ?? [] as $translationRecord) {
-                if(!isset($translationRecord['sku'])) {
+                if (!isset($translationRecord['sku'])) {
                     continue;
                 }
                 $skus[] = $translationRecord['sku'];
             }
 
             $attribute->addTranslation(new ProductSimpleAttributeTranslation($skus, $language));
+        }
+
+        return $attribute;
+    }
+
+    private function transformPriceAttribute(array $attributeData, string $type): ProductPriceAttribute
+    {
+        $attribute = new ProductPriceAttribute(
+            $attributeData['attribute']['code'],
+            $type,
+            $attributeData['attribute']['currency']
+        );
+
+        foreach ($attributeData['translations'] ?? [] as $translation) {
+            $attributeTranslation = new ProductSimpleAttributeTranslation(
+                $translation['value_numeric'] ?? null,
+                $translation['language']
+            );
+
+            $attribute->addTranslation($attributeTranslation);
         }
 
         return $attribute;

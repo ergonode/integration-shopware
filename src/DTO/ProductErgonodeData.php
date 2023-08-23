@@ -6,6 +6,7 @@ namespace Ergonode\IntegrationShopware\DTO;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Model\ProductAttribute;
+use Ergonode\IntegrationShopware\Model\ProductGalleryAttribute;
 
 class ProductErgonodeData
 {
@@ -47,6 +48,13 @@ class ProductErgonodeData
         return $key ? ($this->attributes[$key] ?? null) : null;
     }
 
+    public function getTax(): ?string
+    {
+        $key = $this->getMappingKey('tax');
+
+        return $key ? ($this->attributes[$key] ?? null) : null;
+    }
+
     public function getDeliveryTime(): ?string
     {
         $key = $this->getMappingKey('deliveryTime');
@@ -57,6 +65,13 @@ class ProductErgonodeData
     public function getManufacturer(): ?string
     {
         $key = $this->getMappingKey('manufacturer');
+
+        return $key ? ($this->attributes[$key] ?? null) : null;
+    }
+
+    public function getMedia(): ?ProductGalleryAttribute
+    {
+        $key = $this->getMappingKey('media');
 
         return $key ? ($this->attributes[$key] ?? null) : null;
     }
@@ -102,5 +117,13 @@ class ProductErgonodeData
             $this->attributes,
             fn(ProductAttribute $attribute) => in_array($attribute->getCode(), $codes)
         );
+    }
+
+    /**
+     * @return ProductAttribute[]
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
     }
 }

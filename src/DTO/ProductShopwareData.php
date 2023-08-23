@@ -13,14 +13,14 @@ class ProductShopwareData
         $this->data = $data;
     }
 
-    public function getMinPurchase(): ?int
+    public function getStock(): ?string
     {
-        return $this->data['minPurchase'] ?? null;
+        return $this->data['stock'] ?? null;
     }
 
-    public function getMaxPurchase(): ?int
+    public function getName(): ?string
     {
-        return $this->data['maxPurchase'] ?? null;
+        return $this->data['name'] ?? null;
     }
 
     public function setMinPurchase(?int $minPurchase): void
@@ -123,5 +123,57 @@ class ProductShopwareData
     public function getData(string $key): mixed
     {
         return $this->data[$key] ?? null;
+    }
+
+    public function resetCustomFields(): void
+    {
+        foreach ($this->data['translations'] as &$translation) {
+            if (isset($translation['customFields'])) {
+                unset($translation['customFields']);
+            }
+        }
+    }
+
+    public function setCover(array $payload): void
+    {
+        $this->data['cover'] = $payload;
+    }
+
+    public function setCustomFields(array $customFields)
+    {
+        $this->data['translations'] = array_merge_recursive(
+            $this->data['translations'] ?? [],
+            $customFields
+        );
+    }
+
+    public function setMedia(array $payloads): void
+    {
+        $this->data['media'] = $payloads;
+    }
+
+    public function resetTax(): void
+    {
+        unset($this->data['tax']);
+    }
+
+    public function setTax(string $taxId): void
+    {
+        $this->data['taxId'] = $taxId;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->data['name'] = $name;
+    }
+
+    public function setStock(int $stock): void
+    {
+        $this->data['stock'] = $stock;
+    }
+
+    public function setData(string $key, array $payload): void
+    {
+        $this->data[$key] = $payload;
     }
 }

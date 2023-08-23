@@ -171,7 +171,7 @@ class ProductPersistor
                 $context
             );
 
-            $transformedData = $this->variantsTransformer->transform($transformedData, $context);
+            //$transformedData = $this->variantsTransformer->transform($transformedData, $context);
         //} catch (Throwable $e) {
         //    $this->logger->error('Error while transforming product. Product has been omitted.', [
         //        'sku' => $sku,

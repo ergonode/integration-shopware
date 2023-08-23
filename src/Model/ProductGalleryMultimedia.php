@@ -5,7 +5,7 @@ namespace Ergonode\IntegrationShopware\Model;
 
 class ProductGalleryMultimedia
 {
-    /** @var ProductSimpleAttributeTranslation[] */
+    /** @var ProductMultimediaTranslation[] */
     private array $translations = [];
 
     public function __construct(private readonly string $filename)
@@ -17,9 +17,9 @@ class ProductGalleryMultimedia
         return $this->translations;
     }
 
-    public function addTranslation(ProductSimpleAttributeTranslation $translation): void
+    public function addTranslation(ProductMultimediaTranslation $translation): void
     {
-        $this->translations[$translation->language] = $translation;
+        $this->translations[$translation->getLanguage()] = $translation;
     }
 
     public function getFilename(): string

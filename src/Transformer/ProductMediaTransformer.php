@@ -35,44 +35,37 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $swData = $productData->getShopwareData();
+        $ergonodeData = $productData->getErgonodeData();
 
-        if (
-            empty($swData[self::SW_PRODUCT_FIELD_MEDIA]) ||
-            !is_array($swData[self::SW_PRODUCT_FIELD_MEDIA])
-        ) {
-            $productData->unsetSwData(self::SW_PRODUCT_FIELD_MEDIA);
-            $this->addEntitiesToDelete($productData);
+        /* @todo add delete media part when not exist in Ergonode */
 
+        $galleryAttribute = $ergonodeData->getMedia();
+        if (!$galleryAttribute) {
             return $productData;
         }
 
-        foreach ($swData[self::SW_PRODUCT_FIELD_MEDIA] as $index => &$image) {
-            $mediaId = $this->fileManager->persist($image, $context);
-            if (null === $mediaId) {
-                unset($swData[self::SW_PRODUCT_FIELD_MEDIA][$index]);
-                continue;
-            }
+        $payloads = [];
+        $index = 0;
+        foreach ($galleryAttribute->getAllMultimedia() as $multimedia) {
+            foreach ($multimedia->getTranslations() as $translation) {
+                $mediaId = $this->fileManager->persist($translation, $context);
+                if (isset($payloads[$mediaId])) {
+                    continue;
+                }
 
-            $payload = $this->buildProductMediaPayload($mediaId, $index, $productData, $context);
-            if (empty($payload)) {
-                unset($swData[self::SW_PRODUCT_FIELD_MEDIA][$index]);
-                continue;
-            }
-
-            $image = $payload;
-
-            if (0 === $index) {
-                $swData['cover'] = $payload;
+                $payloads[$mediaId] = $this->buildProductMediaPayload($mediaId, $index, $productData, $context);
+                if($index === 0) {
+                    $swData->setCover($payloads[$mediaId]);
+                }
+                $index++;
             }
         }
 
-        if (empty($swData[self::SW_PRODUCT_FIELD_MEDIA])) {
-            unset($swData[self::SW_PRODUCT_FIELD_MEDIA]);
-        }
+        $swData->setMedia($payloads);
 
         $productData->setShopwareData($swData);
 
-        $this->addEntitiesToDelete($productData);
+        //$this->addEntitiesToDelete($productData);
 
         return $productData;
     }
@@ -93,9 +86,10 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
         }
 
         return [
-            'id' => $productMedia ? $productMedia->getId() : Uuid::randomHex(), // need to generate uuid here so media won't be duplicated if used as cover
+            'id' => $productMedia ? $productMedia->getId() : Uuid::randomHex(),
+            // need to generate uuid here so media won't be duplicated if used as cover
             'mediaId' => $mediaId,
-            'position' => $position
+            'position' => $position,
         ];
     }
 

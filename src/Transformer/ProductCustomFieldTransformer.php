@@ -10,9 +10,7 @@ use Ergonode\IntegrationShopware\Service\ConfigService;
 use Ergonode\IntegrationShopware\Util\CustomFieldUtil;
 use Shopware\Core\Framework\Context;
 
-use function array_filter;
 use function array_merge_recursive;
-use function in_array;
 
 class ProductCustomFieldTransformer implements ProductDataTransformerInterface
 {
@@ -31,6 +29,8 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $swData = $productData->getShopwareData();
+        //@todo verify if resetting code is correct
+        $swData->resetCustomFields();
 
         $codes = $this->configService->getErgonodeCustomFieldKeys();
 
@@ -52,21 +52,10 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
 
         $customFields = array_merge_recursive(...$customFields);
 
-        $swData['translations'] = array_merge_recursive(
-            $swData['translations'] ?? [],
-            $customFields
-        );
+        $swData->setCustomFields($customFields);
 
         $productData->setShopwareData($swData);
 
         return $productData;
-    }
-
-    private function getAttributesByCodes(array $ergonodeData, array $codes): array
-    {
-        return array_filter(
-            $ergonodeData['attributeList']['edges'] ?? [],
-            fn(array $attribute) => in_array($attribute['node']['attribute']['code'] ?? '', $codes)
-        );
     }
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
-use RuntimeException;
 use Shopware\Core\Framework\Context;
 
 class ProductDefaultValuesTransformer implements ProductDataTransformerInterface
@@ -15,17 +14,12 @@ class ProductDefaultValuesTransformer implements ProductDataTransformerInterface
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $swData = $productData->getShopwareData();
-        $sku = $productData->getErgonodeData()['sku'] ?? null;
-
-        if (null === $sku) {
-            throw new RuntimeException('Missing SKU from product data');
-        }
-
+        $sku = $productData->getErgonodeData()->getSku();
         $swData['productNumber'] = $sku;
 
         if ($productData->isCreate()) {
-            $swData['name'] = $swData['name'] ?? $sku;
-            $swData['stock'] = $swData['stock'] ?? self::DEFAULT_STOCK_VALUE;
+            $swData->setName($swData->getName() ?? $sku);
+            $swData->setStock($swData->getStock() ?? self::DEFAULT_STOCK_VALUE);
         }
 
         $productData->setShopwareData($swData);

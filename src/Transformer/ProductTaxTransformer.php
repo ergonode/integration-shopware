@@ -27,13 +27,14 @@ class ProductTaxTransformer implements ProductDataTransformerInterface
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $swData = $productData->getShopwareData();
-        $productTaxRate = $swData['tax']['rate'] ?? null;
+        $ergonodeData = $productData->getErgonodeData();
+
+        $swData->resetTax();
+        $productTaxRate = $ergonodeData->getTax();
 
         $taxId = $this->getTaxEntityId($productTaxRate, $context);
 
-        $swData['taxId'] = $taxId;
-        unset($swData['tax']);
-
+        $swData->setTax($taxId);
         $productData->setShopwareData($swData);
 
         return $productData;

@@ -7,10 +7,12 @@ namespace Ergonode\IntegrationShopware\Transformer;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum as Attr;
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
 use Ergonode\IntegrationShopware\Util\AttributeTypeValidator;
+use Ergonode\IntegrationShopware\Util\Constants;
 use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Ergonode\IntegrationShopware\Util\YesNo;
@@ -58,9 +60,7 @@ class ProductTransformer implements ProductDataTransformerInterface
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $ergonodeData = $productData->getErgonodeData();
-        if (false === is_array($ergonodeData['attributeList']['edges'] ?? null)) {
-            throw new RuntimeException('Invalid data format');
-        }
+        $swData = $productData->getShopwareData();
 
         $this->defaultLocale = IsoCodeConverter::shopwareToErgonodeIso(
             $this->languageProvider->getDefaultLanguageLocale($context)
@@ -68,43 +68,43 @@ class ProductTransformer implements ProductDataTransformerInterface
 
         $result = [];
 
-        foreach ($ergonodeData['attributeList']['edges'] as $edge) {
-            $code = $edge['node']['attribute']['code'];
-            $mappingKeys = $this->attributeMappingProvider->provideByErgonodeKey($code, $context);
+        $mappings = $this->attributeMappingProvider->getAttributeMapByErgonodeKeys($context);
+        foreach ($mappings as $mapping) {
+            if (in_array($mapping->getShopwareKey(), Constants::MAPPINGS_WITH_SEPARATE_TRANSFORMERS)) {
+                continue;
+            }
+            $code = $mapping->getErgonodeKey();
+            $attribute = $ergonodeData->getAttributeByCode($code);
+            if (!$attribute instanceof ProductAttribute) {
+                continue;
+            }
+            $mappingKeys = $this->attributeMappingProvider->provideByErgonodeKey($attribute->getCode(), $context);
 
-            $this->attributeTypeValidator->filterWrongAttributes(
-                $edge['node']['attribute'] ?? [],
-                $mappingKeys,
+            $this->attributeTypeValidator->isValid(
+                $attribute,
+                $mapping,
                 $context,
-                ['sku' => $ergonodeData['sku']]
+                $ergonodeData->getSku()
             );
 
             if (0 === $mappingKeys->count()) {
                 continue;
             }
 
-            $isCodeAsValueAttribute = $this->isCodeAsValueAttribute($mappingKeys);
-
-            $translatedValues = $this->getTranslatedValues($edge['node']['translations'], $isCodeAsValueAttribute);
-            if (false === array_key_exists($this->defaultLocale, $translatedValues)) {
-                throw new RuntimeException(
-                    sprintf('Default locale %s not found in product data', $this->defaultLocale)
-                );
+            $data = [];
+            foreach ($attribute->getTranslations() as $translation) {
+                $data['translations'][$translation->getLanguage()] = $translation->getValue();
             }
 
-            $result = array_merge_recursive(
-                $result,
-                $this->getTransformedResult($mappingKeys, $translatedValues)
-            );
+            $swData->setData($mapping->getShopwareKey(), $data);
         }
 
         if ($productData->isUpdate()) {
-            $result['id'] = $productData->getSwProduct()->getId();
+            //@todo change id
+            //$result['id'] = $productData->getSwProduct()->getId();
         }
 
-        $productData->setShopwareData(
-            ArrayUnfoldUtil::unfoldArray($result)
-        );
+        $productData->setShopwareData($swData);
 
         return $productData;
     }
@@ -182,19 +182,5 @@ class ProductTransformer implements ProductDataTransformerInterface
         }
 
         return $result;
-    }
-
-    /**
-     * Returns names of Ergondoe attributes that we should use code instead of translated name
-     */
-    private function isCodeAsValueAttribute(ErgonodeAttributeMappingCollection $mappingKeys): bool
-    {
-        foreach ($mappingKeys as $mappingKey) {
-            if ($mappingKey->getShopwareKey() === 'manufacturer') {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

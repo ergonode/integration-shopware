@@ -7,7 +7,7 @@ class ProductSimpleAttributeTranslation
 {
     public function __construct(
         private mixed $value,
-        public readonly string $language
+        private readonly string $language
     ) {
 
     }
@@ -20,5 +20,10 @@ class ProductSimpleAttributeTranslation
     public function setValue(mixed $value): void
     {
         $this->value = $value;
+    }
+
+    public function getLanguage(): string
+    {
+        return $this->language;
     }
 }
