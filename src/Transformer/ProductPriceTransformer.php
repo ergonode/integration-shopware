@@ -15,6 +15,21 @@ class ProductPriceTransformer implements ProductDataTransformerInterface
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $swData = $productData->getShopwareData();
+        $ergonodeData = $productData->getErgonodeData();
+        if(!$ergonodeData->getPriceNet() && !$ergonodeData->getPriceGross()) {
+            return $productData;
+        }
+
+        foreach($existingPrice->getElements() as $element) {
+            $elementArray = (array)$element;
+            var_dump(array_keys($elementArray));
+            //foreach($element as $row) {
+            //
+            //    var_dump(((array)$row)['currencyId']);
+            //}
+        }
+        //dump($existingPrice);
+        throw new \Exception('rpcei');
         $price = $swData->getPrice();
         $price = [
             array_merge(
