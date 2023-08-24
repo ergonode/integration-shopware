@@ -65,7 +65,7 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
 
         $productData->setShopwareData($swData);
 
-        //$this->addEntitiesToDelete($productData);
+        $this->addEntitiesToDelete($productData);
 
         return $productData;
     }
@@ -104,15 +104,15 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
             return [];
         }
 
-        $swData = $productData->getShopwareData();
         $productMediaIds = $productMedia->getIds();
 
-        if (!isset($swData[self::SW_PRODUCT_FIELD_MEDIA])) {
+        $newMediaPayloads = $productData->getShopwareData()->getMedia();
+        if (empty($newMediaPayloads)) {
             return array_map(fn(string $id) => ['id' => $id], $productMediaIds);
         }
 
         $newProductMediaIds = array_filter(
-            array_map(fn(array $media) => $media['id'] ?? null, $swData[self::SW_PRODUCT_FIELD_MEDIA])
+            array_map(fn(array $media) => $media['id'] ?? null, $newMediaPayloads)
         );
 
         $idsToDelete = array_diff($productMediaIds, $newProductMediaIds);

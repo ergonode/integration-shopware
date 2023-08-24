@@ -24,16 +24,23 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
     {
         $shopwareData = $productData->getShopwareData();
         $ergonodeData = $productData->getErgonodeData();
-        $shopwareData->resetScaleUnit();
 
         $scaleUnit = $ergonodeData->getScaleUnit();
         if ($scaleUnit) {
-            $criteria = new Criteria();
-            $criteria->addFilter(new EqualsFilter('code', $scaleUnit));
-            $scaleUnitId = $this->mappingExtensionRepository->searchIds($criteria, $context);
-            if ($scaleUnitId->firstId()) {
-                $shopwareData->setUnitId($scaleUnitId->firstId());
+            $shopwareData->setUnitId(null);
+            if ($scaleUnit->getFirstOption()) {
+                $unitCode = $scaleUnit->getFirstOption()->getCode();
+                $criteria = new Criteria();
+                $criteria->addFilter(new EqualsFilter('code', $unitCode));
+                $scaleUnitId = $this->mappingExtensionRepository->searchIds($criteria, $context);
+                if ($scaleUnitId->firstId()) {
+                    $shopwareData->setUnitId($scaleUnitId->firstId());
+                }
             }
+        } elseif ($scaleUnit === false) {
+            $shopwareData->setUnitId($productData->getSwProduct()->getUnitId());
+        } else {
+            $shopwareData->setUnitId(null);
         }
 
         $productData->setShopwareData($shopwareData);

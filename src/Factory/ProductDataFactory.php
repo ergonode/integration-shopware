@@ -19,12 +19,20 @@ use Ergonode\IntegrationShopware\Model\ProductPriceAttribute;
 use Ergonode\IntegrationShopware\Model\ProductRelationAttribute;
 use Ergonode\IntegrationShopware\Model\ProductSelectAttribute;
 use Ergonode\IntegrationShopware\Model\ProductSimpleAttributeTranslation;
+use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Shopware\Core\Framework\Context;
 
 class ProductDataFactory
 {
-    public function create(array $data, bool $isInitialPaginatedImport): ProductTransformationDTO
+    public function __construct(private readonly AttributeMappingProvider $mappingProvider)
     {
-        $ergonodeData = new ProductErgonodeData($data['sku'], $data['__typename'], []);
+
+    }
+
+    public function create(array $data, bool $isInitialPaginatedImport, Context $context, string $defaultLanguage): ProductTransformationDTO
+    {
+        $mappings = $this->getMappings($context);
+        $ergonodeData = new ProductErgonodeData($data['sku'], $data['__typename'], $mappings);
         foreach ($data['attributeList']['edges'] ?? [] as $attributeEdge) {
             $attributeData = $attributeEdge['node'];
 
@@ -33,7 +41,7 @@ class ProductDataFactory
             $ergonodeData->addAttribute($attribute);
         }
 
-        return new ProductTransformationDTO($ergonodeData, new ProductShopwareData([]), $isInitialPaginatedImport);
+        return new ProductTransformationDTO($ergonodeData, new ProductShopwareData([]), $defaultLanguage, $isInitialPaginatedImport);
     }
 
     private function transformProductAttribute(array $attributeData): ProductAttribute
@@ -120,7 +128,9 @@ class ProductDataFactory
             $translationRecords = $translation['value_multimedia_array'];
             $language = $translation['language'];
             foreach ($translationRecords ?? [] as $translationRecord) {
-                $multimedia = $attribute->getMultimedia($translationRecord['name']) ?? new ProductGalleryMultimedia($translationRecord['name']);
+                $multimedia = $attribute->getMultimedia($translationRecord['name']) ?? new ProductGalleryMultimedia(
+                    $translationRecord['name']
+                );
                 $multimedia->addTranslation(
                     new ProductMultimediaTranslation(
                         $translationRecord['name'],
@@ -212,5 +222,16 @@ class ProductDataFactory
         }
 
         return $attribute;
+    }
+
+    private function getMappings(Context $context): array
+    {
+        $mappings = $this->mappingProvider->getAttributeMapByErgonodeKeys($context);
+        $result = [];
+        foreach ($mappings as $mapping) {
+            $result[$mapping->getShopwareKey()] = $mapping->getErgonodeKey();
+        }
+
+        return $result;
     }
 }

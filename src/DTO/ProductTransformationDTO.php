@@ -20,14 +20,18 @@ class ProductTransformationDTO
 
     private bool $isInitialPaginatedImport;
 
+    private string $defaultLanguage;
+
     public function __construct(
         ProductErgonodeData $ergonodeData,
         ProductShopwareData $shopwareData,
-        bool $isInitialPaginatedImport = false
+        string $defaultLanguage,
+        bool $isInitialPaginatedImport = false,
     ) {
         $this->ergonodeData = $ergonodeData;
         $this->shopwareData = $shopwareData;
         $this->isInitialPaginatedImport = $isInitialPaginatedImport;
+        $this->defaultLanguage = $defaultLanguage;
     }
 
     public function getErgonodeData(): ProductErgonodeData
@@ -141,8 +145,8 @@ class ProductTransformationDTO
         return $this->isInitialPaginatedImport;
     }
 
-    public function getSku(): string
+    public function getDefaultLanguage(): string
     {
-        return $this->ergonodeData['sku'] ?? '';
+        return $this->defaultLanguage;
     }
 }

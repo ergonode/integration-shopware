@@ -23,12 +23,19 @@ class ProductDeliveryTimeTransformer implements ProductDataTransformerInterface
         $shopwareData = $productData->getShopwareData();
         $ergonodeData = $productData->getErgonodeData();
 
-        $shopwareData->resetDeliveryTime();
-
-        $productDeliveryTime = $ergonodeData->getDeliveryTime();
-        if ($productDeliveryTime) {
-            $deliveryTimeId = $this->deliveryTimeProvider->getIdByName($productDeliveryTime, $context);
-            $shopwareData->setDeliveryTimeId($deliveryTimeId);
+        $deliveryTime = $ergonodeData->getDeliveryTime();
+        if ($deliveryTime) {
+            $shopwareData->setDeliveryTimeId(null);
+            if ($deliveryTime->getFirstOption()) {
+                $name = $deliveryTime->getFirstOption()->getName();
+                $productDeliveryTime = $name[$productData->getDefaultLanguage()] ?? $deliveryTime->getFirstOption()->getCode();
+                $deliveryTimeId = $this->deliveryTimeProvider->getIdByName($productDeliveryTime, $context);
+                $shopwareData->setDeliveryTimeId($deliveryTimeId);
+            }
+        } elseif ($deliveryTime === false) {
+            $shopwareData->setDeliveryTimeId($productData->getSwProduct()->getDeliveryTimeId());
+        } else {
+            $shopwareData->setDeliveryTimeId(null);
         }
 
         $productData->setShopwareData($shopwareData);

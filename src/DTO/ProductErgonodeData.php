@@ -7,6 +7,7 @@ namespace Ergonode\IntegrationShopware\DTO;
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Ergonode\IntegrationShopware\Model\ProductGalleryAttribute;
+use Ergonode\IntegrationShopware\Model\ProductSelectAttribute;
 
 class ProductErgonodeData
 {
@@ -27,46 +28,84 @@ class ProductErgonodeData
         return $this->mappings[$shopwareKey] ?? null;
     }
 
-    public function getMinPurchase(): ?int
+    public function getMinPurchase(): null|ProductAttribute|false
     {
         $key = $this->getMappingKey('minPurchase');
+        if (!$key) {
+            return false;
+        }
 
-        return $key ? ($this->attributes[$key] ?? null) : null;
+        return $this->attributes[$key] ?? null;
     }
 
-    public function getMaxPurchase(): ?int
+    public function getMaxPurchase(): null|ProductAttribute|false
     {
         $key = $this->getMappingKey('maxPurchase');
+        if (!$key) {
+            return false;
+        }
 
-        return $key ? ($this->attributes[$key] ?? null) : null;
+        return $this->attributes[$key] ?? null;
     }
 
-    public function getScaleUnit(): ?string
+    public function getScaleUnit(): ProductSelectAttribute|false|null
     {
         $key = $this->getMappingKey('scaleUnit');
+        if (!$key) {
+            return false;
+        }
 
-        return $key ? ($this->attributes[$key] ?? null) : null;
+        return $this->attributes[$key] ?? null;
     }
 
-    public function getTax(): ?string
+    public function getTax(): ProductAttribute|null|false
     {
-        $key = $this->getMappingKey('tax');
+        $key = $this->getMappingKey('tax.rate');
+        if (!$key) {
+            return false;
+        }
 
-        return $key ? ($this->attributes[$key] ?? null) : null;
+        return $this->attributes[$key] ?? null;
     }
 
-    public function getDeliveryTime(): ?string
+    public function getPriceGross(): ProductAttribute|null|false
+    {
+        $key = $this->getMappingKey('price.gross');
+        if (!$key) {
+            return false;
+        }
+
+        return $this->attributes[$key] ?? null;
+    }
+
+    public function getPriceNet(): ProductAttribute|null|false
+    {
+        $key = $this->getMappingKey('price.net');
+        if (!$key) {
+            return false;
+        }
+
+        return $this->attributes[$key] ?? null;
+    }
+
+    public function getDeliveryTime(): ProductSelectAttribute|null|false
     {
         $key = $this->getMappingKey('deliveryTime');
+        if (!$key) {
+            return false;
+        }
 
-        return $key ? ($this->attributes[$key] ?? null) : null;
+        return $this->attributes[$key] ?? null;
     }
 
-    public function getManufacturer(): ?string
+    public function getManufacturer(): ProductSelectAttribute|null|false
     {
         $key = $this->getMappingKey('manufacturer');
+        if (!$key) {
+            return false;
+        }
 
-        return $key ? ($this->attributes[$key] ?? null) : null;
+        return $this->attributes[$key] ?? null;
     }
 
     public function getMedia(): ?ProductGalleryAttribute
@@ -125,5 +164,19 @@ class ProductErgonodeData
     public function getAttributes(): array
     {
         return $this->attributes;
+    }
+
+    public function getStock(): ?ProductAttribute
+    {
+        $key = $this->getMappingKey('stock');
+
+        return $key ? ($this->attributes[$key] ?? null) : null;
+    }
+
+    public function getName(): ?ProductAttribute
+    {
+        $key = $this->getMappingKey('name');
+
+        return $key ? ($this->attributes[$key] ?? null) : null;
     }
 }

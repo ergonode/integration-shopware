@@ -193,12 +193,12 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductTransformer'
 #        - '@Ergonode\IntegrationShopware\Transformer\ProductCategoryTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductTaxTransformer'
-#        - '@Ergonode\IntegrationShopware\Transformer\ProductPriceTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductPriceTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductDefaultValuesTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductMediaTransformer'
-        - '@Ergonode\IntegrationShopware\Transformer\ProductCustomFieldTransformer'
-        - '@Ergonode\IntegrationShopware\Transformer\ProductMappedCustomFieldTransformer'
-        - '@Ergonode\IntegrationShopware\Transformer\ProductPropertiesTransformer'
+#        - '@Ergonode\IntegrationShopware\Transformer\ProductCustomFieldTransformer'
+#        - '@Ergonode\IntegrationShopware\Transformer\ProductMappedCustomFieldTransformer'
+#        - '@Ergonode\IntegrationShopware\Transformer\ProductPropertiesTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductCrossSellingTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductDeliveryTimeTransformer'
@@ -214,7 +214,7 @@ services:
     arguments:
       $attributeMappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'
 
-  Ergonode\IntegrationShopware\Transformer\ProductExistingCustomFieldTransformer:
+  Ergonode\IntegrationShopware\Transformer\ProductMappedCustomFieldTransformer:
     arguments:
       $customFieldMappingProvider: '@ergonode.integration_shopware.provider.custom_field_mapping_provider'
 
@@ -231,3 +231,6 @@ services:
     arguments:
       $enabled: '%ergonode_integration.use_performance_logger%'
 
+  Ergonode\IntegrationShopware\Factory\ProductDataFactory:
+    arguments:
+      $mappingProvider: '@ergonode.integration_shopware.provider.attribute_mapping_provider'

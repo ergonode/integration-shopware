@@ -32,4 +32,10 @@ class ProductSelectAttribute extends ProductAttribute
     {
         return isset($this->options[$code]);
     }
+
+    public function getFirstOption(): ?ProductAttributeOption
+    {
+        $firstKey = array_key_first($this->options);
+        return $this->options[$firstKey] ?? null;
+    }
 }

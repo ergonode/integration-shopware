@@ -9,12 +9,14 @@ use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Factory\ProductDataFactory;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
+use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Struct\ProductContainer;
 use Ergonode\IntegrationShopware\Transformer\ProductTransformerChain;
 use Ergonode\IntegrationShopware\Transformer\VariantsTransformer;
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Ergonode\IntegrationShopware\Util\Constants;
+use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
@@ -63,7 +65,8 @@ class ProductPersistor
         VariantsTransformer $variantsTransformer,
         ProductContainer $productContainer,
         ErgonodeCursorManager $cursorManager,
-        ProductDataFactory $productDataFactory
+        ProductDataFactory $productDataFactory,
+        private readonly LanguageProvider $languageProvider
     ) {
         $this->productRepository = $productRepository;
         $this->productProvider = $productProvider;
@@ -89,6 +92,7 @@ class ProductPersistor
 
         foreach ($productListData as $productData) {
             $mainProductPayload = $this->getProductPayload($productData['node'] ?? [], $context);
+            var_dump($mainProductPayload);
             if (
                 empty($mainProductPayload) ||
                 false === isset($mainProductPayload['productNumber'])
@@ -162,7 +166,10 @@ class ProductPersistor
 
         $isInitialPaginatedImport = $this->checkIsInitialPaginatedImport($productData, $context);
 
-        $dto = $this->productDataFactory->create($productData, $isInitialPaginatedImport);
+        $defaultLanguage = IsoCodeConverter::shopwareToErgonodeIso(
+            $this->languageProvider->getDefaultLanguageLocale($context)
+        );
+        $dto = $this->productDataFactory->create($productData, $isInitialPaginatedImport, $context, $defaultLanguage);
         $dto->setSwProduct($existingProduct);
 
         //try {
@@ -171,6 +178,7 @@ class ProductPersistor
                 $context
             );
 
+            //var_dump($transformedData);
             //$transformedData = $this->variantsTransformer->transform($transformedData, $context);
         //} catch (Throwable $e) {
         //    $this->logger->error('Error while transforming product. Product has been omitted.', [
@@ -182,7 +190,7 @@ class ProductPersistor
         //    return [];
         //}
 
-        throw new \Exception('dtp');
+        //throw new \Exception('dtp');
         try {
             $this->deleteEntities($dto, $context);
         } catch (Throwable $e) {
@@ -196,10 +204,7 @@ class ProductPersistor
             return [];
         }
 
-        return array_filter(
-            $transformedData->getShopwareData(),
-            fn($value) => !empty($value) || 0 === $value || false === $value || null === $value
-        );
+        return $transformedData->getShopwareData()->getAllData();
     }
 
     private function deleteEntities(ProductTransformationDTO $dto, Context $context): void

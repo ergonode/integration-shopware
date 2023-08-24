@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductErgonodeData;
+use Ergonode\IntegrationShopware\DTO\ProductShopwareData;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
@@ -21,38 +23,9 @@ class ProductMinMaxQuantityTransformer implements ProductDataTransformerInterfac
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $shopwareData = $productData->getShopwareData();
-        $ergonodeData = $productData->getErgonodeData();
 
-        $maxPurchase = $ergonodeData->getMaxPurchase();
-        $minPurchase = $ergonodeData->getMinPurchase();
-
-        if ($maxPurchase && $minPurchase && $minPurchase > $maxPurchase) {
-            return $this->handleMinGteMax($minPurchase, $maxPurchase, $productData);
-        }
-
-        if ($ergonodeData->getMinPurchase() === 0) {
-            $this->logGteOne(
-                $productData->getSku(),
-                $productData->getSwProductId(),
-                $ergonodeData->getMinPurchase(),
-                'minPurchase'
-            );
-            $shopwareData->setMinPurchase(null);
-        } else {
-            $shopwareData->setMinPurchase($ergonodeData->getMinPurchase());
-        }
-
-        if ($ergonodeData->getMaxPurchase() === 0) {
-            $this->logGteOne(
-                $productData->getSku(),
-                $productData->getSwProductId(),
-                $ergonodeData->getMaxPurchase(),
-                'maxPurchase'
-            );
-            $shopwareData->setMaxPurchase(null);
-        } else {
-            $shopwareData->setMaxPurchase($ergonodeData->getMaxPurchase());
-        }
+        $shopwareData->setMinPurchase($this->getMinPurchase($productData));
+        $shopwareData->setMaxPurchase($this->getMaxPurchase($productData));
 
         $productData->setShopwareData($shopwareData);
 
@@ -82,7 +55,7 @@ class ProductMinMaxQuantityTransformer implements ProductDataTransformerInterfac
             [
                 'minPurchase' => $minPurchase,
                 'maxPurchase' => $maxPurchase,
-                'sku' => $productData->getSku(),
+                'sku' => $productData->getErgonodeData()->getSku(),
                 'productId' => $productData->getSwProductId(),
             ]
         );
@@ -93,5 +66,63 @@ class ProductMinMaxQuantityTransformer implements ProductDataTransformerInterfac
         $productData->setShopwareData($shopwareData);
 
         return $productData;
+    }
+
+    private function getMinPurchase(
+        ProductTransformationDTO $productData,
+    ): ?int {
+        $ergonodeData = $productData->getErgonodeData();
+        $minPurchaseMapping = $ergonodeData->getMinPurchase();
+        $defaultLanguage = $productData->getDefaultLanguage();
+        $existingMinPurchase = $productData->getSwProduct()?->getMinPurchase();
+        // if unmapped, return current value
+        if ($minPurchaseMapping === false) {
+            return $existingMinPurchase;
+        }
+
+        $minPurchase = $minPurchaseMapping?->getTranslation($defaultLanguage)?->getValue();
+        if (is_int($minPurchase)) {
+            if ($minPurchase === 0) {
+                $this->logGteOne(
+                    $productData->getErgonodeData()->getSku(),
+                    $productData->getSwProductId(),
+                    $minPurchase,
+                    'minPurchase'
+                );
+            } else {
+                return $minPurchase;
+            }
+        }
+
+        return null;
+    }
+
+    private function getMaxPurchase(
+        ProductTransformationDTO $productData,
+    ): ?int {
+        $ergonodeData = $productData->getErgonodeData();
+        $maxPurchaseMapping = $ergonodeData->getMaxPurchase();
+        $defaultLanguage = $productData->getDefaultLanguage();
+        $existingMaxPurchase = $productData->getSwProduct()?->getMaxPurchase();
+        // if unmapped, return current value
+        if ($maxPurchaseMapping === false) {
+            return $existingMaxPurchase;
+        }
+
+        $maxPurchase = $maxPurchaseMapping?->getTranslation($defaultLanguage)?->getValue();
+        if (is_int($maxPurchase)) {
+            if ($maxPurchase=== 0) {
+                $this->logGteOne(
+                    $productData->getErgonodeData()->getSku(),
+                    $productData->getSwProductId(),
+                    $maxPurchase,
+                    'maxPurchase'
+                );
+            } else {
+                return $maxPurchase;
+            }
+        }
+
+        return null;
     }
 }

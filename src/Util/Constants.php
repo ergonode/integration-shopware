@@ -100,7 +100,7 @@ class Constants
         'price.gross' => 'global.sw-price-field.labelPriceGross',
         'purchaseUnit' => 'sw-product.priceForm.labelPurchaseUnit',
         'referenceUnit' => 'sw-product.priceForm.labelReferenceUnit',
-        'scaleUnit' => 'sw-product-stream.filter.values.unit',
+        'scaleUnit' => 'sw-product.packagingForm.labelUnit',
     ];
 
     /**

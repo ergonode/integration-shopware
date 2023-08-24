@@ -28,12 +28,18 @@ class ProductManufacturerTransformer implements ProductDataTransformerInterface
         $shopwareData = $productData->getShopwareData();
         $ergonodeData = $productData->getErgonodeData();
 
-        $shopwareData->resetManufacturer();;
-        $manufacturerName = $ergonodeData->getManufacturer();
-        if (!empty($manufacturerName)) {
-            $manufacturerId = $this->findManufacturer($manufacturerName, $context);
-
-            $shopwareData->setManufacturerId($manufacturerId);
+        $manufacturerAttribute = $ergonodeData->getManufacturer();
+        if ($manufacturerAttribute) {
+            $shopwareData->setManufacturerId(null);
+            if ($manufacturerAttribute->getFirstOption()) {
+                $code = $manufacturerAttribute->getFirstOption()->getCode();
+                $manufacturerId = $this->findManufacturer($code, $context);
+                $shopwareData->setManufacturerId($manufacturerId);
+            }
+        } elseif ($manufacturerAttribute === false) {
+            $shopwareData->setManufacturerId($productData->getSwProduct()->getManufacturerId());
+        } else {
+            $shopwareData->setManufacturerId(null);
         }
 
         $productData->setShopwareData($shopwareData);
