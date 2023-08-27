@@ -32,13 +32,10 @@ class ProductDataFactory
     public function create(array $data, bool $isInitialPaginatedImport, Context $context, string $defaultLanguage): ProductTransformationDTO
     {
         $mappings = $this->getMappings($context);
-        $ergonodeData = new ProductErgonodeData($data['sku'], $data['__typename'], $mappings);
-        foreach ($data['attributeList']['edges'] ?? [] as $attributeEdge) {
-            $attributeData = $attributeEdge['node'];
-
-            $attribute = $this->transformProductAttribute($attributeData);
-
-            $ergonodeData->addAttribute($attribute);
+        $ergonodeData = $this->buildErgonodeData($data, $mappings);
+        foreach($data['variantList']['edges'] ?? [] as $variantData) {
+            $variant = $this->buildErgonodeData($variantData, $mappings);
+            $ergonodeData->addVariant($variant);
         }
 
         return new ProductTransformationDTO($ergonodeData, new ProductShopwareData([]), $defaultLanguage, $isInitialPaginatedImport);
@@ -233,5 +230,23 @@ class ProductDataFactory
         }
 
         return $result;
+    }
+
+    private function buildErgonodeData(array $data, array $mappings): ProductErgonodeData
+    {
+        $ergonodeData = new ProductErgonodeData($data['sku'], $data['__typename'], $mappings);
+        foreach ($data['attributeList']['edges'] ?? [] as $attributeEdge) {
+            $attributeData = $attributeEdge['node'];
+
+            $attribute = $this->transformProductAttribute($attributeData);
+
+            $ergonodeData->addAttribute($attribute);
+        }
+
+        foreach ($data['categoryList']['edges'] ?? [] as $categoryEdge) {
+            $ergonodeData->addCategory($categoryEdge);
+        }
+
+        return $ergonodeData;
     }
 }

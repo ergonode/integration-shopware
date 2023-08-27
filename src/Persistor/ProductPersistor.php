@@ -178,8 +178,7 @@ class ProductPersistor
                 $context
             );
 
-            //var_dump($transformedData);
-            //$transformedData = $this->variantsTransformer->transform($transformedData, $context);
+            $transformedData = $this->variantsTransformer->transform($transformedData, $context);
         //} catch (Throwable $e) {
         //    $this->logger->error('Error while transforming product. Product has been omitted.', [
         //        'sku' => $sku,
@@ -190,7 +189,6 @@ class ProductPersistor
         //    return [];
         //}
 
-        //throw new \Exception('dtp');
         try {
             $this->deleteEntities($dto, $context);
         } catch (Throwable $e) {

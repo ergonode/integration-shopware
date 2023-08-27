@@ -53,7 +53,7 @@ class MediaProductCustomFieldTransformer implements ProductCustomFieldTransforme
         foreach ($multimedia->getTranslations() as $translation) {
             $mediaId = $this->fileManager->persist($translation, $context);
 
-            $customFields[$translation->getLanguage()]['customFields'][$customFieldName] = $mediaId;
+            $customFields[$translation->getLanguage(true)]['customFields'][$customFieldName] = $mediaId;
         }
 
         return $customFields;

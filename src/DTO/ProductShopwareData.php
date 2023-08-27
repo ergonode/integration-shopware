@@ -13,16 +13,6 @@ class ProductShopwareData
         $this->data = $data;
     }
 
-    public function getStock(): ?string
-    {
-        return $this->data['stock'] ?? null;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->data['name'] ?? null;
-    }
-
     public function setMinPurchase(?int $minPurchase): void
     {
         $this->data['minPurchase'] = $minPurchase;
@@ -36,21 +26,6 @@ class ProductShopwareData
     public function setUnitId(?string $id): void
     {
         $this->data['unitId'] = $id;
-    }
-
-    public function resetScaleUnit(): void
-    {
-        unset($this->data['scaleUnit']);
-    }
-
-    public function resetDeliveryTime(): void
-    {
-        unset($this->data['deliveryTime']);
-    }
-
-    public function resetManufacturer(): void
-    {
-        unset($this->data['manufacturer']);
     }
 
     public function setDeliveryTimeId(?string $id): void
@@ -70,16 +45,6 @@ class ProductShopwareData
         } else {
             $this->data['crossSellings'] = $crossSellings;
         }
-    }
-
-    public function getCrossSellings(): ?array
-    {
-        return $this->data['crossSellings'] ?? null;
-    }
-
-    public function getProperties(): array
-    {
-        return $this->data['properties'] ?? [];
     }
 
     public function setProperties(array $properties): void
@@ -110,15 +75,6 @@ class ProductShopwareData
         return $this->data;
     }
 
-    public function resetCustomFields(): void
-    {
-        foreach ($this->data['translations'] as &$translation) {
-            if (isset($translation['customFields'])) {
-                unset($translation['customFields']);
-            }
-        }
-    }
-
     public function setCover(array $payload): void
     {
         $this->data['cover'] = $payload;
@@ -137,16 +93,6 @@ class ProductShopwareData
         $this->data['media'] = $payloads;
     }
 
-    public function getMedia(): array
-    {
-        return $this->data['media'] ?? [];
-    }
-
-    public function resetTax(): void
-    {
-        unset($this->data['tax']);
-    }
-
     public function setTax(string $taxId): void
     {
         $this->data['taxId'] = $taxId;
@@ -156,7 +102,6 @@ class ProductShopwareData
     {
         $this->data['name'] = $name;
     }
-
 
     public function setTranslatedName(string $language, string $name): void
     {
@@ -183,13 +128,33 @@ class ProductShopwareData
         $this->data['price'] = $pricePayload;
     }
 
-    public function getPrice(): array
-    {
-        return $this->data['price'] ?? [];
-    }
-
     public function setId(string $id): void
     {
         $this->data['id'] = $id;
+    }
+
+    public function setParentId(string $id): void
+    {
+        $this->data['parentId'] = $id;
+    }
+
+    public function addChild(ProductShopwareData $productShopwareData): void
+    {
+        $this->data['children'][] = $productShopwareData->getAllData();
+    }
+
+    public function setDisplayParent(bool $display = true): void
+    {
+        $this->data['displayParent'] = $display;
+    }
+
+    public function addConfigrationSettings(array $configurationSettings): void
+    {
+        $this->data['configuratorSettings'][] = $configurationSettings;
+    }
+
+    public function setCategories(array $categories): void
+    {
+        $this->data['categories'] = $categories;
     }
 }

@@ -81,9 +81,7 @@ class ProductTransformationDTO
 
     public function ergonodeDataHasVariants(): bool
     {
-        return false;
-        // @todo refactor
-        return false === empty($this->ergonodeData['variantList']['edges']);
+        return count($this->ergonodeData->getVariants()) > 0;
     }
 
     public function swProductHasVariants(): bool
@@ -99,11 +97,6 @@ class ProductTransformationDTO
     public function isUpdate(): bool
     {
         return null !== $this->swProduct;
-    }
-
-    public function isCreate(): bool
-    {
-        return null === $this->swProduct;
     }
 
     public function getEntitiesToDelete(): array
@@ -133,11 +126,6 @@ class ProductTransformationDTO
 
             $this->addEntitiesToDelete($entityName, $payloadPart);
         }
-    }
-
-    public function unsetSwData(string $fieldKey): void
-    {
-        unset($this->shopwareData[$fieldKey]);
     }
 
     public function isInitialPaginatedImport(): bool

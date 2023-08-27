@@ -44,7 +44,7 @@ class SimpleProductCustomFieldTransformer implements ProductCustomFieldTransform
             if (!is_null($customField) && $customField->getType() === CustomFieldTypes::BOOL) {
                 $value = YesNo::cast($value);
             }
-            $customFields[$translation->getLanguage()]['customFields'][$customFieldName] = $value;
+            $customFields[$translation->getLanguage(true)]['customFields'][$customFieldName] = $value;
         }
 
         return $customFields;

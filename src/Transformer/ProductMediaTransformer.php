@@ -106,7 +106,7 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
 
         $productMediaIds = $productMedia->getIds();
 
-        $newMediaPayloads = $productData->getShopwareData()->getMedia();
+        $newMediaPayloads = $productData->getSwProduct()?->getMedia()->getElements();
         if (empty($newMediaPayloads)) {
             return array_map(fn(string $id) => ['id' => $id], $productMediaIds);
         }

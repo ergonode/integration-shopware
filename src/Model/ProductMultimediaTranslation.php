@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Model;
 
+use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
+
 class ProductMultimediaTranslation
 {
     public function __construct(
@@ -41,8 +43,8 @@ class ProductMultimediaTranslation
         return $this->url;
     }
 
-    public function getLanguage(): string
+    public function getLanguage(?bool $useShopwareFormat = false): string
     {
-        return $this->language;
+        return $useShopwareFormat ? IsoCodeConverter::ergonodeToShopwareIso($this->language) : $this->language;
     }
 }

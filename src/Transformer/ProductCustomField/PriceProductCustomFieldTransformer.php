@@ -38,15 +38,11 @@ class PriceProductCustomFieldTransformer implements ProductCustomFieldTransforme
 
         $customFields = [];
         foreach ($attribute->getTranslations() as $translation) {
-            $customFields[$translation->getLanguage()]['customFields'][$customFieldName] = [
+            $customFields[$translation->getLanguage(true)]['customFields'][$customFieldName][] = [
                 'net' => $translation->getValue(),
                 'gross' => $translation->getValue(),
                 'linked' => true,
-                'listPrice' => null,
                 'currencyId' => $currencyId,
-                'extensions' => [],
-                'percentage' => null,
-                'regulationPrice' => null,
             ];
         }
 

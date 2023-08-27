@@ -29,14 +29,14 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $swData = $productData->getShopwareData();
-        //@todo verify if resetting code is correct
-        $swData->resetCustomFields();
 
         $codes = $this->configService->getErgonodeCustomFieldKeys();
 
         $attributes = $productData->getErgonodeData()->getAttributesByCodes($codes);
 
         $customFields = [];
+
+        $unprocessedCodes = array_flip($codes);
         foreach ($attributes as $attribute) {
             $typedTransformer = $this->transformerResolver->resolve($attribute);
             if (null === $typedTransformer) {
@@ -48,9 +48,17 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
                 CustomFieldUtil::buildCustomFieldName($attribute->getCode()),
                 $context
             );
+
+            unset($unprocessedCodes[$attribute->getCode()]);
         }
 
         $customFields = array_merge_recursive(...$customFields);
+
+        foreach ($unprocessedCodes as $unprocessedCode => $val) {
+            foreach ($customFields as $language => $customFieldList) {
+                $customFields[$language]['customFields'][CustomFieldUtil::buildCustomFieldName($unprocessedCode)] = null;
+            }
+        }
 
         $swData->setCustomFields($customFields);
 

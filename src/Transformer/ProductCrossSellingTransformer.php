@@ -171,13 +171,13 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
             return [];
         }
 
-        if ($swData->getCrossSellings()) {
+        if ($productData->getSwProduct()->getCrossSellings()) {
             return array_map(fn(string $id) => ['id' => $id], $crossSellingIds);
         }
 
         $newCrossSellingIds = array_filter(
-            array_map(fn(array $crossSelling) => $crossSelling['id'] ?? null,
-                $swData->getCrossSellings())
+            array_map(fn(ProductCrossSellingEntity $crossSelling) => $crossSelling->getId(),
+                $productData->getSwProduct()->getCrossSellings()->getElements())
         );
 
         $idsToDelete = array_diff($crossSellingIds, $newCrossSellingIds);

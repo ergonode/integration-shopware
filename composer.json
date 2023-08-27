@@ -24,8 +24,8 @@
     "require": {
         "php": ">= 8.1",
         "ext-json": "*",
-        "shopware/administration": "<=6.5.5",
-        "shopware/core": "<=6.5.5",
+        "shopware/administration": "6.5.*",
+        "shopware/core": "6.5.*",
         "gmostafa/php-graphql-client": "^1.13"
     },
     "require-dev": {
@@ -43,5 +43,9 @@
         "psr-4": {
             "Ergonode\\IntegrationShopware\\Tests\\": "tests/"
         }
+    },
+    "conflict": {
+        "shopware/administration": ">=6.5.5",
+        "shopware/core": ">=6.5.5"
     }
 }

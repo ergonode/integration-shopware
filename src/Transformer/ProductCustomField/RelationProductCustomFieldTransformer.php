@@ -53,7 +53,7 @@ class RelationProductCustomFieldTransformer implements ProductCustomFieldTransfo
                 $ids[] = $product->getId();
             }
 
-            $customFields[$translation->getLanguage()]['customFields'][$customFieldName] = $ids;
+            $customFields[$translation->getLanguage(true)]['customFields'][$customFieldName] = $ids;
         }
 
         return $customFields;

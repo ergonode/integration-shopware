@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\DTO;
 
-use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Ergonode\IntegrationShopware\Model\ProductGalleryAttribute;
 use Ergonode\IntegrationShopware\Model\ProductSelectAttribute;
@@ -14,6 +13,13 @@ class ProductErgonodeData
     private array $mappings;
 
     private array $attributes = [];
+
+    /**
+     * @var ProductErgonodeData[]
+     */
+    private array $variants = [];
+
+    private array $categories = [];
 
     public function __construct(
         private readonly string $sku,
@@ -26,6 +32,11 @@ class ProductErgonodeData
     private function getMappingKey(string $shopwareKey): ?string
     {
         return $this->mappings[$shopwareKey] ?? null;
+    }
+
+    public function getMappings(): array
+    {
+        return $this->mappings;
     }
 
     public function getMinPurchase(): null|ProductAttribute|false
@@ -135,7 +146,7 @@ class ProductErgonodeData
     }
 
     /**
-     * @param string[] $codes
+     * @param string[] $types
      * @return ProductAttribute[]
      */
     public function getAttributesByTypes(array $types): array
@@ -178,5 +189,25 @@ class ProductErgonodeData
         $key = $this->getMappingKey('name');
 
         return $key ? ($this->attributes[$key] ?? null) : null;
+    }
+
+    public function getVariants(): array
+    {
+        return $this->variants;
+    }
+
+    public function addVariant(ProductErgonodeData $variant): void
+    {
+        $this->variants[] = $variant;
+    }
+
+    public function addCategory(array $categoryData): void
+    {
+        $this->categories[] = $categoryData;
+    }
+
+    public function getCategories(): array
+    {
+        return $this->categories;
     }
 }

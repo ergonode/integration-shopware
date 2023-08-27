@@ -6,8 +6,8 @@ namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Entity\ErgonodeMappingExtension\ErgonodeMappingExtensionEntity;
-use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Ergonode\IntegrationShopware\Model\ProductSelectAttribute;
 use Ergonode\IntegrationShopware\Provider\PropertyGroupOptionProvider;
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
@@ -38,11 +38,11 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
         $ergonodeData = $productData->getErgonodeData();
 
         $selectAttributes = $ergonodeData->getAttributesByTypes([
-            AttributeTypesEnum::SELECT,
-            AttributeTypesEnum::MULTISELECT,
+            ProductAttribute::TYPE_SELECT,
+            ProductAttribute::TYPE_MULTI_SELECT,
         ]);
 
-        $optionCodes = $this->getOptionCodes($selectAttributes);
+        $optionCodes = $this->getOptionCodes($selectAttributes, $ergonodeData->getMappings());
 
         $optionMapping = $this->getOptionsMapping($optionCodes, $context);
 
@@ -126,7 +126,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
             return [];
         }
 
-        $newProperties = $dto->getShopwareData()->getData($field) ?? [];
+        $newProperties = $dto->getSwProduct()->get($field) ?? [];
         if (empty($newProperties)) {
             return [];
         }
@@ -148,11 +148,15 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
      * @param ProductSelectAttribute[] $selectAttributes
      * @return string[]
      */
-    private function getOptionCodes(array $selectAttributes): array
+    private function getOptionCodes(array $selectAttributes, array $existingMappings): array
     {
         $optionCodes = [];
         foreach ($selectAttributes as $selectAttribute) {
             if (!$selectAttribute instanceof ProductSelectAttribute) {
+                continue;
+            }
+
+            if (in_array($selectAttribute->getCode(), $existingMappings)) {
                 continue;
             }
 
