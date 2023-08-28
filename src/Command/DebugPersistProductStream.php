@@ -79,7 +79,7 @@ class DebugPersistProductStream extends Command
         $entityCount = 0;
         $processTime = 0;
         $peakProcessMemory = 0;
-        //try {
+        try {
             do {
                 $io->progressAdvance();
                 // please note this function process only first page of variants.
@@ -101,11 +101,11 @@ class DebugPersistProductStream extends Command
             } while ($result->hasNextPage());
 
             $io->progressFinish();
-        //} catch (\Throwable $e) {
-        //    $io->error($e->getMessage());
-        //
-        //    return Command::FAILURE;
-        //}
+        } catch (\Throwable $e) {
+            $io->error($e->getMessage());
+
+            return Command::FAILURE;
+        }
 
         $io->success(\sprintf('Processed %d page(s) and %d entities', $processedPages - 1, $entityCount));
         $io->info(
