@@ -56,6 +56,11 @@ class ProductShopwareData
         }
     }
 
+    public function getProperties(): array
+    {
+        return $this->data['properties'] ?? [];
+    }
+
     public function setOptions(array $options)
     {
         if (empty($options)) {

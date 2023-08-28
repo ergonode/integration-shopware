@@ -126,7 +126,7 @@ class ProductPropertiesTransformer implements ProductDataTransformerInterface
             return [];
         }
 
-        $newProperties = $dto->getSwProduct()->get($field) ?? [];
+        $newProperties = $dto->getShopwareData()->getProperties() ?? [];
         if (empty($newProperties)) {
             return [];
         }

@@ -172,6 +172,9 @@ class ProductDataFactory
         );
         foreach ($translations as $translation) {
             $translationRecord = $translation['value_multimedia'];
+            if (is_null($translationRecord)) {
+                continue;
+            }
             $language = $translation['language'];
             $multimedia->addTranslation(
                 new ProductMultimediaTranslation(
