@@ -8,6 +8,7 @@ use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Manager\FileManager;
 use Ergonode\IntegrationShopware\Provider\ProductMediaProvider;
 use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaDefinition;
+use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Uuid\Uuid;
 
@@ -112,7 +113,7 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
         }
 
         $newProductMediaIds = array_filter(
-            array_map(fn(array $media) => $media['id'] ?? null, $newMediaPayloads)
+            array_map(fn(ProductMediaEntity $media) => $media->getId() ?? null, $newMediaPayloads)
         );
 
         $idsToDelete = array_diff($productMediaIds, $newProductMediaIds);

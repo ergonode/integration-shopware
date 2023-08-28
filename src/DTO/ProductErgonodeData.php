@@ -21,6 +21,8 @@ class ProductErgonodeData
 
     private array $categories = [];
 
+    private array $bindings = [];
+
     public function __construct(
         private readonly string $sku,
         private readonly string $type,
@@ -209,5 +211,15 @@ class ProductErgonodeData
     public function getCategories(): array
     {
         return $this->categories;
+    }
+
+    public function addBinding(string $code): void
+    {
+        $this->bindings[] = $code;
+    }
+
+    public function getBindings(): array
+    {
+        return $this->bindings;
     }
 }

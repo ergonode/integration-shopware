@@ -22,10 +22,8 @@ class ProductPriceTransformer implements ProductDataTransformerInterface
         ];
 
         if (!$productData->getSwProduct()?->getPrice()) {
-            $pricePayload = [
-                'gross' => (float)($ergonodeData->getPriceGross()?->getTranslation($defaultLanguage)?->getValue() ?? 0),
-                'net' => (float)($ergonodeData->getPriceNet()?->getTranslation($defaultLanguage)?->getValue() ?? 0),
-            ];
+            $pricePayload['gross'] = (float)$ergonodeData->getPriceGross()?->getTranslation($defaultLanguage)?->getValue() ?? 0;
+            $pricePayload['net']  = (float)$ergonodeData->getPriceNet()?->getTranslation($defaultLanguage)?->getValue() ?? 0;
         } else {
             $pricePayload['gross'] = $ergonodeData->getPriceGross()
                 ? (float)$ergonodeData->getPriceGross()?->getTranslation($defaultLanguage)?->getValue()
@@ -34,6 +32,7 @@ class ProductPriceTransformer implements ProductDataTransformerInterface
                 ? (float)$ergonodeData->getPriceNet()?->getTranslation($defaultLanguage)?->getValue()
                 : $this->getExistingNetPrice($productData);
         }
+
         $swData->setPrice([$pricePayload]);
 
         $productData->setShopwareData($swData);

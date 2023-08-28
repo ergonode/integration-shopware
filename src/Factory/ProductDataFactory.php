@@ -29,16 +29,29 @@ class ProductDataFactory
 
     }
 
-    public function create(array $data, bool $isInitialPaginatedImport, Context $context, string $defaultLanguage): ProductTransformationDTO
-    {
+    public function create(
+        array $data,
+        bool $isInitialPaginatedImport,
+        Context $context,
+        string $defaultLanguage
+    ): ProductTransformationDTO {
         $mappings = $this->getMappings($context);
         $ergonodeData = $this->buildErgonodeData($data, $mappings);
-        foreach($data['variantList']['edges'] ?? [] as $variantData) {
+        foreach ($data['variantList']['edges'] ?? [] as $variantEdge) {
+            $variantData = $variantEdge['node'] ?? [];
+            if (empty($variantData)) {
+                continue;
+            }
             $variant = $this->buildErgonodeData($variantData, $mappings);
             $ergonodeData->addVariant($variant);
         }
 
-        return new ProductTransformationDTO($ergonodeData, new ProductShopwareData([]), $defaultLanguage, $isInitialPaginatedImport);
+        return new ProductTransformationDTO(
+            $ergonodeData,
+            new ProductShopwareData([]),
+            $defaultLanguage,
+            $isInitialPaginatedImport
+        );
     }
 
     private function transformProductAttribute(array $attributeData): ProductAttribute
@@ -245,6 +258,12 @@ class ProductDataFactory
 
         foreach ($data['categoryList']['edges'] ?? [] as $categoryEdge) {
             $ergonodeData->addCategory($categoryEdge);
+        }
+
+        if (isset($data['bindings'])) {
+            foreach ($data['bindings'] ?? [] as $binding) {
+                $ergonodeData->addBinding($binding['code']);
+            }
         }
 
         return $ergonodeData;

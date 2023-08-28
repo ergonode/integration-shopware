@@ -23,7 +23,7 @@ class ProductDefaultValuesTransformer implements ProductDataTransformerInterface
         $swData->setName($this->getName($productData));
         $swData->setStock($this->getStock($productData));
 
-        foreach ($ergonodeData->getName()?->getTranslations() as $translation) {
+        foreach ($ergonodeData->getName()?->getTranslations() ?? [] as $translation) {
             if (!is_null($translation->getValue())) {
                 $swData->setTranslatedName(
                     IsoCodeConverter::ergonodeToShopwareIso($translation->getLanguage()),

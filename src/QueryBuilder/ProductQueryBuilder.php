@@ -61,6 +61,7 @@ class ProductQueryBuilder
                                                         (new Query('node'))
                                                             ->setSelectionSet([
                                                                 'sku',
+                                                                '__typename',
                                                                 (new Query('attributeList'))
                                                                     ->setArguments(['first' => self::ATTRIBUTE_LIST_COUNT])
                                                                     ->setSelectionSet([

@@ -92,7 +92,6 @@ class ProductPersistor
 
         foreach ($productListData as $productData) {
             $mainProductPayload = $this->getProductPayload($productData['node'] ?? [], $context);
-            var_dump($mainProductPayload);
             if (
                 empty($mainProductPayload) ||
                 false === isset($mainProductPayload['productNumber'])

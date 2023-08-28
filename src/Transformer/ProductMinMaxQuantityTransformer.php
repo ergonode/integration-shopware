@@ -32,7 +32,7 @@ class ProductMinMaxQuantityTransformer implements ProductDataTransformerInterfac
         return $productData;
     }
 
-    private function logGteOne(string $sku, string $productId, ?int $value, string $key): void
+    private function logGteOne(string $sku, ?string $productId, ?int $value, string $key): void
     {
         $this->ergonodeSyncLogger->warning(
             sprintf('Product %s equals 0, but should be greater or equal 1. Value has been erased.', $key),

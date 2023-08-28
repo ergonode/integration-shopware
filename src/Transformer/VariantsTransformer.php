@@ -54,7 +54,7 @@ class VariantsTransformer
 
         $this->loadExistingVariants($productData, $context);
 
-        $bindings = $ergonodeData['bindings'] ?? [];
+        $bindings = $ergonodeData->getBindings();
 
         $transformedVariants = [];
 
@@ -65,7 +65,7 @@ class VariantsTransformer
             $existingProduct = $this->productContainer->get($variantData->getSku());
 
             $dto = new ProductTransformationDTO($variantData, new ProductShopwareData([]), $defaultLanguage);
-            $dto->setBindingCodes(array_filter(array_map(fn(array $binding) => $binding['code'] ?? null, $bindings)));
+            $dto->setBindingCodes($bindings);
             $dto->setSwProduct($existingProduct);
 
             $transformedVariants[$variantData->getSku()] = $this->productTransformerChain->transform(
