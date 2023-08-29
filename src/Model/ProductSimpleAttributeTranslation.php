@@ -11,7 +11,6 @@ class ProductSimpleAttributeTranslation
         private mixed $value,
         private readonly string $language
     ) {
-
     }
 
     public function getValue(): mixed

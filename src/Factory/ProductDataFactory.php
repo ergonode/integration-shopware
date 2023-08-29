@@ -26,7 +26,6 @@ class ProductDataFactory
 {
     public function __construct(private readonly AttributeMappingProvider $mappingProvider)
     {
-
     }
 
     public function create(
@@ -97,7 +96,13 @@ class ProductDataFactory
 
         $existingOptions = [];
         foreach ($attributeData['translations'] ?? [] as $translation) {
-            $translationRecords = $translation['value_multi_array'] ?? [$translation['value_array'] ?? []];
+            $translationRecords = [];
+            if (isset($translation['value_array'])) {
+                $translationRecords = [$translation['value_array']];
+            } elseif (isset($translation['value_multi_array'])) {
+                $translationRecords = $translation['value_multi_array'];
+            }
+
             $language = $translation['language'];
             foreach ($translationRecords as $translationData) {
                 if (empty($translationData)) {
@@ -134,7 +139,7 @@ class ProductDataFactory
         }
 
         $translations = $attributeData['translations'] ?? [];
-        foreach ($translations ?? [] as $translation) {
+        foreach ($translations as $translation) {
             $translationRecords = $translation['value_multimedia_array'];
             $language = $translation['language'];
             foreach ($translationRecords ?? [] as $translationRecord) {
@@ -200,7 +205,7 @@ class ProductDataFactory
         );
 
         $translations = $attributeData['translations'] ?? [];
-        foreach ($translations ?? [] as $translation) {
+        foreach ($translations as $translation) {
             $translationRecords = $translation['value_product_array'];
             $language = $translation['language'];
             $skus = [];
@@ -225,7 +230,8 @@ class ProductDataFactory
             $attributeData['attribute']['currency']
         );
 
-        foreach ($attributeData['translations'] ?? [] as $translation) {
+        $translations = $attributeData['translations'] ?? [];
+        foreach ($translations as $translation) {
             $attributeTranslation = new ProductSimpleAttributeTranslation(
                 $translation['value_numeric'] ?? null,
                 $translation['language']

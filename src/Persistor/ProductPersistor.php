@@ -171,22 +171,22 @@ class ProductPersistor
         $dto = $this->productDataFactory->create($productData, $isInitialPaginatedImport, $context, $defaultLanguage);
         $dto->setSwProduct($existingProduct);
 
-        //try {
+        try {
             $transformedData = $this->productTransformerChain->transform(
                 $dto,
                 $context
             );
 
             $transformedData = $this->variantsTransformer->transform($transformedData, $context);
-        //} catch (Throwable $e) {
-        //    $this->logger->error('Error while transforming product. Product has been omitted.', [
-        //        'sku' => $sku,
-        //        'message' => $e->getMessage(),
-        //        'file' => $e->getFile() . ':' . $e->getLine(),
-        //    ]);
-        //
-        //    return [];
-        //}
+        } catch (Throwable $e) {
+            $this->logger->error('Error while transforming product. Product has been omitted.', [
+                'sku' => $sku,
+                'message' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
+            ]);
+
+            return [];
+        }
 
         try {
             $this->deleteEntities($dto, $context);
