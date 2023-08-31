@@ -19,8 +19,8 @@ use Shopware\Core\System\DeliveryTime\DeliveryTimeEntity;
 
 class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterface
 {
-    private const SHOPWARE_KEY          = 'deliveryTime';
-    public const  MAPPING_TYPE          = 'deliveryTime';
+    private const SHOPWARE_KEY = 'deliveryTime';
+    public const  MAPPING_TYPE = 'deliveryTime';
     private const DELIVERY_TIME_PATTERN = '/[\s-]+/';
 
     private AttributeMappingProvider $attributeMappingProvider;
@@ -69,7 +69,7 @@ class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterfac
             }
 
             [$min, $max, $unit] = $pieces;
-            $timeEntity = $this->getExistingDeliveryTimeEntity($code, $context);
+            $timeEntity = $this->getExistingDeliveryTimeEntity((int)$min, (int)$max, $unit, $code, $context);
 
             $translations = [];
             foreach ($option['name'] as $nameRow) {
@@ -120,8 +120,13 @@ class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterfac
         $this->mappingExtensionRepository->delete(array_values($existingIds->getData()), $context);
     }
 
-    private function getExistingDeliveryTimeEntity(string $code, Context $context): ?DeliveryTimeEntity
-    {
+    private function getExistingDeliveryTimeEntity(
+        int $min,
+        int $max,
+        string $unit,
+        string $code,
+        Context $context
+    ): ?DeliveryTimeEntity {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('code', $code));
         $criteria->addFilter(new EqualsFilter('type', self::MAPPING_TYPE));
@@ -135,7 +140,15 @@ class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterfac
             return $timeResult->getEntities()->first();
         }
 
-        return null;
+        $fallbackTimeCriteria = new Criteria();
+        $fallbackTimeCriteria->addFilter(new EqualsFilter('min', $min));
+        $fallbackTimeCriteria->addFilter(new EqualsFilter('max', $max));
+        $fallbackTimeCriteria->addFilter(new EqualsFilter('unit', $unit));
+        $fallbackTimeResult = $this->deliveryTimeRepository->search($fallbackTimeCriteria, $context);
+
+        $entity = $fallbackTimeResult->getEntities()->first();
+
+        return $entity instanceof DeliveryTimeEntity ? $entity : null;
     }
 
     private function getDeliveryTimePieces(string $code): ?array

@@ -32,6 +32,7 @@ class DatabaseLifecycleManager
         'product_cross_selling' => 'ergonode_mapping_extension_id',
         'property_group' => 'ergonode_mapping_extension_id',
         'property_group_option' => 'ergonode_mapping_extension_id',
+        'delivery_time' => 'ergonode_mapping_extension_id',
     ];
 
     private Connection $connection;

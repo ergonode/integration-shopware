@@ -174,7 +174,7 @@ services:
   Ergonode\IntegrationShopware\Subscriber\DeleteCategoryExtensionSubscriber:
     tags: [ 'kernel.event_subscriber' ]
 
-  Ergonode\IntegrationShopware\Subscriber\DeleteManufacturerSubscriber:
+  Ergonode\IntegrationShopware\Subscriber\DeleteMappingSubscriber:
     tags: [ 'kernel.event_subscriber' ]
 
   Ergonode\IntegrationShopware\Subscriber\ClearCursorsSubscriber:
