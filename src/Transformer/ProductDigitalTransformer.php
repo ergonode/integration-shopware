@@ -47,6 +47,9 @@ class ProductDigitalTransformer implements ProductDataTransformerInterface
         }
         $swData = $productData->getShopwareData();
         $code = $this->configService->getDigitalProductAttribute();
+        if (!$code) {
+            return $productData;
+        }
 
         $ergoData = $productData->getErgonodeData();
 
