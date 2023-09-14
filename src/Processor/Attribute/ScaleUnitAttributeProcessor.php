@@ -54,7 +54,8 @@ class ScaleUnitAttributeProcessor implements AttributeCustomProcessorInterface
     public function process(array $node, Context $context): void
     {
         $unitIds = [];
-        foreach ($node['options'] ?? [] as $option) {
+        foreach ($node['optionList']['edges'] ?? [] as $optionNode) {
+            $option = $optionNode['node'];
             $code = $option['code'];
             $unitEntity = $this->getExistingUnitEntity($code, $context);
 

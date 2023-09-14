@@ -54,7 +54,8 @@ class ManufacturerAttributeProcessor implements AttributeCustomProcessorInterfac
     public function process(array $node, Context $context): void
     {
         $manufacturerIds = [];
-        foreach ($node['options'] ?? [] as $option) {
+        foreach ($node['optionList']['edges'] ?? [] as $optionNode) {
+            $option = $optionNode['node'];
             $code = $option['code'];
             $manufacturerEntity = $this->getExistingManufacturerEntity($code, $context);
 
