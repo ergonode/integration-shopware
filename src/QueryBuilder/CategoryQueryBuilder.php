@@ -132,6 +132,11 @@ class CategoryQueryBuilder
                                                         (new Query('category'))
                                                             ->setSelectionSet([
                                                                 'code',
+                                                                (new Query('name'))
+                                                                    ->setSelectionSet([
+                                                                        'value',
+                                                                        'language',
+                                                                    ]),
                                                             ]),
                                                         (new Query('parentCategory'))
                                                             ->setSelectionSet([

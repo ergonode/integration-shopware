@@ -11,6 +11,7 @@ use Ergonode\IntegrationShopware\MessageQueue\Message\CategorySync;
 use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\Processor\CategoryProcessorInterface;
 use Ergonode\IntegrationShopware\Processor\CategorySyncProcessor;
+use Ergonode\IntegrationShopware\Processor\CategoryTreeSyncProcessor;
 use Ergonode\IntegrationShopware\Service\ConfigService;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Ergonode\IntegrationShopware\Util\SyncPerformanceLogger;
@@ -33,7 +34,7 @@ class CategorySyncHandler extends AbstractSyncHandler
 
     private ConfigService $configService;
 
-    private iterable $processors;
+    private CategoryTreeSyncProcessor $processor;
 
     private MessageBusInterface $messageBus;
 
@@ -50,7 +51,7 @@ class CategorySyncHandler extends AbstractSyncHandler
      * @param LoggerInterface $ergonodeSyncLogger
      * @param LockFactory $lockFactory
      * @param ConfigService $configService
-     * @param CategoryProcessorInterface[] $processors
+     * @param CategoryTreeSyncProcessor $processor
      * @param MessageBusInterface $messageBus
      * @param SyncPerformanceLogger $performanceLogger
      * @param CategoryOrderHelper $categoryOrderHelper
@@ -61,7 +62,7 @@ class CategorySyncHandler extends AbstractSyncHandler
         LoggerInterface $ergonodeSyncLogger,
         LockFactory $lockFactory,
         ConfigService $configService,
-        iterable $processors,
+        CategoryTreeSyncProcessor $processor,
         MessageBusInterface $messageBus,
         SyncPerformanceLogger $performanceLogger,
         CategoryOrderHelper $categoryOrderHelper,
@@ -71,7 +72,7 @@ class CategorySyncHandler extends AbstractSyncHandler
         parent::__construct($syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
         $this->configService = $configService;
-        $this->processors = $processors;
+        $this->processor = $processor;
         $this->messageBus = $messageBus;
         $this->performanceLogger = $performanceLogger;
         $this->categoryOrderHelper = $categoryOrderHelper;
@@ -111,14 +112,16 @@ class CategorySyncHandler extends AbstractSyncHandler
         $this->clearLegacyCategoryMappings();
         $primaryKeys = [];
         try {
-            foreach ($this->processors as $processor) {
-                $processedKeys = $this->runProcessor($categoryTreeCodes, $processor);
+            $processedKeys = $this->runProcessor($categoryTreeCodes);
 
-                $primaryKeys = \array_merge($primaryKeys, $processedKeys);
-                $count += count($primaryKeys);
-            }
+            $primaryKeys = \array_merge($primaryKeys, $processedKeys);
+            $count += count($primaryKeys);
         } catch (Throwable $e) {
-            $this->logger->error($e->getMessage());
+            $this->logger->error('Error while persisting category sync.', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
 
         $primaryKeys = \array_unique($primaryKeys);
@@ -132,10 +135,10 @@ class CategorySyncHandler extends AbstractSyncHandler
         return $count;
     }
 
-    private function runProcessor(array $categoryTreeCodes, CategoryProcessorInterface $processor): array
+    private function runProcessor(array $categoryTreeCodes): array
     {
         $currentPage = 0;
-        $processorClass = \get_class($processor);
+        $processorClass = \get_class($this->processor);
         $this->logger->info(
             'Starting category processor',
             [
@@ -146,7 +149,7 @@ class CategorySyncHandler extends AbstractSyncHandler
 
         $primaryKeys = [];
         do {
-            $result = $processor->processStream($categoryTreeCodes, $this->context);
+            $result = $this->processor->processStream($categoryTreeCodes, $this->context);
 
             if ($result->hasStopwatch()) {
                 $this->performanceLogger->logPerformance($processorClass, $result->getStopwatch());
@@ -163,25 +166,23 @@ class CategorySyncHandler extends AbstractSyncHandler
             $this->logger->info('Dispatching next CategorySyncMessage because still has next page');
             $this->messageBus->dispatch(new CategorySync());
         } else {
-            if ($processor instanceof CategorySyncProcessor) {
-                $processor->removeOrphanedCategories();
+            $this->processor->removeOrphanedCategories();
 
-                $formattedTime = $this->configService->setLastCategorySyncTimestamp(
-                    (new \DateTime('+1 second'))->getTimestamp()
-                );
-                $this->logger->info('Saved lastCategorySyncTime', [
-                    'time' => $formattedTime,
-                ]);
-                $this->categoryOrderHelper->clearSaved();
-                $this->cursorManager->deleteCursors(
-                    [
-                        CategoryStreamResultsProxy::MAIN_FIELD,
-                        CategoryTreeStreamResultsProxy::MAIN_FIELD,
-                        CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
-                    ],
-                    $this->context
-                );
-            }
+            $formattedTime = $this->configService->setLastCategorySyncTimestamp(
+                (new \DateTime('+1 second'))->getTimestamp()
+            );
+            $this->logger->info('Saved lastCategorySyncTime', [
+                'time' => $formattedTime,
+            ]);
+            $this->categoryOrderHelper->clearSaved();
+            $this->cursorManager->deleteCursors(
+                [
+                    CategoryStreamResultsProxy::MAIN_FIELD,
+                    CategoryTreeStreamResultsProxy::MAIN_FIELD,
+                    CategoryTreeStreamResultsProxy::TREE_LEAF_LIST_CURSOR,
+                ],
+                $this->context
+            );
             $this->logger->info('Category sync finished.');
         }
 

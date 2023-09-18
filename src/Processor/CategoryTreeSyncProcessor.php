@@ -11,6 +11,7 @@ use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Persistor\CategoryTreePersistor;
 use Ergonode\IntegrationShopware\Persistor\Helper\CategoryOrderHelper;
 use Ergonode\IntegrationShopware\QueryBuilder\CategoryQueryBuilder;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
@@ -34,13 +35,16 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
     private CategoryOrderHelper $categoryOrderHelper;
 
+    private ConfigService $configService;
+
     public function __construct(
         ErgonodeGqlClientInterface $gqlClient,
         CategoryQueryBuilder $categoryQueryBuilder,
         CategoryTreePersistor $categoryTreePersistor,
         ErgonodeCursorManager $cursorManager,
         LoggerInterface $ergonodeSyncLogger,
-        CategoryOrderHelper $categoryOrderHelper
+        CategoryOrderHelper $categoryOrderHelper,
+        ConfigService $configService
     ) {
         $this->gqlClient = $gqlClient;
         $this->categoryQueryBuilder = $categoryQueryBuilder;
@@ -48,6 +52,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $this->cursorManager = $cursorManager;
         $this->logger = $ergonodeSyncLogger;
         $this->categoryOrderHelper = $categoryOrderHelper;
+        $this->configService = $configService;
     }
 
     /**
@@ -190,5 +195,19 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         if ($lastRootCategoryId) {
             $this->categoryTreePersistor->setLastRootCategoryId($lastRootCategoryId);
         }
+    }
+
+
+    public function removeOrphanedCategories(): void
+    {
+        $lastSync = $this->configService->getLastCategorySyncTimestamp();
+
+        $removedCategoryCount = $this->categoryTreePersistor->removeCategoriesUpdatedAtBeforeTimestamp(
+            $lastSync
+        );
+        $this->logger->info('Removed orphaned Ergonode categories', [
+            'count' => $removedCategoryCount,
+            'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM),
+        ]);
     }
 }
