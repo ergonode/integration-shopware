@@ -81,10 +81,6 @@ services:
     arguments:
       $lockFactory: '@ergonode_integration.lock_factory'
 
-  Ergonode\IntegrationShopware\MessageQueue\Handler\CategorySyncHandler:
-    arguments:
-      $processors: !tagged_iterator 'ergonode_integration.category_processor'
-
   # LOCK
   ergonode_integration.flock_store:
     class: Symfony\Component\Lock\Store\FlockStore
