@@ -6,6 +6,7 @@ Component.extend('ergonode-attribute-multiselect', 'ergonode-api-entity-multisel
             type: String,
         }
     },
+
     computed: {
         filteredValue() {
             return (Array.isArray(this.value)
@@ -28,14 +29,7 @@ Component.extend('ergonode-attribute-multiselect', 'ergonode-api-entity-multisel
 
     methods: {
         fetchOptionsRequest() {
-            let types = []
-            if (this.attributesType) {
-                types = this.attributesType.split(',');
-            }
-            
-            console.log(types);
-            
-            return this.ergonodeMappingService.getErgonodeAttributes(types)
+            return this.ergonodeMappingService.getErgonodeAttributes(this.attributesType ? [this.attributesType]:[])
         }
     }
 });

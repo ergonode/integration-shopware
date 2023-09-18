@@ -43,24 +43,4 @@ class ErgonodeProductProvider
             $endCursor = $results->getEndCursor();
         } while ($results->hasNextPage());
     }
-
-    public function provideVariableProducts(): array
-    {
-        $productSkus = [];
-        $endCursor = null;
-        do {
-            $query = $this->productQueryBuilder->buildVariableProducts($endCursor);
-            /** @var ProductStreamResultsProxy|null $result */
-            $result = $this->ergonodeGqlClient->query($query, ProductStreamResultsProxy::class);
-
-            foreach ($result->getProductData()['edges'] ?? [] as $product) {
-                if (isset($product['node']['sku'])) {
-                    $productSkus[]['sku'] = $product['node']['sku'];
-                }
-            }
-            $endCursor = $result->getEndCursor();
-        } while ($result->hasNextPage());
-
-        return $productSkus;
-    }
 }

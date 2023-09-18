@@ -161,7 +161,6 @@ class VariantsTransformer
             'media',
             'properties',
             'options',
-            'downloads',
             'crossSellings.assignedProducts',
             'crossSellings.' . AbstractErgonodeMappingExtension::EXTENSION_NAME,
         ]);
