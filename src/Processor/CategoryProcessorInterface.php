@@ -16,6 +16,4 @@ interface CategoryProcessorInterface
         array $treeCodes,
         Context $context
     ): SyncCounterDTO;
-
-    public static function getDefaultPriority(): int;
 }
