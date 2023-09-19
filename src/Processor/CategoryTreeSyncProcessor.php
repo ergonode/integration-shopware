@@ -177,11 +177,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         return $counter;
     }
 
-    public static function getDefaultPriority(): int
-    {
-        return 15;
-    }
-
     /**
      * Gets ID of last existing top level category
      *
