@@ -7,6 +7,7 @@ namespace Ergonode\IntegrationShopware\Processor;
 use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
 use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Persistor\CustomFieldPersistor;
 use Ergonode\IntegrationShopware\Persistor\PropertyGroupPersistor;
 use Ergonode\IntegrationShopware\Provider\ErgonodeAttributeProvider;
@@ -25,21 +26,29 @@ class AttributeSyncProcessor
 
     private ConfigService $configService;
 
+    private ErgonodeCursorManager $cursorManager;
+
     public function __construct(
         ErgonodeAttributeProvider $ergonodeAttributeProvider,
         PropertyGroupPersistor $propertyGroupPersistor,
         CustomFieldPersistor $customFieldManager,
-        ConfigService $configService
+        ConfigService $configService,
+        ErgonodeCursorManager $cursorManager
     ) {
         $this->ergonodeAttributeProvider = $ergonodeAttributeProvider;
         $this->propertyGroupPersistor = $propertyGroupPersistor;
         $this->customFieldManager = $customFieldManager;
         $this->configService = $configService;
+        $this->cursorManager = $cursorManager;
     }
 
     public function process(Context $context): SyncCounterDTO
     {
-        $generator = $this->ergonodeAttributeProvider->provideProductAttributes();
+        $cursorEntity = $this->cursorManager->getCursorEntity(AttributeStreamResultsProxy::MAIN_FIELD, $context);
+        $cursor = $cursorEntity?->getCursor();
+
+        $generator = $this->ergonodeAttributeProvider->provideProductAttributes($cursor);
+
         $counter = new SyncCounterDTO();
 
         foreach ($generator as $attributeStream) {
@@ -49,6 +58,13 @@ class AttributeSyncProcessor
             $counter->incrProcessedEntityCount(
                 $this->persistCustomFields($attributeStream, $context)
             );
+
+            $endCursor = $attributeStream->getEndCursor();
+            if (null === $endCursor) {
+                throw new \RuntimeException('Could not retrieve end cursor from the response.');
+            }
+
+            $this->cursorManager->persist($endCursor, AttributeStreamResultsProxy::MAIN_FIELD, $context);
         }
 
         return $counter;

@@ -24,10 +24,10 @@ class Constants
         'ean' => [Attr::TEXT, Attr::TEXTAREA, Attr::SELECT],
         'manufacturerNumber' => [Attr::TEXT, Attr::TEXTAREA, Attr::SELECT],
         'manufacturer' => [Attr::SELECT],
-        'weight' => [Attr::NUMERIC],
-        'height' => [Attr::NUMERIC],
-        'width' => [Attr::NUMERIC],
-        'length' => [Attr::NUMERIC],
+        'weight' => [Attr::NUMERIC, Attr::UNIT],
+        'height' => [Attr::NUMERIC, Attr::UNIT],
+        'width' => [Attr::NUMERIC, Attr::UNIT],
+        'length' => [Attr::NUMERIC, Attr::UNIT],
         'customSearchKeywords' => [Attr::MULTISELECT],
         'description' => [Attr::TEXT, Attr::TEXTAREA],
         'metaTitle' => [Attr::TEXT, Attr::TEXTAREA, Attr::SELECT],
@@ -101,18 +101,5 @@ class Constants
         'purchaseUnit' => 'sw-product.priceForm.labelPurchaseUnit',
         'referenceUnit' => 'sw-product.priceForm.labelReferenceUnit',
         'scaleUnit' => 'sw-product.packagingForm.labelUnit',
-    ];
-
-    /**
-     * Those mappings are processed by specific transformers. Should not be processed in main ProductTransformer
-     */
-    public const MAPPINGS_WITH_SEPARATE_TRANSFORMERS = [
-        'price.net' ,
-        'price.gross',
-        'tax.rate',
-        'media',
-        'manufacturer',
-        'deliveryTime',
-        'scaleUnit',
     ];
 }
