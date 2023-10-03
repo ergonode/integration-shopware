@@ -61,6 +61,7 @@ class ProductQueryBuilder
                                                         (new Query('node'))
                                                             ->setSelectionSet([
                                                                 'sku',
+                                                                '__typename',
                                                                 (new Query('attributeList'))
                                                                     ->setArguments(['first' => self::ATTRIBUTE_LIST_COUNT])
                                                                     ->setSelectionSet([
@@ -223,6 +224,7 @@ class ProductQueryBuilder
                                                                     ]),
                                                                 (new InlineFragment('MultiSelectAttributeValueTranslation'))
                                                                     ->setSelectionSet([
+                                                                        'language',
                                                                         (new Query('translatedValue'))
                                                                             ->setAlias('value_multi_array')
                                                                             ->setSelectionSet([
@@ -232,6 +234,7 @@ class ProductQueryBuilder
                                                                     ]),
                                                                 (new InlineFragment('SelectAttributeValueTranslation'))
                                                                     ->setSelectionSet([
+                                                                        'language',
                                                                         (new Query('translatedValue'))
                                                                             ->setAlias('value_array')
                                                                             ->setSelectionSet([
@@ -651,6 +654,7 @@ class ProductQueryBuilder
     {
         return (new Query('attribute'))
             ->setSelectionSet([
+                '__typename',
                 'code',
                 'scope',
                 (new InlineFragment('DateAttribute'))

@@ -23,11 +23,7 @@ class ProductCategoryTransformer implements ProductDataTransformerInterface
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
-        $categoryData = $productData->getErgonodeData()['categoryList']['edges'] ?? null;
-
-        if (null === $categoryData) {
-            return $productData;
-        }
+        $categoryData = $productData->getErgonodeData()->getCategories();
 
         $categoryIds = [];
         foreach ($categoryData as $category) {
@@ -46,7 +42,7 @@ class ProductCategoryTransformer implements ProductDataTransformerInterface
         $categoryIds = array_merge(...$categoryIds);
 
         $swData = $productData->getShopwareData();
-        $swData['categories'] = array_values($categoryIds);
+        $swData->setCategories(array_values($categoryIds));
         $productData->setShopwareData($swData);
 
         return $productData;

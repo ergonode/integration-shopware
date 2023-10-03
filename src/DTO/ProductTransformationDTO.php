@@ -8,9 +8,9 @@ use Shopware\Core\Content\Product\ProductEntity;
 
 class ProductTransformationDTO
 {
-    private array $ergonodeData;
+    private ProductErgonodeData $ergonodeData;
 
-    private array $shopwareData;
+    private ProductShopwareData $shopwareData;
 
     private ?ProductEntity $swProduct = null;
 
@@ -20,29 +20,31 @@ class ProductTransformationDTO
 
     private bool $isInitialPaginatedImport;
 
-    public function __construct(array $ergonodeData, array $shopwareData = [], bool $isInitialPaginatedImport = false)
-    {
+    private string $defaultLanguage;
+
+    public function __construct(
+        ProductErgonodeData $ergonodeData,
+        ProductShopwareData $shopwareData,
+        string $defaultLanguage,
+        bool $isInitialPaginatedImport = false,
+    ) {
         $this->ergonodeData = $ergonodeData;
         $this->shopwareData = $shopwareData;
         $this->isInitialPaginatedImport = $isInitialPaginatedImport;
+        $this->defaultLanguage = $defaultLanguage;
     }
 
-    public function getErgonodeData(): array
+    public function getErgonodeData(): ProductErgonodeData
     {
         return $this->ergonodeData;
     }
 
-    public function setErgonodeData(array $ergonodeData): void
-    {
-        $this->ergonodeData = $ergonodeData;
-    }
-
-    public function getShopwareData(): array
+    public function getShopwareData(): ProductShopwareData
     {
         return $this->shopwareData;
     }
 
-    public function setShopwareData(array $shopwareData): void
+    public function setShopwareData(ProductShopwareData $shopwareData): void
     {
         $this->shopwareData = $shopwareData;
     }
@@ -79,7 +81,7 @@ class ProductTransformationDTO
 
     public function ergonodeDataHasVariants(): bool
     {
-        return false === empty($this->ergonodeData['variantList']['edges']);
+        return count($this->ergonodeData->getVariants()) > 0;
     }
 
     public function swProductHasVariants(): bool
@@ -95,11 +97,6 @@ class ProductTransformationDTO
     public function isUpdate(): bool
     {
         return null !== $this->swProduct;
-    }
-
-    public function isCreate(): bool
-    {
-        return null === $this->swProduct;
     }
 
     public function getEntitiesToDelete(): array
@@ -131,18 +128,13 @@ class ProductTransformationDTO
         }
     }
 
-    public function unsetSwData(string $fieldKey): void
-    {
-        unset($this->shopwareData[$fieldKey]);
-    }
-
     public function isInitialPaginatedImport(): bool
     {
         return $this->isInitialPaginatedImport;
     }
 
-    public function getSku(): string
+    public function getDefaultLanguage(): string
     {
-        return $this->ergonodeData['sku'] ?? '';
+        return $this->defaultLanguage;
     }
 }

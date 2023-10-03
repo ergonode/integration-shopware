@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Transformer\ProductCustomField;
 
-use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
-use Ergonode\IntegrationShopware\Transformer\TranslationTransformer;
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
+use Ergonode\IntegrationShopware\Model\ProductPriceAttribute;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -15,51 +15,38 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 
 class PriceProductCustomFieldTransformer implements ProductCustomFieldTransformerInterface
 {
-    private TranslationTransformer $translationTransformer;
-
     private EntityRepository $currencyRepository;
 
     public function __construct(
-        TranslationTransformer $translationTransformer,
         EntityRepository $currencyRepository
     ) {
-        $this->translationTransformer = $translationTransformer;
         $this->currencyRepository = $currencyRepository;
     }
 
-    public function supports(array $node): bool
+    public function supports(ProductAttribute $attribute): bool
     {
-        return AttributeTypesEnum::PRICE === AttributeTypesEnum::getNodeType($node['attribute']);
+        return ProductAttribute::TYPE_PRICE === $attribute->getType();
     }
 
-    public function transformNode(array $node, string $customFieldName, Context $context): array
+    public function transformNode(ProductAttribute $attribute, string $customFieldName, Context $context): array
     {
-        $translated = $this->translationTransformer->transform(
-            $node['translations']
-        );
+        if (!$attribute instanceof ProductPriceAttribute) {
+            return [];
+        }
 
-        $currencyId = $this->getCurrencyIdByCode($node['attribute']['currency'] ?? '', $context);
+        $currencyId = $this->getCurrencyIdByCode($attribute->getCurrency(), $context);
 
-        foreach ($translated as &$value) {
-            $value = [
-                'customFields' => [
-                    $customFieldName => [
-                        [
-                            'net' => $value,
-                            'gross' => $value,
-                            'linked' => true,
-                            'listPrice' => null,
-                            'currencyId' => $currencyId,
-                            'extensions' => [],
-                            'percentage' => null,
-                            'regulationPrice' => null,
-                        ],
-                    ],
-                ],
+        $customFields = [];
+        foreach ($attribute->getTranslations() as $translation) {
+            $customFields[$translation->getLanguage(true)]['customFields'][$customFieldName][] = [
+                'net' => $translation->getValue(),
+                'gross' => $translation->getValue(),
+                'linked' => true,
+                'currencyId' => $currencyId,
             ];
         }
 
-        return $translated;
+        return $customFields;
     }
 
     private function getCurrencyIdByCode(string $code, Context $context): string

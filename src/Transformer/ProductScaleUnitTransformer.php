@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
-use Ergonode\IntegrationShopware\Provider\UnitProvider;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -23,22 +22,28 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
-        $swData = $productData->getShopwareData();
-        $scaleUnit = $swData['scaleUnit'] ?? null;
-        if (is_null($scaleUnit)) {
-            return $productData;
-        }
-        unset($swData['scaleUnit']);
+        $shopwareData = $productData->getShopwareData();
+        $ergonodeData = $productData->getErgonodeData();
 
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('code', $scaleUnit));
-        $scaleUnitId = $this->mappingExtensionRepository->searchIds($criteria, $context);
-        if (!$scaleUnitId->firstId()) {
-            return $productData;
+        $scaleUnit = $ergonodeData->getScaleUnit();
+        if ($scaleUnit) {
+            $shopwareData->setUnitId(null);
+            if ($scaleUnit->getFirstOption()) {
+                $unitCode = $scaleUnit->getFirstOption()->getCode();
+                $criteria = new Criteria();
+                $criteria->addFilter(new EqualsFilter('code', $unitCode));
+                $scaleUnitId = $this->mappingExtensionRepository->searchIds($criteria, $context);
+                if ($scaleUnitId->firstId()) {
+                    $shopwareData->setUnitId($scaleUnitId->firstId());
+                }
+            }
+        } elseif ($scaleUnit === false) {
+            $shopwareData->setUnitId($productData->getSwProduct()->getUnitId());
+        } else {
+            $shopwareData->setUnitId(null);
         }
 
-        $swData['unitId'] = $scaleUnitId->firstId();
-        $productData->setShopwareData($swData);
+        $productData->setShopwareData($shopwareData);
 
         return $productData;
     }

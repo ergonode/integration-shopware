@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductShopwareData;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
+use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Struct\ChecksumContainer;
 use Ergonode\IntegrationShopware\Struct\ProductContainer;
+use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Shopware\Core\Content\Product\Aggregate\ProductConfiguratorSetting\ProductConfiguratorSettingDefinition;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
@@ -23,16 +26,20 @@ class VariantsTransformer
 
     private ProductContainer $productContainer;
 
+    private LanguageProvider $languageProvider;
+
     public function __construct(
         ProductProvider $productProvider,
         ProductTransformerChain $productTransformerChain,
         ChecksumContainer $checksumContainer,
-        ProductContainer $productContainer
+        ProductContainer $productContainer,
+        LanguageProvider $languageProvider
     ) {
         $this->productProvider = $productProvider;
         $this->productTransformerChain = $productTransformerChain;
         $this->checksumContainer = $checksumContainer;
         $this->productContainer = $productContainer;
+        $this->languageProvider = $languageProvider;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
@@ -47,24 +54,21 @@ class VariantsTransformer
 
         $this->loadExistingVariants($productData, $context);
 
-        $bindings = $ergonodeData['bindings'] ?? [];
+        $bindings = $ergonodeData->getBindings();
 
         $transformedVariants = [];
 
-        foreach ($ergonodeData['variantList']['edges'] ?? [] as $variantData) {
-            $variantNode = $variantData['node'];
-            if (empty($variantNode)) {
-                continue;
-            }
+        $defaultLanguage = IsoCodeConverter::shopwareToErgonodeIso(
+            $this->languageProvider->getDefaultLanguageLocale($context)
+        );
+        foreach ($ergonodeData->getVariants() as $variantData) {
+            $existingProduct = $this->productContainer->get($variantData->getSku());
 
-            $sku = $variantNode['sku'];
-            $existingProduct = $this->productContainer->get($sku);
-
-            $dto = new ProductTransformationDTO($variantNode);
-            $dto->setBindingCodes(array_filter(array_map(fn(array $binding) => $binding['code'] ?? null, $bindings)));
+            $dto = new ProductTransformationDTO($variantData, new ProductShopwareData([]), $defaultLanguage);
+            $dto->setBindingCodes($bindings);
             $dto->setSwProduct($existingProduct);
 
-            $transformedVariants[$sku] = $this->productTransformerChain->transform(
+            $transformedVariants[$variantData->getSku()] = $this->productTransformerChain->transform(
                 $dto,
                 $context
             );
@@ -72,40 +76,36 @@ class VariantsTransformer
 
         $entitiesToDelete = [];
         foreach ($transformedVariants as $variant) {
-            $shopwareData = array_filter(
-                $variant->getShopwareData(),
-                fn($value) => !empty($value) || 0 === $value || false === $value
-            );
-
+            $shopwareData = $variant->getShopwareData();
 
             if (null !== $parentProduct) {
-                $shopwareData['parentId'] = $parentProduct->getId();
+                $shopwareData->setParentId($parentProduct->getId());
             }
 
-            $swData['children'][] = $shopwareData;
+            $swData->addChild($shopwareData);
             if (property_exists(ProductEntity::class, 'displayParent')) {
-                $swData['displayParent'] = true;
+                $swData->setDisplayParent();
             }
 
-            foreach ($shopwareData['options'] ?? [] as $optionId) {
+            foreach ($variant->getSwProduct()?->getOptionIds() ?? [] as $optionId) {
                 if (
-                    false === isset($optionId['id']) ||
-                    $this->checksumContainer->exists($swData['productNumber'], $optionId['id'])
+                    false === isset($optionId)
+                    || $this->checksumContainer->exists($ergonodeData->getSku(), $optionId)
                 ) {
                     continue;
                 }
 
                 if (null !== $parentProduct) {
-                    $existingConfigurationId = $this->getExistingConfigurationId($parentProduct, $optionId['id']);
+                    $existingConfigurationId = $this->getExistingConfigurationId($parentProduct, $optionId);
                 }
 
-                $swData['configuratorSettings'][] = [
+                $swData->addConfigrationSettings([
                     'id' => $existingConfigurationId ?? null,
-                    'productId' => $swData['id'] ?? null,
-                    'optionId' => $optionId['id'],
-                ];
+                    'productId' => $productData->getSwProductId(),
+                    'optionId' => $optionId,
+                ]);
 
-                $this->checksumContainer->push($swData['productNumber'], $optionId['id']);
+                $this->checksumContainer->push($ergonodeData->getSku(), $optionId);
             }
 
             $entitiesToDelete[] = $variant->getEntitiesToDelete();
@@ -137,14 +137,9 @@ class VariantsTransformer
 
         $skus = [];
 
-        $ergonodeVariants = $productData->getErgonodeData()['variantList']['edges'] ?? null;
-        if (null !== $ergonodeVariants) {
-            $skus = array_merge(
-                $skus,
-                array_filter(
-                    array_map(fn(array $edge) => $edge['node']['sku'] ?? null, $ergonodeVariants)
-                )
-            );
+        $ergonodeVariants = $productData->getErgonodeData()->getVariants();
+        foreach ($ergonodeVariants as $ergonodeVariant) {
+            $skus[] = $ergonodeVariant->getSku();
         }
 
         $swVariants = $productData->getSwProduct()->getChildren();
