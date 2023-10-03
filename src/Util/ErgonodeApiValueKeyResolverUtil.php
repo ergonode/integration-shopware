@@ -15,9 +15,9 @@ class ErgonodeApiValueKeyResolverUtil
             case 'TextAttributeValueTranslation':
             case 'TextareaAttributeValueTranslation':
             case 'DateAttributeValueTranslation':
-            case 'UnitAttributeValueTranslation':
                 return 'value_string';
             case 'NumericAttributeValueTranslation':
+            case 'UnitAttributeValueTranslation':
             case 'PriceAttributeValueTranslation':
                 return 'value_numeric';
             case 'SelectAttributeValueTranslation':
