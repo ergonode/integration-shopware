@@ -43,5 +43,5 @@
         "psr-4": {
             "Ergonode\\IntegrationShopware\\Tests\\": "tests/"
         }
-    },
+    }
 }
