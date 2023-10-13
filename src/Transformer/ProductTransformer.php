@@ -5,42 +5,19 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
-use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
-use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum as Attr;
 use Ergonode\IntegrationShopware\Model\ProductAttribute;
+use Ergonode\IntegrationShopware\Model\ProductSelectAttribute;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
-use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
 use Ergonode\IntegrationShopware\Util\AttributeTypeValidator;
 use Ergonode\IntegrationShopware\Util\Constants;
-use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
-use Ergonode\IntegrationShopware\Util\YesNo;
-use RuntimeException;
 use Shopware\Core\Framework\Context;
 
-use function array_key_exists;
-use function array_merge_recursive;
 use function in_array;
-use function is_array;
-use function sprintf;
 
 class ProductTransformer implements ProductDataTransformerInterface
 {
-    private string $defaultLocale;
-
-    private const TRANSLATABLE_KEYS = [
-        'name',
-        'description',
-        'metaDescription',
-        'keywords',
-        'metaTitle',
-        'packUnit',
-        'packUnitPlural',
-        'customSearchKeywords',
-        'scaleUnit',
-    ];
-
     private AttributeMappingProvider $attributeMappingProvider;
 
     private LanguageProvider $languageProvider;
@@ -62,7 +39,7 @@ class ProductTransformer implements ProductDataTransformerInterface
         $ergonodeData = $productData->getErgonodeData();
         $swData = $productData->getShopwareData();
 
-        $this->defaultLocale = IsoCodeConverter::shopwareToErgonodeIso(
+        $defaultLocale = IsoCodeConverter::shopwareToErgonodeIso(
             $this->languageProvider->getDefaultLanguageLocale($context)
         );
 
@@ -89,12 +66,33 @@ class ProductTransformer implements ProductDataTransformerInterface
                 continue;
             }
 
-            $data = [];
-            foreach ($attribute->getTranslations() as $translation) {
-                $data['translations'][$translation->getLanguage()] = $translation->getValue();
+            if ($attribute instanceof ProductSelectAttribute) {
+                foreach ($attribute->getOptions() as $option) {
+                    $swData->setTranslatedField(
+                        $mapping->getShopwareKey(),
+                        IsoCodeConverter::ergonodeToShopwareIso($defaultLocale),
+                        $option->getCode()
+                    );
+                    foreach ($option->getName() as $language => $value) {
+                        if ($language === $defaultLocale && is_null($value)) {
+                            continue;
+                        }
+                        $swData->setTranslatedField(
+                            $mapping->getShopwareKey(),
+                            IsoCodeConverter::ergonodeToShopwareIso($language),
+                            $value
+                        );
+                    }
+                }
+            } else {
+                foreach ($attribute->getTranslations() as $translation) {
+                    $swData->setTranslatedField(
+                        $mapping->getShopwareKey(),
+                        IsoCodeConverter::ergonodeToShopwareIso($translation->getLanguage()),
+                        $translation->getValue()
+                    );
+                }
             }
-
-            $swData->setData($mapping->getShopwareKey(), $data);
         }
 
         if ($productData->isUpdate()) {
