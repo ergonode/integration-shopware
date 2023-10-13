@@ -29,7 +29,9 @@ class ProductMinMaxQuantityTransformer implements ProductDataTransformerInterfac
         $shopwareData->setMinPurchase($minPurchase);
         $shopwareData->setMaxPurchase($maxPurchase);
 
-        $productData = $this->handleMinGteMax($minPurchase, $maxPurchase, $productData);
+        if ($minPurchase && $maxPurchase && $minPurchase > $maxPurchase) {
+            $productData = $this->handleMinGteMax($minPurchase, $maxPurchase, $productData);
+        }
 
         $productData->setShopwareData($shopwareData);
 
