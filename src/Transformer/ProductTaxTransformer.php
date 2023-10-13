@@ -30,9 +30,11 @@ class ProductTaxTransformer implements ProductDataTransformerInterface
         $ergonodeData = $productData->getErgonodeData();
 
         $defaultLanguage = $productData->getDefaultLanguage();
-        $productTaxRate = $ergonodeData->getTax()?->getTranslation($defaultLanguage)?->getValue();
-        if (!is_null($productTaxRate)) {
-            $productTaxRate = (float)$productTaxRate;
+        if ($ergonodeData->getTax() !== false) {
+            $productTaxRate = $ergonodeData->getTax()?->getTranslation($defaultLanguage)?->getValue();
+            if (!is_null($productTaxRate)) {
+                $productTaxRate = (float)$productTaxRate;
+            }
         }
 
         $taxId = $this->getTaxEntityId($productTaxRate, $context);

@@ -58,10 +58,10 @@ class ProductDefaultValuesTransformer implements ProductDataTransformerInterface
     private function getStock(ProductTransformationDTO $productData): int
     {
         $ergonodeData = $productData->getErgonodeData();
-        $name = $ergonodeData->getStock();
-        if ($name instanceof ProductAttribute) {
+        $stock = $ergonodeData->getStock();
+        if ($stock instanceof ProductAttribute) {
             $defaultLanguage = $productData->getDefaultLanguage();
-            $translation = $name->getTranslation($defaultLanguage);
+            $translation = $stock->getTranslation($defaultLanguage);
             if ($translation && !is_null($translation->getValue())) {
                 return $translation->getValue();
             }

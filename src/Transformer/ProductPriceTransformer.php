@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 
@@ -22,8 +23,16 @@ class ProductPriceTransformer implements ProductDataTransformerInterface
         ];
 
         if (!$productData->getSwProduct()?->getPrice()) {
-            $pricePayload['gross'] = (float)$ergonodeData->getPriceGross()?->getTranslation($defaultLanguage)?->getValue() ?? 0;
-            $pricePayload['net']  = (float)$ergonodeData->getPriceNet()?->getTranslation($defaultLanguage)?->getValue() ?? 0;
+            $pricePayload['gross'] = 0;
+            if ($ergonodeData->getPriceGross() instanceof ProductAttribute) {
+                $pricePayload['gross'] = (float)$ergonodeData->getPriceGross()->getTranslation($defaultLanguage)?->getValue() ?? 0;
+            }
+
+            $pricePayload['net'] = 0;
+            if ($ergonodeData->getPriceNet() instanceof ProductAttribute) {
+                $pricePayload['net'] = (float)$ergonodeData->getPriceNet()->getTranslation($defaultLanguage)?->getValue(
+                ) ?? 0;
+            }
         } else {
             $pricePayload['gross'] = $ergonodeData->getPriceGross()
                 ? (float)$ergonodeData->getPriceGross()?->getTranslation($defaultLanguage)?->getValue()
