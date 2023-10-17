@@ -37,7 +37,7 @@ class ProductScaleUnitTransformer implements ProductDataTransformerInterface
                     $shopwareData->setUnitId($scaleUnitId->firstId());
                 }
             }
-        } elseif ($scaleUnit === false) {
+        } elseif ($scaleUnit === false && $productData->getSwProduct()) {
             $shopwareData->setUnitId($productData->getSwProduct()->getUnitId());
         } else {
             $shopwareData->setUnitId(null);

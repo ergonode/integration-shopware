@@ -32,7 +32,7 @@ class ProductDeliveryTimeTransformer implements ProductDataTransformerInterface
                 $deliveryTimeId = $this->deliveryTimeProvider->getIdByName($productDeliveryTime, $context);
                 $shopwareData->setDeliveryTimeId($deliveryTimeId);
             }
-        } elseif ($deliveryTime === false) {
+        } elseif ($deliveryTime === false && $productData->getSwProduct()) {
             $shopwareData->setDeliveryTimeId($productData->getSwProduct()->getDeliveryTimeId());
         } else {
             $shopwareData->setDeliveryTimeId(null);

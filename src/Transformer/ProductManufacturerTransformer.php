@@ -36,7 +36,7 @@ class ProductManufacturerTransformer implements ProductDataTransformerInterface
                 $manufacturerId = $this->findManufacturer($code, $context);
                 $shopwareData->setManufacturerId($manufacturerId);
             }
-        } elseif ($manufacturerAttribute === false) {
+        } elseif ($manufacturerAttribute === false && $productData->getSwProduct()) {
             $shopwareData->setManufacturerId($productData->getSwProduct()->getManufacturerId());
         } else {
             $shopwareData->setManufacturerId(null);
