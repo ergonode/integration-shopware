@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Ergonode\IntegrationShopware\Model\ProductSelectAttribute;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
@@ -12,6 +13,7 @@ use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Util\AttributeTypeValidator;
 use Ergonode\IntegrationShopware\Util\Constants;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
+use Ergonode\IntegrationShopware\Util\YesNo;
 use Shopware\Core\Framework\Context;
 
 use function in_array;
@@ -66,6 +68,8 @@ class ProductTransformer implements ProductDataTransformerInterface
                 continue;
             }
 
+            $castToBool = AttributeTypesEnum::isShopwareFieldOfType($mapping->getShopwareKey(), 'bool');
+
             if ($attribute instanceof ProductSelectAttribute) {
                 foreach ($attribute->getOptions() as $option) {
                     $swData->setTranslatedField(
@@ -80,7 +84,7 @@ class ProductTransformer implements ProductDataTransformerInterface
                         $swData->setTranslatedField(
                             $mapping->getShopwareKey(),
                             IsoCodeConverter::ergonodeToShopwareIso($language),
-                            $value
+                            $castToBool ? YesNo::cast($value) : $value
                         );
                     }
                 }
@@ -89,7 +93,7 @@ class ProductTransformer implements ProductDataTransformerInterface
                     $swData->setTranslatedField(
                         $mapping->getShopwareKey(),
                         IsoCodeConverter::ergonodeToShopwareIso($translation->getLanguage()),
-                        $translation->getValue()
+                        $castToBool ? YesNo::cast($translation->getValue()) : $translation->getValue()
                     );
                 }
             }
