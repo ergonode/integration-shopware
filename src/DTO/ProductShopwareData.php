@@ -123,7 +123,7 @@ class ProductShopwareData
         $this->data['stock'] = $stock;
     }
 
-    public function setData(string $key, array $payload): void
+    public function setData(string $key, mixed $payload): void
     {
         $this->data[$key] = $payload;
     }

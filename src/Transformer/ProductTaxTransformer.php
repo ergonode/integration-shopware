@@ -35,11 +35,15 @@ class ProductTaxTransformer implements ProductDataTransformerInterface
             if (!is_null($productTaxRate)) {
                 $productTaxRate = (float)$productTaxRate;
             }
+
+            $taxId = $this->getTaxEntityId($productTaxRate, $context);
+        } elseif($productData->getSwProduct()?->getTaxId()) {
+            $taxId = $productData->getSwProduct()->getTaxId();
+        } else {
+            $taxId = $this->getTaxEntityId(null, $context);
         }
-
-        $taxId = $this->getTaxEntityId($productTaxRate, $context);
-
         $swData->setTax($taxId);
+
         $productData->setShopwareData($swData);
 
         return $productData;

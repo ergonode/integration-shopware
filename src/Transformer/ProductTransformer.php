@@ -77,23 +77,32 @@ class ProductTransformer implements ProductDataTransformerInterface
                         IsoCodeConverter::ergonodeToShopwareIso($defaultLocale),
                         $option->getCode()
                     );
+                    $swData->setData($mapping->getShopwareKey(), $option->getCode());
                     foreach ($option->getName() as $language => $value) {
-                        if ($language === $defaultLocale && is_null($value)) {
-                            continue;
+                        $translatedValue = $castToBool ? YesNo::cast($value) : $value;
+                        if ($language === $defaultLocale) {
+                            if (is_null($value)) {
+                                continue;
+                            }
+                            $swData->setData($mapping->getShopwareKey(), $translatedValue);
                         }
                         $swData->setTranslatedField(
                             $mapping->getShopwareKey(),
                             IsoCodeConverter::ergonodeToShopwareIso($language),
-                            $castToBool ? YesNo::cast($value) : $value
+                            $translatedValue
                         );
                     }
                 }
             } else {
                 foreach ($attribute->getTranslations() as $translation) {
+                    $value = $castToBool ? YesNo::cast($translation->getValue()) : $translation->getValue();
+                    if ($translation->getLanguage() === $defaultLocale) {
+                        $swData->setData($mapping->getShopwareKey(), $value);
+                    }
                     $swData->setTranslatedField(
                         $mapping->getShopwareKey(),
                         IsoCodeConverter::ergonodeToShopwareIso($translation->getLanguage()),
-                        $castToBool ? YesNo::cast($translation->getValue()) : $translation->getValue()
+                        $value
                     );
                 }
             }
