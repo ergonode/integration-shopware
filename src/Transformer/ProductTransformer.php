@@ -53,6 +53,7 @@ class ProductTransformer implements ProductDataTransformerInterface
             $code = $mapping->getErgonodeKey();
             $attribute = $ergonodeData->getAttributeByCode($code);
             if (!$attribute instanceof ProductAttribute) {
+                $swData->setData($mapping->getShopwareKey(), null);
                 continue;
             }
             $mappingKeys = $this->attributeMappingProvider->provideByErgonodeKey($attribute->getCode(), $context);
@@ -104,6 +105,9 @@ class ProductTransformer implements ProductDataTransformerInterface
                         IsoCodeConverter::ergonodeToShopwareIso($translation->getLanguage()),
                         $value
                     );
+                }
+                if (empty($attribute->getTranslations())) {
+                    $swData->setData($mapping->getShopwareKey(), null);
                 }
             }
         }

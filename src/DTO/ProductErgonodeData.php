@@ -121,11 +121,14 @@ class ProductErgonodeData
         return $this->attributes[$key] ?? null;
     }
 
-    public function getMedia(): ?ProductGalleryAttribute
+    public function getMedia(): ProductGalleryAttribute|null|false
     {
         $key = $this->getMappingKey('media');
+        if (!$key) {
+            return false;
+        }
 
-        return $key ? ($this->attributes[$key] ?? null) : null;
+        return $this->attributes[$key] ?? null;
     }
 
     /**

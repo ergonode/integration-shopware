@@ -93,6 +93,11 @@ class ProductShopwareData
         );
     }
 
+    public function getMedia(): array
+    {
+        return $this->data['media'] ?? [];
+    }
+
     public function setMedia(array $payloads): void
     {
         $this->data['media'] = $payloads;

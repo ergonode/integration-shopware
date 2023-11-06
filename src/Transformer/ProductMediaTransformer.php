@@ -19,8 +19,6 @@ use function is_array;
 
 class ProductMediaTransformer implements ProductDataTransformerInterface
 {
-    private const SW_PRODUCT_FIELD_MEDIA = 'media';
-
     private FileManager $fileManager;
 
     private ProductMediaProvider $productMediaProvider;
@@ -41,24 +39,26 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
         /* @todo add delete media part when not exist in Ergonode */
 
         $galleryAttribute = $ergonodeData->getMedia();
-        if (!$galleryAttribute) {
+        if ($galleryAttribute === false) {
             return $productData;
         }
 
         $payloads = [];
         $index = 0;
-        foreach ($galleryAttribute->getAllMultimedia() as $multimedia) {
-            foreach ($multimedia->getTranslations() as $translation) {
-                $mediaId = $this->fileManager->persist($translation, $context);
-                if (isset($payloads[$mediaId])) {
-                    continue;
-                }
+        if ($galleryAttribute) {
+            foreach ($galleryAttribute->getAllMultimedia() as $multimedia) {
+                foreach ($multimedia->getTranslations() as $translation) {
+                    $mediaId = $this->fileManager->persist($translation, $context);
+                    if (isset($payloads[$mediaId])) {
+                        continue;
+                    }
 
-                $payloads[$mediaId] = $this->buildProductMediaPayload($mediaId, $index, $productData, $context);
-                if($index === 0) {
-                    $swData->setCover($payloads[$mediaId]);
+                    $payloads[$mediaId] = $this->buildProductMediaPayload($mediaId, $index, $productData, $context);
+                    if ($index === 0) {
+                        $swData->setCover($payloads[$mediaId]);
+                    }
+                    $index++;
                 }
-                $index++;
             }
         }
 
@@ -107,13 +107,13 @@ class ProductMediaTransformer implements ProductDataTransformerInterface
 
         $productMediaIds = $productMedia->getIds();
 
-        $newMediaPayloads = $productData->getSwProduct()?->getMedia()->getElements();
+        $newMediaPayloads = $productData->getShopwareData()->getMedia();
         if (empty($newMediaPayloads)) {
             return array_map(fn(string $id) => ['id' => $id], $productMediaIds);
         }
 
         $newProductMediaIds = array_filter(
-            array_map(fn(ProductMediaEntity $media) => $media->getId() ?? null, $newMediaPayloads)
+            array_map(fn(array $media) => $media['id'] ?? null, $newMediaPayloads)
         );
 
         $idsToDelete = array_diff($productMediaIds, $newProductMediaIds);
