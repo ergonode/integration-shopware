@@ -94,7 +94,8 @@ class ProductDataFactory
             ? new ProductSelectAttribute($attributeData['attribute']['code'], $type)
             : new ProductMultiSelectAttribute($attributeData['attribute']['code'], $type);
 
-        $existingOptions = [];
+        $options = [];
+
         foreach ($attributeData['translations'] ?? [] as $translation) {
             $translationRecords = [];
             if (isset($translation['value_array'])) {
@@ -104,21 +105,20 @@ class ProductDataFactory
             }
 
             $language = $translation['language'];
+
             foreach ($translationRecords as $translationData) {
                 if (empty($translationData)) {
                     continue;
                 }
                 $code = $translationData['code'];
-                // Ergonode graphql returns one option multiple times for each translation, process it just once
-                if (isset($existingOptions[$code])) {
-                    continue;
-                }
-
-                $attribute->addOption(
-                    new ProductAttributeOption(strtolower($code), [$language => $translationData['name']])
-                );
-                $existingOptions[$code] = $code;
+                $options[$code]['translations'][$language] = $translationData['name'];
             }
+        }
+
+        foreach ($options as $code => $data) {
+            $attribute->addOption(
+                new ProductAttributeOption(strtolower((string)$code), $data['translations'] ?? [])
+            );
         }
 
         return $attribute;

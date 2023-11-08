@@ -10,6 +10,7 @@ use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Ergonode\IntegrationShopware\Model\ProductSelectAttribute;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
+use Ergonode\IntegrationShopware\Transformer\Strategy\ProductResetValueStrategy;
 use Ergonode\IntegrationShopware\Util\AttributeTypeValidator;
 use Ergonode\IntegrationShopware\Util\Constants;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
@@ -26,14 +27,18 @@ class ProductTransformer implements ProductDataTransformerInterface
 
     private AttributeTypeValidator $attributeTypeValidator;
 
+    private ProductResetValueStrategy $resetValueStrategy;
+
     public function __construct(
         AttributeMappingProvider $attributeMappingProvider,
         LanguageProvider $languageProvider,
-        AttributeTypeValidator $attributeTypeValidator
+        AttributeTypeValidator $attributeTypeValidator,
+        ProductResetValueStrategy $resetValueStrategy
     ) {
         $this->attributeMappingProvider = $attributeMappingProvider;
         $this->languageProvider = $languageProvider;
         $this->attributeTypeValidator = $attributeTypeValidator;
+        $this->resetValueStrategy = $resetValueStrategy;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
@@ -53,7 +58,7 @@ class ProductTransformer implements ProductDataTransformerInterface
             $code = $mapping->getErgonodeKey();
             $attribute = $ergonodeData->getAttributeByCode($code);
             if (!$attribute instanceof ProductAttribute) {
-                $swData->setData($mapping->getShopwareKey(), null);
+                $swData = $this->resetValueStrategy->resetValue($swData, $mapping);
                 continue;
             }
             $mappingKeys = $this->attributeMappingProvider->provideByErgonodeKey($attribute->getCode(), $context);
@@ -94,6 +99,9 @@ class ProductTransformer implements ProductDataTransformerInterface
                         );
                     }
                 }
+                if (empty($attribute->getOptions())) {
+                    $this->resetValueStrategy->resetValue($swData, $mapping);
+                }
             } else {
                 foreach ($attribute->getTranslations() as $translation) {
                     $value = $castToBool ? YesNo::cast($translation->getValue()) : $translation->getValue();
@@ -107,7 +115,7 @@ class ProductTransformer implements ProductDataTransformerInterface
                     );
                 }
                 if (empty($attribute->getTranslations())) {
-                    $swData->setData($mapping->getShopwareKey(), null);
+                    $this->resetValueStrategy->resetValue($swData, $mapping);
                 }
             }
         }
