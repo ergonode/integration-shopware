@@ -123,6 +123,11 @@ class ProductShopwareData
         $this->data['translations'][$language][$field] = $value;
     }
 
+    public function getTranslatedField(string $field, string $language): mixed
+    {
+        return $this->data['translations'][$language][$field] ?? null;
+    }
+
     public function setStock(int $stock): void
     {
         $this->data['stock'] = $stock;

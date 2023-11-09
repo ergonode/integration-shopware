@@ -24,13 +24,12 @@ class ProductResetValueStrategy
         'purchaseSteps',
     ];
 
-    // if value is unset in Ergonode, in Shopware it should be changed to 0
-    private const VALUE_0_FIELDS = [
+    // if value is unset in Ergonode, in Shopware it should be changed to false
+    private const VALUE_FALSE_FIELDS = [
         'isCloseout',
         'shippingFree',
         'markAsTopseller',
     ];
-
     public function resetValue(
         ProductShopwareData $shopwareData,
         ErgonodeAttributeMappingEntity $mapping
@@ -45,8 +44,8 @@ class ProductResetValueStrategy
             return $shopwareData;
         }
 
-        if (in_array($mapping->getShopwareKey(), self::VALUE_0_FIELDS)) {
-            $shopwareData->setData($mapping->getShopwareKey(), 0);
+        if (in_array($mapping->getShopwareKey(), self::VALUE_FALSE_FIELDS)) {
+            $shopwareData->setData($mapping->getShopwareKey(), false);
 
             return $shopwareData;
         }

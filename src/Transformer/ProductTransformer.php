@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductShopwareData;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
+use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
 use Ergonode\IntegrationShopware\Model\ProductAttribute;
+use Ergonode\IntegrationShopware\Model\ProductMultiSelectAttribute;
 use Ergonode\IntegrationShopware\Model\ProductSelectAttribute;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
@@ -76,32 +79,10 @@ class ProductTransformer implements ProductDataTransformerInterface
 
             $castToBool = AttributeTypesEnum::isShopwareFieldOfType($mapping->getShopwareKey(), 'bool');
 
-            if ($attribute instanceof ProductSelectAttribute) {
-                foreach ($attribute->getOptions() as $option) {
-                    $swData->setTranslatedField(
-                        $mapping->getShopwareKey(),
-                        IsoCodeConverter::ergonodeToShopwareIso($defaultLocale),
-                        $option->getCode()
-                    );
-                    $swData->setData($mapping->getShopwareKey(), $option->getCode());
-                    foreach ($option->getName() as $language => $value) {
-                        $translatedValue = $castToBool ? YesNo::cast($value) : $value;
-                        if ($language === $defaultLocale) {
-                            if (is_null($value)) {
-                                continue;
-                            }
-                            $swData->setData($mapping->getShopwareKey(), $translatedValue);
-                        }
-                        $swData->setTranslatedField(
-                            $mapping->getShopwareKey(),
-                            IsoCodeConverter::ergonodeToShopwareIso($language),
-                            $translatedValue
-                        );
-                    }
-                }
-                if (empty($attribute->getOptions())) {
-                    $this->resetValueStrategy->resetValue($swData, $mapping);
-                }
+            if ($attribute instanceof ProductMultiSelectAttribute) {
+                $swData = $this->processMultiSelectAttribute($attribute, $swData, $defaultLocale, $mapping, $castToBool);
+            } elseif ($attribute instanceof ProductSelectAttribute) {
+                $swData = $this->processSelectAttribute($attribute, $swData, $defaultLocale, $mapping, $castToBool);
             } else {
                 foreach ($attribute->getTranslations() as $translation) {
                     $value = $castToBool ? YesNo::cast($translation->getValue()) : $translation->getValue();
@@ -115,7 +96,7 @@ class ProductTransformer implements ProductDataTransformerInterface
                     );
                 }
                 if (empty($attribute->getTranslations())) {
-                    $this->resetValueStrategy->resetValue($swData, $mapping);
+                    $swData = $this->resetValueStrategy->resetValue($swData, $mapping);
                 }
             }
         }
@@ -127,5 +108,93 @@ class ProductTransformer implements ProductDataTransformerInterface
         $productData->setShopwareData($swData);
 
         return $productData;
+    }
+
+    private function processMultiSelectAttribute(
+        ProductMultiSelectAttribute $attribute,
+        mixed $swData,
+        string $defaultLocale,
+        ErgonodeAttributeMappingEntity $mapping,
+        bool $castToBool
+    ): ProductShopwareData {
+        $defaultData = [];
+        foreach ($attribute->getOptions() as $option) {
+            $defaultValue = $option->getCode();
+            foreach ($option->getName() as $language => $value) {
+                $translatedValue = $castToBool ? YesNo::cast($value) : $value;
+                if ($language === $defaultLocale) {
+                    if (is_null($value)) {
+                        continue;
+                    }
+                    $defaultValue = $translatedValue;
+                }
+
+                $existingTranslation = $swData->getTranslatedField(
+                    $mapping->getShopwareKey(),
+                    IsoCodeConverter::ergonodeToShopwareIso($language)
+                ) ?? [];
+                $existingTranslation[] = $translatedValue;
+                $swData->setTranslatedField(
+                    $mapping->getShopwareKey(),
+                    IsoCodeConverter::ergonodeToShopwareIso($language),
+                    $existingTranslation
+                );
+            }
+            $defaultData[] = $defaultValue;
+        }
+
+        $defaultTranslation = $swData->getTranslatedField(
+            $mapping->getShopwareKey(),
+            IsoCodeConverter::ergonodeToShopwareIso($defaultLocale)
+        );
+        $swData->setData($mapping->getShopwareKey(), $defaultData);
+        if (empty($defaultTranslation)) {
+            $swData->setTranslatedField(
+                $mapping->getShopwareKey(),
+                IsoCodeConverter::ergonodeToShopwareIso($defaultLocale),
+                $defaultData
+            );
+        }
+        if (empty($attribute->getOptions())) {
+            $swData = $this->resetValueStrategy->resetValue($swData, $mapping);
+        }
+
+        return $swData;
+    }
+
+    private function processSelectAttribute(
+        ProductSelectAttribute $attribute,
+        ProductShopwareData $swData,
+        string $defaultLocale,
+        ErgonodeAttributeMappingEntity $mapping,
+        bool $castToBool
+    ): ProductShopwareData {
+        foreach ($attribute->getOptions() as $option) {
+            $swData->setTranslatedField(
+                $mapping->getShopwareKey(),
+                IsoCodeConverter::ergonodeToShopwareIso($defaultLocale),
+                $option->getCode()
+            );
+            $swData->setData($mapping->getShopwareKey(), $option->getCode());
+            foreach ($option->getName() as $language => $value) {
+                $translatedValue = $castToBool ? YesNo::cast($value) : $value;
+                if ($language === $defaultLocale) {
+                    if (is_null($value)) {
+                        continue;
+                    }
+                    $swData->setData($mapping->getShopwareKey(), $translatedValue);
+                }
+                $swData->setTranslatedField(
+                    $mapping->getShopwareKey(),
+                    IsoCodeConverter::ergonodeToShopwareIso($language),
+                    $translatedValue
+                );
+            }
+        }
+        if (empty($attribute->getOptions())) {
+            $swData = $this->resetValueStrategy->resetValue($swData, $mapping);
+        }
+
+        return $swData;
     }
 }

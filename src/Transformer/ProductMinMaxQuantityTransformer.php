@@ -100,7 +100,7 @@ class ProductMinMaxQuantityTransformer implements ProductDataTransformerInterfac
             }
         }
 
-        return null;
+        return 1;
     }
 
     private function getMaxPurchase(
