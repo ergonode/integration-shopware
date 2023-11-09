@@ -77,6 +77,8 @@ class ProductTransformer implements ProductDataTransformerInterface
                 continue;
             }
 
+            $swData = $this->resetValueStrategy->resetValue($swData, $mapping);
+
             $castToBool = AttributeTypesEnum::isShopwareFieldOfType($mapping->getShopwareKey(), 'bool');
 
             if ($attribute instanceof ProductMultiSelectAttribute) {

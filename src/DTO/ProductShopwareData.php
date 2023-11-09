@@ -128,6 +128,11 @@ class ProductShopwareData
         return $this->data['translations'][$language][$field] ?? null;
     }
 
+    public function getTranslations(): array
+    {
+        return $this->data['translations'] ?? [];
+    }
+
     public function setStock(int $stock): void
     {
         $this->data['stock'] = $stock;

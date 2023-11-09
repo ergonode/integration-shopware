@@ -40,17 +40,26 @@ class ProductResetValueStrategy
 
         if (in_array($mapping->getShopwareKey(), self::VALUE_1_FIELDS)) {
             $shopwareData->setData($mapping->getShopwareKey(), 1);
+            foreach ($shopwareData->getTranslations() as $language => $data) {
+                $shopwareData->setTranslatedField($mapping->getShopwareKey(), $language, 1);
+            }
 
             return $shopwareData;
         }
 
         if (in_array($mapping->getShopwareKey(), self::VALUE_FALSE_FIELDS)) {
             $shopwareData->setData($mapping->getShopwareKey(), false);
+            foreach ($shopwareData->getTranslations() as $language => $data) {
+                $shopwareData->setTranslatedField($mapping->getShopwareKey(), $language, false);
+            }
 
             return $shopwareData;
         }
 
         $shopwareData->setData($mapping->getShopwareKey(), null);
+        foreach ($shopwareData->getTranslations() as $language => $data) {
+            $shopwareData->setTranslatedField($mapping->getShopwareKey(), $language, null);
+        }
 
         return $shopwareData;
     }
