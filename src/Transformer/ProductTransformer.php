@@ -87,7 +87,7 @@ class ProductTransformer implements ProductDataTransformerInterface
                 $swData = $this->processSelectAttribute($attribute, $swData, $defaultLocale, $mapping, $castToBool);
             } else {
                 foreach ($attribute->getTranslations() as $translation) {
-                    $value = $castToBool ? YesNo::cast($translation->getValue()) : $translation->getValue();
+                    $value = $castToBool && !is_null($translation->getValue()) ? YesNo::cast($translation->getValue()) : $translation->getValue();
                     if ($translation->getLanguage() === $defaultLocale) {
                         $swData->setData($mapping->getShopwareKey(), $value);
                     }
@@ -123,7 +123,7 @@ class ProductTransformer implements ProductDataTransformerInterface
         foreach ($attribute->getOptions() as $option) {
             $defaultValue = $option->getCode();
             foreach ($option->getName() as $language => $value) {
-                $translatedValue = $castToBool ? YesNo::cast($value) : $value;
+                $translatedValue = $castToBool && !is_null($value) ? YesNo::cast($value) : $value;
                 if ($language === $defaultLocale) {
                     if (is_null($value)) {
                         continue;
@@ -179,7 +179,7 @@ class ProductTransformer implements ProductDataTransformerInterface
             );
             $swData->setData($mapping->getShopwareKey(), $option->getCode());
             foreach ($option->getName() as $language => $value) {
-                $translatedValue = $castToBool ? YesNo::cast($value) : $value;
+                $translatedValue = $castToBool && !is_null($value) ? YesNo::cast($value) : $value;
                 if ($language === $defaultLocale) {
                     if (is_null($value)) {
                         continue;
