@@ -102,4 +102,17 @@ class Constants
         'referenceUnit' => 'sw-product.priceForm.labelReferenceUnit',
         'scaleUnit' => 'sw-product.packagingForm.labelUnit',
     ];
+
+    /**
+     * Those mappings are processed by specific transformers. Should not be processed in main ProductTransformer
+     */
+    public const MAPPINGS_WITH_SEPARATE_TRANSFORMERS = [
+        'price.net' ,
+        'price.gross',
+        'tax.rate',
+        'media',
+        'manufacturer',
+        'deliveryTime',
+        'scaleUnit',
+    ];
 }
