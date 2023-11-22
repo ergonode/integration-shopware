@@ -22,6 +22,14 @@ class ProductProvider
         $this->productRepository = $productRepository;
     }
 
+    public function getProductId(string $sku, Context $context): ?string
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('productNumber', $sku));
+
+        return $this->productRepository->searchIds($criteria, $context)->firstId();
+    }
+
     public function getProductBySku(string $sku, Context $context, array $associations = []): ?ProductEntity
     {
         $criteria = new Criteria();

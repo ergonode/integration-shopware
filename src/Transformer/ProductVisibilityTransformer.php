@@ -10,6 +10,10 @@ use Shopware\Core\Content\Product\Aggregate\ProductVisibility\ProductVisibilityD
 use Shopware\Core\Content\Product\Aggregate\ProductVisibility\ProductVisibilityEntity;
 use Shopware\Core\Framework\Context;
 
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use function array_values;
 use function in_array;
 
@@ -17,10 +21,14 @@ class ProductVisibilityTransformer
 {
     private ProductProvider $productProvider;
 
+    private EntityRepository $productVisibilityRepository;
+
     public function __construct(
-        ProductProvider $productProvider
+        ProductProvider $productProvider,
+        EntityRepository $productVisibilityRepository
     ) {
         $this->productProvider = $productProvider;
+        $this->productVisibilityRepository = $productVisibilityRepository;
     }
 
     public function transform(ProductVisibilityDTO $dto, Context $context): ProductVisibilityDTO
@@ -28,22 +36,18 @@ class ProductVisibilityTransformer
         $sku = $dto->getSku();
         $productSalesChannelIds = $dto->getSalesChannelIds();
 
-        $product = $this->productProvider->getProductBySku($sku, $context, ['visibilities']);
+        $productId = $this->productProvider->getProductId($sku, $context);
 
-        if (null === $product) {
+        if (!$productId) {
             return $dto; // product missing
         }
 
-        $visibilities = $product->getVisibilities();
-
-        if (null === $visibilities) {
-            return $dto; // association missing
-        }
+        $visibilities = $this->getVisibility($productId, $context);
 
         if (0 === $visibilities->count()) {
             $payload = array_map(fn(string $salesChannelId) => [
                 'visibility' => ProductVisibilityDefinition::VISIBILITY_ALL,
-                'productId' => $product->getId(),
+                'productId' => $productId,
                 'salesChannelId' => $salesChannelId,
             ], $productSalesChannelIds);
 
@@ -72,12 +76,19 @@ class ProductVisibilityTransformer
 
         $payload = array_map(fn(string $salesChannelId) => [
             'visibility' => ProductVisibilityDefinition::VISIBILITY_ALL,
-            'productId' => $product->getId(),
+            'productId' => $productId,
             'salesChannelId' => $salesChannelId,
         ], array_values($newSalesChannelIds));
 
         $dto->setCreatePayload($payload);
 
         return $dto;
+    }
+
+    private function getVisibility(string $productId, Context $context): EntitySearchResult
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('productId', $productId));
+        return $this->productVisibilityRepository->search($criteria, $context);
     }
 }
