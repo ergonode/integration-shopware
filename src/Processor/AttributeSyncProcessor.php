@@ -60,11 +60,9 @@ class AttributeSyncProcessor
             );
 
             $endCursor = $attributeStream->getEndCursor();
-            if (null === $endCursor) {
-                throw new \RuntimeException('Could not retrieve end cursor from the response.');
+            if (null !== $endCursor) {
+                $this->cursorManager->persist($endCursor, AttributeStreamResultsProxy::MAIN_FIELD, $context);
             }
-
-            $this->cursorManager->persist($endCursor, AttributeStreamResultsProxy::MAIN_FIELD, $context);
         }
 
         return $counter;
