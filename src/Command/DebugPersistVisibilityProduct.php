@@ -10,6 +10,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 
 /**
  * Temporary debug command
@@ -38,7 +39,7 @@ class DebugPersistVisibilityProduct extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->messageBus->dispatch(new ProductVisibilitySync());
+        $this->messageBus->dispatch(new ProductVisibilitySync(), [new TransportNamesStamp('sync')]);
 
         return self::SUCCESS;
     }

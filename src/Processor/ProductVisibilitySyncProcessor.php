@@ -6,9 +6,11 @@ namespace Ergonode\IntegrationShopware\Processor;
 
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientFactory;
 use Ergonode\IntegrationShopware\DTO\SyncCounterDTO;
+use Ergonode\IntegrationShopware\MessageQueue\Message\SingleProductVisibilitySync;
 use Ergonode\IntegrationShopware\Persistor\ProductVisibilityPersistor;
 use Ergonode\IntegrationShopware\Provider\ErgonodeProductProvider;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class ProductVisibilitySyncProcessor
 {
@@ -20,14 +22,18 @@ class ProductVisibilitySyncProcessor
 
     private ErgonodeProductProvider $ergonodeProductProvider;
 
+    private MessageBusInterface $messageBus;
+
     public function __construct(
         ProductVisibilityPersistor $persistor,
         ErgonodeGqlClientFactory $gqlClientFactory,
-        ErgonodeProductProvider $ergonodeProductProvider
+        ErgonodeProductProvider $ergonodeProductProvider,
+        MessageBusInterface $messageBus
     ) {
         $this->persistor = $persistor;
         $this->gqlClientFactory = $gqlClientFactory;
         $this->ergonodeProductProvider = $ergonodeProductProvider;
+        $this->messageBus = $messageBus;
     }
 
     public function processStream(Context $context, int $productCount = self::DEFAULT_PRODUCT_COUNT): SyncCounterDTO
@@ -50,10 +56,23 @@ class ProductVisibilitySyncProcessor
                     $skuSalesChannelsMap[$product['node']['sku']][] = $salesChannelClient->getSalesChannelId();
                 }
             }
-
         }
 
-        foreach ($skuSalesChannelsMap as $sku => $salesChannelIds) {
+        $chunk = array_chunk($skuSalesChannelsMap, 5000, true);
+
+        foreach($chunk as $chunkRecord) {
+            $this->messageBus->dispatch(new SingleProductVisibilitySync($chunkRecord));
+        }
+
+        return $counter;
+    }
+
+
+    public function processSingle(array $data, Context $context): SyncCounterDTO
+    {
+        $counter = new SyncCounterDTO();
+
+        foreach ($data as $sku => $salesChannelIds) {
             $counter->incrProcessedEntityCount(
                 count($this->persistor->persist(strval($sku), $salesChannelIds, $context))
             );
