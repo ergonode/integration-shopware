@@ -328,7 +328,6 @@ class ProductQueryBuilder
     public function buildProductWithVariants(
         string $sku,
         ?string $variantsCursor = null,
-        ?string $categoriesCursor = null
     ): Query {
         $variantListArguments = ['first' => self::VARIANT_LIST_COUNT];
         if (null !== $variantsCursor) {
@@ -336,9 +335,6 @@ class ProductQueryBuilder
         }
 
         $categoryListArguments = ['first' => self::CATEGORY_LIST_COUNT];
-        if (null !== $categoriesCursor) {
-            $categoryListArguments['after'] = $categoriesCursor;
-        }
 
         return (new Query('product'))
             ->setArguments(['sku' => $sku])

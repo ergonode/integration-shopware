@@ -43,24 +43,23 @@ class PropertyGroupTransformer
         $propertyGroup = $dto->getSwPropertyGroup();
 
         $options = [];
-        if (!empty($node['options'])) {
-            foreach ($node['options'] as $option) {
-                if (!empty($option['code'])) {
-                    $existingOption = $propertyGroup ? $this->getOptionByCode($propertyGroup, $option['code']) : null;
+        foreach ($node['optionList']['edges'] ?? [] as $optionNode) {
+            $option = $optionNode['node'];
+            if (!empty($option['code'])) {
+                $existingOption = $propertyGroup ? $this->getOptionByCode($propertyGroup, $option['code']) : null;
 
-                    $options[] = [
-                        'id' => $existingOption ? $existingOption->getId() : null,
-                        'name' => $option['code'],
-                        'translations' => $this->translationTransformer->transform($option['name'], 'name'),
-                        'extensions' => [
-                            AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                                'id' => $existingOption ? $this->getEntityExtensionId($existingOption) : null,
-                                'code' => CodeBuilderUtil::buildExtended($code, $option['code']),
-                                'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
-                            ],
+                $options[] = [
+                    'id' => $existingOption?->getId(),
+                    'name' => $option['code'],
+                    'translations' => $this->translationTransformer->transform($option['name'], 'name'),
+                    'extensions' => [
+                        AbstractErgonodeMappingExtension::EXTENSION_NAME => [
+                            'id' => $existingOption ? $this->getEntityExtensionId($existingOption) : null,
+                            'code' => CodeBuilderUtil::buildExtended($code, $option['code']),
+                            'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                         ],
-                    ];
-                }
+                    ],
+                ];
             }
         }
 

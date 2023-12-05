@@ -123,6 +123,9 @@ class CategoryTreePersistor
         }
 
         $afterCategoryId = $parentCode ? $this->categoryOrderHelper->getLastCategoryIdForParent($parentId) : $lastRootCategoryId;
+        if ($afterCategoryId === $id) {
+            $afterCategoryId = null;
+        }
         $this->categoryOrderHelper->set($parentId, $id);
 
         $categoryName = null;

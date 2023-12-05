@@ -88,17 +88,17 @@ class ProductCrossSellingTransformer implements ProductDataTransformerInterface
             }
             $productIds = array_values($this->productProvider->getProductIdsBySkus($skus, $context));
 
-            $existingCrossSelling = $this->getProductCrossSelling($productData->getSwProduct(), $code, $context);
+            $existingCrossSelling = $this->getProductCrossSelling($productData->getSwProduct(), $relationAttribute->getCode(), $context);
 
             $assignedProducts = array_values(
                 $this->getAssignedProductsPayload($existingCrossSelling, $productIds, $productData)
             );
 
             $translations[$defaultLocale] = [
-                'name' => $code,
+                'name' => $relationAttribute->getCode(),
             ];
 
-            $extensionCode = CodeBuilderUtil::buildExtended($productData->getErgonodeData()->getSku(), $code);
+            $extensionCode = CodeBuilderUtil::buildExtended($productData->getErgonodeData()->getSku(), $relationAttribute->getCode());
             if (!$existingCrossSelling) {
                 $this->deleteLegacyMapping($extensionCode, $context);
             }
