@@ -12,7 +12,7 @@ use Shopware\Core\Framework\Context;
 
 use function array_merge_recursive;
 
-class ProductExistingCustomFieldTransformer implements ProductDataTransformerInterface
+class ProductMappedCustomFieldTransformer implements ProductDataTransformerInterface
 {
     private ProductCustomFieldTransformerResolver $transformerResolver;
 
@@ -35,45 +35,37 @@ class ProductExistingCustomFieldTransformer implements ProductDataTransformerInt
         $ergonodeData = $productData->getErgonodeData();
         $swData = $productData->getShopwareData();
 
+        $mappings = $this->customFieldMappingProvider->getAttributeMapByErgonodeKeys($context);
         $customFields = [];
-
-        foreach ($ergonodeData['attributeList']['edges'] as $edge) {
-            $code = $edge['node']['attribute']['code'];
-            $mappings = $this->customFieldMappingProvider->provideByErgonodeKey($code, $context);
-
-            $this->validator->filterWrongAttributes(
-                $edge['node']['attribute'] ?? [],
-                $mappings,
-                $context,
-                ['sku' => $ergonodeData['sku']]
-            );
-
-            if (0 === $mappings->count()) {
+        foreach ($mappings as $mapping) {
+            $code = $mapping->getErgonodeKey();
+            $attribute = $ergonodeData->getAttributeByCode($code);
+            if (is_null($attribute)) {
                 continue;
             }
 
-            $node = $edge['node'];
+            if (!$this->validator->isValid($attribute, $mapping, $context, $ergonodeData->getSku())) {
+                continue;
+            }
 
-            $typedTransformer = $this->transformerResolver->resolve($node);
+            $typedTransformer = $this->transformerResolver->resolve($attribute);
             if (null === $typedTransformer) {
                 continue;
             }
 
-            foreach ($mappings as $mapping) {
-                $customFields[] = $typedTransformer->transformNode(
-                    $node,
-                    $mapping->getShopwareKey(),
-                    $context
-                );
-            }
+            $customFields[] = $typedTransformer->transformNode(
+                $attribute,
+                $mapping->getShopwareKey(),
+                $context
+            );
         }
 
+        if (empty($customFields)) {
+            return $productData;
+        }
         $customFields = array_merge_recursive(...$customFields);
 
-        $swData['translations'] = array_merge_recursive(
-            $swData['translations'] ?? [],
-            $customFields
-        );
+        $swData->setCustomFields($customFields);
 
         $productData->setShopwareData($swData);
 

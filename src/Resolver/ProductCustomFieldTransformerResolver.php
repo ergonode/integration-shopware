@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Resolver;
 
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Ergonode\IntegrationShopware\Transformer\ProductCustomField\ProductCustomFieldTransformerInterface;
 
 class ProductCustomFieldTransformerResolver
@@ -19,10 +20,10 @@ class ProductCustomFieldTransformerResolver
         $this->transformers = $transformers;
     }
 
-    public function resolve(array $node): ?ProductCustomFieldTransformerInterface
+    public function resolve(ProductAttribute $attribute): ?ProductCustomFieldTransformerInterface
     {
         foreach ($this->transformers as $transformer) {
-            if ($transformer->supports($node)) {
+            if ($transformer->supports($attribute)) {
                 return $transformer;
             }
         }

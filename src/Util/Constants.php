@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Util;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum as Attr;
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
 
 class Constants
 {
@@ -23,10 +24,10 @@ class Constants
         'ean' => [Attr::TEXT, Attr::TEXTAREA, Attr::SELECT],
         'manufacturerNumber' => [Attr::TEXT, Attr::TEXTAREA, Attr::SELECT],
         'manufacturer' => [Attr::SELECT],
-        'weight' => [Attr::NUMERIC],
-        'height' => [Attr::NUMERIC],
-        'width' => [Attr::NUMERIC],
-        'length' => [Attr::NUMERIC],
+        'weight' => [Attr::NUMERIC, Attr::UNIT],
+        'height' => [Attr::NUMERIC, Attr::UNIT],
+        'width' => [Attr::NUMERIC, Attr::UNIT],
+        'length' => [Attr::NUMERIC, Attr::UNIT],
         'customSearchKeywords' => [Attr::MULTISELECT],
         'description' => [Attr::TEXT, Attr::TEXTAREA],
         'metaTitle' => [Attr::TEXT, Attr::TEXTAREA, Attr::SELECT],
@@ -47,6 +48,42 @@ class Constants
         'scaleUnit' => [Attr::SELECT],
     ];
 
+
+    public const SW_PRODUCT_MAPPABLE_FIELD_TYPES = [
+        'active' => [ProductAttribute::TYPE_BOOL],
+        'name' => [ProductAttribute::TYPE_TEXT, ProductAttribute::TYPE_TEXTAREA, ProductAttribute::TYPE_SELECT],
+        'price.net' => [ProductAttribute::TYPE_NUMERIC, ProductAttribute::TYPE_PRICE],
+        'price.gross' => [ProductAttribute::TYPE_NUMERIC, ProductAttribute::TYPE_PRICE],
+        'tax.rate' => [ProductAttribute::TYPE_NUMERIC],
+        'stock' => [ProductAttribute::TYPE_NUMERIC],
+        'media' => [ProductAttribute::TYPE_GALLERY],
+        'ean' => [ProductAttribute::TYPE_TEXT, ProductAttribute::TYPE_TEXTAREA, ProductAttribute::TYPE_SELECT],
+        'manufacturerNumber' => [ProductAttribute::TYPE_TEXT, ProductAttribute::TYPE_TEXTAREA, ProductAttribute::TYPE_SELECT],
+        'manufacturer' => [ProductAttribute::TYPE_SELECT],
+        'weight' => [ProductAttribute::TYPE_NUMERIC],
+        'height' => [ProductAttribute::TYPE_NUMERIC],
+        'width' => [ProductAttribute::TYPE_NUMERIC],
+        'length' => [ProductAttribute::TYPE_NUMERIC],
+        'customSearchKeywords' => [ProductAttribute::TYPE_MULTI_SELECT],
+        'description' => [ProductAttribute::TYPE_TEXT, ProductAttribute::TYPE_TEXTAREA],
+        'metaTitle' => [ProductAttribute::TYPE_TEXT, ProductAttribute::TYPE_TEXTAREA, ProductAttribute::TYPE_SELECT],
+        'metaDescription' => [ProductAttribute::TYPE_TEXT, ProductAttribute::TYPE_TEXTAREA, ProductAttribute::TYPE_SELECT],
+        'keywords' => [ProductAttribute::TYPE_TEXT, ProductAttribute::TYPE_TEXTAREA, ProductAttribute::TYPE_SELECT],
+        'purchaseSteps' => [ProductAttribute::TYPE_NUMERIC],
+        'maxPurchase' => [ProductAttribute::TYPE_NUMERIC],
+        'minPurchase' => [ProductAttribute::TYPE_NUMERIC],
+        'packUnit' => [ProductAttribute::TYPE_TEXT, ProductAttribute::TYPE_TEXTAREA, ProductAttribute::TYPE_SELECT],
+        'packUnitPlural' => [ProductAttribute::TYPE_TEXT, ProductAttribute::TYPE_TEXTAREA, ProductAttribute::TYPE_SELECT],
+        'purchaseUnit' => [ProductAttribute::TYPE_NUMERIC],
+        'referenceUnit' => [ProductAttribute::TYPE_NUMERIC],
+        'isCloseout' => [ProductAttribute::TYPE_BOOL],
+        'shippingFree' => [ProductAttribute::TYPE_BOOL],
+        'restockTime' => [ProductAttribute::TYPE_NUMERIC],
+        'markAsTopseller' => [ProductAttribute::TYPE_BOOL],
+        'deliveryTime' => [ProductAttribute::TYPE_SELECT],
+        'scaleUnit' => [ProductAttribute::TYPE_SELECT],
+    ];
+
     public const DEFAULT_TRANSLATION_KEY = 'sw-product-stream.filter.values.';
 
     // put translations keys here if key is different from self::DEFAULT_TRANSLATION_KEY
@@ -63,6 +100,19 @@ class Constants
         'price.gross' => 'global.sw-price-field.labelPriceGross',
         'purchaseUnit' => 'sw-product.priceForm.labelPurchaseUnit',
         'referenceUnit' => 'sw-product.priceForm.labelReferenceUnit',
-        'scaleUnit' => 'sw-product-stream.filter.values.unit',
+        'scaleUnit' => 'sw-product.packagingForm.labelUnit',
+    ];
+
+    /**
+     * Those mappings are processed by specific transformers. Should not be processed in main ProductTransformer
+     */
+    public const MAPPINGS_WITH_SEPARATE_TRANSFORMERS = [
+        'price.net' ,
+        'price.gross',
+        'tax.rate',
+        'media',
+        'manufacturer',
+        'deliveryTime',
+        'scaleUnit',
     ];
 }

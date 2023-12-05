@@ -7,13 +7,16 @@ namespace Ergonode\IntegrationShopware\Persistor;
 use Ergonode\IntegrationShopware\Api\ProductStreamResultsProxy;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
+use Ergonode\IntegrationShopware\Factory\ProductDataFactory;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
+use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
 use Ergonode\IntegrationShopware\Struct\ProductContainer;
 use Ergonode\IntegrationShopware\Transformer\ProductTransformerChain;
 use Ergonode\IntegrationShopware\Transformer\VariantsTransformer;
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
 use Ergonode\IntegrationShopware\Util\Constants;
+use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\Context;
@@ -50,6 +53,8 @@ class ProductPersistor
 
     private ErgonodeCursorManager $cursorManager;
 
+    private ProductDataFactory $productDataFactory;
+
     public function __construct(
         EntityRepository $productRepository,
         ProductProvider $productProvider,
@@ -59,7 +64,9 @@ class ProductPersistor
         EntityRepository $productCategoryRepository,
         VariantsTransformer $variantsTransformer,
         ProductContainer $productContainer,
-        ErgonodeCursorManager $cursorManager
+        ErgonodeCursorManager $cursorManager,
+        ProductDataFactory $productDataFactory,
+        private readonly LanguageProvider $languageProvider
     ) {
         $this->productRepository = $productRepository;
         $this->productProvider = $productProvider;
@@ -70,6 +77,7 @@ class ProductPersistor
         $this->variantsTransformer = $variantsTransformer;
         $this->productContainer = $productContainer;
         $this->cursorManager = $cursorManager;
+        $this->productDataFactory = $productDataFactory;
     }
 
     /**
@@ -157,7 +165,10 @@ class ProductPersistor
 
         $isInitialPaginatedImport = $this->checkIsInitialPaginatedImport($productData, $context);
 
-        $dto = new ProductTransformationDTO($productData, [], $isInitialPaginatedImport);
+        $defaultLanguage = IsoCodeConverter::shopwareToErgonodeIso(
+            $this->languageProvider->getDefaultLanguageLocale($context)
+        );
+        $dto = $this->productDataFactory->create($productData, $isInitialPaginatedImport, $context, $defaultLanguage);
         $dto->setSwProduct($existingProduct);
 
         try {
@@ -190,10 +201,7 @@ class ProductPersistor
             return [];
         }
 
-        return array_filter(
-            $transformedData->getShopwareData(),
-            fn($value) => !empty($value) || 0 === $value || false === $value || null === $value
-        );
+        return $transformedData->getShopwareData()->getAllData();
     }
 
     private function deleteEntities(ProductTransformationDTO $dto, Context $context): void

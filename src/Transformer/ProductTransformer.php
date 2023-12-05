@@ -4,197 +4,199 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Transformer;
 
+use Ergonode\IntegrationShopware\DTO\ProductShopwareData;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
-use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingCollection;
-use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum as Attr;
+use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeAttributeMappingEntity;
+use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
+use Ergonode\IntegrationShopware\Model\ProductMultiSelectAttribute;
+use Ergonode\IntegrationShopware\Model\ProductSelectAttribute;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
-use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
+use Ergonode\IntegrationShopware\Transformer\Strategy\ProductResetValueStrategy;
 use Ergonode\IntegrationShopware\Util\AttributeTypeValidator;
-use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
+use Ergonode\IntegrationShopware\Util\Constants;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Ergonode\IntegrationShopware\Util\YesNo;
-use RuntimeException;
 use Shopware\Core\Framework\Context;
 
-use function array_key_exists;
-use function array_merge_recursive;
 use function in_array;
-use function is_array;
-use function sprintf;
 
 class ProductTransformer implements ProductDataTransformerInterface
 {
-    private string $defaultLocale;
-
-    private const TRANSLATABLE_KEYS = [
-        'name',
-        'description',
-        'metaDescription',
-        'keywords',
-        'metaTitle',
-        'packUnit',
-        'packUnitPlural',
-        'customSearchKeywords',
-        'scaleUnit',
-    ];
-
     private AttributeMappingProvider $attributeMappingProvider;
 
     private LanguageProvider $languageProvider;
 
     private AttributeTypeValidator $attributeTypeValidator;
 
+    private ProductResetValueStrategy $resetValueStrategy;
+
     public function __construct(
         AttributeMappingProvider $attributeMappingProvider,
         LanguageProvider $languageProvider,
-        AttributeTypeValidator $attributeTypeValidator
+        AttributeTypeValidator $attributeTypeValidator,
+        ProductResetValueStrategy $resetValueStrategy
     ) {
         $this->attributeMappingProvider = $attributeMappingProvider;
         $this->languageProvider = $languageProvider;
         $this->attributeTypeValidator = $attributeTypeValidator;
+        $this->resetValueStrategy = $resetValueStrategy;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $ergonodeData = $productData->getErgonodeData();
-        if (false === is_array($ergonodeData['attributeList']['edges'] ?? null)) {
-            throw new RuntimeException('Invalid data format');
-        }
+        $swData = $productData->getShopwareData();
 
-        $this->defaultLocale = IsoCodeConverter::shopwareToErgonodeIso(
+        $defaultLocale = IsoCodeConverter::shopwareToErgonodeIso(
             $this->languageProvider->getDefaultLanguageLocale($context)
         );
 
-        $result = [];
+        $mappings = $this->attributeMappingProvider->getAttributeMapByErgonodeKeys($context);
+        foreach ($mappings as $mapping) {
+            if (in_array($mapping->getShopwareKey(), Constants::MAPPINGS_WITH_SEPARATE_TRANSFORMERS)) {
+                continue;
+            }
+            $code = $mapping->getErgonodeKey();
+            $attribute = $ergonodeData->getAttributeByCode($code);
+            if (!$attribute instanceof ProductAttribute) {
+                $swData = $this->resetValueStrategy->resetValue($swData, $mapping);
+                continue;
+            }
+            $mappingKeys = $this->attributeMappingProvider->provideByErgonodeKey($attribute->getCode(), $context);
 
-        foreach ($ergonodeData['attributeList']['edges'] as $edge) {
-            $code = $edge['node']['attribute']['code'];
-            $mappingKeys = $this->attributeMappingProvider->provideByErgonodeKey($code, $context);
-
-            $this->attributeTypeValidator->filterWrongAttributes(
-                $edge['node']['attribute'] ?? [],
-                $mappingKeys,
+            $this->attributeTypeValidator->isValid(
+                $attribute,
+                $mapping,
                 $context,
-                ['sku' => $ergonodeData['sku']]
+                $ergonodeData->getSku()
             );
 
             if (0 === $mappingKeys->count()) {
                 continue;
             }
 
-            $isCodeAsValueAttribute = $this->isCodeAsValueAttribute($mappingKeys);
+            $swData = $this->resetValueStrategy->resetValue($swData, $mapping);
 
-            $translatedValues = $this->getTranslatedValues($edge['node']['translations'], $isCodeAsValueAttribute);
-            if (false === array_key_exists($this->defaultLocale, $translatedValues)) {
-                throw new RuntimeException(
-                    sprintf('Default locale %s not found in product data', $this->defaultLocale)
-                );
+            $castToBool = AttributeTypesEnum::isShopwareFieldOfType($mapping->getShopwareKey(), 'bool');
+
+            if ($attribute instanceof ProductMultiSelectAttribute) {
+                $swData = $this->processMultiSelectAttribute($attribute, $swData, $defaultLocale, $mapping, $castToBool);
+            } elseif ($attribute instanceof ProductSelectAttribute) {
+                $swData = $this->processSelectAttribute($attribute, $swData, $defaultLocale, $mapping, $castToBool);
+            } else {
+                foreach ($attribute->getTranslations() as $translation) {
+                    $value = $castToBool && !is_null($translation->getValue()) ? YesNo::cast($translation->getValue()) : $translation->getValue();
+                    if ($translation->getLanguage() === $defaultLocale) {
+                        $swData->setData($mapping->getShopwareKey(), $value);
+                    }
+                    $swData->setTranslatedField(
+                        $mapping->getShopwareKey(),
+                        IsoCodeConverter::ergonodeToShopwareIso($translation->getLanguage()),
+                        $value
+                    );
+                }
+                if (empty($attribute->getTranslations())) {
+                    $swData = $this->resetValueStrategy->resetValue($swData, $mapping);
+                }
             }
-
-            $result = array_merge_recursive(
-                $result,
-                $this->getTransformedResult($mappingKeys, $translatedValues)
-            );
         }
 
         if ($productData->isUpdate()) {
-            $result['id'] = $productData->getSwProduct()->getId();
+            $swData->setId($productData->getSwProduct()->getId());
         }
 
-        $productData->setShopwareData(
-            ArrayUnfoldUtil::unfoldArray($result)
-        );
+        $productData->setShopwareData($swData);
 
         return $productData;
     }
 
-    private function getTranslatedValues(array $valueTranslations, bool $isCodeAsValueAttribute): array
-    {
-        $translatedValues = [];
-        foreach ($valueTranslations as $valueTranslation) {
-            $language = $valueTranslation['language'];
-            $valueKey = ErgonodeApiValueKeyResolverUtil::resolve($valueTranslation['__typename']);
-            switch ($valueKey) {
-                case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_ARRAY:
-                    if ($valueTranslation[$valueKey] === null) {
-                        $translatedValues[$language] = null;
-                        break;
+    private function processMultiSelectAttribute(
+        ProductMultiSelectAttribute $attribute,
+        mixed $swData,
+        string $defaultLocale,
+        ErgonodeAttributeMappingEntity $mapping,
+        bool $castToBool
+    ): ProductShopwareData {
+        $defaultData = [];
+        foreach ($attribute->getOptions() as $option) {
+            $defaultValue = $option->getCode();
+            foreach ($option->getName() as $language => $value) {
+                $translatedValue = $castToBool && !is_null($value) ? YesNo::cast($value) : $value;
+                if ($language === $defaultLocale) {
+                    if (is_null($value)) {
+                        continue;
                     }
-                    $translatedValues[$language] = empty($valueTranslation[$valueKey]['name']) || $isCodeAsValueAttribute
-                        ? $valueTranslation[$valueKey]['code']
-                        : $valueTranslation[$valueKey]['name'];
-                    break;
-                case ErgonodeApiValueKeyResolverUtil::TYPE_VALUE_MULTI_ARRAY:
-                    $values = [];
-                    foreach ($valueTranslation[$valueKey] as $record) {
-                        $values[] = empty($record['name']) || $isCodeAsValueAttribute
-                            ? $record['code']
-                            : $record['name'];
+                    $defaultValue = $translatedValue;
+                }
+
+                $existingTranslation = $swData->getTranslatedField(
+                    $mapping->getShopwareKey(),
+                    IsoCodeConverter::ergonodeToShopwareIso($language)
+                ) ?? [];
+                $existingTranslation[] = $translatedValue;
+                $swData->setTranslatedField(
+                    $mapping->getShopwareKey(),
+                    IsoCodeConverter::ergonodeToShopwareIso($language),
+                    $existingTranslation
+                );
+            }
+            $defaultData[] = $defaultValue;
+        }
+
+        $defaultTranslation = $swData->getTranslatedField(
+            $mapping->getShopwareKey(),
+            IsoCodeConverter::ergonodeToShopwareIso($defaultLocale)
+        );
+        $swData->setData($mapping->getShopwareKey(), $defaultData);
+        if (empty($defaultTranslation)) {
+            $swData->setTranslatedField(
+                $mapping->getShopwareKey(),
+                IsoCodeConverter::ergonodeToShopwareIso($defaultLocale),
+                $defaultData
+            );
+        }
+        if (empty($attribute->getOptions())) {
+            $swData = $this->resetValueStrategy->resetValue($swData, $mapping);
+        }
+
+        return $swData;
+    }
+
+    private function processSelectAttribute(
+        ProductSelectAttribute $attribute,
+        ProductShopwareData $swData,
+        string $defaultLocale,
+        ErgonodeAttributeMappingEntity $mapping,
+        bool $castToBool
+    ): ProductShopwareData {
+        foreach ($attribute->getOptions() as $option) {
+            $swData->setTranslatedField(
+                $mapping->getShopwareKey(),
+                IsoCodeConverter::ergonodeToShopwareIso($defaultLocale),
+                $option->getCode()
+            );
+            $swData->setData($mapping->getShopwareKey(), $option->getCode());
+            foreach ($option->getName() as $language => $value) {
+                $translatedValue = $castToBool && !is_null($value) ? YesNo::cast($value) : $value;
+                if ($language === $defaultLocale) {
+                    if (is_null($value)) {
+                        continue;
                     }
-                    $translatedValues[$language] = $values;
-                    break;
-                default:
-                    $translatedValues[$language] = $valueTranslation[$valueKey];
-                    break;
+                    $swData->setData($mapping->getShopwareKey(), $translatedValue);
+                }
+                $swData->setTranslatedField(
+                    $mapping->getShopwareKey(),
+                    IsoCodeConverter::ergonodeToShopwareIso($language),
+                    $translatedValue
+                );
             }
         }
-
-        return $translatedValues;
-    }
-
-    private function getTransformedResult(
-        ErgonodeAttributeMappingCollection $mappingKeys,
-        array $translatedValues
-    ): array {
-        $result = [];
-        foreach ($mappingKeys as $mappingEntity) {
-            $swKey = $mappingEntity->getShopwareKey();
-            $result[$swKey] = $translatedValues[$this->defaultLocale];
-            $result = $this->getTranslations($translatedValues, $swKey, $result);
-
-            if (Attr::isShopwareFieldOfType($swKey, Attr::BOOL)) {
-                $result = $this->castResultsToBoolean($result);
-            }
+        if (empty($attribute->getOptions())) {
+            $swData = $this->resetValueStrategy->resetValue($swData, $mapping);
         }
 
-        return $result;
-    }
-
-    private function getTranslations(array $translatedValues, string $swKey, array $result): array
-    {
-        foreach ($translatedValues as $locale => $value) {
-            if (null === $value || false === in_array($swKey, self::TRANSLATABLE_KEYS)) {
-                continue;
-            }
-
-            $swLocale = IsoCodeConverter::ergonodeToShopwareIso($locale);
-            $result['translations'][$swLocale][$swKey] = $value;
-        }
-
-        return $result;
-    }
-
-    private function castResultsToBoolean(array $result): array
-    {
-        foreach ($result as &$value) {
-            $value = YesNo::cast($value);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns names of Ergondoe attributes that we should use code instead of translated name
-     */
-    private function isCodeAsValueAttribute(ErgonodeAttributeMappingCollection $mappingKeys): bool
-    {
-        foreach ($mappingKeys as $mappingKey) {
-            if ($mappingKey->getShopwareKey() === 'manufacturer') {
-                return true;
-            }
-        }
-
-        return false;
+        return $swData;
     }
 }

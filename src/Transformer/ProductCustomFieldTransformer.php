@@ -10,9 +10,7 @@ use Ergonode\IntegrationShopware\Service\ConfigService;
 use Ergonode\IntegrationShopware\Util\CustomFieldUtil;
 use Shopware\Core\Framework\Context;
 
-use function array_filter;
 use function array_merge_recursive;
-use function in_array;
 
 class ProductCustomFieldTransformer implements ProductDataTransformerInterface
 {
@@ -34,46 +32,38 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
 
         $codes = $this->configService->getErgonodeCustomFieldKeys();
 
-        $attributes = $this->getAttributesByCodes($productData->getErgonodeData(), $codes);
+        $attributes = $productData->getErgonodeData()->getAttributesByCodes($codes);
 
         $customFields = [];
-        foreach ($attributes as $ergoCustomField) {
-            $node = $ergoCustomField['node'] ?? null;
-            $code = $node['attribute']['code'] ?? null;
 
-            if (empty($node) || empty($code)) {
-                continue;
-            }
-
-            $typedTransformer = $this->transformerResolver->resolve($node);
+        $unprocessedCodes = array_flip($codes);
+        foreach ($attributes as $attribute) {
+            $typedTransformer = $this->transformerResolver->resolve($attribute);
             if (null === $typedTransformer) {
                 continue;
             }
 
             $customFields[] = $typedTransformer->transformNode(
-                $node,
-                CustomFieldUtil::buildCustomFieldName($code),
+                $attribute,
+                CustomFieldUtil::buildCustomFieldName($attribute->getCode()),
                 $context
             );
+
+            unset($unprocessedCodes[$attribute->getCode()]);
         }
 
         $customFields = array_merge_recursive(...$customFields);
 
-        $swData['translations'] = array_merge_recursive(
-            $swData['translations'] ?? [],
-            $customFields
-        );
+        foreach ($unprocessedCodes as $unprocessedCode => $val) {
+            foreach ($customFields as $language => $customFieldList) {
+                $customFields[$language]['customFields'][CustomFieldUtil::buildCustomFieldName($unprocessedCode)] = null;
+            }
+        }
+
+        $swData->setCustomFields($customFields);
 
         $productData->setShopwareData($swData);
 
         return $productData;
-    }
-
-    private function getAttributesByCodes(array $ergonodeData, array $codes): array
-    {
-        return array_filter(
-            $ergonodeData['attributeList']['edges'] ?? [],
-            fn(array $attribute) => in_array($attribute['node']['attribute']['code'] ?? '', $codes)
-        );
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Manager;
 
+use Ergonode\IntegrationShopware\Model\ProductMultimediaTranslation;
 use Ergonode\IntegrationShopware\Service\FileDownloader;
 use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\MediaService;
@@ -31,9 +32,9 @@ class FileManager
         $this->mediaRepository = $mediaRepository;
     }
 
-    public function persist(array $image, Context $context): ?string
+    public function persist(ProductMultimediaTranslation $image, Context $context): ?string
     {
-        if (empty($image['url']) || empty($image['extension'])) {
+        if (empty($image->getUrl()) || empty($image->getExtension())) {
             return null;
         }
 
@@ -43,7 +44,7 @@ class FileManager
             return $existingMedia->getId();
         }
 
-        $file = $this->fileDownloader->download($image['url'], $image['extension']);
+        $file = $this->fileDownloader->download($image->getUrl(), $image->getExtension());
 
         if (null === $file) {
             return null;
@@ -59,7 +60,7 @@ class FileManager
         );
     }
 
-    private function getMediaEntity(array $image, Context $context): ?MediaEntity
+    private function getMediaEntity(ProductMultimediaTranslation $image, Context $context): ?MediaEntity
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('fileName', $this->buildFileName($image)));
@@ -75,8 +76,16 @@ class FileManager
         return null;
     }
 
-    private function buildFileName(array $image): string
+    private function buildFileName(ProductMultimediaTranslation $image): string
     {
-        return md5(json_encode($image));
+        $imageData = [
+            'name' => $image->getName(),
+            'extension' => $image->getExtension(),
+            'mime' => $image->getMime(),
+            'size' => $image->getSize(),
+            'url' => $image->getUrl(),
+        ];
+
+        return md5(json_encode($imageData));
     }
 }

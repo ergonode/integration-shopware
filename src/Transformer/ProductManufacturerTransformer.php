@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
@@ -25,14 +26,22 @@ class ProductManufacturerTransformer implements ProductDataTransformerInterface
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $shopwareData = $productData->getShopwareData();
-        $manufacturerName = $shopwareData['manufacturer'] ?? null;
-        if (empty($manufacturerName)) {
-            return $productData;
+        $ergonodeData = $productData->getErgonodeData();
+
+        $manufacturerAttribute = $ergonodeData->getManufacturer();
+        if ($manufacturerAttribute) {
+            $shopwareData->setManufacturerId(null);
+            if ($manufacturerAttribute->getFirstOption()) {
+                $code = $manufacturerAttribute->getFirstOption()->getCode();
+                $manufacturerId = $this->findManufacturer($code, $context);
+                $shopwareData->setManufacturerId($manufacturerId);
+            }
+        } elseif ($manufacturerAttribute === false && $productData->getSwProduct()) {
+            $shopwareData->setManufacturerId($productData->getSwProduct()->getManufacturerId());
+        } else {
+            $shopwareData->setManufacturerId(null);
         }
 
-        $manufacturerId = $this->findManufacturer($manufacturerName, $context);
-
-        $shopwareData['manufacturer'] = $manufacturerId ? ['id' => $manufacturerId] : null;
         $productData->setShopwareData($shopwareData);
 
         return $productData;

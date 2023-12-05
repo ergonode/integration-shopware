@@ -29,4 +29,18 @@ class AttributeStreamResultsProxy extends AbstractStreamResultsProxy
             fn(array $attribute) => in_array($attribute['node']['code'] ?? null, $array)
         );
     }
+
+    public function addOptions(string $attributeCode, array $options): void
+    {
+        $edges = $this->results['data'][static::MAIN_FIELD]['edges'];
+
+        foreach ($edges as $key => $edge) {
+            if ($edge['node']['code'] === $attributeCode) {
+                $edge['node']['optionList']['edges'] = array_merge($edge['node']['optionList']['edges'], $options);
+                $this->results['data'][static::MAIN_FIELD]['edges'][$key] = $edge;
+
+                return;
+            }
+        }
+    }
 }
