@@ -22,6 +22,7 @@ class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterfac
     private const SHOPWARE_KEY = 'deliveryTime';
     public const  MAPPING_TYPE = 'deliveryTime';
     private const DELIVERY_TIME_PATTERN = '/[\s-]+/';
+    private const AVAILABLE_UNITS = ['hour', 'day', 'week', 'month', 'year'];
 
     private AttributeMappingProvider $attributeMappingProvider;
 
@@ -69,6 +70,17 @@ class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterfac
             }
 
             [$min, $max, $unit] = $pieces;
+
+            $unit = rtrim($unit, 's');
+
+            if (!in_array($unit, self::AVAILABLE_UNITS)) {
+                $this->ergonodeSyncLogger->error(
+                    sprintf('Invalid syntax for option %s - delivery time unit. Acceptable values: hours, days, weeks, months, years', $code)
+                );
+
+                continue;
+            }
+
             $timeEntity = $this->getExistingDeliveryTimeEntity((int)$min, (int)$max, $unit, $code, $context);
 
             $translations = [];

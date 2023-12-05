@@ -138,16 +138,13 @@ class ProductSyncProcessor
         $stopwatch = new Stopwatch();
 
         $variantsCursorKey = CodeBuilderUtil::build(ProductStreamResultsProxy::VARIANT_LIST_FIELD, $sku);
-        $categoriesCursorKey = CodeBuilderUtil::build(ProductStreamResultsProxy::CATEGORY_LIST_FIELD, $sku);
 
         $variantsCursor = $this->cursorManager->getCursorEntity($variantsCursorKey, $context);
-        $categoriesCursor = $this->cursorManager->getCursorEntity($categoriesCursorKey, $context);
 
         $stopwatch->start('query');
         $query = $this->productQueryBuilder->buildProductWithVariants(
             $sku,
             $variantsCursor ? $variantsCursor->getCursor() : null,
-            $categoriesCursor ? $categoriesCursor->getCursor() : null
         );
         /** @var ProductResultsProxy|null $result */
         $result = $this->gqlClient->query($query, ProductResultsProxy::class);
@@ -172,15 +169,9 @@ class ProductSyncProcessor
             $this->cursorManager->persist($variantsEndCursor, $variantsCursorKey, $context);
         }
 
-        $categoriesEndCursor = $result->getCategoriesEndCursor();
-        if (null !== $categoriesEndCursor) {
-            $this->cursorManager->persist($categoriesEndCursor, $categoriesCursorKey, $context);
-        }
-
         $hasNextPage = $result->hasVariantsNextPage() || $result->hasCategoriesNextPage();
         if (false === $hasNextPage) {
             $this->cursorManager->deleteCursor($variantsCursorKey, $context);
-            $this->cursorManager->deleteCursor($categoriesCursorKey, $context);
         }
 
         $counter->incrProcessedEntityCount(count($primaryKeys));
