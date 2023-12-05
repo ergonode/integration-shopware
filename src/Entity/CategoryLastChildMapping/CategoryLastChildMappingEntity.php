@@ -11,11 +11,11 @@ class CategoryLastChildMappingEntity extends Entity
 {
     use EntityIdTrait;
 
-    protected string $categoryId;
+    protected ?string $categoryId = null;
 
     protected string $lastChildId;
 
-    public function getCategoryId(): string
+    public function getCategoryId(): ?string
     {
         return $this->categoryId;
     }
