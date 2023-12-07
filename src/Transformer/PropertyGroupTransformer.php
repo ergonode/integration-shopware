@@ -11,18 +11,24 @@ use Ergonode\IntegrationShopware\Extension\AbstractErgonodeMappingExtension;
 use Ergonode\IntegrationShopware\Extension\PropertyGroup\PropertyGroupExtension;
 use Ergonode\IntegrationShopware\Extension\PropertyGroupOption\PropertyGroupOptionExtension;
 use Ergonode\IntegrationShopware\Util\CodeBuilderUtil;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionEntity;
 use Shopware\Core\Content\Property\PropertyGroupEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
+use Symfony\Component\String\UnicodeString;
 
 class PropertyGroupTransformer
 {
     private TranslationTransformer $translationTransformer;
 
+    private LoggerInterface $ergonodeSyncLogger;
+
     public function __construct(
-        TranslationTransformer $translationTransformer
+        TranslationTransformer $translationTransformer,
+        LoggerInterface $ergonodeSyncLogger
     ) {
         $this->translationTransformer = $translationTransformer;
+        $this->ergonodeSyncLogger = $ergonodeSyncLogger;
     }
 
     public function transformAttributeNode(PropertyGroupTransformationDTO $dto): PropertyGroupTransformationDTO
@@ -46,7 +52,22 @@ class PropertyGroupTransformer
         foreach ($node['optionList']['edges'] ?? [] as $optionNode) {
             $option = $optionNode['node'];
             if (!empty($option['code'])) {
-                $existingOption = $propertyGroup ? $this->getOptionByCode($propertyGroup, $option['code']) : null;
+                $optionCode = $option['code'];
+                $optionCode = (new UnicodeString($optionCode))->ascii()->toString();
+
+                $existingOption = $propertyGroup ? $this->getOptionByCode($propertyGroup, $optionCode) : null;
+                // avoid duplicate properties with same option code
+                if ($existingOption) {
+                    foreach ($options as $optionRow) {
+                        if ($optionRow['id'] === $existingOption->getId()) {
+                            $this->ergonodeSyncLogger->warning(
+                                'Option with duplicate code. Skipped',
+                                ['option' => $option['code'], 'attribute' => $code]
+                            );
+                            continue 2;
+                        }
+                    }
+                }
 
                 $options[] = [
                     'id' => $existingOption?->getId(),
@@ -55,7 +76,7 @@ class PropertyGroupTransformer
                     'extensions' => [
                         AbstractErgonodeMappingExtension::EXTENSION_NAME => [
                             'id' => $existingOption ? $this->getEntityExtensionId($existingOption) : null,
-                            'code' => CodeBuilderUtil::buildExtended($code, $option['code']),
+                            'code' => CodeBuilderUtil::buildExtended($code, $optionCode),
                             'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
                         ],
                     ],
@@ -64,7 +85,7 @@ class PropertyGroupTransformer
         }
 
         $dto->setPropertyGroupPayload([
-            'id' => $propertyGroup ? $propertyGroup->getId() : null,
+            'id' => $propertyGroup?->getId(),
             'name' => $code,
             'options' => $options,
             'translations' => $translations,
@@ -100,11 +121,13 @@ class PropertyGroupTransformer
         foreach ($options as $option) {
             $extension = $option->getExtension(AbstractErgonodeMappingExtension::EXTENSION_NAME);
 
+            $asciiExtensionCode = (new UnicodeString($extension->getCode()))->ascii()->toString();
             if (
                 $extension instanceof ErgonodeMappingExtensionEntity &&
                 $groupExtension instanceof ErgonodeMappingExtensionEntity && (
                     CodeBuilderUtil::build($groupExtension->getCode(), $code) === $extension->getCode()
                     || CodeBuilderUtil::buildExtended($groupExtension->getCode(), $code) === $extension->getCode()
+                    || CodeBuilderUtil::buildExtended($groupExtension->getCode(), $code) === $asciiExtensionCode
                 )
             ) {
                 return $option;
