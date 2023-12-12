@@ -13,6 +13,7 @@
       "attributeMappings": "Attribute mappings",
       "customFieldMappings": "Custom field mappings",
       "categoryMappings": "Category mappings",
+      "categoryAttributeMappings": "Category attribute mappings",
       "importHistory": "Import history",
       "synchronization": "Synchronization"
     },
@@ -23,9 +24,11 @@
       "categoryMappings": "Category mappings",
       "shopwareAttribute": "Shopware attribute",
       "shopwareCategory": "Shopware category",
+      "shopwareCategoryAttribute": "Shopware category attribute",
       "shopwareCustomField": "Shopware custom field",
       "ergonodeAttribute": "Ergonode attribute",
       "ergonodeCategory": "Ergonode category",
+      "ergonodeCategoryAttribute": "Ergonode category attribute",
       "addMapping": "Add mapping",
       "messages": {
         "mappingCreationSuccessful": "A mapping has been successfully created.",
@@ -76,6 +79,14 @@
         "label": "Ergonode integration",
         "synchronisation_triggerer": "Trigger synchronization",
         "history_viewer": "View import history"
+      }
+    }
+  },
+  "sw-category": {
+    "base": {
+      "link": {
+        "externalLink": "External link",
+        "internalLink": "Internal link data"
       }
     }
   }

@@ -52,8 +52,17 @@ class AttributeTypesEnum
         return reset($type) ?: self::TEXT;
     }
 
-    public static function isShopwareFieldOfType(string $shopwareKey, string $type): bool
+    public static function isShopwareProductFieldOfType(string $shopwareKey, string $type): bool
     {
-        return in_array($type, Constants::SW_PRODUCT_MAPPABLE_FIELDS[$shopwareKey] ?? []);
+        return in_array(
+            $type, Constants::SW_PRODUCT_MAPPABLE_FIELDS[$shopwareKey] ?? []
+        );
+    }
+
+    public static function isShopwareCategoryFieldOfType(string $shopwareKey, string $type): bool
+    {
+        return in_array(
+            $type, Constants::SW_CATEGORY_ATTRIBUTES_MAPPABLE_FIELDS[$shopwareKey] ?? []
+        );
     }
 }

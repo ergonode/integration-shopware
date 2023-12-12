@@ -46,6 +46,21 @@ export default class ErgonodeMappingService extends ApiService {
             headers: this.getBasicHeaders()
         });
     }
+
+    async getShopwareCategoryAttributes() {
+        return await this.client.get('ergonode/shopware-category-attributes', {
+            headers: this.getBasicHeaders(),
+        });
+    }
+
+    async getErgonodeCategoryAttributes(types = []) {
+        return await this.client.get('ergonode/ergonode-category-attributes', {
+            headers: this.getBasicHeaders(),
+            params: {
+                ...(types?.length && { types }),
+            },
+        });
+    }
     
     async getTimezones() {
         return await this.client.get('ergonode/timezones', {

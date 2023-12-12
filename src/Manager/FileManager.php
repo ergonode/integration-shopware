@@ -32,13 +32,16 @@ class FileManager
         $this->mediaRepository = $mediaRepository;
     }
 
-    public function persist(ProductMultimediaTranslation $image, Context $context): ?string
-    {
+    public function persist(
+        array $image,
+        Context $context,
+        string $folder = ProductDefinition::ENTITY_NAME
+    ): ?string {
         if (empty($image->getUrl()) || empty($image->getExtension())) {
             return null;
         }
 
-        $existingMedia = $this->getMediaEntity($image, $context);
+        $existingMedia = $this->getMediaEntity($image, $context, $folder);
 
         if (null !== $existingMedia) {
             return $existingMedia->getId();
@@ -54,17 +57,21 @@ class FileManager
             $file,
             $this->buildFileName($image),
             $context,
-            ProductDefinition::ENTITY_NAME,
+            $folder,
             null,
             false
         );
     }
 
-    private function getMediaEntity(ProductMultimediaTranslation $image, Context $context): ?MediaEntity
+    private function getMediaEntity(
+        array $image,
+        Context $context,
+        string $folder = ProductDefinition::ENTITY_NAME
+    ): ?MediaEntity
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('fileName', $this->buildFileName($image)));
-        $criteria->addFilter(new EqualsFilter('mediaFolder.defaultFolder.entity', ProductDefinition::ENTITY_NAME));
+        $criteria->addFilter(new EqualsFilter('mediaFolder.defaultFolder.entity', $folder));
         $criteria->addAssociation('mediaFolder.defaultFolder');
 
         $media = $this->mediaRepository->search($criteria, $context)->first();

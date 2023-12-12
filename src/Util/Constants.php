@@ -115,4 +115,44 @@ class Constants
         'deliveryTime',
         'scaleUnit',
     ];
+
+
+    public const SW_CATEGORY_ATTRIBUTES_MAPPABLE_FIELDS = [
+        # General tab
+        'active' => [Attr::BOOL],
+        'tags' => [Attr::MULTISELECT],
+        'type' => [Attr::SELECT],
+        # General `product` type
+        'visible' => [Attr::BOOL],
+        'media' => [Attr::IMAGE],
+        'description' => [Attr::TEXTAREA],
+        # General `url` type
+        'linkNewTab' => [Attr::BOOL],
+        'linkType' => [Attr::SELECT],
+        'externalLink' => [Attr::TEXT],
+        'internalLink' => [Attr::TEXT],
+        # Seo tab
+        'metaTitle' => [Attr::TEXT],
+        'metaDescription' => [Attr::TEXTAREA],
+        'keywords' => [Attr::TEXT],
+    ];
+
+    public const SW_CATEGORY_ATTRIBUTES_TRANSLATION_KEYS = [
+        # General tab
+        'active' => 'sw-category.base.general.isCategoryActiveLabel',
+        'tags' => 'sw-category.base.general.labelCategoryTags',
+        'type' => 'sw-category.base.general.types.title',
+        'visible' => 'sw-category.base.menu.visible',
+        'media' => 'sw-category.base.menu.imageLabel',
+        'description' => 'sw-category.base.menu.descriptionLabel',
+        # Links
+        'linkNewTab' => 'sw-category.base.link.linkNewTabLabel',
+        'linkType' => 'sw-category.base.link.mainTypeLabel',
+        'externalLink' => 'sw-category.base.link.externalLink',
+        'internalLink' => 'sw-category.base.link.internalLink',
+        # Seo tab
+        'metaTitle' => 'sw-category.base.seo.labelMetaTitle',
+        'metaDescription' => 'sw-landing-page.base.seo.labelMetaDescription',
+        'keywords' => 'sw-category.base.seo.labelKeywords',
+    ];
 }

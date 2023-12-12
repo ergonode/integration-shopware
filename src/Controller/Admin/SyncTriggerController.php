@@ -6,6 +6,7 @@ namespace Ergonode\IntegrationShopware\Controller\Admin;
 
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\MessageQueue\Message\AttributeSync;
+use Ergonode\IntegrationShopware\MessageQueue\Message\CategoryAttributesSync;
 use Ergonode\IntegrationShopware\MessageQueue\Message\CategorySync;
 use Ergonode\IntegrationShopware\MessageQueue\Message\DeletedAttributeSync;
 use Ergonode\IntegrationShopware\MessageQueue\Message\DeletedProductSync;
@@ -53,6 +54,7 @@ class SyncTriggerController extends AbstractController
         $this->messageBus->dispatch(new AttributeSync());
         $this->messageBus->dispatch(new CategorySync());
         $this->messageBus->dispatch(new ProductSync());
+        $this->messageBus->dispatch(new CategoryAttributesSync());
         $this->messageBus->dispatch(new ProductVisibilitySync());
         $this->messageBus->dispatch(new DeletedProductSync());
         $this->messageBus->dispatch(new DeletedAttributeSync());

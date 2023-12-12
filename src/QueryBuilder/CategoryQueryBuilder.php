@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\QueryBuilder;
 
+use Ergonode\IntegrationShopware\QueryBuilder\Common\AttributesQuery;
 use GraphQL\Query;
 
 class CategoryQueryBuilder
 {
     public const DEFAULT_TREE_COUNT = 50;
+    public const DEFAULT_CATEGORY_ATTRIBUTE_COUNT = 200;
 
     public function buildTree(string $treeCode, int $count, ?string $cursor): Query
     {
@@ -91,6 +93,41 @@ class CategoryQueryBuilder
             ]);
     }
 
+    public function buildWithCategoryAttributes(int $count, ?string $cursor): Query
+    {
+        $listArguments = ['first' => $count];
+        if ($cursor !== null) {
+            $listArguments['after'] = $cursor;
+        }
+
+        $attributesArguments = ['first' => self::DEFAULT_CATEGORY_ATTRIBUTE_COUNT];
+
+        return (new Query('categoryStream'))
+            ->setArguments($listArguments)
+            ->setSelectionSet([
+                'totalCount',
+                (new Query('pageInfo'))
+                    ->setSelectionSet([
+                        'endCursor',
+                        'hasNextPage',
+                    ]),
+                (new Query('edges'))
+                    ->setSelectionSet([
+                        'cursor',
+                        (new Query('node'))
+                            ->setSelectionSet([
+                                'code',
+                                (new Query('name'))
+                                    ->setSelectionSet([
+                                        'value',
+                                        'language',
+                                    ]),
+                                $this->queryAttributeList($attributesArguments),
+                            ]),
+                    ]),
+            ]);
+    }
+
     public function buildTreeStream(
         int $categoryLeafCount,
         ?string $categoryLeafCursor = null
@@ -149,6 +186,23 @@ class CategoryQueryBuilder
                     ]),
             ]);
     }
+
+    private function queryAttributeList(array $attributesArguments)
+    {
+        return (new Query('attributeList'))
+            ->setArguments($attributesArguments)
+            ->setSelectionSet([
+                (new Query('edges'))
+                    ->setSelectionSet([
+                        (new Query('node'))
+                            ->setSelectionSet([
+                                AttributesQuery::getAttributeFragment(),
+                                AttributesQuery::attributesTranslations(),
+                            ]),
+                    ]),
+            ]);
+    }
+
 
     public function buildTreeStreamWithOnlyCodes(
         int $treeCount,
