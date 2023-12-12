@@ -41,11 +41,19 @@ class CategoryAttributesPersistor
 
             if (null === $categoryContainer->getShopwareId($ergonodeCategoryCode)) {
                 //Category was not downloaded to shopware
+
                 continue;
             }
 
             if ($edge['node']['attributeList']['edges'] === []) {
                 // Empty attributes in ergo
+
+                $this->ergonodeSyncLogger->info(
+                    'No category attributes in ergonode',
+                    [
+                        'code' => $ergonodeCategoryCode,
+                    ]
+                );
                 continue;
             }
 
@@ -89,6 +97,14 @@ class CategoryAttributesPersistor
             try {
                 $repository = $this->definitionInstanceRegistry->getRepository($entityName);
                 $repository->delete(array_values($payload), $context);
+
+                $this->ergonodeSyncLogger->info(
+                    'Deleting entities',
+                    [
+                        'entity' => $entityName,
+                        'count' => count($payload),
+                    ]
+                );
             } catch (EntityRepositoryNotFoundException $e) {
                 continue;
             }

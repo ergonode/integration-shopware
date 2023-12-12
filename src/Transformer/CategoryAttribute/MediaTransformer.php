@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Transformer\CategoryAttribute;
 
 use Ergonode\IntegrationShopware\DTO\CategoryTransformationDTO;
-use Ergonode\IntegrationShopware\Manager\FileManager;
+use Ergonode\IntegrationShopware\Manager\FileManagerArray;
 use Ergonode\IntegrationShopware\Transformer\CategoryDataTransformerInterface;
 use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\Context;
@@ -16,7 +16,7 @@ class MediaTransformer implements CategoryDataTransformerInterface
     private const SW_FIELD_MEDIA_ID = 'mediaId';
 
     public function __construct(
-        private FileManager $fileManager,
+        private FileManagerArray $fileManager,
     )
     {
     }
@@ -25,21 +25,17 @@ class MediaTransformer implements CategoryDataTransformerInterface
     {
         $swData = $categoryData->getShopwareData();
 
-        if (empty($swData[self::SW_FIELD_MEDIA]) ||
-            !is_array($swData[self::SW_FIELD_MEDIA])) {
-            $categoryData->unsetSwData(self::SW_FIELD_MEDIA);
-
+        if (!isset($swData[self::SW_FIELD_MEDIA])) {
             return $categoryData;
         }
 
         $image = $swData[self::SW_FIELD_MEDIA];
 
         $mediaId = $this->fileManager->persist($image, $context, CategoryDefinition::ENTITY_NAME);
-
         $swData[self::SW_FIELD_MEDIA_ID] = $mediaId;
-        $categoryData->unsetSwData(self::SW_FIELD_MEDIA);
 
         $categoryData->setShopwareData($swData);
+        $categoryData->unsetSwData(self::SW_FIELD_MEDIA);
 
         return $categoryData;
     }

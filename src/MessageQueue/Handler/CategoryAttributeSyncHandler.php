@@ -21,8 +21,6 @@ use Throwable;
 #[AsMessageHandler]
 class CategoryAttributeSyncHandler extends AbstractSyncHandler
 {
-    private const MAX_PAGES_PER_RUN = 10;
-
     private CategoryAttributesSyncProcessor $processor;
 
     private MessageBusInterface $messageBus;
@@ -64,13 +62,12 @@ class CategoryAttributeSyncHandler extends AbstractSyncHandler
     {
         $categoryContainer = $this->createCategoryContainer();
 
-        $currentPage = 0;
         $primaryKeys = [];
         do {
             try {
                 $result = $this->processor->processStream($categoryContainer, $this->context);
 
-                $primaryKeys = \array_unique($result->getPrimaryKeys());
+                $primaryKeys = array_merge($primaryKeys, $result->getPrimaryKeys());
             } catch (Throwable $e) {
                 $this->logger->error('Error while persisting category sync.', [
                     'message' => $e->getMessage(),
@@ -78,9 +75,7 @@ class CategoryAttributeSyncHandler extends AbstractSyncHandler
                     'trace' => $e->getTraceAsString(),
                 ]);
             }
-
-            $currentPage++;
-        } while (isset($result) && $result->hasNextPage() && $currentPage <= self::MAX_PAGES_PER_RUN);
+        } while (isset($result) && $result->hasNextPage());
 
         if (false === empty($primaryKeys)) {
             $this->logger->info('Dispatching category indexing message');

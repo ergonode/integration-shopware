@@ -83,7 +83,7 @@ class CategoryAttributesSyncProcessor
             $categoryContainer,
             $context
         );
-        $counter->setPrimaryKeys($counter->getPrimaryKeys() + $primaryKeys);
+        $counter->setPrimaryKeys($primaryKeys);
 
         if ($result->hasNextPage()) {
             $this->logger->info('Category attribute stream have next page', [

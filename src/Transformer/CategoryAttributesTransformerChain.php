@@ -22,7 +22,7 @@ class CategoryAttributesTransformerChain implements CategoryDataTransformerInter
         foreach ($this->transformers as $transformer) {
             $categoryData = $transformer->transform($categoryData, $context);
         }
-var_dump($categoryData->getShopwareData());
+
         return $categoryData;
     }
 }
