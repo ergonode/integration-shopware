@@ -61,9 +61,9 @@ class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterfac
     public function process(array $node, Context $context): void
     {
         $deliveryTimeIds = [];
-        foreach ($node['options'] ?? [] as $option) {
+        foreach ($node['optionList']['edges'] ?? [] as $edge) {
+            $option = $edge['node'];
             $code = $option['code'];
-
             $pieces = $this->getDeliveryTimePieces($code);
             if (!$pieces) {
                 continue;
@@ -110,7 +110,6 @@ class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterfac
             ];
 
             $deliveryTimeIds[] = $timeId;
-
             $this->mappingExtensionRepository->upsert([$mappingData], $context);
         }
 
