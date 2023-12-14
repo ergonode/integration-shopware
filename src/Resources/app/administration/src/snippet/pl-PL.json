@@ -45,6 +45,7 @@
       "attributeMappings": "Mapowania atrybutów",
       "customFieldMappings": "Mapowania pól dodatkowych",
       "categoryMappings": "Mapowania kategorii",
+      "categoryAttributeMappings": "Mapowania atrybutów kategorii",
       "shopwareAttribute": "Atrybut Shopware",
       "shopwareCustomField": "Pole dodatkowe Shopware",
       "ergonodeAttribute": "Atrybut Ergonode",
@@ -74,6 +75,14 @@
         "label": "Integracja z Ergonode",
         "synchronisation_triggerer": "Wyzwalanie synchronizacji",
         "history_viewer": "Przeglądanie historii importów"
+      }
+    }
+  },
+  "sw-category": {
+    "base": {
+      "link": {
+        "externalLink": "Zewnętrzny link",
+        "internalLink": "Wewnętrzny zasób link"
       }
     }
   }
