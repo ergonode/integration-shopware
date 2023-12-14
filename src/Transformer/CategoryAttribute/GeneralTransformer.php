@@ -29,7 +29,6 @@ class GeneralTransformer implements CategoryDataTransformerInterface
     private const TRANSLATABLE_KEYS = [
         'name',
         'description',
-        //Seo
         'metaTitle',
         'metaDescription',
         'keywords',

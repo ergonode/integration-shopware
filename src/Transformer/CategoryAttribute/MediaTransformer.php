@@ -17,8 +17,7 @@ class MediaTransformer implements CategoryDataTransformerInterface
 
     public function __construct(
         private FileManagerArray $fileManager,
-    )
-    {
+    ) {
     }
 
     public function transform(CategoryTransformationDTO $categoryData, Context $context): CategoryTransformationDTO

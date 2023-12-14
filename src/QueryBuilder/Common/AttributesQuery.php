@@ -14,6 +14,7 @@ class AttributesQuery
     {
         return (new Query('attribute'))
             ->setSelectionSet([
+                '__typename',
                 'code',
                 'scope',
                 (new InlineFragment('DateAttribute'))

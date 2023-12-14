@@ -45,7 +45,7 @@
       "attributeMappings": "Mapowania atrybutów",
       "customFieldMappings": "Mapowania pól dodatkowych",
       "categoryMappings": "Mapowania kategorii",
-      "categoryAttributeMappings": "Mapowania kategorii atrybutów",
+      "categoryAttributeMappings": "Mapowania atrybutów kategorii",
       "shopwareAttribute": "Atrybut Shopware",
       "shopwareCustomField": "Pole dodatkowe Shopware",
       "ergonodeAttribute": "Atrybut Ergonode",

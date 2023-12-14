@@ -62,7 +62,7 @@ class FileManagerArray
     private function getMediaEntity(
         array $image,
         Context $context,
-        string $folder = ProductDefinition::ENTITY_NAME
+        string $folder
     ): ?MediaEntity
     {
         $criteria = new Criteria();

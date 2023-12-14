@@ -203,7 +203,6 @@ class CategoryQueryBuilder
             ]);
     }
 
-
     public function buildTreeStreamWithOnlyCodes(
         int $treeCount,
         ?string $treeCursor = null

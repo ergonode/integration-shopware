@@ -32,8 +32,7 @@ class CategoryAttributeSyncHandler extends AbstractSyncHandler
         CategoryAttributesSyncProcessor $processor,
         MessageBusInterface             $messageBus,
         private readonly Connection     $connection,
-    )
-    {
+    ) {
         parent::__construct($syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
         $this->processor = $processor;
