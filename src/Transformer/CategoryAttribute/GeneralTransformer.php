@@ -24,6 +24,7 @@ use function sprintf;
 
 class GeneralTransformer implements CategoryDataTransformerInterface
 {
+    const KEY_FOR_REVERSE_VALUE = 'visible';
     private string $defaultLocale;
 
     private const TRANSLATABLE_KEYS = [
@@ -34,6 +35,18 @@ class GeneralTransformer implements CategoryDataTransformerInterface
         'keywords',
     ];
 
+    private const CATEGORY_KEYS = [
+        'active',
+        'visible',
+        'description',
+        'linkNewTab',
+        'linkType',
+        'externalLink',
+        'internalLink',
+        'metaTitle',
+        'metaDescription',
+        'keywords',
+    ];
 
     public function __construct(
         private CategoryAttributeMappingProvider $categoryAttributeMappingProvider,
@@ -53,6 +66,7 @@ class GeneralTransformer implements CategoryDataTransformerInterface
         );
 
         $result = $categoryData->getShopwareData();
+
         foreach ($ergonodeData['attributeList']['edges'] as $edge) {
             $code = $edge['node']['attribute']['code'];
             $mappingKeys = $this->categoryAttributeMappingProvider->provideByErgonodeKey($code, $context);
@@ -77,6 +91,8 @@ class GeneralTransformer implements CategoryDataTransformerInterface
         $categoryData->setShopwareData(
             ArrayUnfoldUtil::unfoldArray($result)
         );
+
+        $this->setupEmptyValues($categoryData, $context);
 
         return $categoryData;
     }
@@ -127,6 +143,11 @@ class GeneralTransformer implements CategoryDataTransformerInterface
 
             if (Attr::isShopwareCategoryFieldOfType($swKey, Attr::BOOL)) {
                 $result = $this->castResultsToBoolean($result);
+
+                if ($swKey === self::KEY_FOR_REVERSE_VALUE) {
+                    //Shopware shows reverse value for this field in admin panel.
+                    $result[$swKey] = !$result[$swKey];
+                }
             }
         }
 
@@ -154,5 +175,46 @@ class GeneralTransformer implements CategoryDataTransformerInterface
         }
 
         return $result;
+    }
+
+    private function setupEmptyValues(CategoryTransformationDTO $categoryData, Context $context): void
+    {
+        $shopwareData = $categoryData->getShopwareData();
+        foreach (self::CATEGORY_KEYS as $swKey) {
+            $mapping = $this->categoryAttributeMappingProvider->provideByShopwareKey($swKey, $context);
+
+            if (null === $mapping) {
+                //Mapping not set for field - removing values not allowed
+                continue;
+            }
+
+            if (in_array($swKey, self::TRANSLATABLE_KEYS)) {
+                //Field in translation
+                //Setup all translations for null
+                foreach ($categoryData->getSwLangCodes() as $langCode) {
+                    if (!isset($shopwareData['translations'][$langCode][$swKey])) {
+                        $shopwareData['translations'][$langCode][$swKey] = null;
+                    }
+                }
+
+                continue;
+            }
+
+            //Field in main body
+            if (!isset($shopwareData[$swKey])) {
+                if (Attr::isShopwareCategoryFieldOfType($swKey, Attr::BOOL)) {
+                    $shopwareData[$swKey] = false;
+
+                    if ($swKey === self::KEY_FOR_REVERSE_VALUE) {
+                        //Shopware shows reverse value for this field in admin panel.
+                        $shopwareData[$swKey] = !$shopwareData[$swKey];
+                    }
+                    continue;
+                }
+                $shopwareData[$swKey] = null;
+            }
+
+        }
+        $categoryData->setShopwareData($shopwareData);
     }
 }

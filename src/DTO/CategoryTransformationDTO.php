@@ -14,7 +14,8 @@ class CategoryTransformationDTO
 
     public function __construct(
         private string $shopwareCategoryId,
-        private array $ergonodeCategoryData
+        private array $ergonodeCategoryData,
+        private array $swLangCodes,
     ) {
         $this->shopwareData = [
             'id' => $shopwareCategoryId,
@@ -73,5 +74,10 @@ class CategoryTransformationDTO
     public function unsetSwData(string $fieldKey): void
     {
         unset($this->shopwareData[$fieldKey]);
+    }
+
+    public function getSwLangCodes(): array
+    {
+        return $this->swLangCodes;
     }
 }

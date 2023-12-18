@@ -13,6 +13,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityRepositoryNotFoundException;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Throwable;
 
 class CategoryAttributesPersistor
@@ -22,6 +23,7 @@ class CategoryAttributesPersistor
         private CategoryAttributesTransformerChain $categoryAttributesTransformerChain,
         private DefinitionInstanceRegistry $definitionInstanceRegistry,
         private LoggerInterface $ergonodeSyncLogger,
+        private EntityRepository $languageRepository,
     ) {
     }
 
@@ -35,6 +37,8 @@ class CategoryAttributesPersistor
     ): array
     {
         $payloads = [];
+
+        $swLangCodes = $this->getShopwareLanguageCodes($context);
         foreach ($ergonodeCategoryEdges as $edge) {
             $node = $edge['node'] ?? null;
             $ergonodeCategoryCode = $node['code'];
@@ -45,21 +49,10 @@ class CategoryAttributesPersistor
                 continue;
             }
 
-            if ($edge['node']['attributeList']['edges'] === []) {
-                // Empty attributes in ergo
-
-                $this->ergonodeSyncLogger->info(
-                    'No category attributes in ergonode',
-                    [
-                        'code' => $ergonodeCategoryCode,
-                    ]
-                );
-                continue;
-            }
-
             $dto = new CategoryTransformationDTO(
                 $categoryContainer->getShopwareId($ergonodeCategoryCode),
-                $node
+                $node,
+                $swLangCodes
             );
 
             $this->categoryAttributesTransformerChain->transform($dto, $context);
@@ -109,5 +102,19 @@ class CategoryAttributesPersistor
                 continue;
             }
         }
+    }
+
+    private function getShopwareLanguageCodes(Context $context): array
+    {
+        $criteria = new Criteria();
+        $criteria->addAssociation('locale');
+        $languages = $this->languageRepository->search($criteria, $context);
+
+        $result = [];
+        foreach ($languages as $language) {
+            $result[] = $language->getLocale()->getCode();
+        }
+
+        return $result;
     }
 }
