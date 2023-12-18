@@ -5,6 +5,30 @@
         <sw-card-view>
             <ergonode-tabs></ergonode-tabs>
             <sw-card
+                    class="ergonode-import-history__filter-card"
+                    :title="$t('ErgonodeIntegrationShopware.importHistory.filters')"
+            >
+                <sw-checkbox-field
+                        key="boolean"
+                        :label="$tc('ErgonodeIntegrationShopware.importHistory.onlyErrors')"
+                        v-model="showOnlyErrors"
+                        @change="paginateListing"
+                >
+                </sw-checkbox-field>
+
+                <sw-datepicker dateType="datetime-local"
+                               :label="$tc('ErgonodeIntegrationShopware.importHistory.dateFrom')"
+                               v-model="logRange.from"
+                               @input="paginateListing">
+                </sw-datepicker>
+
+                <sw-datepicker dateType="datetime-local"
+                               :label="$tc('ErgonodeIntegrationShopware.importHistory.dateTo')"
+                               v-model="logRange.to"
+                               @input="paginateListing">
+                </sw-datepicker>
+            </sw-card>
+            <sw-card
                 class="ergonode-import-history__grid-card"
                 :title="$t('ErgonodeIntegrationShopware.importHistory.importHistory')"
             >

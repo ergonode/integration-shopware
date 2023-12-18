@@ -18,6 +18,11 @@ Component.register('ergonode-import-history', {
             isDetailsLoading: false,
             imports: [],
             detailsId: null,
+            showOnlyErrors: false,
+            logRange: {
+                from: null,
+                to: null
+            },
             listingPage: 1,
             listingLimit: 25,
             detailsPage: 1,
@@ -110,6 +115,7 @@ Component.register('ergonode-import-history', {
 
         async fetchImports () {
             this.isListingLoading = true;
+            let range = {};
             const criteria = new Criteria()
                 .setTotalCountMode(1)
                 .addSorting(
@@ -124,6 +130,21 @@ Component.register('ergonode-import-history', {
                 )
                 .setPage(this.listingPage)
                 .setLimit(this.listingLimit);
+
+            if (this.showOnlyErrors === true) {
+                criteria.addFilter(Criteria.equals('status', 'errors'));
+            }
+
+            if (this.logRange.from) {
+                range.gte = this.logRange.from;
+            }
+            if (this.logRange.to) {
+                range.lte = this.logRange.to;
+            }
+            if (range.gte || range.lte) {
+                criteria.addFilter(Criteria.range('createdAt', range));
+            }
+
             try {
                 this.imports = await this.repository.search(criteria, Context.Api);
                 // initialize logs arrays
