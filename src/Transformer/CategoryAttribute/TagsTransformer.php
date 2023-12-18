@@ -40,6 +40,10 @@ class TagsTransformer implements CategoryDataTransformerInterface
     {
         $mapping = $this->categoryAttributeMappingProvider->provideByShopwareKey(self::ATTRIBUTE_CODE_TAGS, $context);
 
+        if (null === $mapping) {
+            return $categoryData;
+        }
+
         $this->defaultLocale = IsoCodeConverter::shopwareToErgonodeIso(
             $this->languageProvider->getDefaultLanguageLocale($context)
         );
@@ -52,7 +56,6 @@ class TagsTransformer implements CategoryDataTransformerInterface
 
         return $categoryData;
     }
-
 
     private function getTranslatedValues(array $valueTranslations): array
     {
@@ -91,10 +94,6 @@ class TagsTransformer implements CategoryDataTransformerInterface
             }
         }
 
-        // No tags found in translations
-        if ($tagsFilter === []) {
-            return [];
-        }
         // Filter to add existing tags for current category
         $tagsFilter[self::FILTER_ZERO] = new EqualsFilter('categories.id', $categoryData->getShopwareCategoryId());
 
@@ -114,6 +113,7 @@ class TagsTransformer implements CategoryDataTransformerInterface
         // Verification of existing tags, and assigning tags to delete
         foreach ($tagCollection as $tag) {
             if (!isset($tagsFilter[$tag->getName()])) {
+                // Removing all tags that are not set in translations
                 $categoryData->addEntitiesToDelete(
                     CategoryTagDefinition::ENTITY_NAME,
                     [

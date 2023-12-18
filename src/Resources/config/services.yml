@@ -252,6 +252,10 @@ services:
     arguments:
       $categoryAttributeMappingProvider: '@ergonode.integration_shopware.provider.category_attribute_general_mapping_provider'
 
+  Ergonode\IntegrationShopware\Transformer\CategoryAttribute\MediaTransformer:
+    arguments:
+      $categoryAttributeMappingProvider: '@ergonode.integration_shopware.provider.category_attribute_general_mapping_provider'
+
   # UTIL
   Ergonode\IntegrationShopware\Util\SyncPerformanceLogger:
     arguments:
