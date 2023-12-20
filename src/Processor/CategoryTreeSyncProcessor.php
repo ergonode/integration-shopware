@@ -37,6 +37,8 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
     private ConfigService $configService;
 
+    private array $ergonodeTreeStructure = [];
+
     public function __construct(
         ErgonodeGqlClientInterface $gqlClient,
         CategoryQueryBuilder $categoryQueryBuilder,
@@ -92,7 +94,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             return $counter;
         }
 
-
         $treeEndCursor = $result->getEndCursor();
         if (null === $treeEndCursor) {
             throw new RuntimeException('Could not retrieve end cursor from the response.');
@@ -115,6 +116,11 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
             try {
                 $leafEdges = $edge['node']['categoryTreeLeafList']['edges'] ?? [];
+
+                foreach ($leafEdges as $leafEdge) {
+                    $this->addTreeConnection($leafEdge['node']['category']['code'], $currentTreeCode);
+                }
+
                 $primaryKeys = $this->categoryTreePersistor->persistLeaves($leafEdges, $currentTreeCode, $context);
 
                 $processedKeys[] = $primaryKeys;
@@ -192,17 +198,33 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         }
     }
 
-
-    public function removeOrphanedCategories(): void
+    public function removeOrphanedCategories(Context $context): void
     {
         $lastSync = $this->configService->getLastCategorySyncTimestamp();
 
-        $removedCategoryCount = $this->categoryTreePersistor->removeCategoriesUpdatedAtBeforeTimestamp(
-            $lastSync
-        );
+        $existingCategories = $this->categoryTreePersistor->fetchExistingCategories();
+
+        $categoriesToDelete = array_diff_key($existingCategories, $this->ergonodeTreeStructure);
+
+        try {
+            $this->categoryTreePersistor->removeCategoriesById(
+                array_values($categoriesToDelete),
+                $context
+            );
+        } catch (Throwable $ex) {
+            $this->logger->error('One of categories marked to delete is mapped in Sales Channel navigation. ' .
+                'Cannot delete as long as it is set in sales channel navigation', [
+                'categories' => array_values($categoriesToDelete),
+            ]);
+        }
         $this->logger->info('Removed orphaned Ergonode categories', [
-            'count' => $removedCategoryCount,
+            'count' => count($categoriesToDelete),
             'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM),
         ]);
+    }
+
+    private function addTreeConnection(string $childrenCode, string $parentCode): void
+    {
+        $this->ergonodeTreeStructure[$childrenCode] = $parentCode;
     }
 }

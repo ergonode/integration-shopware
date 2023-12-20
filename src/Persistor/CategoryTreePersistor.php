@@ -179,29 +179,25 @@ class CategoryTreePersistor
         return $this->lastRootCategoryId;
     }
 
-    /**
-     * @return int Number of deleted categories
-     */
-    public function removeCategoriesUpdatedAtBeforeTimestamp(int $timestamp): int
+    public function removeCategoriesById(array $categoryIds, Context $context): void
     {
-        $result = $this->connection->executeStatement(
-            \sprintf(
-                'DELETE cat FROM %1$s cat
-                 JOIN %2$s ext ON cat.ergonode_category_mapping_extension_id = ext.id
-                 WHERE GREATEST(cat.created_at, COALESCE(cat.updated_at, NULL)) < :timestamp
-                 AND cat.ergonode_category_mapping_extension_id IS NOT NULL;',
-                CategoryDefinition::ENTITY_NAME,
-                ErgonodeCategoryMappingExtensionDefinition::ENTITY_NAME,
-            ),
-            [
-                'timestamp' => (new \DateTime('@' . $timestamp))->format('Y-m-d H:i:s'),
-            ],
-        );
+        $this->categoryRepository->delete($categoryIds, $context);
+    }
 
-        if (is_int($result)) {
-            return $result;
+    public function fetchExistingCategories(): array
+    {
+        $existingCategories = $this->connection->fetchAllAssociative(
+                'SELECT 
+                            LOWER(HEX(c.id)) AS id, 
+                            cme.code AS children_code
+                        FROM category c
+                        INNER JOIN ergonode_category_mapping_extension cme 
+                            ON cme.id = c.ergonode_category_mapping_extension_id');
+        $result = [];
+        foreach ($existingCategories as $record) {
+            $result[$record['children_code']] = $record;
         }
 
-        return 0;
+        return $result;
     }
 }
