@@ -184,20 +184,35 @@ class CategoryTreePersistor
         $this->categoryRepository->delete($categoryIds, $context);
     }
 
-    public function fetchExistingCategories(): array
+    public function fetchCategoriesToDelete(): array
     {
-        $existingCategories = $this->connection->fetchAllAssociative(
+        return $this->connection->fetchAllAssociative(
                 'SELECT 
-                            LOWER(HEX(c.id)) AS id, 
-                            cme.code AS children_code
+                            cme.code AS code,
+                            LOWER(HEX(c.id)) AS id
                         FROM category c
                         INNER JOIN ergonode_category_mapping_extension cme 
-                            ON cme.id = c.ergonode_category_mapping_extension_id');
-        $result = [];
-        foreach ($existingCategories as $record) {
-            $result[$record['children_code']] = $record;
-        }
+                            ON cme.id = c.ergonode_category_mapping_extension_id
+                        WHERE cme.active = 0    
+        ');
+    }
 
-        return $result;
+    public function markCategoriesAsActive(array $categoryIds): void
+    {
+        $categoryIds = array_map(function ($record) {
+            return '0x'.$record;
+        }, $categoryIds);
+        $this->connection->executeStatement(
+                sprintf('UPDATE ergonode_category_mapping_extension SET active=1
+                        WHERE id IN (SELECT ergonode_category_mapping_extension_id 
+			                FROM category WHERE id IN (%s))', implode(', ', $categoryIds)),
+        );
+    }
+
+    public function clearCategoriesAsActive(): void
+    {
+        $this->connection->executeStatement(
+                'UPDATE ergonode_category_mapping_extension SET active=0'
+        );
     }
 }
