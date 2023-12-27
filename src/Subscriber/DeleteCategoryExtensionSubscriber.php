@@ -11,7 +11,7 @@ use Shopware\Core\Content\Category\CategoryEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Event\BeforeDeleteEvent;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityDeleteEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
@@ -42,11 +42,11 @@ class DeleteCategoryExtensionSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            BeforeDeleteEvent::class => 'onEntityBeforeDelete',
+            EntityDeleteEvent::class => 'onEntityBeforeDelete',
         ];
     }
 
-    public function onEntityBeforeDelete(BeforeDeleteEvent $event): void
+    public function onEntityBeforeDelete(EntityDeleteEvent $event): void
     {
         $categories = $this->getAllDeletedCategories($event);
         if (0 === $categories->count()) {
@@ -67,7 +67,7 @@ class DeleteCategoryExtensionSubscriber implements EventSubscriberInterface
         });
     }
 
-    private function getAllDeletedCategories(BeforeDeleteEvent $event): CategoryCollection
+    private function getAllDeletedCategories(EntityDeleteEvent $event): CategoryCollection
     {
         $ids = $event->getIds(CategoryDefinition::ENTITY_NAME);
         if (empty($ids)) {

@@ -12,7 +12,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Event\BeforeDeleteEvent;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityDeleteEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -43,11 +43,11 @@ class DeleteExtensionSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            BeforeDeleteEvent::class => 'onEntityBeforeDelete',
+            EntityDeleteEvent::class => 'onEntityBeforeDelete',
         ];
     }
 
-    public function onEntityBeforeDelete(BeforeDeleteEvent $event): void
+    public function onEntityBeforeDelete(EntityDeleteEvent $event): void
     {
         $entityExtensionDeletePayloads = [];
 

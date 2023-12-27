@@ -6,7 +6,7 @@ namespace Ergonode\IntegrationShopware\Subscriber;
 
 use Shopware\Core\Content\Product\Aggregate\ProductManufacturer\ProductManufacturerDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Event\BeforeDeleteEvent;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityDeleteEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\System\DeliveryTime\DeliveryTimeDefinition;
@@ -32,11 +32,11 @@ class DeleteMappingSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            BeforeDeleteEvent::class => 'onEntityBeforeDelete',
+            EntityDeleteEvent::class => 'onEntityBeforeDelete',
         ];
     }
 
-    public function onEntityBeforeDelete(BeforeDeleteEvent $event): void
+    public function onEntityBeforeDelete(EntityDeleteEvent $event): void
     {
         foreach (self::SUPPORTED_ENTITIES as $entityName) {
             $ids = $event->getIds($entityName);
