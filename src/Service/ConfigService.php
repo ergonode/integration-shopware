@@ -137,6 +137,11 @@ class ConfigService
         return (new \DateTime($lastCheckedStr))->getTimestamp();
     }
 
+    public function isProductCategoryAssignDisabled() :bool
+    {
+        return $this->configService->getBool('disableCategoryAssign');
+    }
+
     /**
      * @return string Human-readable time
      */
