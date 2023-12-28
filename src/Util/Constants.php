@@ -101,6 +101,7 @@ class Constants
         'purchaseUnit' => 'sw-product.priceForm.labelPurchaseUnit',
         'referenceUnit' => 'sw-product.priceForm.labelReferenceUnit',
         'scaleUnit' => 'sw-product.packagingForm.labelUnit',
+        'markAsTopseller' => 'sw-product.settingsForm.labelMarkAsTopseller',
     ];
 
     /**
