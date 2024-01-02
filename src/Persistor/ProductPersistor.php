@@ -35,6 +35,8 @@ use function is_array;
 
 class ProductPersistor
 {
+    const REGEX_EXCEPTION = '/\[\/(\d+)\/?.*\/?(\w+)\](.*)\..*/mU';
+
     private EntityRepository $productRepository;
 
     private ProductProvider $productProvider;
@@ -123,12 +125,50 @@ class ProductPersistor
             $this->clearProductCategories($productIds, $context);
         }
 
-        $writeResult = $this->productRepository->upsert(
-            array_values($payloads),
-            $context
-        );
+        try {
+            $payloads = array_values($payloads);
+            $writeResult = $this->productRepository->upsert(
+                $payloads,
+                $context
+            );
+        } catch (Throwable $exception) {
+            if ($this->processErrorResponse($exception->getMessage(), $payloads)) {
+                //Removed problematic product from upsert
+                $writeResult = $this->productRepository->upsert(
+                    array_values($payloads),
+                    $context
+                );
+
+                return $writeResult->getPrimaryKeys(ProductDefinition::ENTITY_NAME);
+            }
+
+            throw $exception;
+        }
 
         return $writeResult->getPrimaryKeys(ProductDefinition::ENTITY_NAME);
+    }
+
+    private function processErrorResponse(string $message, array &$payloads): bool
+    {
+        preg_match_all(self::REGEX_EXCEPTION, $message, $matches, PREG_SET_ORDER, 0);
+
+        foreach ($matches as $match) {
+            $keyValue = (int)$match[1];
+            $fieldName = $match[2];
+            $errorMessage = $match[3];
+            $this->logger->error(
+                'Error: ' .$payloads[$keyValue]['name'].': '. $fieldName . ' -' . $errorMessage,
+                [
+                    'name' => $payloads[$keyValue]['name'],
+                    'field' => $fieldName,
+                    'input_translations' => $payloads[$keyValue]['translations'],
+                ]
+            );
+
+            unset($payloads[$keyValue]);
+        }
+
+        return (bool)count($matches);
     }
 
     public function deleteProductIds(array $productIds, Context $context): void
