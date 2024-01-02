@@ -5,6 +5,7 @@
                 <ergonode-tabs></ergonode-tabs>
                 <sw-skeleton v-if="isLoading"></sw-skeleton>
                 <template v-else>
+                    <ergonode-support-end></ergonode-support-end>
                     <sw-card v-if="acl.can('ergonode_category_mapping.creator')"
                         :title="$t('ErgonodeIntegrationShopware.mappings.addMapping')"
                     >

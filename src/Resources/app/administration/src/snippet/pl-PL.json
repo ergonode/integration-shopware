@@ -1,5 +1,9 @@
 {
   "ErgonodeIntegrationShopware": {
+    "supportEnd": {
+      "message": "Uwaga! Wtyczka dla wersji Shopware 6.4.x.x nie będzie już utrzymywana po 31 marca 2024 r. Oznacza to, że może przestać działać częściowo lub w ogóle. Zalecamy aktualizację do wersji Shopware 6.5.x.x i korzystanie z wtyczki SW 6.5.x.x (wersja wtyczki 2.x.x).",
+      "maintaining": "Oczywiście, zgodnie z licencją wtyczki, po 31 marca 2024 r. można nadal korzystać z wersji dla SW 6.4.x.x i utrzymywać ją samodzielnie."
+    },
     "mainMenuItemGeneral": "Integracja z Ergonode",
     "configuration": {
       "verifyCredentials": {
