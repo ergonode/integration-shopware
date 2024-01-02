@@ -40,6 +40,10 @@
     },
     "importHistory": {
       "importHistory": "Import history",
+      "filters": "Filters",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "onlyErrors": "Show only errors",
       "grid": {
         "name": "Name",
         "status": "Status",
