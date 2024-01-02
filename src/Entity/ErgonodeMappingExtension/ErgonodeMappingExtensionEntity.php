@@ -15,6 +15,8 @@ class ErgonodeMappingExtensionEntity extends Entity
 
     protected string $type;
 
+    protected ?bool $active;
+
     public function getCode(): string
     {
         return $this->code;
@@ -33,5 +35,15 @@ class ErgonodeMappingExtensionEntity extends Entity
     public function setType(string $type): void
     {
         $this->type = $type;
+    }
+
+    public function getActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(?bool $active): void
+    {
+        $this->active = $active;
     }
 }
