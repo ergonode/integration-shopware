@@ -49,43 +49,43 @@ class PropertyGroupTransformer
         $propertyGroup = $dto->getSwPropertyGroup();
 
         $options = [];
-        if (!empty($node['options'])) {
-            foreach ($node['options'] as $option) {
-                if (!empty($option['code'])) {
-                    $optionCode = $option['code'];
-                    $optionCode = (new UnicodeString($optionCode))->ascii()->toString();
-                    $existingOption = $propertyGroup ? $this->getOptionByCode($propertyGroup, $optionCode) : null;
+        foreach ($node['optionList']['edges'] ?? [] as $optionNode) {
+            $option = $optionNode['node'];
+            if (!empty($option['code'])) {
+                $optionCode = $option['code'];
+                $optionCode = (new UnicodeString($optionCode))->ascii()->toString();
 
-                    if ($existingOption) {
-                        foreach ($options as $optionRow) {
-                            if ($optionRow['id'] === $existingOption->getId()) {
-                                $this->ergonodeSyncLogger->warning(
-                                    'Option with duplicate code. Skipped',
-                                    ['option' => $option['code'], 'attribute' => $code]
-                                );
-                                continue 2;
-                            }
+                $existingOption = $propertyGroup ? $this->getOptionByCode($propertyGroup, $optionCode) : null;
+                // avoid duplicate properties with same option code
+                if ($existingOption) {
+                    foreach ($options as $optionRow) {
+                        if ($optionRow['id'] === $existingOption->getId()) {
+                            $this->ergonodeSyncLogger->warning(
+                                'Option with duplicate code. Skipped',
+                                ['option' => $option['code'], 'attribute' => $code]
+                            );
+                            continue 2;
                         }
                     }
-
-                    $options[] = [
-                        'id' => $existingOption ? $existingOption->getId() : null,
-                        'name' => $option['code'],
-                        'translations' => $this->translationTransformer->transform($option['name'], 'name'),
-                        'extensions' => [
-                            AbstractErgonodeMappingExtension::EXTENSION_NAME => [
-                                'id' => $existingOption ? $this->getEntityExtensionId($existingOption) : null,
-                                'code' => CodeBuilderUtil::buildExtended($code, $optionCode),
-                                'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
-                            ],
-                        ],
-                    ];
                 }
+
+                $options[] = [
+                    'id' => $existingOption?->getId(),
+                    'name' => $option['code'],
+                    'translations' => $this->translationTransformer->transform($option['name'], 'name'),
+                    'extensions' => [
+                        AbstractErgonodeMappingExtension::EXTENSION_NAME => [
+                            'id' => $existingOption ? $this->getEntityExtensionId($existingOption) : null,
+                            'code' => CodeBuilderUtil::buildExtended($code, $optionCode),
+                            'type' => PropertyGroupOptionExtension::ERGONODE_TYPE,
+                        ],
+                    ],
+                ];
             }
         }
 
         $dto->setPropertyGroupPayload([
-            'id' => $propertyGroup ? $propertyGroup->getId() : null,
+            'id' => $propertyGroup?->getId(),
             'name' => $code,
             'options' => $options,
             'translations' => $translations,
@@ -121,11 +121,13 @@ class PropertyGroupTransformer
         foreach ($options as $option) {
             $extension = $option->getExtension(AbstractErgonodeMappingExtension::EXTENSION_NAME);
 
+            $asciiExtensionCode = (new UnicodeString($extension->getCode()))->ascii()->toString();
             if (
                 $extension instanceof ErgonodeMappingExtensionEntity &&
                 $groupExtension instanceof ErgonodeMappingExtensionEntity && (
                     CodeBuilderUtil::build($groupExtension->getCode(), $code) === $extension->getCode()
                     || CodeBuilderUtil::buildExtended($groupExtension->getCode(), $code) === $extension->getCode()
+                    || CodeBuilderUtil::buildExtended($groupExtension->getCode(), $code) === $asciiExtensionCode
                 )
             ) {
                 return $option;
