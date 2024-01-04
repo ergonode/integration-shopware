@@ -6,6 +6,7 @@ namespace Ergonode\IntegrationShopware\Provider;
 
 use Ergonode\IntegrationShopware\Api\AbstractStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\AttributeResultsProxy;
 use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
 use Ergonode\IntegrationShopware\QueryBuilder\AttributeQueryBuilder;
@@ -37,6 +38,8 @@ class ErgonodeAttributeProvider
                 continue;
             }
 
+            $results = $this->addOptionListPages($results);
+
             yield $results;
 
             $endCursor = $results->getEndCursor();
@@ -57,5 +60,39 @@ class ErgonodeAttributeProvider
 
             $endCursor = $results->getEndCursor();
         } while ($results instanceof AbstractStreamResultsProxy && $results->hasNextPage());
+    }
+
+    private function addOptionListPages(AttributeStreamResultsProxy $results): AttributeStreamResultsProxy
+    {
+        foreach ($results->getEdges() as $edge) {
+            if (isset(
+                    $edge['node']['optionList'],
+                    $edge['node']['optionList']['pageInfo']['endCursor'], $edge['node']['optionList']['pageInfo']['hasNextPage']
+                )
+                && $edge['node']['optionList']['pageInfo']['hasNextPage']) {
+
+                $endCursor = $edge['node']['optionList']['pageInfo']['endCursor'];
+                do {
+                    $query = $this->attributeQueryBuilder->buildSingle(
+                        $edge['node']['code'],
+                        $endCursor
+                    );
+                    $attributeResults = $this->ergonodeGqlClient->query($query, AttributeResultsProxy::class);
+                    $mainData = $attributeResults->getMainData();
+
+                    $results->addOptions($edge['node']['code'], $mainData['optionList']['edges']);
+                    $hasNextPage = false;
+                    if (isset(
+                        $mainData['optionList']['pageInfo']['hasNextPage'],
+                        $mainData['optionList']['pageInfo']['endCursor'])
+                    ) {
+                        $hasNextPage = $mainData['optionList']['pageInfo']['hasNextPage'];
+                        $endCursor = $mainData['optionList']['pageInfo']['endCursor'];
+                    }
+                } while ($hasNextPage);
+            }
+        }
+
+        return $results;
     }
 }
