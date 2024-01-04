@@ -1,5 +1,9 @@
 {
   "ErgonodeIntegrationShopware": {
+    "supportEnd": {
+      "message": "Attention! The plugin for the 6.4.x.x Shopware version will no longer be maintained after March 31, 2024.This means that it may stop working in parts or at all. We kindly advise you to upgrade to Shopware 6.5.x.x and to use the SW 6.5.x.x plugin (plugin version 2.x.x).",
+      "maintaining": "Of course you may still use it after the 31st of March 2024 and maintain it by yourself, as the plugin license allows for it."
+    },
     "mainMenuItemGeneral": "Ergonode integration",
     "configuration": {
       "verifyCredentials": {

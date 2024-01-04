@@ -5,6 +5,10 @@
         <title>API Settings</title>
         <title lang="de-DE">API Einstellungen</title>
 
+        <component name="ergonode-support-end">
+            <name>ergonodeSupportEnd</name>
+        </component>
+
         <input-field type="password">
             <name>ergonodeApiEndpoint</name>
             <label>Ergonode GraphQL API endpoint</label>
