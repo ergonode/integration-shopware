@@ -132,7 +132,10 @@ Component.register('ergonode-import-history', {
                 .setLimit(this.listingLimit);
 
             if (this.showOnlyErrors === true) {
-                criteria.addFilter(Criteria.equals('status', 'errors'));
+                criteria.addFilter(Criteria.multi('OR', [
+                    Criteria.equals('status', 'errors'),
+                    Criteria.range('totalError', {gte: 1}),
+                ]));
             }
 
             if (this.logRange.from) {
