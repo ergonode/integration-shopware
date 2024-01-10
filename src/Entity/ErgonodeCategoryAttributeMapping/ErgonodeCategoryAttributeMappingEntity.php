@@ -15,8 +15,6 @@ class ErgonodeCategoryAttributeMappingEntity extends Entity
 
     protected string $ergonodeKey;
 
-    protected ?bool $active;
-
     public function getShopwareKey(): string
     {
         return $this->shopwareKey;
@@ -35,15 +33,5 @@ class ErgonodeCategoryAttributeMappingEntity extends Entity
     public function setErgonodeKey(string $ergonodeKey): void
     {
         $this->ergonodeKey = $ergonodeKey;
-    }
-
-    public function getActive(): ?bool
-    {
-        return $this->active;
-    }
-
-    public function setActive(?bool $active): void
-    {
-        $this->active = $active;
     }
 }
