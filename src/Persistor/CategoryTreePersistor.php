@@ -142,6 +142,10 @@ class CategoryTreePersistor
             $translations[IsoCodeConverter::ergonodeToShopwareIso($translationLocale)]['name'] = $translationValue;
         }
 
+        if ([] === $translations) {
+            $translations[IsoCodeConverter::ergonodeToShopwareIso($defaultLocale)]['name'] = $code;
+        }
+
         $result = [
             'id' => $id,
             'parentId' => $parentId,
