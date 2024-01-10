@@ -17,6 +17,14 @@ use function in_array;
 
 class SelectProductCustomFieldTransformer implements ProductCustomFieldTransformerInterface
 {
+    private CustomFieldProvider $customFieldProvider;
+
+    public function __construct(
+        CustomFieldProvider $customFieldProvider
+    ) {
+        $this->customFieldProvider = $customFieldProvider;
+    }
+
     public function supports(ProductAttribute $attribute): bool
     {
         return in_array($attribute->getType(), [
@@ -27,6 +35,8 @@ class SelectProductCustomFieldTransformer implements ProductCustomFieldTransform
 
     public function transformNode(ProductAttribute $attribute, string $customFieldName, Context $context): array
     {
+        $customField = $this->customFieldProvider->getCustomFieldByName($customFieldName, $context);
+
         if (!$attribute instanceof ProductSelectAttribute) {
             return [];
         }
@@ -44,6 +54,11 @@ class SelectProductCustomFieldTransformer implements ProductCustomFieldTransform
             if (!$attribute instanceof ProductMultiSelectAttribute) {
                 $value = $value[0];
             }
+
+            if (!is_null($customField) && $customField->getType() === CustomFieldTypes::BOOL) {
+                $value = YesNo::cast($value);
+            }
+
             $customFields[IsoCodeConverter::ergonodeToShopwareIso($language)]['customFields'][$customFieldName] = $value;
         }
 

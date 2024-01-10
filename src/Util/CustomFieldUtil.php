@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Util;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\System\CustomField\CustomFieldEntity;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
@@ -80,7 +81,8 @@ class CustomFieldUtil
             case CustomFieldTypes::SWITCH:
             case CustomFieldTypes::BOOL:
                 return [
-                    AttributeTypesEnum::BOOL
+                    AttributeTypesEnum::BOOL,
+                    ProductAttribute::TYPE_SELECT,
                 ];
             case CustomFieldTypes::COLORPICKER:
             case CustomFieldTypes::ENTITY:
