@@ -202,10 +202,15 @@ class CategoryTreePersistor
         $categoryIds = array_map(function ($record) {
             return '0x'.$record;
         }, $categoryIds);
+
+        if ($categoryIds === []) {
+            return;
+        }
+
         $this->connection->executeStatement(
                 sprintf('UPDATE ergonode_category_mapping_extension SET active=1
                         WHERE id IN (SELECT ergonode_category_mapping_extension_id 
-			                FROM category WHERE id IN (%s))', implode(', ', $categoryIds)),
+			                FROM category WHERE id IN (%s))', implode(', ', $categoryIds))
         );
     }
 
