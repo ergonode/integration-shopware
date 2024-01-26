@@ -36,7 +36,6 @@ class GeneralTransformer implements CategoryDataTransformerInterface
     ];
 
     private const CATEGORY_KEYS = [
-        'active',
         'visible',
         'description',
         'linkNewTab',
