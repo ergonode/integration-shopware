@@ -17,6 +17,8 @@ class ErgonodeCategoryMappingExtensionEntity extends Entity
 
     protected ?string $locale;
 
+    protected ?bool $active;
+
     public function getCode(): ?string
     {
         return $this->code;
@@ -45,5 +47,15 @@ class ErgonodeCategoryMappingExtensionEntity extends Entity
     public function setLocale(?string $locale): void
     {
         $this->locale = $locale;
+    }
+
+    public function getActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(?bool $active): void
+    {
+        $this->active = $active;
     }
 }

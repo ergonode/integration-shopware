@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Entity\ErgonodeCategoryMappingExtension;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
@@ -28,6 +29,7 @@ class ErgonodeCategoryMappingExtensionDefinition extends EntityDefinition
     protected function defineFields(): FieldCollection
     {
         return new FieldCollection([
+            (new BoolField('active', 'active')),
             (new IdField('id', 'id'))->addFlags(new PrimaryKey(), new Required()),
             (new StringField('code', 'code'))->addFlags(new Required()),
             (new StringField('locale', 'locale')),

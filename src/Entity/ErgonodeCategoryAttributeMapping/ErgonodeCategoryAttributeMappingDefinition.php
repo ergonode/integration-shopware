@@ -35,7 +35,6 @@ class ErgonodeCategoryAttributeMappingDefinition extends EntityDefinition
     {
         return new FieldCollection([
             (new IdField('id', 'id'))->addFlags(new ApiAware(), new PrimaryKey(), new Required()),
-
             (new StringField('shopware_key', 'shopwareKey'))->addFlags(new Required()),
             (new StringField('ergonode_key', 'ergonodeKey'))->addFlags(new Required()),
         ]);

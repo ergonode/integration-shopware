@@ -22,6 +22,7 @@
       "attributeMappings": "Attribute mappings",
       "customFieldMappings": "Custom field mappings",
       "categoryMappings": "Category mappings",
+      "categoryAttributeMappings": "Category Attribute Mappings",
       "shopwareAttribute": "Shopware attribute",
       "shopwareCategory": "Shopware category",
       "shopwareCategoryAttribute": "Shopware category attribute",
@@ -40,6 +41,10 @@
     },
     "importHistory": {
       "importHistory": "Import history",
+      "filters": "Filters",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "onlyErrors": "Show only errors",
       "grid": {
         "name": "Name",
         "status": "Status",

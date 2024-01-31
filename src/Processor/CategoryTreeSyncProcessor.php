@@ -92,7 +92,6 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             return $counter;
         }
 
-
         $treeEndCursor = $result->getEndCursor();
         if (null === $treeEndCursor) {
             throw new RuntimeException('Could not retrieve end cursor from the response.');
@@ -115,7 +114,9 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
 
             try {
                 $leafEdges = $edge['node']['categoryTreeLeafList']['edges'] ?? [];
+
                 $primaryKeys = $this->categoryTreePersistor->persistLeaves($leafEdges, $currentTreeCode, $context);
+                $this->categoryTreePersistor->markCategoriesAsActive($primaryKeys);
 
                 $processedKeys[] = $primaryKeys;
 
@@ -192,16 +193,28 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         }
     }
 
-
-    public function removeOrphanedCategories(): void
+    public function removeOrphanedCategories(Context $context): void
     {
         $lastSync = $this->configService->getLastCategorySyncTimestamp();
 
-        $removedCategoryCount = $this->categoryTreePersistor->removeCategoriesUpdatedAtBeforeTimestamp(
-            $lastSync
-        );
+        $categoriesToDelete = $this->categoryTreePersistor->fetchCategoriesToDelete();
+
+        try {
+            $this->categoryTreePersistor->removeCategoriesById(
+                array_values($categoriesToDelete),
+                $context
+            );
+        } catch (Throwable $ex) {
+            $this->logger->error('One of categories marked to delete is mapped in Sales Channel navigation. ' .
+                'Cannot delete as long as it is set in sales channel navigation', [
+                'categories' => $categoriesToDelete,
+                'message' => $ex->getMessage(),
+            ]);
+        }
+        $this->categoryTreePersistor->clearCategoriesAsActive();
+
         $this->logger->info('Removed orphaned Ergonode categories', [
-            'count' => $removedCategoryCount,
+            'count' => count($categoriesToDelete),
             'time' => (new \DateTime('@' . $lastSync))->format(DATE_ATOM),
         ]);
     }

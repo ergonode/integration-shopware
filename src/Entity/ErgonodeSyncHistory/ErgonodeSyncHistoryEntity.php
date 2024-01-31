@@ -10,8 +10,9 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 
 class ErgonodeSyncHistoryEntity extends Entity
 {
-    public const STATUS_STARTED = 'started';
+    public const STATUS_ERRORS = 'errors';
     public const STATUS_FINISHED = 'finished';
+    public const STATUS_STARTED = 'started';
 
     use EntityIdTrait;
 

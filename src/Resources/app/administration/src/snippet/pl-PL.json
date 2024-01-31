@@ -16,6 +16,10 @@
     },
     "importHistory": {
       "importHistory": "Historia importów",
+      "filters": "Filtry",
+      "onlyErrors": "Pokazuj tylko błędy",
+      "dateFrom": "Od",
+      "dateTo": "Do",
       "grid": {
         "name": "Nazwa",
         "status": "Status",

@@ -37,10 +37,19 @@ class FileManagerArray
             return null;
         }
 
-        $existingMedia = $this->getMediaEntity($image, $context, $folder);
-
+        //Photo can be used in products
+        $existingMedia = $this->getMediaEntity($image, $context, ProductDefinition::ENTITY_NAME);
         if (null !== $existingMedia) {
             return $existingMedia->getId();
+        }
+
+        //Photo can be used in different folder
+        if ($folder !== ProductDefinition::ENTITY_NAME) {
+            $existingMedia = $this->getMediaEntity($image, $context, $folder);
+
+            if (null !== $existingMedia) {
+                return $existingMedia->getId();
+            }
         }
 
         $file = $this->fileDownloader->download($image['url'], $image['extension']);

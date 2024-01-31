@@ -70,7 +70,9 @@ class SyncHistoryLogger
 
         $payload = [
             'id' => $id,
-            'status' => ErgonodeSyncHistoryEntity::STATUS_FINISHED,
+            'status' => $totalError > 0
+                ? ErgonodeSyncHistoryEntity::STATUS_ERRORS
+                : ErgonodeSyncHistoryEntity::STATUS_FINISHED,
             'totalError' => $totalError,
             'endDate' => (new DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
         ];

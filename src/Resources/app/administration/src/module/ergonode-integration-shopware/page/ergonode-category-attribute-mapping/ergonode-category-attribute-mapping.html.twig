@@ -36,7 +36,7 @@
                     </sw-card>
                     <sw-card v-if="acl.can('ergonode_category_attribute_mapping.viewer')"
                         class="ergonode__category-attribute-mapping-grid-card"
-                        :title="$t('ErgonodeIntegrationShopware.mappings.categoryMappings')"
+                        :title="$t('ErgonodeIntegrationShopware.mappings.categoryAttributeMappings')"
                     >
                         <template #default>
                             <sw-entity-listing
@@ -55,7 +55,7 @@
                                     {{ translation(item.shopwareKey) }} ({{ type('shopwareCategoryAttributes', item.shopwareKey) }})
                                 </template>
                                 <template #column-ergonodeKey="{ item }">
-                                    {{ item.ergonodeKey }}
+                                    {{ item.ergonodeKey }} ({{ type('ergonodeCategoryAttributes', item.ergonodeKey) }})
                                 </template>
                             </sw-entity-listing>
                         </template>
