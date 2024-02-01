@@ -69,7 +69,6 @@
             <label lang="de-DE">Disable assigning products to categories</label>
             <helpText>When this option is on, products will not change their categories during synchronization</helpText>
             <helpText lang="de-DE">When this option is on, products will not change their categories during synchronization</helpText>
-            <defaultValue>1</defaultValue>
         </input-field>
     </card>
     <card>
