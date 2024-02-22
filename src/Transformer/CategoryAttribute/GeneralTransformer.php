@@ -14,6 +14,7 @@ use Ergonode\IntegrationShopware\Util\ArrayUnfoldUtil;
 use Ergonode\IntegrationShopware\Util\ErgonodeApiValueKeyResolverUtil;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Ergonode\IntegrationShopware\Util\YesNo;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Shopware\Core\Framework\Context;
 use function array_key_exists;
@@ -47,15 +48,25 @@ class GeneralTransformer implements CategoryDataTransformerInterface
         'keywords',
     ];
 
+    private const MAX_LENGTH = [
+        'metaTitle' => 255,
+        'metaDescription' => 255,
+        'keywords' => 255,
+    ];
+
+    private string $shopwareCategoryId;
+
     public function __construct(
         private CategoryAttributeMappingProvider $categoryAttributeMappingProvider,
         private LanguageProvider $languageProvider,
+        private LoggerInterface $ergonodeSyncLogger,
     ) {
     }
 
     public function transform(CategoryTransformationDTO $categoryData, Context $context): CategoryTransformationDTO
     {
         $ergonodeData = $categoryData->getErgonodeCategoryData();
+        $this->shopwareCategoryId = $categoryData->getShopwareCategoryId();
         if (false === is_array($ergonodeData['attributeList']['edges'] ?? null)) {
             throw new RuntimeException('Invalid data format');
         }
@@ -157,6 +168,19 @@ class GeneralTransformer implements CategoryDataTransformerInterface
     {
         foreach ($translatedValues as $locale => $value) {
             if (null === $value || false === in_array($swKey, self::TRANSLATABLE_KEYS)) {
+                continue;
+            }
+
+            if (isset(self::MAX_LENGTH[$swKey]) && mb_strlen($value) > self::MAX_LENGTH[$swKey]) {
+                $this->ergonodeSyncLogger->error(
+                    sprintf(
+                        'Maximum length %d exceeded for field `%s` (sw category id %s) - length passed %d',
+                        self::MAX_LENGTH[$swKey],
+                        $swKey,
+                        $this->shopwareCategoryId,
+                        mb_strlen($value)
+                    )
+                );
                 continue;
             }
 
