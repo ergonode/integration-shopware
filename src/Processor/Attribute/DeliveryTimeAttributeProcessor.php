@@ -21,8 +21,12 @@ class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterfac
 {
     private const SHOPWARE_KEY = 'deliveryTime';
     public const  MAPPING_TYPE = 'deliveryTime';
-    private const DELIVERY_TIME_PATTERN = '/[\s-]+/';
+    protected const DELIVERY_TIME_PATTERN = '/[\s-]+/';
+    protected const DELIVERY_TIME_NUMBER_PATTERN = '/\d+/';
     private const AVAILABLE_UNITS = ['hour', 'day', 'week', 'month', 'year'];
+    const DEFAULT_FALLBACK_MIN = 0;
+    const DEFAULT_FALLBACK_MAX = 999;
+    const DEFAULT_FALLBACK_UNIT = 'day';
 
     private AttributeMappingProvider $attributeMappingProvider;
 
@@ -64,24 +68,6 @@ class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterfac
         foreach ($node['optionList']['edges'] ?? [] as $edge) {
             $option = $edge['node'];
             $code = $option['code'];
-            $pieces = $this->getDeliveryTimePieces($code);
-            if (!$pieces) {
-                continue;
-            }
-
-            [$min, $max, $unit] = $pieces;
-
-            $unit = rtrim($unit, 's');
-
-            if (!in_array($unit, self::AVAILABLE_UNITS)) {
-                $this->ergonodeSyncLogger->error(
-                    sprintf('Invalid syntax for option %s - delivery time unit. Acceptable values: hours, days, weeks, months, years', $code)
-                );
-
-                continue;
-            }
-
-            $timeEntity = $this->getExistingDeliveryTimeEntity((int)$min, (int)$max, $unit, $code, $context);
 
             $translations = [];
             foreach ($option['name'] as $nameRow) {
@@ -89,28 +75,17 @@ class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterfac
                     'name' => $nameRow['value'] ?? $option['code'],
                 ];
             }
-            $data = [
-                'min' => (int)$min,
-                'max' => (int)$max,
-                'unit' => $unit,
-                'translations' => $translations,
-            ];
 
-            if ($timeEntity instanceof DeliveryTimeEntity) {
-                $data['id'] = $timeEntity->getId();
+            $pieces = $this->getDeliveryTimePieces($code);
+            if (!$pieces) {
+                $deliveryTimeIds[] = $this->createFallback($code, $translations, $context);
+                $this->ergonodeSyncLogger->error(
+                    sprintf('Created fallback deliveryTime for code %s. Please verify content. You can change min/max/unit values', $code)
+                );
+                continue;
             }
 
-            $resultEvent = $this->deliveryTimeRepository->upsert([$data], $context);
-            $timeId = $resultEvent->getPrimaryKeys(DeliveryTimeDefinition::ENTITY_NAME)[0];
-
-            $mappingData = [
-                'type' => self::MAPPING_TYPE,
-                'code' => $code,
-                'id' => $timeId,
-            ];
-
-            $deliveryTimeIds[] = $timeId;
-            $this->mappingExtensionRepository->upsert([$mappingData], $context);
+            $deliveryTimeIds[] = $this->createStandard($pieces, $code, $translations, $context);
         }
 
         $this->removeLegacyDeliveryTimes($deliveryTimeIds, $context);
@@ -162,17 +137,134 @@ class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterfac
         return $entity instanceof DeliveryTimeEntity ? $entity : null;
     }
 
-    private function getDeliveryTimePieces(string $code): ?array
+    public function createStandard(array $pieces, string $code, array $translations, Context $context): ?string
     {
-        $pieces = preg_split(self::DELIVERY_TIME_PATTERN, $code);
-        if (count($pieces) !== 3) {
+        [$min, $max, $unit] = $pieces;
+
+        $unit = rtrim($unit, 's');
+
+        if (!in_array($unit, self::AVAILABLE_UNITS)) {
             $this->ergonodeSyncLogger->error(
-                sprintf('Invalid syntax for option %s. Expected e.g. 2-3 days', $code)
+                sprintf('Invalid syntax for option %s - delivery time unit. Acceptable values: hours, days, weeks, months, years', $code)
             );
 
             return null;
         }
 
+        $timeEntity = $this->getExistingDeliveryTimeEntity((int)$min, (int)$max, $unit, $code, $context);
+
+        $data = [
+            'min' => (int)$min,
+            'max' => (int)$max,
+            'unit' => $unit,
+            'translations' => $translations,
+        ];
+
+        if ($timeEntity instanceof DeliveryTimeEntity) {
+            $data['id'] = $timeEntity->getId();
+        }
+
+        $resultEvent = $this->deliveryTimeRepository->upsert([$data], $context);
+        $timeId = $resultEvent->getPrimaryKeys(DeliveryTimeDefinition::ENTITY_NAME)[0];
+
+        $mappingData = [
+            'type' => self::MAPPING_TYPE,
+            'code' => $code,
+            'id' => $timeId,
+        ];
+
+        $this->mappingExtensionRepository->upsert([$mappingData], $context);
+
+        return $timeId;
+    }
+
+    private function getDeliveryTimeByCode(
+        string $code,
+        Context $context
+    ): ?DeliveryTimeEntity {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('code', $code));
+        $criteria->addFilter(new EqualsFilter('type', self::MAPPING_TYPE));
+        $result = $this->mappingExtensionRepository->search($criteria, $context);
+        $mappingEntity = $result->getEntities()->first();
+        if (!$mappingEntity instanceof ErgonodeMappingExtensionEntity) {
+            return null;
+        }
+
+        $timeCriteria = new Criteria();
+        $timeCriteria->addFilter(new EqualsFilter('id', $mappingEntity->getId()));
+        $timeResult = $this->deliveryTimeRepository->search($timeCriteria, $context);
+
+        return $timeResult->getEntities()->first();
+
+    }
+
+    public function createFallback(string $code, array $translations, Context $context): ?string
+    {
+        $timeEntity = $this->getDeliveryTimeByCode($code, $context);
+
+        if ($timeEntity instanceof DeliveryTimeEntity) {
+            $mappingData = [
+                'type' => self::MAPPING_TYPE,
+                'code' => $code,
+                'id' => $timeEntity->getId(),
+            ];
+
+            $this->mappingExtensionRepository->upsert([$mappingData], $context);
+
+
+            return $timeEntity->getId();
+        }
+
+        $data = [
+            'min' => $this->getNumberFromCode($code) ?: self::DEFAULT_FALLBACK_MIN,
+            'max' => $this->getNumberFromCode($code) ?: self::DEFAULT_FALLBACK_MAX,
+            'unit' => $this->findUnitFromCode($code),
+            'translations' => $translations,
+        ];
+
+        $resultEvent = $this->deliveryTimeRepository->upsert([$data], $context);
+        $timeId = $resultEvent->getPrimaryKeys(DeliveryTimeDefinition::ENTITY_NAME)[0];
+
+        $mappingData = [
+            'type' => self::MAPPING_TYPE,
+            'code' => $code,
+            'id' => $timeId,
+        ];
+
+        $this->mappingExtensionRepository->upsert([$mappingData], $context);
+
+        return $timeId;
+    }
+
+    private function getDeliveryTimePieces(string $code): ?array
+    {
+        $pieces = preg_split(self::DELIVERY_TIME_PATTERN, $code);
+        if (count($pieces) !== 3) {
+            return null;
+        }
+
         return $pieces;
+    }
+
+    private function getNumberFromCode(string $code): ?int
+    {
+        preg_match(self::DELIVERY_TIME_NUMBER_PATTERN, $code, $matches);
+        if ($matches === []) {
+            return null;
+        }
+
+        return (int)$matches[0];
+    }
+
+    private function findUnitFromCode(string $code): string
+    {
+        foreach (self::AVAILABLE_UNITS as $unit) {
+            if (str_contains(strtolower($code), $unit)) {
+                return $unit;
+            }
+        }
+
+        return self::DEFAULT_FALLBACK_UNIT;
     }
 }
