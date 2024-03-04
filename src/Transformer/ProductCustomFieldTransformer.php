@@ -36,6 +36,7 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
 
         $attributes = $this->getAttributesByCodes($productData->getErgonodeData(), $codes);
 
+        $usedCustomFields = [];
         $customFields = [];
         foreach ($attributes as $ergoCustomField) {
             $node = $ergoCustomField['node'] ?? null;
@@ -44,6 +45,7 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
             if (empty($node) || empty($code)) {
                 continue;
             }
+            $usedCustomFields[] = $code;
 
             $typedTransformer = $this->transformerResolver->resolve($node);
             if (null === $typedTransformer) {
@@ -56,8 +58,10 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
                 $context
             );
         }
+        $fieldsToRemove = array_diff($codes, $usedCustomFields);
 
         $customFields = array_merge_recursive(...$customFields);
+        $customFields = $this->addEmptyValues($customFields, $fieldsToRemove);
 
         $swData['translations'] = array_merge_recursive(
             $swData['translations'] ?? [],
@@ -75,5 +79,16 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
             $ergonodeData['attributeList']['edges'] ?? [],
             fn(array $attribute) => in_array($attribute['node']['attribute']['code'] ?? '', $codes)
         );
+    }
+
+    public function addEmptyValues(array $customFields, array $fieldsToRemove): array
+    {
+        foreach ($customFields as &$value) {
+            foreach ($fieldsToRemove as $code) {
+                $value['customFields'][CustomFieldUtil::buildCustomFieldName($code)] = null;
+            }
+        }
+
+        return $customFields;
     }
 }
