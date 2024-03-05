@@ -70,7 +70,7 @@ class PropertyGroupTransformer
                 }
 
                 $options[] = [
-                    'id' => $existingOption?->getId(),
+                    'id' => $existingOption ? $existingOption->getId() : null,
                     'name' => $option['code'],
                     'translations' => $this->translationTransformer->transform($option['name'], 'name'),
                     'extensions' => [
@@ -85,7 +85,7 @@ class PropertyGroupTransformer
         }
 
         $dto->setPropertyGroupPayload([
-            'id' => $propertyGroup?->getId(),
+            'id' => $propertyGroup ? $propertyGroup->getId() : null,
             'name' => $code,
             'options' => $options,
             'translations' => $translations,
