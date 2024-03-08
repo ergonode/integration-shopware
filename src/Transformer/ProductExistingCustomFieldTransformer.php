@@ -6,6 +6,7 @@ namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Resolver\ProductCustomFieldTransformerResolver;
 use Ergonode\IntegrationShopware\Util\CustomFieldTypeValidator;
 use Shopware\Core\Framework\Context;
@@ -20,14 +21,18 @@ class ProductExistingCustomFieldTransformer implements ProductDataTransformerInt
 
     private CustomFieldTypeValidator $validator;
 
+    private LanguageProvider $languageProvider;
+
     public function __construct(
         ProductCustomFieldTransformerResolver $transformerResolver,
         AttributeMappingProvider $customFieldMappingProvider,
-        CustomFieldTypeValidator $validator
+        CustomFieldTypeValidator $validator,
+        LanguageProvider $languageProvider
     ) {
         $this->transformerResolver = $transformerResolver;
         $this->customFieldMappingProvider = $customFieldMappingProvider;
         $this->validator = $validator;
+        $this->languageProvider = $languageProvider;
     }
 
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
@@ -55,6 +60,7 @@ class ProductExistingCustomFieldTransformer implements ProductDataTransformerInt
             $node = $edge['node'];
 
             $typedTransformer = $this->transformerResolver->resolve($node);
+
             if (null === $typedTransformer) {
                 continue;
             }
@@ -69,6 +75,7 @@ class ProductExistingCustomFieldTransformer implements ProductDataTransformerInt
         }
 
         $customFields = array_merge_recursive(...$customFields);
+        $customFields = $this->setEmptyValues($context, $customFields);
 
         $swData['translations'] = array_merge_recursive(
             $swData['translations'] ?? [],
@@ -78,5 +85,21 @@ class ProductExistingCustomFieldTransformer implements ProductDataTransformerInt
         $productData->setShopwareData($swData);
 
         return $productData;
+    }
+
+    public function setEmptyValues(Context $context, array $customFields): array
+    {
+        $customFieldMappings = $this->customFieldMappingProvider->getAttributeMapByErgonodeKeys($context);
+        $locales = $this->languageProvider->getActiveLocaleCodes($context);
+
+        foreach ($customFieldMappings as $customField) {
+            foreach ($locales as $locale) {
+                if (!isset($customFields[$locale]['customFields'][$customField->getShopwareKey()])) {
+                    $customFields[$locale]['customFields'][$customField->getShopwareKey()] = null;
+                }
+            }
+        }
+
+        return $customFields;
     }
 }
