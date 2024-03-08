@@ -60,7 +60,7 @@ class ProductExistingCustomFieldTransformer implements ProductDataTransformerInt
             $node = $edge['node'];
 
             $typedTransformer = $this->transformerResolver->resolve($node);
-            echo $code.' - '.get_class($typedTransformer).PHP_EOL;
+
             if (null === $typedTransformer) {
                 continue;
             }
@@ -75,7 +75,7 @@ class ProductExistingCustomFieldTransformer implements ProductDataTransformerInt
         }
 
         $customFields = array_merge_recursive(...$customFields);
-        $customFields = $this->settingEmptyValues($context, $customFields);
+        $customFields = $this->setEmptyValues($context, $customFields);
 
         $swData['translations'] = array_merge_recursive(
             $swData['translations'] ?? [],
@@ -87,7 +87,7 @@ class ProductExistingCustomFieldTransformer implements ProductDataTransformerInt
         return $productData;
     }
 
-    public function settingEmptyValues(Context $context, array $customFields): array
+    public function setEmptyValues(Context $context, array $customFields): array
     {
         $customFieldMappings = $this->customFieldMappingProvider->getAttributeMapByErgonodeKeys($context);
         $locales = $this->languageProvider->getActiveLocaleCodes($context);
