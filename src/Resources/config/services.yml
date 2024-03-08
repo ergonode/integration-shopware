@@ -203,6 +203,7 @@ services:
   Ergonode\IntegrationShopware\Transformer\ProductExistingCustomFieldTransformer:
     arguments:
       $customFieldMappingProvider: '@ergonode.integration_shopware.provider.custom_field_mapping_provider'
+      $languageProvider: '@Ergonode\IntegrationShopware\Provider\LanguageProvider'
 
   Ergonode\IntegrationShopware\Transformer\ProductScaleUnitTransformer:
     arguments:
