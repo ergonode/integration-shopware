@@ -57,26 +57,42 @@ class CustomFieldUtil
             case CustomFieldTypes::DATETIME:
                 return [
                     AttributeTypesEnum::DATE,
+                    ProductAttribute::TYPE_DATE,
                 ];
             case CustomFieldTypes::FLOAT:
             case CustomFieldTypes::INT:
                 return [
                     AttributeTypesEnum::NUMERIC,
                     AttributeTypesEnum::UNIT,
+                    ProductAttribute::TYPE_NUMERIC,
+                    ProductAttribute::TYPE_UNIT,
                 ];
             case CustomFieldTypes::PRICE:
                 return [
                     AttributeTypesEnum::PRICE,
+                    ProductAttribute::TYPE_PRICE,
                 ];
             case CustomFieldTypes::SELECT:
                 $isMultiSelect = 'sw-multi-select' === ($config['componentName'] ?? '');
 
-                return $isMultiSelect ? [AttributeTypesEnum::MULTISELECT] : [AttributeTypesEnum::SELECT];
+                if ($isMultiSelect) {
+                    return [
+                        AttributeTypesEnum::MULTISELECT,
+                        ProductAttribute::TYPE_MULTI_SELECT,
+                    ];
+                } else {
+                    return [
+                        AttributeTypesEnum::SELECT,
+                        ProductAttribute::TYPE_SELECT,
+                    ];
+                }
             case CustomFieldTypes::HTML:
             case CustomFieldTypes::TEXT:
                 return [
                     AttributeTypesEnum::TEXT,
                     AttributeTypesEnum::TEXTAREA,
+                    ProductAttribute::TYPE_TEXT,
+                    ProductAttribute::TYPE_TEXTAREA,
                 ];
             case CustomFieldTypes::SWITCH:
             case CustomFieldTypes::BOOL:
