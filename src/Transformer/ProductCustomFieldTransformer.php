@@ -35,6 +35,7 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
         $attributes = $productData->getErgonodeData()->getAttributesByCodes($codes);
 
         $customFields = [];
+        $usedCustomFields = [];
 
         $unprocessedCodes = array_flip($codes);
         foreach ($attributes as $attribute) {
@@ -42,6 +43,7 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
             if (null === $typedTransformer) {
                 continue;
             }
+            $usedCustomFields[] = $attribute->getCode();
 
             $customFields[] = $typedTransformer->transformNode(
                 $attribute,
@@ -52,7 +54,9 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
             unset($unprocessedCodes[$attribute->getCode()]);
         }
 
+        $fieldsToRemove = array_diff($codes, $usedCustomFields);
         $customFields = array_merge_recursive(...$customFields);
+        $customFields = $this->addEmptyValues($customFields, $fieldsToRemove);
 
         foreach ($unprocessedCodes as $unprocessedCode => $val) {
             foreach ($customFields as $language => $customFieldList) {
@@ -65,5 +69,16 @@ class ProductCustomFieldTransformer implements ProductDataTransformerInterface
         $productData->setShopwareData($swData);
 
         return $productData;
+    }
+
+    public function addEmptyValues(array $customFields, array $fieldsToRemove): array
+    {
+        foreach ($customFields as &$value) {
+            foreach ($fieldsToRemove as $code) {
+                $value['customFields'][CustomFieldUtil::buildCustomFieldName($code)] = null;
+            }
+        }
+
+        return $customFields;
     }
 }
