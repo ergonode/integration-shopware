@@ -41,8 +41,10 @@ class ProductCategoryPersistor
         $productId = $this->findProductIdBySku($sku, $context);
 
         if ($productId === null) {
+            $this->logger->error(sprintf('Product not found in Shopware %s', $sku));
             throw new \Exception('Product not exist');
         }
+        $this->logger->info(sprintf('Started sync categories for product %s (%s)', $sku, $productId));
         $categoriesPayload = $this->findCategoriesIdsByCategoryCodes($categoryCodes, $context);
 
         if (count($categoriesPayload) < count($categoryCodes)) {
