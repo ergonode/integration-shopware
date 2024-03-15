@@ -38,7 +38,7 @@ class ProductCategoryPersistor
      */
     public function persist(string $sku, array $categoryCodes, Context $context): array
     {
-        $productId = $this->findProductIdBySku($sku, $context);
+        $productId = $this->productProvider->getProductIdBySkus($sku, $context);
 
         if ($productId === null) {
             $this->logger->error(sprintf('Product not found in Shopware %s', $sku));
@@ -72,11 +72,6 @@ class ProductCategoryPersistor
         return $writeResult->getPrimaryKeys(ProductDefinition::ENTITY_NAME);
     }
 
-    private function findProductIdBySku(string $sku, Context $context): ?string
-    {
-        return $this->productProvider->getProductIdBySkus($sku, $context);
-    }
-
     private function findCategoriesIdsByCategoryCodes(array $categoryCodes, Context $context): array
     {
         $result = [];
@@ -86,6 +81,7 @@ class ProductCategoryPersistor
                 'id' => $category,
             ];
         }
+
         return $result;
     }
 }
