@@ -32,7 +32,7 @@ class DebugPersistSegmentMapping extends Command
         $this->productVisibilitySyncProcessor = $productVisibilitySyncProcessor;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 

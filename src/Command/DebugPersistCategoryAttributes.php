@@ -31,7 +31,7 @@ class DebugPersistCategoryAttributes extends Command
         $this->messageBus = $messageBus;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 

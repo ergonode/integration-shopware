@@ -67,6 +67,16 @@ class CategoryProvider
         return $this->categoryRepository->searchIds($criteria, $context)->getIds();
     }
 
+    public function getCategoryIdsByCodes(array $codes, Context $context): array
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(
+            new EqualsAnyFilter(ErgonodeCategoryMappingExtension::EXTENSION_NAME . '.code', $codes)
+        );
+
+        return $this->categoryRepository->searchIds($criteria, $context)->getIds();
+    }
+
     public function getCategoriesWithAnyCode(
         array $codes,
         Context $context,

@@ -36,7 +36,7 @@ class DebugAttributeDeletedStream extends Command
         $this->cursorManager = $cursorManager;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription(
             'Iterates through latest Ergonode deleted attributes and deletes matching Shopware Property Groups.'

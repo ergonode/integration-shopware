@@ -29,7 +29,7 @@ class SyncLanguagesCommand extends Command
         $this->processor = $processor;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription(
             'Fetches all languages from Ergonode and saves them as Language entities in Shopware.'

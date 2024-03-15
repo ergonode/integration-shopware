@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 
-use Ergonode\IntegrationShopware\MessageQueue\Message\ProductSync;
 use Ergonode\IntegrationShopware\MessageQueue\Message\SingleProductCategorySync;
-use Ergonode\IntegrationShopware\MessageQueue\Message\SingleProductSync;
-use Ergonode\IntegrationShopware\Processor\ProductSyncProcessor;
+use Ergonode\IntegrationShopware\Persistor\ProductCategoryPersistor;
+use Ergonode\IntegrationShopware\Processor\ProductCategorySyncProcessor;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Product\DataAbstractionLayer\ProductIndexingMessage;
@@ -19,11 +18,11 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
 #[AsMessageHandler]
-class ProductSyncHandler extends AbstractSyncHandler
+class ProductCategorySyncHandler extends AbstractSyncHandler
 {
-    private const MAX_PAGES_PER_RUN = 4;
+    private ProductCategorySyncProcessor $processor;
 
-    private ProductSyncProcessor $productSyncProcessor;
+    private ProductCategoryPersistor $persistor;
 
     private MessageBusInterface $messageBus;
 
@@ -31,16 +30,18 @@ class ProductSyncHandler extends AbstractSyncHandler
         SyncHistoryLogger $syncHistoryService,
         LockFactory $lockFactory,
         LoggerInterface $ergonodeSyncLogger,
-        ProductSyncProcessor $productSyncProcessor,
+        ProductCategorySyncProcessor $processor,
+        ProductCategoryPersistor $persistor,
         MessageBusInterface $messageBus
     ) {
         parent::__construct($syncHistoryService, $lockFactory, $ergonodeSyncLogger);
 
-        $this->productSyncProcessor = $productSyncProcessor;
+        $this->processor = $processor;
+        $this->persistor = $persistor;
         $this->messageBus = $messageBus;
     }
 
-    public function __invoke(ProductSync $message)
+    public function __invoke(SingleProductCategorySync $message)
     {
         $this->handleMessage($message);
     }
@@ -55,30 +56,21 @@ class ProductSyncHandler extends AbstractSyncHandler
 
     public function runSync($message): int
     {
-        $currentPage = 0;
         $count = 0;
+        $records = [];
         $result = null;
 
         try {
-            $primaryKeys = [];
             do {
-                $result = $this->productSyncProcessor->processStream($this->context);
+                $result = $this->processor->process($message->getSku(), $this->context);
 
                 $count += $result->getProcessedEntityCount();
-                $primaryKeys = \array_merge($primaryKeys, $result->getPrimaryKeys());
+                $records = \array_merge($records, $result->getRetrievedData());
 
-                foreach ($result->getSeparateProcessSkusVariants() as $sku) {
-                    $this->messageBus->dispatch(new SingleProductSync($sku, true));
-                }
-
-                foreach ($result->getSeparateProcessSkusCategories() as $sku) {
-                    $this->messageBus->dispatch(new SingleProductCategorySync($sku));
-                }
-
-                if (self::MAX_PAGES_PER_RUN !== null && ++$currentPage >= self::MAX_PAGES_PER_RUN) {
-                    break;
-                }
             } while ($result->hasNextPage());
+
+
+        $primaryKeys = $this->persistor->persist($message->getSku(), $records, $this->context);
         } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
         }
@@ -88,10 +80,6 @@ class ProductSyncHandler extends AbstractSyncHandler
             $indexingMessage = new ProductIndexingMessage($primaryKeys);
             $indexingMessage->setIndexer('product.indexer');
             $this->messageBus->dispatch($indexingMessage);
-        }
-
-        if (null !== $result && $result->hasNextPage()) {
-            $this->messageBus->dispatch(new ProductSync());
         }
 
         return $count;

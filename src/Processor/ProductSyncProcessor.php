@@ -93,7 +93,8 @@ class ProductSyncProcessor
 
         $this->cursorManager->persist($endCursor, ProductStreamResultsProxy::MAIN_FIELD, $context);
 
-        $separateProcessSkus = [];
+        $separateProcessSkusVariants = [];
+        $separateProcessSkusCategories = [];
         // store cursors for products which have more variants or categories than allowed limit in query builder
         foreach ($result->getProductData()['edges'] as $mainProductEdge) {
             $sku = $mainProductEdge['node']['sku'] ?? '';
@@ -116,8 +117,12 @@ class ProductSyncProcessor
                 $context
             );
 
-            if ($hasMoreVariants || $hasMoreCategories) {
-                $separateProcessSkus[] = $sku;
+            if ($hasMoreVariants) {
+                $separateProcessSkusVariants[] = $sku;
+            }
+
+            if ($hasMoreCategories) {
+                $separateProcessSkusCategories[] = $sku;
             }
         }
 
@@ -125,7 +130,8 @@ class ProductSyncProcessor
         $counter->setPrimaryKeys($primaryKeys);
         $counter->setHasNextPage($result->hasNextPage());
         $counter->setStopwatch($stopwatch);
-        $counter->setSeparateProcessSkus($separateProcessSkus);
+        $counter->setSeparateProcessSkusVariants($separateProcessSkusVariants);
+        $counter->setSeparateProcessSkusCategories($separateProcessSkusCategories);
 
         $this->performanceLogger->logPerformance(self::class, $stopwatch);
 
@@ -138,16 +144,13 @@ class ProductSyncProcessor
         $stopwatch = new Stopwatch();
 
         $variantsCursorKey = CodeBuilderUtil::build(ProductStreamResultsProxy::VARIANT_LIST_FIELD, $sku);
-        $categoryCursorKey = CodeBuilderUtil::build(ProductStreamResultsProxy::CATEGORY_LIST_FIELD, $sku);
 
         $variantsCursor = $this->cursorManager->getCursorEntity($variantsCursorKey, $context);
-        $categoryCursor = $this->cursorManager->getCursorEntity($categoryCursorKey, $context);
 
         $stopwatch->start('query');
         $query = $this->productQueryBuilder->buildProductWithVariants(
             $sku,
-            $variantsCursor ? $variantsCursor->getCursor() : null,
-            $categoryCursor ? $categoryCursor->getCursor() : null
+            $variantsCursor ? $variantsCursor->getCursor() : null
         );
         /** @var ProductResultsProxy|null $result */
         $result = $this->gqlClient->query($query, ProductResultsProxy::class);
@@ -163,29 +166,27 @@ class ProductSyncProcessor
             return $counter;
         }
 
+        $variantsEndCursor = $result->getVariantsEndCursor();
+        $categoriesEndCursor = $result->getCategoriesEndCursor();
+
         $stopwatch->start('process');
+        //extract category ids to pass to another processor
         $primaryKeys = $this->productPersistor->persist([['node' => $result->getProductData()]], $context);
         $stopwatch->stop('process');
 
-        $variantsEndCursor = $result->getVariantsEndCursor();
-        $categoriesEndCursor = $result->getCategoriesEndCursor();
+
         if (null !== $categoriesEndCursor) {
-            // Category cursor exists.
-            $this->cursorManager->persist($categoriesEndCursor, $categoryCursorKey, $context);
-        } else if (null !== $variantsEndCursor) {
-            // There is no categories, but there is variants soo lets go through them. Also remove categories cursor.
-            $this->cursorManager->deleteCursor($categoryCursorKey, $context);
-            $this->cursorManager->persist($variantsEndCursor, $variantsCursorKey, $context);
-        } else if (false === $result->hasVariantsNextPage()) {
-            // We go through all variants so we can delete cursor for variants
-            $this->cursorManager->deleteCursor($variantsCursorKey, $context);
+            //There is more categories that 50, pushing product to update categories
+            $counter->setSeparateProcessSkusCategories([$sku]);
         }
 
-        $hasNextPage = $result->hasVariantsNextPage() || $result->hasCategoriesNextPage();
-        if (false === $result->hasVariantsNextPage() && false === $result->hasCategoriesNextPage()) {
-            // Nothing left remove both cursors
+        if (null !== $variantsEndCursor) {
+            $this->cursorManager->persist($variantsEndCursor, $variantsCursorKey, $context);
+        }
+
+        $hasNextPage = $result->hasVariantsNextPage();
+        if (false === $hasNextPage) {
             $this->cursorManager->deleteCursor($variantsCursorKey, $context);
-            $this->cursorManager->deleteCursor($categoryCursorKey, $context);
         }
 
         $counter->incrProcessedEntityCount(count($primaryKeys));

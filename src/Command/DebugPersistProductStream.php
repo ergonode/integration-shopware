@@ -36,7 +36,7 @@ class DebugPersistProductStream extends Command
         $this->cursorManager = $cursorManager;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
