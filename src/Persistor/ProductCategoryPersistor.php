@@ -50,7 +50,7 @@ class ProductCategoryPersistor
         if (count($categoriesPayload) < count($categoryCodes)) {
             $this->logger->warning(
                 sprintf(
-                    'Found less categories that assigned to product in Ergonode %d[%d]',
+                    'Found less categories than assigned to product in Ergonode %d[%d]',
                     count($categoriesPayload),
                     count($categoryCodes)
                 )
@@ -64,27 +64,17 @@ class ProductCategoryPersistor
             ]
         ];
 
-        try {
-            $writeResult = $this->productRepository->upsert(
-                $payload,
-                $context
-            );
-        } catch (Throwable $exception) {
-            throw $exception;
-        }
+        $writeResult = $this->productRepository->upsert(
+            $payload,
+            $context
+        );
 
         return $writeResult->getPrimaryKeys(ProductDefinition::ENTITY_NAME);
     }
 
     private function findProductIdBySku(string $sku, Context $context): ?string
     {
-        $productIds = $this->productProvider->getProductIdsBySkus([$sku], $context);
-
-        if (\count($productIds) > 0) {
-            return array_pop($productIds);
-        }
-
-        return null;
+        return $this->productProvider->getProductIdBySkus($sku, $context);
     }
 
     private function findCategoriesIdsByCategoryCodes(array $categoryCodes, Context $context): array

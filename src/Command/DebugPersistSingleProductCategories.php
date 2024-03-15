@@ -27,7 +27,7 @@ class DebugPersistSingleProductCategories extends Command
         $this->handler = $handler;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
