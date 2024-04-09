@@ -53,7 +53,7 @@ class PropertyGroupTransformer
             $option = $optionNode['node'];
             if (!empty($option['code'])) {
                 $optionCode = $option['code'];
-                $optionCode = (new UnicodeString($optionCode))->ascii()->toString();
+                $optionCode = (new UnicodeString($optionCode))->toString();
 
                 $existingOption = $propertyGroup ? $this->getOptionByCode($propertyGroup, $optionCode) : null;
                 // avoid duplicate properties with same option code
