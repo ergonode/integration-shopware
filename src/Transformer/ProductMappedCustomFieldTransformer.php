@@ -65,9 +65,6 @@ class ProductMappedCustomFieldTransformer implements ProductDataTransformerInter
             );
         }
 
-        if (empty($customFields)) {
-            return $productData;
-        }
         $customFields = array_merge_recursive(...$customFields);
         $customFields = $this->setEmptyValues($context, $customFields);
 
