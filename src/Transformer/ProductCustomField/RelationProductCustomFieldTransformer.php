@@ -63,6 +63,9 @@ class RelationProductCustomFieldTransformer implements ProductCustomFieldTransfo
     {
         $customField = $this->customFieldProvider->getCustomFieldByName($customFieldName, $context);
 
+        if (null === $customField) {
+            return null;
+        }
         return $customField->getConfig()['componentName'] ?? null;
     }
 }
