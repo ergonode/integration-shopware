@@ -46,6 +46,14 @@
             <helpText>Every selected attribute will create a separate cross-selling collection. (This field will be inherited from All Sales Channel, DO NOT modify or delete for specific channels)</helpText>
             <helpText lang="de-DE">Jedes ausgewählte Attribut erstellt eine separate Cross-Selling-Kollektion. (Dieses Feld wird für alle Vertriebskanäle übernommen, NICHT für einzelne Kanäle ändern oder löschen)</helpText>
         </component>
+
+        <input-field type="bool">
+            <name>forceUppercaseSkuSync</name>
+            <label>Forces to save product sku in uppercase</label>
+            <label lang="de-DE">Forces to save product sku in uppercase</label>
+            <helpText>When this option is on, products will be saved in shopware in uppercase ex. Ergonode: `Product-12a` will be saved as `PRODUCT-12A`</helpText>
+            <helpText lang="de-DE">When this option is on, products will be saved in shopware in uppercase ex. Ergonode: `Product-12a` will be saved as `PRODUCT-12A`</helpText>
+        </input-field>
     </card>
     <card>
         <title>Category Sync</title>

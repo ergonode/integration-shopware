@@ -137,7 +137,7 @@ class ConfigService
         return (new \DateTime($lastCheckedStr))->getTimestamp();
     }
 
-    public function isProductCategoryAssignDisabled() :bool
+    public function isProductCategoryAssignDisabled(): bool
     {
         return $this->configService->getBool('disableCategoryAssign');
     }
@@ -154,5 +154,10 @@ class ConfigService
         );
 
         return $formatted;
+    }
+
+    public function forceUppercaseSkuSync(): bool
+    {
+        return $this->configService->getBool('forceUppercaseSkuSync');
     }
 }

@@ -6,6 +6,7 @@ namespace Ergonode\IntegrationShopware\Transformer;
 
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Model\ProductAttribute;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Shopware\Core\Framework\Context;
 
@@ -13,11 +14,22 @@ class ProductDefaultValuesTransformer implements ProductDataTransformerInterface
 {
     private const DEFAULT_STOCK_VALUE = 999;
 
+    private ConfigService $configService;
+
+    public function __construct(ConfigService $configService)
+    {
+        $this->configService = $configService;
+    }
+
+
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $swData = $productData->getShopwareData();
         $ergonodeData = $productData->getErgonodeData();
         $sku = $ergonodeData->getSku();
+        if ($this->configService->forceUppercaseSkuSync()) {
+            $sku = strtoupper($sku);
+        }
         $swData->setProductNumber($sku);
 
         $swData->setName($this->getName($productData));
