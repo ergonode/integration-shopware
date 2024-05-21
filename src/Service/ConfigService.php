@@ -139,7 +139,7 @@ class ConfigService
 
     public function isProductCategoryAssignDisabled(): bool
     {
-        return $this->configService->getBool('disableCategoryAssign');
+        return $this->configService->getBool(self::CONFIG_NAMESPACE . 'disableCategoryAssign');
     }
 
     /**
@@ -158,6 +158,6 @@ class ConfigService
 
     public function forceUppercaseSkuSync(): bool
     {
-        return $this->configService->getBool('forceUppercaseSkuSync');
+        return $this->configService->getBool(self::CONFIG_NAMESPACE . 'forceUppercaseSkuSync');
     }
 }
