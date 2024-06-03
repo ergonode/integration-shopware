@@ -11,6 +11,7 @@ use Ergonode\IntegrationShopware\Factory\ProductDataFactory;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Ergonode\IntegrationShopware\Struct\ProductContainer;
 use Ergonode\IntegrationShopware\Transformer\ProductTransformerChain;
 use Ergonode\IntegrationShopware\Transformer\VariantsTransformer;
@@ -57,6 +58,8 @@ class ProductPersistor
 
     private ProductDataFactory $productDataFactory;
 
+    private ConfigService $configService;
+
     public function __construct(
         EntityRepository $productRepository,
         ProductProvider $productProvider,
@@ -68,7 +71,8 @@ class ProductPersistor
         ProductContainer $productContainer,
         ErgonodeCursorManager $cursorManager,
         ProductDataFactory $productDataFactory,
-        private readonly LanguageProvider $languageProvider
+        private readonly LanguageProvider $languageProvider,
+        ConfigService $configService
     ) {
         $this->productRepository = $productRepository;
         $this->productProvider = $productProvider;
@@ -80,6 +84,7 @@ class ProductPersistor
         $this->productContainer = $productContainer;
         $this->cursorManager = $cursorManager;
         $this->productDataFactory = $productDataFactory;
+        $this->configService = $configService;
     }
 
     /**
@@ -200,6 +205,11 @@ class ProductPersistor
         }
 
         $sku = $productData['sku'];
+
+        if ($this->configService->forceUppercaseSkuSync()) {
+            $sku = strtoupper($sku);
+            $productData['sku'] = $sku;
+        }
 
         $existingProduct = $this->productContainer->get($sku);
 
