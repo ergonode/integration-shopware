@@ -24,7 +24,6 @@ class CustomFieldUtil
     {
         $config = $customField->getConfig() ?: [];
         $customFieldType = $config['customFieldType'] ?? '';
-        var_dump($config, $customField->getType());
         // special cases
         if (CustomFieldTypes::MEDIA === $customFieldType) {
             return [
