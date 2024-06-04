@@ -23,14 +23,17 @@ class CustomFieldUtil
     public static function getValidErgonodeTypes(CustomFieldEntity $customField): array
     {
         $config = $customField->getConfig() ?: [];
-
         $customFieldType = $config['customFieldType'] ?? '';
+        var_dump($config, $customField->getType());
         // special cases
         if (CustomFieldTypes::MEDIA === $customFieldType) {
             return [
                 AttributeTypesEnum::IMAGE,
                 AttributeTypesEnum::FILE,
                 AttributeTypesEnum::GALLERY,
+                ProductAttribute::TYPE_IMAGE,
+                ProductAttribute::TYPE_FILE,
+                ProductAttribute::TYPE_GALLERY,
             ];
         }
 
@@ -41,6 +44,7 @@ class CustomFieldUtil
         ) {
             return [
                 AttributeTypesEnum::RELATION,
+                ProductAttribute::TYPE_PRODUCT_RELATION,
             ];
         }
 
