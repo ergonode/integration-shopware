@@ -54,8 +54,8 @@ class SyncTriggerController extends AbstractController
         $this->messageBus->dispatch(new AttributeSync());
         $this->messageBus->dispatch(new CategorySync());
         $this->messageBus->dispatch(new ProductSync());
-        $this->messageBus->dispatch(new CategoryAttributesSync());
         $this->messageBus->dispatch(new ProductVisibilitySync());
+        $this->messageBus->dispatch(new CategoryAttributesSync());
         $this->messageBus->dispatch(new DeletedProductSync());
         $this->messageBus->dispatch(new DeletedAttributeSync());
 
