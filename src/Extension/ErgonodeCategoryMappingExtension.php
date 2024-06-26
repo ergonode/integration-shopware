@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Extension;
 
+use Ergonode\IntegrationShopware\Entity\ErgonodeCategoryMapping\ErgonodeCategoryMappingDefinition;
 use Ergonode\IntegrationShopware\Entity\ErgonodeCategoryMappingExtension\ErgonodeCategoryMappingExtensionDefinition;
 use Shopware\Core\Content\Category\CategoryDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityExtension;
@@ -15,6 +16,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 class ErgonodeCategoryMappingExtension extends EntityExtension
 {
     public const EXTENSION_NAME = 'ergonodeCategoryMappingExtension';
+    public const MAPPING_EXTENSION_NAME = 'ergonodeCategoryMapping';
 
     public const STORAGE_NAME = 'ergonode_category_mapping_extension_id';
 
@@ -38,6 +40,16 @@ class ErgonodeCategoryMappingExtension extends EntityExtension
                 ErgonodeCategoryMappingExtensionDefinition::class,
                 false
             ))->addFlags(new CascadeDelete())
+        );
+
+        $collection->add(
+            new OneToOneAssociationField(
+                self::MAPPING_EXTENSION_NAME,
+                'id',
+                'shopware_id',
+                ErgonodeCategoryMappingDefinition::class,
+                false
+            )
         );
     }
 
