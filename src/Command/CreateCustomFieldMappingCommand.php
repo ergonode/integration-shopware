@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Command;
 
 use Ergonode\IntegrationShopware\Entity\ErgonodeAttributeMapping\ErgonodeCustomFieldMappingDefinition;
-use Ergonode\IntegrationShopware\Provider\MappableFieldsProvider;
+use Ergonode\IntegrationShopware\Provider\MappableFieldsProviderInterface;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -22,11 +22,11 @@ class CreateCustomFieldMappingCommand extends Command
 
     private EntityRepository $repository;
 
-    private MappableFieldsProvider $mappableFieldsProvider;
+    private MappableFieldsProviderInterface $mappableFieldsProvider;
 
     public function __construct(
         EntityRepository $repository,
-        MappableFieldsProvider $mappableFieldsProvider
+        MappableFieldsProviderInterface $mappableFieldsProvider
     ) {
         $this->context = new Context(new SystemSource());
         $this->repository = $repository;

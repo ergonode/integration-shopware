@@ -214,7 +214,7 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductDeliveryTimeTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductScaleUnitTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductMinMaxQuantityTransformer'
-
+        - '@Ergonode\IntegrationShopware\Transformer\ProductLayoutTransformer'
 
   Ergonode\IntegrationShopware\Transformer\CategoryAttributesTransformerChain:
     arguments:

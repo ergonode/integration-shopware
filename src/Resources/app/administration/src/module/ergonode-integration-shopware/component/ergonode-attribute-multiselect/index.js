@@ -29,7 +29,7 @@ Component.extend('ergonode-attribute-multiselect', 'ergonode-api-entity-multisel
 
     methods: {
         fetchOptionsRequest() {
-            return this.ergonodeMappingService.getErgonodeAttributes(this.attributesType ? [this.attributesType]:[])
+            return this.ergonodeMappingService.getErgonodeAttributes(this.attributesType ? [this.attributesType] : [])
         }
     }
 });

@@ -56,8 +56,8 @@
         </input-field>
     </card>
     <card>
-        <title>Category Sync</title>
-        <title lang="de-DE">Category Sync</title>
+        <title>Category sync</title>
+        <title lang="de-DE">Category sync</title>
         <component name="ergonode-category-tree-multiselect">
             <name>categoryTreeCodes</name>
             <label>Category trees to synchronize</label>
@@ -78,6 +78,18 @@
             <helpText>When this option is on, products will not change their categories during synchronization</helpText>
             <helpText lang="de-DE">When this option is on, products will not change their categories during synchronization</helpText>
         </input-field>
+    </card>
+    <card>
+        <title>Product sync</title>
+        <title lang="de-DE">Product sync</title>
+
+        <component name="ergonode-template-cms-page-mapping">
+            <name>templateLayoutMapping</name>
+            <label>CMS layout mapping by Ergonode template</label>
+            <label lang="de-DE">CMS-Layout-Mapping per Ergonode-Vorlage</label>
+            <helpText>Ergonode template name -> CMS product page layout</helpText>
+            <helpText lang="de-DE">Ergonode-Vorlagenname -> CMS-Produktseitenlayout</helpText>
+        </component>
     </card>
     <card>
         <title>Scheduler</title>

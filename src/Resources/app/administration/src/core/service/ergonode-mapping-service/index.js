@@ -67,4 +67,10 @@ export default class ErgonodeMappingService extends ApiService {
             headers: this.getBasicHeaders()
         });
     }
+
+    async getErgonodeTemplates() {
+        return await this.client.get('ergonode/templates', {
+            headers: this.getBasicHeaders()
+        });
+    }
 }
