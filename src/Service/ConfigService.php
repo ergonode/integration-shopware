@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Ergonode\IntegrationShopware\Service;
 
+use DateTime;
+use DateTimeInterface;
+use DateTimeZone;
 use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
+use Exception;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -79,11 +83,11 @@ class ConfigService
         return $this->configService->getBool(self::CONFIG_NAMESPACE . 'schedulerEnabled');
     }
 
-    public function getSchedulerStartDatetime(): ?\DateTime
+    public function getSchedulerStartDatetime(): ?DateTime
     {
         $value = $this->configService->getString(self::CONFIG_NAMESPACE . 'schedulerStartDatetime');
 
-        return empty($value) ? null : new \DateTime($value);
+        return empty($value) ? null : new DateTime($value);
     }
 
     public function getSchedulerRecurrenceHour(): string
@@ -96,15 +100,15 @@ class ConfigService
         return $this->configService->getString(self::CONFIG_NAMESPACE . 'schedulerRecurrenceMinute');
     }
 
-    public function getLastFullSyncDatetime(): ?\DateTime
+    public function getLastFullSyncDatetime(): ?DateTime
     {
         $value = $this->configService->getString(self::CONFIG_NAMESPACE . 'fullSyncDate');
         $timezone = $this->getSchedulerStartTimezone();
 
-        return empty($value) ? null : new \DateTime($value, new \DateTimeZone($timezone));
+        return empty($value) ? null : new DateTime($value, new DateTimeZone($timezone));
     }
 
-    public function setLastFullSyncDatetime(\DateTime $date): void
+    public function setLastFullSyncDatetime(DateTime $date): void
     {
         $this->configService->set(self::CONFIG_NAMESPACE . 'fullSyncDate', $date->format('d-m-Y H:i:s'));
     }
@@ -134,7 +138,7 @@ class ConfigService
             return 0;
         }
 
-        return (new \DateTime($lastCheckedStr))->getTimestamp();
+        return (new DateTime($lastCheckedStr))->getTimestamp();
     }
 
     public function isProductCategoryAssignDisabled(): bool
@@ -147,7 +151,7 @@ class ConfigService
      */
     public function setLastCategorySyncTimestamp(int $timestamp): string
     {
-        $formatted = (new \DateTime('@' . $timestamp))->format(\DateTimeInterface::ATOM);
+        $formatted = (new DateTime('@' . $timestamp))->format(DateTimeInterface::ATOM);
         $this->configService->set(
             self::CONFIG_NAMESPACE . 'lastCategorySyncTime',
             $formatted
@@ -159,5 +163,18 @@ class ConfigService
     public function forceUppercaseSkuSync(): bool
     {
         return $this->configService->getBool(self::CONFIG_NAMESPACE . 'forceUppercaseSkuSync');
+    }
+
+    /**
+     * @return array<string, string> templateName => cmsPageId
+     */
+    public function getTemplateLayoutMapping(): array
+    {
+        $value = $this->configService->get(self::CONFIG_NAMESPACE . 'templateLayoutMapping');
+        if (false === is_array($value)) {
+            return [];
+        }
+
+        return $value;
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Controller\Admin;
 
 use Ergonode\IntegrationShopware\Provider\MappableFieldsProvider;
+use Ergonode\IntegrationShopware\Provider\MappableFieldsProviderInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,10 +16,10 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route(defaults: ['_routeScope' => ['api']])]
 class MappingController extends AbstractController
 {
-    private MappableFieldsProvider $mappableFieldsProvider;
+    private MappableFieldsProviderInterface $mappableFieldsProvider;
 
     public function __construct(
-        MappableFieldsProvider $mappableFieldsProvider
+        MappableFieldsProviderInterface $mappableFieldsProvider
     ) {
         $this->mappableFieldsProvider = $mappableFieldsProvider;
     }
@@ -44,7 +45,11 @@ class MappingController extends AbstractController
         ], Response::HTTP_OK);
     }
 
-    #[Route(path: '/api/ergonode/ergonode-category-trees', name: 'api.ergonode.ergonodeCategoryTrees', methods: ['GET'])]
+    #[Route(
+        path: '/api/ergonode/ergonode-category-trees',
+        name: 'api.ergonode.ergonodeCategoryTrees',
+        methods: ['GET']
+    )]
     public function ergonodeCategoryTrees(): JsonResponse
     {
         $codes = $this->mappableFieldsProvider->getErgonodeCategoryTreeCodes();
@@ -86,7 +91,6 @@ class MappingController extends AbstractController
         ], Response::HTTP_OK);
     }
 
-
     /**
      * @Route("/api/ergonode/ergonode-categories", name="api.ergonode.ergonodeCategories", methods={"GET"})
      */
@@ -112,9 +116,24 @@ class MappingController extends AbstractController
         ], Response::HTTP_OK);
     }
 
+    /**
+     * @Route("/api/ergonode/templates", name="api.ergonode.templates", methods={"GET"})
+     */
+    #[Route(path: '/api/ergonode/templates', name: 'api.ergonode.templates', methods: ['GET'])]
+    public function ergonodeTemplates(): JsonResponse
+    {
+        $templates = $this->mappableFieldsProvider->getTemplates();
 
-    #[Route(path: '/api/ergonode/shopware-category-attributes', name: 'api.ergonode.shopwareCategoryAttributes',
-        methods: ['GET'])]
+        return new JsonResponse([
+            'data' => $templates,
+        ], Response::HTTP_OK);
+    }
+
+    #[Route(
+        path: '/api/ergonode/shopware-category-attributes',
+        name: 'api.ergonode.shopwareCategoryAttributes',
+        methods: ['GET']
+    )]
     public function shopwareCategoryAttributes(): JsonResponse
     {
         $attributes = $this->mappableFieldsProvider->getShopwareCategoriesAttributesWithTypes();
@@ -124,9 +143,11 @@ class MappingController extends AbstractController
         ], Response::HTTP_OK);
     }
 
-
-    #[Route(path: '/api/ergonode/ergonode-category-attributes', name: 'api.ergonode.ergonodeCategoryAttributes',
-        methods: ['GET'])]
+    #[Route(
+        path: '/api/ergonode/ergonode-category-attributes',
+        name: 'api.ergonode.ergonodeCategoryAttributes',
+        methods: ['GET']
+    )]
     public function ergonodeCategoryAttributes(QueryDataBag $dataBag): JsonResponse
     {
         $types = $dataBag->get('types', []);
