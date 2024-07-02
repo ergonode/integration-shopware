@@ -263,7 +263,14 @@ class ProductDataFactory
         if ($this->configService->forceUppercaseSkuSync()) {
             $data['sku'] = strtoupper($data['sku']);
         }
-        $ergonodeData = new ProductErgonodeData($data['sku'], $data['__typename'], $mappings);
+
+        $ergonodeData = new ProductErgonodeData(
+            $data['sku'],
+            $data['__typename'],
+            $data['template']['code'],
+            $mappings
+        );
+
         foreach ($data['attributeList']['edges'] ?? [] as $attributeEdge) {
             $attributeData = $attributeEdge['node'];
 
@@ -276,8 +283,8 @@ class ProductDataFactory
             $ergonodeData->addCategory($categoryEdge);
         }
 
-        if (isset($data['bindings'])) {
-            foreach ($data['bindings'] ?? [] as $binding) {
+        if (is_array($data['bindings'] ?? null)) {
+            foreach ($data['bindings'] as $binding) {
                 $ergonodeData->addBinding($binding['code']);
             }
         }

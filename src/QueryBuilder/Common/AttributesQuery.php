@@ -110,7 +110,7 @@ class AttributesQuery
                             ->setAlias('value_multi_array')
                             ->setSelectionSet([
                                 'code',
-                                'name'
+                                'name',
                             ]),
                     ]),
                 (new InlineFragment('SelectAttributeValueTranslation'))
@@ -119,7 +119,7 @@ class AttributesQuery
                             ->setAlias('value_array')
                             ->setSelectionSet([
                                 'code',
-                                'name'
+                                'name',
                             ]),
                     ]),
 

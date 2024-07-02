@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Command;
 
 use Ergonode\IntegrationShopware\Entity\ErgonodeCategoryAttributeMapping\ErgonodeCategoryAttributeMappingDefinition;
-use Ergonode\IntegrationShopware\Provider\MappableFieldsProvider;
+use Ergonode\IntegrationShopware\Provider\MappableFieldsProviderInterface;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -22,7 +22,7 @@ class CreateCategoryAttributeMappingCommand extends Command
 
     public function __construct(
         private EntityRepository $repository,
-        private MappableFieldsProvider $mappableFieldsProvider
+        private MappableFieldsProviderInterface $mappableFieldsProvider
     ) {
         $this->context = new Context(new SystemSource());
 
