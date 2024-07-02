@@ -1,7 +1,7 @@
 import './acl'
 import './page'
 import './component'
-import ergonodeApiSelectState from "./state/ergonode-api-select";
+import ergonodeApiSelectState from './state/ergonode-api-select';
 
 Shopware.State.registerModule('ergonodeApiSelect', ergonodeApiSelectState);
 

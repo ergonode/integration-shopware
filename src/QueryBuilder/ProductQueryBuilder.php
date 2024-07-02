@@ -11,9 +11,9 @@ use GraphQL\Query;
 
 class ProductQueryBuilder
 {
-    private const int ATTRIBUTE_LIST_COUNT = 1000;
-    private const int VARIANT_LIST_COUNT = 25;
-    private const int CATEGORY_LIST_COUNT = 50;
+    private const ATTRIBUTE_LIST_COUNT = 1000;
+    private const VARIANT_LIST_COUNT = 25;
+    private const CATEGORY_LIST_COUNT = 50;
 
     public function build(int $count, ?string $cursor = null): Query
     {

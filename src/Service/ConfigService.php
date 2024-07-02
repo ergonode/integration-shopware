@@ -8,7 +8,6 @@ use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
 use Ergonode\IntegrationShopware\Api\ErgonodeAccessData;
-use Exception;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -175,6 +174,16 @@ class ConfigService
             return [];
         }
 
-        return $value;
+        return array_merge(
+            ...array_map(function (array $item) {
+                if (in_array(null, [$item['templateName'], $item['cmsPageId']], true)) {
+                    return [];
+                }
+
+                return [
+                    $item['templateName'] => $item['cmsPageId'],
+                ];
+            }, $value)
+        );
     }
 }

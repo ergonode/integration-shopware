@@ -7,6 +7,7 @@ namespace Ergonode\IntegrationShopware\Transformer;
 use Ergonode\IntegrationShopware\DTO\ProductTransformationDTO;
 use Ergonode\IntegrationShopware\Service\ConfigService;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Uuid\Uuid;
 
 class ProductLayoutTransformer implements ProductDataTransformerInterface
 {
@@ -27,7 +28,12 @@ class ProductLayoutTransformer implements ProductDataTransformerInterface
         $templateName = $productData->getErgonodeData()->getTemplateName();
 
         if (array_key_exists($templateName, $mapping)) {
-            $shopwareData->setCmsPageId($mapping[$templateName]);
+            $cmsPageId = $mapping[$templateName];
+            if (false === Uuid::isValid($cmsPageId)) {
+                return $productData;
+            }
+
+            $shopwareData->setCmsPageId($cmsPageId);
         }
 
         $productData->setShopwareData($shopwareData);

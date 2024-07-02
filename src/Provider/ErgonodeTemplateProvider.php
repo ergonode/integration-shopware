@@ -11,7 +11,7 @@ use Generator;
 
 class ErgonodeTemplateProvider
 {
-    private const int MAX_TEMPLATES_PER_PAGE = 100;
+    private const MAX_TEMPLATES_PER_PAGE = 100;
 
     public function __construct(
         private readonly TemplateQueryBuilder $templateQueryBuilder,
