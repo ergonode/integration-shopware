@@ -64,6 +64,7 @@ class ProductQueryBuilder
                                                             ->setSelectionSet([
                                                                 'sku',
                                                                 '__typename',
+                                                                TemplateQuery::getTemplateFragment(),
                                                                 (new Query('attributeList'))
                                                                     ->setArguments(['first' => self::ATTRIBUTE_LIST_COUNT]) // phpcs:ignore
                                                                     ->setSelectionSet([
