@@ -26,6 +26,7 @@ class ProductErgonodeData
     public function __construct(
         private readonly string $sku,
         private readonly string $type,
+        private readonly string $templateName,
         array $mappings
     ) {
         $this->mappings = $mappings;
@@ -224,5 +225,10 @@ class ProductErgonodeData
     public function getBindings(): array
     {
         return $this->bindings;
+    }
+
+    public function getTemplateName(): string
+    {
+        return $this->templateName;
     }
 }

@@ -17,37 +17,21 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\System\CustomField\CustomFieldEntity;
+
 use function array_keys;
 use function array_map;
 
-class MappableFieldsProvider
+class MappableFieldsProvider implements MappableFieldsProviderInterface
 {
-    private ErgonodeAttributeProvider $ergonodeAttributeProvider;
-
-    private EntityRepository $customFieldRepository;
-
-    private LanguageProvider $languageProvider;
-
-    private ErgonodeCategoryProvider $ergonodeCategoryProvider;
-
-    private EntityRepository $categoryRepository;
-
-    private ConfigService $configService;
-
     public function __construct(
-        ErgonodeAttributeProvider $ergonodeAttributeProvider,
-        EntityRepository $customFieldRepository,
-        LanguageProvider $languageProvider,
-        ErgonodeCategoryProvider $ergonodeCategoryProvider,
-        EntityRepository $categoryRepository,
-        ConfigService $configService
+        private readonly ErgonodeAttributeProvider $ergonodeAttributeProvider,
+        private readonly EntityRepository $customFieldRepository,
+        private readonly LanguageProvider $languageProvider,
+        private readonly ErgonodeCategoryProvider $ergonodeCategoryProvider,
+        private readonly ErgonodeTemplateProvider $ergonodeTemplateProvider,
+        private readonly EntityRepository $categoryRepository,
+        private readonly ConfigService $configService
     ) {
-        $this->ergonodeAttributeProvider = $ergonodeAttributeProvider;
-        $this->customFieldRepository = $customFieldRepository;
-        $this->languageProvider = $languageProvider;
-        $this->ergonodeCategoryProvider = $ergonodeCategoryProvider;
-        $this->categoryRepository = $categoryRepository;
-        $this->configService = $configService;
     }
 
     /**
@@ -254,5 +238,27 @@ class MappableFieldsProvider
         }
 
         return $attributeCodes;
+    }
+
+    public function getTemplates(): array
+    {
+        $templateCodes = [];
+
+        $generator = $this->ergonodeTemplateProvider->provideTemplates();
+
+        foreach ($generator as $templates) {
+            foreach ($templates->getEdges() as $template) {
+                $code = $template['node']['code'] ?? null;
+                if (null === $code) {
+                    continue;
+                }
+
+                $templateCodes[] = [
+                    'code' => $code,
+                ];
+            }
+        }
+
+        return $templateCodes;
     }
 }
