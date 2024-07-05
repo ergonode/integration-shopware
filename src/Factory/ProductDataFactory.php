@@ -20,11 +20,15 @@ use Ergonode\IntegrationShopware\Model\ProductRelationAttribute;
 use Ergonode\IntegrationShopware\Model\ProductSelectAttribute;
 use Ergonode\IntegrationShopware\Model\ProductSimpleAttributeTranslation;
 use Ergonode\IntegrationShopware\Provider\AttributeMappingProvider;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Shopware\Core\Framework\Context;
 
 class ProductDataFactory
 {
-    public function __construct(private readonly AttributeMappingProvider $mappingProvider)
+    public function __construct(
+        private readonly AttributeMappingProvider $mappingProvider,
+        private readonly ConfigService            $configService
+    )
     {
     }
 
@@ -256,6 +260,9 @@ class ProductDataFactory
 
     private function buildErgonodeData(array $data, array $mappings): ProductErgonodeData
     {
+        if ($this->configService->forceUppercaseSkuSync()) {
+            $data['sku'] = strtoupper($data['sku']);
+        }
         $ergonodeData = new ProductErgonodeData($data['sku'], $data['__typename'], $mappings);
         foreach ($data['attributeList']['edges'] ?? [] as $attributeEdge) {
             $attributeData = $attributeEdge['node'];

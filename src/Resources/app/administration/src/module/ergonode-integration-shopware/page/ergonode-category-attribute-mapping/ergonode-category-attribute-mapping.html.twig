@@ -1,0 +1,67 @@
+{% block ergonode_category_attribute_mapping_page %}
+    <sw-page class="ergonode__category-attribute-mapping-page">
+        <template slot="content">
+            <sw-card-view>
+                <ergonode-tabs></ergonode-tabs>
+                <sw-skeleton v-if="isLoading"></sw-skeleton>
+                <template v-else>
+                    <sw-card v-if="acl.can('ergonode_category_attribute_mapping.creator')"
+                        :title="$t('ErgonodeIntegrationShopware.mappings.addMapping')"
+                    >
+                        <sw-single-select
+                            :label="$t('ErgonodeIntegrationShopware.mappings.shopwareCategoryAttribute')"
+                            :options="shopwareCategoryAttributesSelectOptions"
+                            v-model="createShopwareCategoryAttribute"
+                        >
+                        </sw-single-select>
+                        <sw-single-select
+                            :label="$t('ErgonodeIntegrationShopware.mappings.ergonodeCategoryAttribute')"
+                            :options="ergonodeCategoryAttributesSelectOptions"
+                            v-model="createErgonodeCategoryAttribute"
+                        >
+                        </sw-single-select>
+                        <sw-button
+                            variant="primary"
+                            :isLoading="isCreateLoading"
+                            :disabled="buttonDisabled"
+                            @click="addMapping"
+                        >
+                            {{ $t('ErgonodeIntegrationShopware.mappings.addMapping') }}
+                        </sw-button>
+                        <sw-label v-if="mappingAlreadyExists"
+                                  variant="danger"
+                        >
+                            {{ $t('ErgonodeIntegrationShopware.mappings.messages.mappingAlreadyExists') }}
+                        </sw-label>
+                    </sw-card>
+                    <sw-card v-if="acl.can('ergonode_category_attribute_mapping.viewer')"
+                        class="ergonode__category-attribute-mapping-grid-card"
+                        :title="$t('ErgonodeIntegrationShopware.mappings.categoryAttributeMappings')"
+                    >
+                        <template #default>
+                            <sw-entity-listing
+                                class="ergonode__category-attribute-mapping-grid"
+                                :columns="columns"
+                                :items="mappings"
+                                :repository="repository"
+                                :fullPage="false"
+                                :allow-delete="acl.can('ergonode_category_attribute_mapping.deleter')"
+                                :allow-edit="false"
+                                :allow-inline-edit="false"
+                                :is-loading="isMappingLoading"
+                                @delete-item-finish="fetchMappings()"
+                            >
+                                <template #column-shopwareId="{ item }">
+                                    {{ translation(item.shopwareKey) }} ({{ type('shopwareCategoryAttributes', item.shopwareKey) }})
+                                </template>
+                                <template #column-ergonodeKey="{ item }">
+                                    {{ item.ergonodeKey }} ({{ type('ergonodeCategoryAttributes', item.ergonodeKey) }})
+                                </template>
+                            </sw-entity-listing>
+                        </template>
+                    </sw-card>
+                </template>
+            </sw-card-view>
+        </template>
+    </sw-page>
+{% endblock %}

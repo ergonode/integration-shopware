@@ -166,7 +166,7 @@ class CategorySyncHandler extends AbstractSyncHandler
             $this->logger->info('Dispatching next CategorySyncMessage because still has next page');
             $this->messageBus->dispatch(new CategorySync());
         } else {
-            $this->processor->removeOrphanedCategories();
+            $this->processor->removeOrphanedCategories($this->context);
 
             $formattedTime = $this->configService->setLastCategorySyncTimestamp(
                 (new \DateTime('+1 second'))->getTimestamp()

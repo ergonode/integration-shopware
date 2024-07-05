@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\Util;
 
 use Ergonode\IntegrationShopware\Enum\AttributeTypesEnum;
+use Ergonode\IntegrationShopware\Model\ProductAttribute;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\System\CustomField\CustomFieldEntity;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
@@ -22,7 +23,6 @@ class CustomFieldUtil
     public static function getValidErgonodeTypes(CustomFieldEntity $customField): array
     {
         $config = $customField->getConfig() ?: [];
-
         $customFieldType = $config['customFieldType'] ?? '';
         // special cases
         if (CustomFieldTypes::MEDIA === $customFieldType) {
@@ -30,6 +30,9 @@ class CustomFieldUtil
                 AttributeTypesEnum::IMAGE,
                 AttributeTypesEnum::FILE,
                 AttributeTypesEnum::GALLERY,
+                ProductAttribute::TYPE_IMAGE,
+                ProductAttribute::TYPE_FILE,
+                ProductAttribute::TYPE_GALLERY,
             ];
         }
 
@@ -40,6 +43,7 @@ class CustomFieldUtil
         ) {
             return [
                 AttributeTypesEnum::RELATION,
+                ProductAttribute::TYPE_PRODUCT_RELATION,
             ];
         }
 
@@ -56,31 +60,48 @@ class CustomFieldUtil
             case CustomFieldTypes::DATETIME:
                 return [
                     AttributeTypesEnum::DATE,
+                    ProductAttribute::TYPE_DATE,
                 ];
             case CustomFieldTypes::FLOAT:
             case CustomFieldTypes::INT:
                 return [
                     AttributeTypesEnum::NUMERIC,
                     AttributeTypesEnum::UNIT,
+                    ProductAttribute::TYPE_NUMERIC,
+                    ProductAttribute::TYPE_UNIT,
                 ];
             case CustomFieldTypes::PRICE:
                 return [
                     AttributeTypesEnum::PRICE,
+                    ProductAttribute::TYPE_PRICE,
                 ];
             case CustomFieldTypes::SELECT:
                 $isMultiSelect = 'sw-multi-select' === ($config['componentName'] ?? '');
 
-                return $isMultiSelect ? [AttributeTypesEnum::MULTISELECT] : [AttributeTypesEnum::SELECT];
+                if ($isMultiSelect) {
+                    return [
+                        AttributeTypesEnum::MULTISELECT,
+                        ProductAttribute::TYPE_MULTI_SELECT,
+                    ];
+                } else {
+                    return [
+                        AttributeTypesEnum::SELECT,
+                        ProductAttribute::TYPE_SELECT,
+                    ];
+                }
             case CustomFieldTypes::HTML:
             case CustomFieldTypes::TEXT:
                 return [
                     AttributeTypesEnum::TEXT,
                     AttributeTypesEnum::TEXTAREA,
+                    ProductAttribute::TYPE_TEXT,
+                    ProductAttribute::TYPE_TEXTAREA,
                 ];
             case CustomFieldTypes::SWITCH:
             case CustomFieldTypes::BOOL:
                 return [
-                    AttributeTypesEnum::BOOL
+                    AttributeTypesEnum::BOOL,
+                    ProductAttribute::TYPE_SELECT,
                 ];
             case CustomFieldTypes::COLORPICKER:
             case CustomFieldTypes::ENTITY:

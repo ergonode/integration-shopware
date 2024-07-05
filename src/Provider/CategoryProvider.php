@@ -13,6 +13,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\OrFilter;
 
 class CategoryProvider
 {
@@ -41,7 +42,10 @@ class CategoryProvider
     public function getCategoriesByCode(string $code, Context $context, array $associations = []): CategoryCollection
     {
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter(ErgonodeCategoryMappingExtension::EXTENSION_NAME . '.code', $code));
+        $criteria->addFilter(new OrFilter([
+            new EqualsFilter(ErgonodeCategoryMappingExtension::EXTENSION_NAME . '.code', $code),
+            new EqualsFilter(ErgonodeCategoryMappingExtension::MAPPING_EXTENSION_NAME . '.ergonodeKey', $code),
+        ]));
         $criteria->addAssociations($associations);
 
         $result = $this->categoryRepository->search($criteria, $context)->getEntities();
@@ -62,6 +66,16 @@ class CategoryProvider
                     new EqualsAnyFilter(ErgonodeCategoryMappingExtension::EXTENSION_NAME . '.code', $notIn)
                 ]
             )
+        );
+
+        return $this->categoryRepository->searchIds($criteria, $context)->getIds();
+    }
+
+    public function getCategoryIdsByCodes(array $codes, Context $context): array
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(
+            new EqualsAnyFilter(ErgonodeCategoryMappingExtension::EXTENSION_NAME . '.code', $codes)
         );
 
         return $this->categoryRepository->searchIds($criteria, $context)->getIds();

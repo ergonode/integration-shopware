@@ -8,8 +8,10 @@ use Ergonode\IntegrationShopware\Api\AbstractStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\AttributeDeletedStreamResultsProxy;
 use Ergonode\IntegrationShopware\Api\AttributeResultsProxy;
 use Ergonode\IntegrationShopware\Api\AttributeStreamResultsProxy;
+use Ergonode\IntegrationShopware\Api\CategoryAttributeListResultsProxy;
 use Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface;
 use Ergonode\IntegrationShopware\QueryBuilder\AttributeQueryBuilder;
+use Ergonode\IntegrationShopware\QueryBuilder\CategoryAttributeQueryBuilder;
 use Generator;
 
 class ErgonodeAttributeProvider
@@ -18,13 +20,17 @@ class ErgonodeAttributeProvider
 
     private AttributeQueryBuilder $attributeQueryBuilder;
 
+    private CategoryAttributeQueryBuilder $categoryAttributeQueryBuilder;
+
     private ErgonodeGqlClientInterface $ergonodeGqlClient;
 
     public function __construct(
         AttributeQueryBuilder $attributeQueryBuilder,
+        CategoryAttributeQueryBuilder $categoryAttributeQueryBuilder,
         ErgonodeGqlClientInterface $ergonodeGqlClient
     ) {
         $this->attributeQueryBuilder = $attributeQueryBuilder;
+        $this->categoryAttributeQueryBuilder = $categoryAttributeQueryBuilder;
         $this->ergonodeGqlClient = $ergonodeGqlClient;
     }
 
@@ -94,5 +100,21 @@ class ErgonodeAttributeProvider
         }
 
         return $results;
+    }
+
+    public function provideProductCategoryAttributes(?string $endCursor = null): Generator
+    {
+        do {
+            $query = $this->categoryAttributeQueryBuilder->build(self::MAX_ATTRIBUTES_PER_PAGE, $endCursor);
+            $results = $this->ergonodeGqlClient->query($query, CategoryAttributeListResultsProxy::class);
+
+            if (!$results instanceof CategoryAttributeListResultsProxy) {
+                continue;
+            }
+
+            yield $results;
+
+            $endCursor = $results->getEndCursor();
+        } while ($results instanceof CategoryAttributeListResultsProxy && $results->hasNextPage());
     }
 }

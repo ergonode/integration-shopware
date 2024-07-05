@@ -100,9 +100,14 @@ class ManufacturerAttributeProcessor implements AttributeCustomProcessorInterfac
             )
         );
         $criteria->addFilter(new EqualsFilter('type', self::MAPPING_TYPE));
-        $existingIds = $this->mappingExtensionRepository->searchIds($criteria, $context);
-        $this->manufacturerRepository->delete([$existingIds->getIds()], $context);
-        $this->mappingExtensionRepository->delete([$existingIds->getIds()], $context);
+
+        $existingIds = $this->mappingExtensionRepository->searchIds($criteria, $context)->getIds();
+        if (empty($existingIds)) {
+            return;
+        }
+
+        $this->manufacturerRepository->delete([$existingIds], $context);
+        $this->mappingExtensionRepository->delete([$existingIds], $context);
     }
 
     private function getExistingManufacturerEntity(string $code, Context $context): ?ProductManufacturerEntity

@@ -111,4 +111,39 @@ class MappingController extends AbstractController
             'data' => $timezones,
         ], Response::HTTP_OK);
     }
+
+
+    #[Route(path: '/api/ergonode/shopware-category-attributes', name: 'api.ergonode.shopwareCategoryAttributes',
+        methods: ['GET'])]
+    public function shopwareCategoryAttributes(): JsonResponse
+    {
+        $attributes = $this->mappableFieldsProvider->getShopwareCategoriesAttributesWithTypes();
+
+        return new JsonResponse([
+            'data' => $attributes,
+        ], Response::HTTP_OK);
+    }
+
+
+    #[Route(path: '/api/ergonode/ergonode-category-attributes', name: 'api.ergonode.ergonodeCategoryAttributes',
+        methods: ['GET'])]
+    public function ergonodeCategoryAttributes(QueryDataBag $dataBag): JsonResponse
+    {
+        $types = $dataBag->get('types', []);
+        if ($types instanceof QueryDataBag) {
+            $types = $types->all();
+        }
+
+        if (!is_array($types)) {
+            return new JsonResponse([
+                'message' => 'Field types must be array.',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $attributes = $this->mappableFieldsProvider->getErgonodeCategoryAttributesWithTypes($types);
+
+        return new JsonResponse([
+            'data' => $attributes,
+        ], Response::HTTP_OK);
+    }
 }

@@ -17,7 +17,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\System\CustomField\CustomFieldEntity;
-
 use function array_keys;
 use function array_map;
 
@@ -212,5 +211,48 @@ class MappableFieldsProvider
         array_multisort($result, SORT_ASC, $codes);
 
         return $result;
+    }
+
+    public function getShopwareCategoriesAttributesWithTypes(): array
+    {
+        $attributes = [];
+        foreach (Constants::SW_CATEGORY_ATTRIBUTES_MAPPABLE_FIELDS as $code => $types) {
+            $attributes[] = [
+                'code' => $code,
+                'type' => implode('/', $types),
+                'translationKey' => Constants::SW_CATEGORY_ATTRIBUTES_TRANSLATION_KEYS[$code]
+                    ?? Constants::DEFAULT_TRANSLATION_KEY . $code,
+            ];
+        }
+
+        return $attributes;
+    }
+
+    public function getErgonodeCategoryAttributesWithTypes(array $types = []): array
+    {
+        $attributeCodes = [];
+
+        $generator = $this->ergonodeAttributeProvider->provideProductCategoryAttributes();
+
+        foreach ($generator as $attributes) {
+            if (!empty($types)) {
+                $attributes = $attributes->filterByAttributeTypes($types);
+            }
+
+            foreach ($attributes->getEdges() as $attribute) {
+                $node = $attribute['node'] ?? null;
+                $code = $node['code'] ?? null;
+                if (null === $node || null === $code) {
+                    continue;
+                }
+
+                $attributeCodes[] = [
+                    'code' => $code,
+                    'type' => AttributeTypesEnum::getNodeType($node),
+                ];
+            }
+        }
+
+        return $attributeCodes;
     }
 }

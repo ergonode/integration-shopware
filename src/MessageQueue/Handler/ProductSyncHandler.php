@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\MessageQueue\Handler;
 
 use Ergonode\IntegrationShopware\MessageQueue\Message\ProductSync;
+use Ergonode\IntegrationShopware\MessageQueue\Message\SingleProductCategorySync;
 use Ergonode\IntegrationShopware\MessageQueue\Message\SingleProductSync;
 use Ergonode\IntegrationShopware\Processor\ProductSyncProcessor;
 use Ergonode\IntegrationShopware\Service\History\SyncHistoryLogger;
@@ -66,8 +67,12 @@ class ProductSyncHandler extends AbstractSyncHandler
                 $count += $result->getProcessedEntityCount();
                 $primaryKeys = \array_merge($primaryKeys, $result->getPrimaryKeys());
 
-                foreach ($result->getSeparateProcessSkus() as $sku) {
+                foreach ($result->getSeparateProcessSkusVariants() as $sku) {
                     $this->messageBus->dispatch(new SingleProductSync($sku, true));
+                }
+
+                foreach ($result->getSeparateProcessSkusCategories() as $sku) {
+                    $this->messageBus->dispatch(new SingleProductCategorySync($sku));
                 }
 
                 if (self::MAX_PAGES_PER_RUN !== null && ++$currentPage >= self::MAX_PAGES_PER_RUN) {

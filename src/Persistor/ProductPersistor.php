@@ -11,6 +11,7 @@ use Ergonode\IntegrationShopware\Factory\ProductDataFactory;
 use Ergonode\IntegrationShopware\Manager\ErgonodeCursorManager;
 use Ergonode\IntegrationShopware\Provider\LanguageProvider;
 use Ergonode\IntegrationShopware\Provider\ProductProvider;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Ergonode\IntegrationShopware\Struct\ProductContainer;
 use Ergonode\IntegrationShopware\Transformer\ProductTransformerChain;
 use Ergonode\IntegrationShopware\Transformer\VariantsTransformer;
@@ -35,6 +36,8 @@ use function is_array;
 
 class ProductPersistor
 {
+    const REGEX_EXCEPTION = '/\[\/(\d+)\/?.*\/?(\w+)\](.*)\..*/mU';
+
     private EntityRepository $productRepository;
 
     private ProductProvider $productProvider;
@@ -55,6 +58,8 @@ class ProductPersistor
 
     private ProductDataFactory $productDataFactory;
 
+    private ConfigService $configService;
+
     public function __construct(
         EntityRepository $productRepository,
         ProductProvider $productProvider,
@@ -66,7 +71,8 @@ class ProductPersistor
         ProductContainer $productContainer,
         ErgonodeCursorManager $cursorManager,
         ProductDataFactory $productDataFactory,
-        private readonly LanguageProvider $languageProvider
+        private readonly LanguageProvider $languageProvider,
+        ConfigService $configService
     ) {
         $this->productRepository = $productRepository;
         $this->productProvider = $productProvider;
@@ -78,6 +84,7 @@ class ProductPersistor
         $this->productContainer = $productContainer;
         $this->cursorManager = $cursorManager;
         $this->productDataFactory = $productDataFactory;
+        $this->configService = $configService;
     }
 
     /**
@@ -123,12 +130,50 @@ class ProductPersistor
             $this->clearProductCategories($productIds, $context);
         }
 
-        $writeResult = $this->productRepository->upsert(
-            array_values($payloads),
-            $context
-        );
+        try {
+            $payloads = array_values($payloads);
+            $writeResult = $this->productRepository->upsert(
+                $payloads,
+                $context
+            );
+        } catch (Throwable $exception) {
+            if ($this->processErrorResponse($exception->getMessage(), $payloads)) {
+                //Removed problematic product from upsert
+                $writeResult = $this->productRepository->upsert(
+                    array_values($payloads),
+                    $context
+                );
+
+                return $writeResult->getPrimaryKeys(ProductDefinition::ENTITY_NAME);
+            }
+
+            throw $exception;
+        }
 
         return $writeResult->getPrimaryKeys(ProductDefinition::ENTITY_NAME);
+    }
+
+    private function processErrorResponse(string $message, array &$payloads): bool
+    {
+        preg_match_all(self::REGEX_EXCEPTION, $message, $matches, PREG_SET_ORDER, 0);
+
+        foreach ($matches as $match) {
+            $keyValue = (int)$match[1];
+            $fieldName = $match[2];
+            $errorMessage = $match[3];
+            $this->logger->error(
+                'Error: ' .$payloads[$keyValue]['name'].': '. $fieldName . ' -' . $errorMessage,
+                [
+                    'name' => $payloads[$keyValue]['name'],
+                    'field' => $fieldName,
+                    'input_translations' => $payloads[$keyValue]['translations'],
+                ]
+            );
+
+            unset($payloads[$keyValue]);
+        }
+
+        return (bool)count($matches);
     }
 
     public function deleteProductIds(array $productIds, Context $context): void
@@ -160,6 +205,11 @@ class ProductPersistor
         }
 
         $sku = $productData['sku'];
+
+        if ($this->configService->forceUppercaseSkuSync()) {
+            $sku = strtoupper($sku);
+            $productData['sku'] = $sku;
+        }
 
         $existingProduct = $this->productContainer->get($sku);
 

@@ -27,7 +27,7 @@ class DebugPersistSingleProduct extends Command
         $this->singleProductSyncHandler = $singleProductSyncHandler;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
