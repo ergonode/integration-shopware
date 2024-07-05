@@ -1,0 +1,52 @@
+@import "~scss/variables";
+
+.ergonode-template-cms-page-mapping {
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    &__list-item {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+
+        .sw-field.sw-select {
+            margin-bottom: 0;
+        }
+    }
+
+    &__btn-container {
+        width: 100%;
+        display: flex;
+        justify-content: end;
+    }
+
+    &__btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+    }
+
+    &__btn--delete .sw-icon {
+        color: $color-crimson-500;
+    }
+
+    &__select {
+        flex: 1;
+    }
+
+    &__arrow {
+        display: flex;
+        align-items: center;
+        text-wrap: none;
+
+        .sw-icon {
+            width: 16px;
+        }
+    }
+}

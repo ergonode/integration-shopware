@@ -182,4 +182,9 @@ class ProductShopwareData
     {
         $this->data['categories'] = $categories;
     }
+
+    public function setCmsPageId(string $cmsPageId): void
+    {
+        $this->data['cmsPageId'] = $cmsPageId;
+    }
 }
