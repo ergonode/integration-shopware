@@ -137,6 +137,11 @@ class ConfigService
         return (new \DateTime($lastCheckedStr))->getTimestamp();
     }
 
+    public function isProductCategoryAssignDisabled(): bool
+    {
+        return $this->configService->getBool(self::CONFIG_NAMESPACE . 'disableCategoryAssign');
+    }
+
     /**
      * @return string Human-readable time
      */
@@ -149,5 +154,10 @@ class ConfigService
         );
 
         return $formatted;
+    }
+
+    public function forceUppercaseSkuSync(): bool
+    {
+        return $this->configService->getBool(self::CONFIG_NAMESPACE . 'forceUppercaseSkuSync');
     }
 }

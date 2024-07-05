@@ -93,7 +93,8 @@ class ProductSyncProcessor
 
         $this->cursorManager->persist($endCursor, ProductStreamResultsProxy::MAIN_FIELD, $context);
 
-        $separateProcessSkus = [];
+        $separateProcessSkusVariants = [];
+        $separateProcessSkusCategories = [];
         // store cursors for products which have more variants or categories than allowed limit in query builder
         foreach ($result->getProductData()['edges'] as $mainProductEdge) {
             $sku = $mainProductEdge['node']['sku'] ?? '';
@@ -116,8 +117,12 @@ class ProductSyncProcessor
                 $context
             );
 
-            if ($hasMoreVariants || $hasMoreCategories) {
-                $separateProcessSkus[] = $sku;
+            if ($hasMoreVariants) {
+                $separateProcessSkusVariants[] = $sku;
+            }
+
+            if ($hasMoreCategories) {
+                $separateProcessSkusCategories[] = $sku;
             }
         }
 
@@ -125,7 +130,8 @@ class ProductSyncProcessor
         $counter->setPrimaryKeys($primaryKeys);
         $counter->setHasNextPage($result->hasNextPage());
         $counter->setStopwatch($stopwatch);
-        $counter->setSeparateProcessSkus($separateProcessSkus);
+        $counter->setSeparateProcessSkusVariants($separateProcessSkusVariants);
+        $counter->setSeparateProcessSkusCategories($separateProcessSkusCategories);
 
         $this->performanceLogger->logPerformance(self::class, $stopwatch);
 
@@ -144,7 +150,7 @@ class ProductSyncProcessor
         $stopwatch->start('query');
         $query = $this->productQueryBuilder->buildProductWithVariants(
             $sku,
-            $variantsCursor ? $variantsCursor->getCursor() : null,
+            $variantsCursor ? $variantsCursor->getCursor() : null
         );
         /** @var ProductResultsProxy|null $result */
         $result = $this->gqlClient->query($query, ProductResultsProxy::class);
@@ -160,16 +166,25 @@ class ProductSyncProcessor
             return $counter;
         }
 
+        $variantsEndCursor = $result->getVariantsEndCursor();
+        $categoriesEndCursor = $result->getCategoriesEndCursor();
+
         $stopwatch->start('process');
+        //extract category ids to pass to another processor
         $primaryKeys = $this->productPersistor->persist([['node' => $result->getProductData()]], $context);
         $stopwatch->stop('process');
 
-        $variantsEndCursor = $result->getVariantsEndCursor();
+
+        if (null !== $categoriesEndCursor) {
+            //There is more categories that 50, pushing product to update categories
+            $counter->setSeparateProcessSkusCategories([$sku]);
+        }
+
         if (null !== $variantsEndCursor) {
             $this->cursorManager->persist($variantsEndCursor, $variantsCursorKey, $context);
         }
 
-        $hasNextPage = $result->hasVariantsNextPage() || $result->hasCategoriesNextPage();
+        $hasNextPage = $result->hasVariantsNextPage();
         if (false === $hasNextPage) {
             $this->cursorManager->deleteCursor($variantsCursorKey, $context);
         }

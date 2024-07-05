@@ -16,7 +16,11 @@ class SyncCounterDTO
 
     private ?Stopwatch $stopwatch = null;
 
-    private array $separateProcessSkus = [];
+    private array $separateProcessSkusVariants = [];
+
+    private array $separateProcessSkusCategories = [];
+
+    private array $retrievedData = [];
 
     public function hasNextPage(): bool
     {
@@ -63,13 +67,33 @@ class SyncCounterDTO
         return null !== $this->stopwatch;
     }
 
-    public function getSeparateProcessSkus(): array
+    public function getSeparateProcessSkusVariants(): array
     {
-        return $this->separateProcessSkus;
+        return $this->separateProcessSkusVariants;
     }
 
-    public function setSeparateProcessSkus(array $separateProcessSkus): void
+    public function getSeparateProcessSkusCategories(): array
     {
-        $this->separateProcessSkus = $separateProcessSkus;
+        return $this->separateProcessSkusCategories;
+    }
+
+    public function setSeparateProcessSkusVariants(array $separateProcessSkus): void
+    {
+        $this->separateProcessSkusVariants = $separateProcessSkus;
+    }
+
+    public function setSeparateProcessSkusCategories(array $separateProcessSkus): void
+    {
+        $this->separateProcessSkusCategories = $separateProcessSkus;
+    }
+
+    public function getRetrievedData(): array
+    {
+        return $this->retrievedData;
+    }
+
+    public function setRetrievedData(array $retrievedData): void
+    {
+        $this->retrievedData = $retrievedData;
     }
 }

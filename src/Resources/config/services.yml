@@ -42,6 +42,10 @@ services:
     arguments:
       $repository: '@ergonode_attribute_mapping.repository'
 
+  Ergonode\IntegrationShopware\Command\CreateCategoryAttributeMappingCommand:
+    arguments:
+      $repository: '@ergonode_category_attribute_mapping.repository'
+
   Ergonode\IntegrationShopware\Command\CreateCustomFieldMappingCommand:
     arguments:
       $repository: '@ergonode_custom_field_mapping.repository'
@@ -126,6 +130,11 @@ services:
     arguments:
       $repository: '@ergonode_custom_field_mapping.repository'
 
+  ergonode.integration_shopware.provider.category_attribute_general_mapping_provider:
+    class: Ergonode\IntegrationShopware\Provider\CategoryAttributeMappingProvider
+    arguments:
+      $repository: '@ergonode_category_attribute_mapping.repository'
+
   Ergonode\IntegrationShopware\Processor\Attribute\AttributeCustomProcessorResolver:
     arguments:
       $processors: !tagged_iterator 'ergonode_integration.attribute_custom_processor'
@@ -206,6 +215,14 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductScaleUnitTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductMinMaxQuantityTransformer'
 
+
+  Ergonode\IntegrationShopware\Transformer\CategoryAttributesTransformerChain:
+    arguments:
+      $transformers:
+        - '@Ergonode\IntegrationShopware\Transformer\CategoryAttribute\GeneralTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\CategoryAttribute\TagsTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\CategoryAttribute\MediaTransformer'
+
   Ergonode\IntegrationShopware\Transformer\ProductManufacturerTransformer:
     arguments:
       $manufacturerRepository: '@product_manufacturer.repository'
@@ -226,6 +243,18 @@ services:
   Ergonode\IntegrationShopware\Transformer\ProductCrossSellingTransformer:
     arguments:
       $mappingExtensionRepository: '@ergonode_mapping_extension.repository'
+
+  Ergonode\IntegrationShopware\Transformer\CategoryAttribute\GeneralTransformer:
+    arguments:
+      $categoryAttributeMappingProvider: '@ergonode.integration_shopware.provider.category_attribute_general_mapping_provider'
+
+  Ergonode\IntegrationShopware\Transformer\CategoryAttribute\TagsTransformer:
+    arguments:
+      $categoryAttributeMappingProvider: '@ergonode.integration_shopware.provider.category_attribute_general_mapping_provider'
+
+  Ergonode\IntegrationShopware\Transformer\CategoryAttribute\MediaTransformer:
+    arguments:
+      $categoryAttributeMappingProvider: '@ergonode.integration_shopware.provider.category_attribute_general_mapping_provider'
 
   # UTIL
   Ergonode\IntegrationShopware\Util\SyncPerformanceLogger:

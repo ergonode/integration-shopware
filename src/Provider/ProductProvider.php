@@ -55,4 +55,12 @@ class ProductProvider
 
         return $this->productRepository->searchIds($criteria, $context)->getIds();
     }
+
+    public function getProductIdBySkus(string $sku, Context $context): string
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('productNumber', $sku));
+
+        return $this->productRepository->searchIds($criteria, $context)->firstId();
+    }
 }

@@ -7,7 +7,6 @@ namespace Ergonode\IntegrationShopware\Lifecycle;
 use Doctrine\DBAL\Connection;
 use Psr\Container\ContainerInterface;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
-
 use function sprintf;
 
 class DatabaseLifecycleManager
@@ -16,6 +15,7 @@ class DatabaseLifecycleManager
 
     private static array $tableNames = [
         'ergonode_attribute_mapping',
+        'ergonode_category_attribute_mapping',
         'ergonode_category_mapping_extension',
         'ergonode_mapping_extension',
         'ergonode_cursor',
