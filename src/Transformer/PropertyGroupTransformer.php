@@ -121,16 +121,19 @@ class PropertyGroupTransformer
         foreach ($options as $option) {
             $extension = $option->getExtension(AbstractErgonodeMappingExtension::EXTENSION_NAME);
 
-            $asciiExtensionCode = (new UnicodeString($extension->getCode()))->ascii()->toString();
             if (
                 $extension instanceof ErgonodeMappingExtensionEntity &&
-                $groupExtension instanceof ErgonodeMappingExtensionEntity && (
+                $groupExtension instanceof ErgonodeMappingExtensionEntity
+            ) {
+                $asciiExtensionCode = (new UnicodeString($extension->getCode()))->ascii()->toString();
+
+                if (
                     CodeBuilderUtil::build($groupExtension->getCode(), $code) === $extension->getCode()
                     || CodeBuilderUtil::buildExtended($groupExtension->getCode(), $code) === $extension->getCode()
                     || CodeBuilderUtil::buildExtended($groupExtension->getCode(), $code) === $asciiExtensionCode
-                )
-            ) {
-                return $option;
+                ) {
+                    return $option;
+                }
             }
         }
 

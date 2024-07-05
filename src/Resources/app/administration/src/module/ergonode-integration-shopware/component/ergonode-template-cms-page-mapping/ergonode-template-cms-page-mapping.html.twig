@@ -1,0 +1,43 @@
+<div class="ergonode-template-cms-page-mapping">
+    <ul class="ergonode-template-cms-page-mapping__list">
+        <li class="ergonode-template-cms-page-mapping__list-item" v-for="(entry, index) in value">
+            <div class="ergonode-template-cms-page-mapping__select">
+                <ergonode-template-select
+                    :value="entry[fields.templateName.valueKey] ?? null"
+                    @change="onSelected(index, fields.templateName.valueKey, ...arguments)"
+                />
+            </div>
+            
+            <p class="ergonode-template-cms-page-mapping__arrow">
+                <sw-icon name="regular-long-arrow-right" />
+            </p>
+            
+            <div class="ergonode-template-cms-page-mapping__select">
+                <sw-entity-single-select
+                    :criteria="cmsPageCriteria"
+                    :entity="fields.cmsPage.name"
+                    :value="entry[fields.cmsPage.valueKey] ?? null"
+                    @option-select="onSelected(index, fields.cmsPage.valueKey, arguments[1].id)"
+                />
+            </div>
+            
+            <div>
+                <sw-button
+                    class="ergonode-template-cms-page-mapping__btn ergonode-template-cms-page-mapping__btn--delete"
+                    @click="removeEntry(index)"
+                >
+                    <sw-icon name="regular-trash" />
+                </sw-button>
+            </div>
+        </li>
+    </ul>
+    
+    <div class="ergonode-template-cms-page-mapping__btn-container">
+        <sw-button
+            class="ergonode-template-cms-page-mapping__btn"
+            @click="addEntry"
+        >
+            <sw-icon name="regular-plus-circle" />
+        </sw-button>
+    </div>
+</div>

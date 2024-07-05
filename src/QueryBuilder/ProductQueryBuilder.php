@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ergonode\IntegrationShopware\QueryBuilder;
 
 use Ergonode\IntegrationShopware\QueryBuilder\Common\AttributesQuery;
+use Ergonode\IntegrationShopware\QueryBuilder\Common\TemplateQuery;
 use GraphQL\InlineFragment;
 use GraphQL\Query;
 
@@ -42,6 +43,7 @@ class ProductQueryBuilder
                                 'createdAt',
                                 'editedAt',
                                 '__typename',
+                                TemplateQuery::getTemplateFragment(),
                                 (new InlineFragment('VariableProduct'))
                                     ->setSelectionSet([
                                         (new Query('bindings'))
@@ -62,15 +64,16 @@ class ProductQueryBuilder
                                                             ->setSelectionSet([
                                                                 'sku',
                                                                 '__typename',
+                                                                TemplateQuery::getTemplateFragment(),
                                                                 (new Query('attributeList'))
-                                                                    ->setArguments(['first' => self::ATTRIBUTE_LIST_COUNT])
+                                                                    ->setArguments(['first' => self::ATTRIBUTE_LIST_COUNT]) // phpcs:ignore
                                                                     ->setSelectionSet([
                                                                         (new Query('edges'))
                                                                             ->setSelectionSet([
                                                                                 (new Query('node'))
                                                                                     ->setSelectionSet([
-                                                                                        AttributesQuery::getAttributeFragment(),
-                                                                                        AttributesQuery::attributesTranslations(),
+                                                                                        AttributesQuery::getAttributeFragment(), // phpcs:ignore
+                                                                                        AttributesQuery::attributesTranslations(), // phpcs:ignore
                                                                                     ]),
                                                                             ]),
                                                                     ]),
@@ -163,6 +166,7 @@ class ProductQueryBuilder
                 'createdAt',
                 'editedAt',
                 '__typename',
+                TemplateQuery::getTemplateFragment(),
                 (new InlineFragment('VariableProduct'))
                     ->setSelectionSet([
                         (new Query('bindings'))
@@ -183,6 +187,7 @@ class ProductQueryBuilder
                                             ->setSelectionSet([
                                                 'sku',
                                                 '__typename',
+                                                TemplateQuery::getTemplateFragment(),
                                                 (new Query('attributeList'))
                                                     ->setArguments(['first' => self::ATTRIBUTE_LIST_COUNT])
                                                     ->setSelectionSet([
