@@ -24,8 +24,8 @@
     "require": {
         "php": ">= 8.1",
         "ext-json": "*",
-        "shopware/administration": "6.5.*",
-        "shopware/core": "6.5.*",
+        "shopware/administration": "6.6.*",
+        "shopware/core": "6.6.*",
         "gmostafa/php-graphql-client": "^1.13"
     },
     "require-dev": {
@@ -42,6 +42,11 @@
     "autoload-dev": {
         "psr-4": {
             "Ergonode\\IntegrationShopware\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": true
         }
     }
 }

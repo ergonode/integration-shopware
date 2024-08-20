@@ -1,7 +1,7 @@
 <sw-page
     class="ergonode-import-history__page"
 >
-    <template slot="content">
+    <template v-slot:content>
         <sw-card-view>
             <ergonode-tabs></ergonode-tabs>
             <sw-card
@@ -11,20 +11,20 @@
                 <sw-checkbox-field
                         key="boolean"
                         :label="$tc('ErgonodeIntegrationShopware.importHistory.onlyErrors')"
-                        v-model="showOnlyErrors"
+                        v-model:value="showOnlyErrors"
                         @change="fetchImports"
                 >
                 </sw-checkbox-field>
 
                 <sw-datepicker dateType="datetime-local"
                                :label="$tc('ErgonodeIntegrationShopware.importHistory.dateFrom')"
-                               v-model="logRange.from"
+                               v-model:value="logRange.from"
                                @input="fetchImports">
                 </sw-datepicker>
 
                 <sw-datepicker dateType="datetime-local"
                                :label="$tc('ErgonodeIntegrationShopware.importHistory.dateTo')"
-                               v-model="logRange.to"
+                               v-model:value="logRange.to"
                                @input="fetchImports">
                 </sw-datepicker>
             </sw-card>

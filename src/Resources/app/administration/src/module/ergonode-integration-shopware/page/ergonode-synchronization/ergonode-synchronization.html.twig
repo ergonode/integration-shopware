@@ -1,6 +1,6 @@
 {% block ergonode_synchronization_page %}
     <sw-page class="ergonode__synchronization-page">
-        <template slot="content">
+        <template v-slot:content>
             <sw-card-view>
                 <ergonode-tabs></ergonode-tabs>
                 <sw-card v-if="acl.can('ergonode_attribute_mapping.viewer')"

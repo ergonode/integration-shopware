@@ -79,9 +79,7 @@ class MappingController extends AbstractController
         ], Response::HTTP_OK);
     }
 
-    /**
-     * @Route("/api/ergonode/shopware-categories", name="api.ergonode.shopwareCategories", methods={"GET"})
-     */
+    #[Route(path: '/api/ergonode/shopware-categories', name: 'api.ergonode.shopwareCategories', methods: ['GET'])]
     public function shopwareCategories(Context $context): JsonResponse
     {
         $attributes = $this->mappableFieldsProvider->getShopwareCategories($context);
@@ -91,9 +89,7 @@ class MappingController extends AbstractController
         ], Response::HTTP_OK);
     }
 
-    /**
-     * @Route("/api/ergonode/ergonode-categories", name="api.ergonode.ergonodeCategories", methods={"GET"})
-     */
+    #[Route(path: '/api/ergonode/ergonode-categories', name: 'api.ergonode.ergonodeCategories', methods: ['GET'])]
     public function ergonodeCategories(): JsonResponse
     {
         $attributes = $this->mappableFieldsProvider->getErgonodeCategories();
@@ -103,9 +99,6 @@ class MappingController extends AbstractController
         ], Response::HTTP_OK);
     }
 
-    /**
-     * @Route("/api/ergonode/timezones", name="api.ergonode.timezones", methods={"GET"})
-     */
     #[Route(path: '/api/ergonode/timezones', name: 'api.ergonode.timezones', methods: ['GET'])]
     public function timezones(): JsonResponse
     {
@@ -116,9 +109,6 @@ class MappingController extends AbstractController
         ], Response::HTTP_OK);
     }
 
-    /**
-     * @Route("/api/ergonode/templates", name="api.ergonode.templates", methods={"GET"})
-     */
     #[Route(path: '/api/ergonode/templates', name: 'api.ergonode.templates', methods: ['GET'])]
     public function ergonodeTemplates(): JsonResponse
     {
