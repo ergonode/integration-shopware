@@ -1,7 +1,7 @@
 {
     "name": "ergonode/integration-shopware",
     "description": "Shopware Ergonode Integration",
-    "version": "2.6.8",
+    "version": "3.0.0",
     "type": "shopware-platform-plugin",
     "license": "proprietary",
     "authors": [
