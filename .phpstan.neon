@@ -1,0 +1,19 @@
+parameters:
+    level: 4
+    paths:
+        - ./src
+    ignoreErrors:
+        - '#apcu_#'
+        - '#ioncube_#'
+        - '#opcache_#'
+        - '#imagettftext#'
+        - '#class Redis#'
+        - '#Constant STARTTIME#'
+    reportUnmatchedIgnoredErrors: false
+    tipsOfTheDay: false
+    treatPhpDocTypesAsCertain: false
+
+services:
+  - class: Ergonode\IntegrationShopware\Tests\PHPStan\Rules\StrictTypeRule
+    tags:
+      - phpstan.rules.rule
