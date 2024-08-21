@@ -2,8 +2,8 @@
     <sw-single-select
             :loading="isLoading"
             :options="options"
-            :value="filteredValue"
+            v-model:value="filteredValue"
             :disabled="disabled"
-            @change="onChange"
+            @update:value="onChange"
     ></sw-single-select>
 </div>
