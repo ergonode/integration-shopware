@@ -7,3 +7,5 @@ build/*
 !build/build-zip.sh
 vendor/
 .idea
+.reports
+

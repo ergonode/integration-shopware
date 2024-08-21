@@ -107,8 +107,12 @@ class ScaleUnitAttributeProcessor implements AttributeCustomProcessorInterface
         );
         $criteria->addFilter(new EqualsFilter('type', self::MAPPING_TYPE));
         $existingIds = $this->mappingExtensionRepository->searchIds($criteria, $context);
-        $this->unitRepository->delete([$existingIds->getIds()], $context);
-        $this->mappingExtensionRepository->delete([$existingIds->getIds()], $context);
+        $ids = array_map(fn($id) => ['id' => $id], $existingIds->getIds());
+        if (empty($ids)) {
+            return;
+        }
+        $this->unitRepository->delete($ids, $context);
+        $this->mappingExtensionRepository->delete($ids, $context);
     }
 
     private function getExistingUnitEntity(string $code, Context $context): ?UnitEntity

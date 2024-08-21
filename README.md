@@ -83,17 +83,19 @@ removed. This means that all mappings will be lost and next synchronization will
 
 ### Testing
 
-In Shopware root run:
+In plugin root you can use the make commando and then the test you want to perform:
 
-`php /var/www/html/vendor/phpunit/phpunit/phpunit --configuration /var/www/html/custom/plugins/ErgonodeIntegrationShopware/phpunit.xml`
+`make phpstan`
+`make phpunit`
+`make phpmd`
 
 ### Building ZIP
 
 To build Store package execute:
 
-`bash <PLUGIN_DIR>/build/build-zip.sh`
+`make release`
 
-NOTE: The script uses absolute paths. It does not matter in which directory it is executed.
+NOTE: The make file is used from the plugin root.
 
 ### Cache
 
@@ -101,7 +103,7 @@ In order to cache Ergonode GQL API requests you need to change the parameter `er
 in `src/Resources/config/parameters.yml` to `true` and
 use `Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClientInterface` in your
 classes instead of concrete `Ergonode\IntegrationShopware\Api\Client\ErgonodeGqlClient` class. Cached client class is
-`Ergonode\IntegrationShopware\Api\Client\CachedErgonodeGqlClient`. 
+`Ergonode\IntegrationShopware\Api\Client\CachedErgonodeGqlClient`.
 
 More cache config options can be found in
 `src/Resources/config/packages/cache.yml`.
@@ -111,3 +113,10 @@ In order to clear cache pool run `bin/console cache:pool:clear ergonode_gql_requ
 Available cache pools:
 - ergonode_gql_request_cache
 - ergonode_attribute_mapping_cache
+
+## Plugin version compatibility
+| Shopware         | Plugin      |
+|------------------|-------------|
+| 6.6 from 6.6.0.0 | Version 3.x |
+| 6.5 from 6.5.0.0 | Version 2.x  |
+| 6.4 from 6.4.0.0 | Version 1.x  |

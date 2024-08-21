@@ -43,15 +43,22 @@ Component.register('ergonode-template-cms-page-mapping', {
 
     methods: {
         emitChanges() {
-            this.$emit('change', this.value);
+            this.$emit('update:value', this.value);
         },
 
         addEntry() {
-            this.value.push({});
+            this.value.push({
+                templateName: null,
+                cmsPageId: null
+            });
+
+            this.emitChanges();
         },
 
         removeEntry(index) {
             this.value.splice(index, 1);
+
+            this.emitChanges();
         },
 
         onSelected(index, field, item) {
