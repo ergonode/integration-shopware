@@ -75,7 +75,8 @@ Component.register('ergonode-api-entity-multiselect', {
         },
 
         onChange(value) {
-            this.$emit('change', value);
+            console.log('onChange');
+            this.$emit('update:value', value);
         },
     },
 

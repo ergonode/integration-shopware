@@ -1,6 +1,6 @@
 {% block ergonode_category_attribute_mapping_page %}
     <sw-page class="ergonode__category-attribute-mapping-page">
-        <template slot="content">
+        <template v-slot:content>
             <sw-card-view>
                 <ergonode-tabs></ergonode-tabs>
                 <sw-skeleton v-if="isLoading"></sw-skeleton>
@@ -11,13 +11,13 @@
                         <sw-single-select
                             :label="$t('ErgonodeIntegrationShopware.mappings.shopwareCategoryAttribute')"
                             :options="shopwareCategoryAttributesSelectOptions"
-                            v-model="createShopwareCategoryAttribute"
+                            v-model:value="createShopwareCategoryAttribute"
                         >
                         </sw-single-select>
                         <sw-single-select
                             :label="$t('ErgonodeIntegrationShopware.mappings.ergonodeCategoryAttribute')"
                             :options="ergonodeCategoryAttributesSelectOptions"
-                            v-model="createErgonodeCategoryAttribute"
+                            v-model:value="createErgonodeCategoryAttribute"
                         >
                         </sw-single-select>
                         <sw-button
