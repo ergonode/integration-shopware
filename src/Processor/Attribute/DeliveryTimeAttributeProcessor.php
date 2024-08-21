@@ -94,6 +94,7 @@ class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterfac
     private function removeLegacyDeliveryTimes(array $processedIds, Context $context): void
     {
         $criteria = new Criteria();
+        $processedIds = array_filter($processedIds);
         $criteria->addFilter(
             new NotFilter(
                 MultiFilter::CONNECTION_AND,
@@ -102,8 +103,9 @@ class DeliveryTimeAttributeProcessor implements AttributeCustomProcessorInterfac
         );
         $criteria->addFilter(new EqualsFilter('type', self::MAPPING_TYPE));
         $existingIds = $this->mappingExtensionRepository->searchIds($criteria, $context);
-        $this->deliveryTimeRepository->delete(array_values($existingIds->getData()), $context);
-        $this->mappingExtensionRepository->delete(array_values($existingIds->getData()), $context);
+        $ids = array_map(fn($id) => ['id' => $id], $existingIds->getIds());
+        $this->deliveryTimeRepository->delete($ids, $context);
+        $this->mappingExtensionRepository->delete($ids, $context);
     }
 
     private function getExistingDeliveryTimeEntity(

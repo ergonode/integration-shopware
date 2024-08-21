@@ -102,7 +102,7 @@ Component.register('ergonode-api-select', {
         },
 
         onChange(value) {
-            this.$emit('change', value);
+            this.$emit('update:value', value);
         },
     },
 
