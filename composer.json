@@ -21,11 +21,22 @@
             "en-GB": "Shopware Ergonode Integration"
         }
     },
+    "autoload": {
+        "psr-4": {
+            "Ergonode\\IntegrationShopware\\": "src/"
+        },
+        "exclude-from-classmap": [
+            "src/DependencyInjection/*"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ergonode\\IntegrationShopware\\Tests\\": "tests/"
+        }
+    },
     "require": {
         "php": ">= 8.2",
         "ext-json": "*",
-        "shopware/administration": "6.5.*",
-        "shopware/core": "6.5.*",
         "gmostafa/php-graphql-client": "^1.13"
     },
     "require-dev": {
@@ -35,18 +46,10 @@
         "composer-runtime-api": "^2.0",
         "friendsofphp/php-cs-fixer": "^3.61",
         "squizlabs/php_codesniffer": "^3.10",
-        "phpcompatibility/php-compatibility": "^9.3"
-    },
-    "autoload": {
-        "psr-4": {
-            "Ergonode\\IntegrationShopware\\": "src/"
-        },
-        "exclude-from-classmap": ["src/DependencyInjection/*"]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Ergonode\\IntegrationShopware\\Tests\\": "tests/"
-        }
+        "phpcompatibility/php-compatibility": "^9.3",
+        "shopware/core": "~6.5.0",
+        "shopware/administration": "~6.5.0",
+        "shopware/storefront": "~6.5.0"
     },
     "config": {
         "allow-plugins": {
