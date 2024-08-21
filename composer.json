@@ -1,7 +1,7 @@
 {
     "name": "ergonode/integration-shopware",
     "description": "Shopware Ergonode Integration",
-    "version": "2.6.9",
+    "version": "2.7.0",
     "type": "shopware-platform-plugin",
     "license": "proprietary",
     "authors": [
@@ -24,8 +24,8 @@
     "require": {
         "php": ">= 8.2",
         "ext-json": "*",
-        "shopware/administration": "6.6.*",
-        "shopware/core": "6.6.*",
+        "shopware/administration": "6.5.*",
+        "shopware/core": "6.5.*",
         "gmostafa/php-graphql-client": "^1.13"
     },
     "require-dev": {
