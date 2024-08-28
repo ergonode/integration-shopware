@@ -101,7 +101,7 @@ class ManufacturerAttributeProcessor implements AttributeCustomProcessorInterfac
         );
         $criteria->addFilter(new EqualsFilter('type', self::MAPPING_TYPE));
         $existingIds = $this->mappingExtensionRepository->searchIds($criteria, $context);
-        $existingIds = array_map(fn($id) => ['id' => $id], $existingIds);
+        $existingIds = array_map(fn($id) => ['id' => $id], $existingIds->getIds());
         if (empty($existingIds)) {
             return;
         }
