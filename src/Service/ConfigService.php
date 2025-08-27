@@ -186,4 +186,11 @@ class ConfigService
             }, $value)
         );
     }
+
+	// start devEcommerce change
+    public function getHideMetaDataKey(): string
+    {
+        return $this->configService->getString(self::CONFIG_NAMESPACE . 'hideMetaDataKey');
+    }
+	// end devEcommerce change
 }

@@ -103,7 +103,7 @@ class ProductShopwareData
         $this->data['media'] = $payloads;
     }
 
-    public function setTax(string $taxId): void
+    public function setTax(?string $taxId): void // devEcommerce change
     {
         $this->data['taxId'] = $taxId;
     }
@@ -148,7 +148,7 @@ class ProductShopwareData
         $this->data['productNumber'] = $sku;
     }
 
-    public function setPrice(array $pricePayload): void
+    public function setPrice(?array $pricePayload): void // devEcommerce change
     {
         $this->data['price'] = $pricePayload;
     }
@@ -170,7 +170,12 @@ class ProductShopwareData
 
     public function setDisplayParent(bool $display = true): void
     {
-        $this->data['displayParent'] = $display;
+        $this->data['variantListingConfig'] = [ // devEcommerce change
+            'extensions' => [],
+            'displayParent' => $display,
+            'mainVariantId' => null,
+            'configuratorGroupConfig' => null
+        ];
     }
 
     public function addConfigrationSettings(array $configurationSettings): void

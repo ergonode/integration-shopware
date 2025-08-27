@@ -59,6 +59,10 @@ class ManufacturerAttributeProcessor implements AttributeCustomProcessorInterfac
             $code = $option['code'];
             $manufacturerEntity = $this->getExistingManufacturerEntity($code, $context);
 
+            if(!in_array($code, ['gymtek', 'outtec', 'kedica', 'queenfit', 'xride', 'luverno', 'stars' ])) { // devEcommerce change
+                continue;
+            }
+
             $translations = [];
             foreach ($option['name'] as $nameRow) {
                 $translations[IsoCodeConverter::ergonodeToShopwareIso($nameRow['language'])] = [

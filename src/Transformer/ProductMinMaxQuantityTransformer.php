@@ -83,7 +83,7 @@ class ProductMinMaxQuantityTransformer implements ProductDataTransformerInterfac
         $existingMinPurchase = $productData->getSwProduct()?->getMinPurchase();
         // if unmapped, return current value
         if ($minPurchaseMapping === false) {
-            return $existingMinPurchase;
+            return $existingMinPurchase ?? 1; // devEcommerce change
         }
 
         $minPurchase = $minPurchaseMapping?->getTranslation($defaultLanguage)?->getValue();

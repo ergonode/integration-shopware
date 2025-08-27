@@ -27,6 +27,17 @@
     </card>
 
     <card>
+        <title>Fields configuration*</title>
+
+        <input-field type="text">
+            <name>hideMetaDataKey</name>
+            <defaultValue>ukryty_w_sklepie</defaultValue>
+            <label>Ergonode metadata key value - to hide an attribute</label>
+            <helpText>Enter the exact name of the metadata key used in Ergonode. Example: "ukryty_w_sklepie". When this key is set on an attribute, that attribute will be hidden in the storefront. This value is inherited by all sales channels.</helpText>
+        </input-field>
+    </card>
+
+    <card>
         <title>Fields mapping</title>
         <title lang="de-DE">Fields mapping</title>
 
@@ -80,8 +91,8 @@
         </input-field>
     </card>
     <card>
-        <title>Product sync</title>
-        <title lang="de-DE">Product sync</title>
+        <title>Template sync</title>
+        <title lang="de-DE">Template sync</title>
 
         <component name="ergonode-template-cms-page-mapping">
             <name>templateLayoutMapping</name>

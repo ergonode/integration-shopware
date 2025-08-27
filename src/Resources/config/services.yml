@@ -215,6 +215,7 @@ services:
         - '@Ergonode\IntegrationShopware\Transformer\ProductScaleUnitTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductMinMaxQuantityTransformer'
         - '@Ergonode\IntegrationShopware\Transformer\ProductLayoutTransformer'
+        - '@Ergonode\IntegrationShopware\Transformer\ProductCustomBusinessTransformer'
 
   Ergonode\IntegrationShopware\Transformer\CategoryAttributesTransformerChain:
     arguments:

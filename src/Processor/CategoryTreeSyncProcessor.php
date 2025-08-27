@@ -113,7 +113,7 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
             $stopwatch->start('process');
 
             try {
-                $leafEdges = $edge['node']['categoryTreeLeafList']['edges'] ?? [];
+                $leafEdges = $this->normalizeCategoryTreeEdges($edge);
 
                 $primaryKeys = $this->categoryTreePersistor->persistLeaves($leafEdges, $currentTreeCode, $context);
                 $this->categoryTreePersistor->markCategoriesAsActive($primaryKeys);
@@ -176,6 +176,42 @@ class CategoryTreeSyncProcessor implements CategoryProcessorInterface
         $counter->setStopwatch($stopwatch);
 
         return $counter;
+    }
+
+    /**
+     * devEcommerce change
+     */
+    private function normalizeCategoryTreeEdges(mixed $edge): mixed
+    {
+        $leafEdges = $edge['node']['categoryTreeLeafList']['edges'] ?? [];
+        $categoryTreeCode = $edge['node']['code'];
+        $categoryTreeNames = $edge['node']['name'];
+        $mainEdgeKeys = array_keys(array_filter(
+            $leafEdges,
+            fn($row) => empty($row['node']['parentCategory'])
+        ));
+
+        if(!empty($mainEdgeKeys)) {
+            $firstCategory = [
+                'node' => [
+                    'category' => [
+                        'code' => $categoryTreeCode,
+                        'name' => $categoryTreeNames,
+                    ],
+                    'parentCategory' => null,
+                ]
+            ];
+            array_unshift($leafEdges,$firstCategory);
+
+            foreach ($mainEdgeKeys as $key) {
+                $leafEdges[$key+1]['node']['parentCategory'] = ['code' => $categoryTreeCode];
+            }
+        }
+
+        file_put_contents('../custom/plugins/ergo_graph.log', print_r($mainEdgeKeys, true) . "\n-----\n" ,FILE_APPEND);
+        file_put_contents('../custom/plugins/ergo_graph.log', print_r($leafEdges, true) . "\n-----\n" ,FILE_APPEND);
+
+        return $leafEdges;
     }
 
     /**

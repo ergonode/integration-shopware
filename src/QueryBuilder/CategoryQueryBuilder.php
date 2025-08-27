@@ -154,6 +154,11 @@ class CategoryQueryBuilder
                         (new Query('node'))
                             ->setSelectionSet([
                                 'code',
+                                (new Query('name')) // devEcommerce change
+                                    ->setSelectionSet([
+                                        'value',
+                                        'language',
+                                    ]),
                                 (new Query('categoryTreeLeafList'))
                                     ->setArguments($categoryLeafArguments)
                                     ->setSelectionSet([

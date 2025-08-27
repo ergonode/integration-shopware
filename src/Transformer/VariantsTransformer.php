@@ -15,6 +15,7 @@ use Ergonode\IntegrationShopware\Util\IsoCodeConverter;
 use Shopware\Core\Content\Product\Aggregate\ProductConfiguratorSetting\ProductConfiguratorSettingDefinition;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Uuid\Uuid;
 
 class VariantsTransformer
 {
@@ -78,14 +79,35 @@ class VariantsTransformer
         foreach ($transformedVariants as $variant) {
             $shopwareData = $variant->getShopwareData();
 
+            // start devEcommerce change - fix configuratorSettings when add a new option
             if (null !== $parentProduct) {
-                $shopwareData->setParentId($parentProduct->getId());
+                $parentProductId = $parentProduct->getId();
+            } else{
+                if(!$swData->getData('id')) {
+                    $swData->setId(Uuid::randomHex());
+                }
+
+                $parentProductId = $swData->getData('id');
             }
 
+            $shopwareData->setParentId($parentProductId);
+
             $swData->addChild($shopwareData);
-            if (property_exists(ProductEntity::class, 'displayParent')) {
+            if (property_exists(ProductEntity::class, 'variantListingConfig')) { // devEcommerce change
                 $swData->setDisplayParent();
             }
+            
+            if(!$variant->getSwProduct()) {
+                foreach ($variant->getShopwareData()->getData('options') as $option) {
+                    $swData->addConfigrationSettings([
+                        'id' => null,
+                        'productId' => $parentProductId,
+                        'optionId' => $option['id'],
+                    ]);
+                }
+            }
+            // end start devEcommerce change
+
 
             foreach ($variant->getSwProduct()?->getOptionIds() ?? [] as $optionId) {
                 if (

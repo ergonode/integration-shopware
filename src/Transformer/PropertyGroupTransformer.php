@@ -87,6 +87,7 @@ class PropertyGroupTransformer
         $dto->setPropertyGroupPayload([
             'id' => $propertyGroup?->getId(),
             'name' => $code,
+            'filterable' => $propertyGroup?->getFilterable() ?? false, // devEcommerce change
             'options' => $options,
             'translations' => $translations,
             'extensions' => [

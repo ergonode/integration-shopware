@@ -13,11 +13,13 @@ class YesNo
         '1',
         'YES',
         'yes',
+        'Yes',
         'Y',
         'y',
         'A',
         'a',
-        'tak'
+        'tak',
+        'Tak'
     ];
 
     private const FALSE_LIKE = [
@@ -27,11 +29,13 @@ class YesNo
         '0',
         'NO',
         'no',
+        'No',
         'N',
         'n',
         'B',
         'b',
-        'nie'
+        'nie',
+        'Nie'
     ];
 
     public static function cast(string|bool|int $value): bool

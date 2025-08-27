@@ -97,6 +97,8 @@ class ProductPersistor
 
         $productListData = $this->filterMainProducts($productListData);
 
+        $productListData = $this->filterProductsNotMatchingSkuPattern($productListData); // devEcommerce change
+        
         foreach ($productListData as $productData) {
             $mainProductPayload = $this->getProductPayload($productData['node'] ?? [], $context);
             if (
@@ -305,6 +307,20 @@ class ProductPersistor
             )
         );
     }
+
+    // start devEcommerce change
+    private function filterProductsNotMatchingSkuPattern(array $productListData): array
+    {
+        return array_values(
+            array_filter(
+                $productListData,
+                static function (array $productData): bool {
+                    return preg_match('/^V[0-9]+$/', $productData['node']['sku']) === 1; // todo move to configuration
+                }
+            )
+        );
+    }
+    // stop devEcommerce change
 
     private function extractSkus(array $productListData, bool $onlyVariants = false): array
     {

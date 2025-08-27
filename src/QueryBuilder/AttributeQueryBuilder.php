@@ -44,6 +44,11 @@ class AttributeQueryBuilder
                         ->setSelectionSet([
                             'code',
                             'scope',
+                            (new Query('metadata')) // devEcommerce change
+                                ->setSelectionSet([
+                                    'key',
+                                    'value',
+                                ]),
                             (new Query('name'))
                                 ->setSelectionSet([
                                     'language',

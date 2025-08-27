@@ -9,6 +9,7 @@ use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\Language\LanguageEntity;
 
 class LanguageProvider
@@ -58,6 +59,8 @@ class LanguageProvider
     {
         $criteria = new Criteria();
         $criteria->addAssociation('locale');
+        $criteria->addAssociation('swagLanguagePackLanguage'); // devEcommerce change
+        $criteria->addFilter(new EqualsFilter('swagLanguagePackLanguage.salesChannelActive', true)); // devEcommerce change
 
         /** @var LanguageEntity[] $languages */
         $languages = $this->languageRepository->search($criteria, $context);

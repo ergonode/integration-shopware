@@ -11,6 +11,8 @@ use Shopware\Core\Framework\Context;
 
 class ProductPriceTransformer implements ProductDataTransformerInterface
 {
+    const DEFAULT_GROSS_PRICE = 99999; // devEcommerce change
+
     public function transform(ProductTransformationDTO $productData, Context $context): ProductTransformationDTO
     {
         $swData = $productData->getShopwareData();
@@ -18,20 +20,20 @@ class ProductPriceTransformer implements ProductDataTransformerInterface
         $defaultLanguage = $productData->getDefaultLanguage();
 
         $pricePayload = [
-            'linked' => false,
+            'linked' => true, // devEcommerce change
             'currencyId' => Defaults::CURRENCY,
         ];
 
         if (!$productData->getSwProduct()?->getPrice()) {
-            $pricePayload['gross'] = 0;
+            $pricePayload['gross'] = self::DEFAULT_GROSS_PRICE; // devEcommerce change
             if ($ergonodeData->getPriceGross() instanceof ProductAttribute) {
-                $pricePayload['gross'] = (float)$ergonodeData->getPriceGross()->getTranslation($defaultLanguage)?->getValue() ?? 0;
+                $pricePayload['gross'] = (float)$ergonodeData->getPriceGross()->getTranslation($defaultLanguage)?->getValue() ?? self::DEFAULT_GROSS_PRICE; // devEcommerce change
             }
 
-            $pricePayload['net'] = 0;
+            $pricePayload['net'] = self::DEFAULT_GROSS_PRICE; // devEcommerce change
             if ($ergonodeData->getPriceNet() instanceof ProductAttribute) {
                 $pricePayload['net'] = (float)$ergonodeData->getPriceNet()->getTranslation($defaultLanguage)?->getValue(
-                ) ?? 0;
+                ) ?? self::DEFAULT_GROSS_PRICE; // devEcommerce change
             }
         } else {
             $pricePayload['gross'] = $ergonodeData->getPriceGross()

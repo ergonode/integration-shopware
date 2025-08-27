@@ -12,7 +12,7 @@ use Shopware\Core\Framework\Context;
 
 class ProductDefaultValuesTransformer implements ProductDataTransformerInterface
 {
-    private const DEFAULT_STOCK_VALUE = 999;
+    private const DEFAULT_STOCK_VALUE = 0;
 
     private ConfigService $configService;
 

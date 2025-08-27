@@ -9,6 +9,8 @@ use Ergonode\IntegrationShopware\DTO\PropertyGroupTransformationDTO;
 use Ergonode\IntegrationShopware\Processor\Attribute\AttributeCustomProcessorResolver;
 use Ergonode\IntegrationShopware\Provider\PropertyGroupProvider;
 use Ergonode\IntegrationShopware\Transformer\PropertyGroupTransformer;
+use Ergonode\IntegrationShopware\Util\YesNo;
+use Ergonode\IntegrationShopware\Service\ConfigService;
 use Shopware\Core\Content\Property\PropertyGroupDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -33,7 +35,8 @@ class PropertyGroupPersistor
         EntityRepository $propertyGroupOptionRepository,
         PropertyGroupTransformer $propertyGroupTransformer,
         PropertyGroupProvider $propertyGroupProvider,
-        AttributeCustomProcessorResolver $attributeCustomProcessorResolver
+        AttributeCustomProcessorResolver $attributeCustomProcessorResolver,
+        private ConfigService $configService
     ) {
         $this->propertyGroupRepository = $propertyGroupRepository;
         $this->propertyGroupOptionRepository = $propertyGroupOptionRepository;
@@ -56,6 +59,19 @@ class PropertyGroupPersistor
                 $customProcessor->process($node, $context);
                 continue;
             }
+
+            // start devEcommerce change
+            $skipMetaHideAttribute = false;
+            foreach ($node['metadata'] as $metadata) {
+                if (($metadata['key'] === $this->configService->getHideMetaDataKey() && YesNo::cast($metadata['value']))) {
+                    $skipMetaHideAttribute = true;
+                    break;
+                }
+            }
+            if ($skipMetaHideAttribute) {
+                continue;
+            }
+            // end devEcommerce change
 
             $propertyGroup = $this->propertyGroupProvider->getPropertyGroupByMapping($code, $context);
 

@@ -86,6 +86,7 @@ class FileManager
             'url' => $image->getUrl(),
         ];
 
-        return md5(json_encode($imageData));
+        //return md5(json_encode($imageData));
+        return pathinfo($imageData['name'], PATHINFO_FILENAME) . '_' . pathinfo($imageData['url'], PATHINFO_FILENAME); // devEcommerce change
     }
 }
